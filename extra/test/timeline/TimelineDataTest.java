@@ -2,7 +2,9 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.lang.instrument.Instrumentation;
@@ -16,6 +18,8 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,8 +37,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongUnaryOperator;
 
+import javax.imageio.ImageIO;
 import javax.swing.event.TableModelEvent;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -42,8 +48,10 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.radio.RadioData;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,6 +73,10 @@ public final class TimelineDataTest {
     private static final YAxis AXIS = new YAxis(0, 100, YAxis.generateScale("linear", ""));
 
     public static void main(String[] args) throws Exception {
+        UIGlobals.uiFontSmall = new Font("SansSerif", Font.PLAIN, 12);
+        UIGlobals.uiFontSmallBold = UIGlobals.uiFontSmall.deriveFont(Font.BOLD);
+        UIGlobals.TL_LABEL_TEXT_COLOR = Color.WHITE;
+        UIGlobals.TL_TICK_LINE_COLOR = Color.DARK_GRAY;
         Directories.createCacheDirs();
         checkEmpty();
         checkOrderingAndGaps();
@@ -75,7 +87,23 @@ public final class TimelineDataTest {
         checkSavedState();
         checkExportImport();
         checkHapiRequests();
+        checkChartPainting();
         System.out.println("Timeline data tests passed");
+        int captureIndex = Arrays.asList(args).indexOf("--hapi-benchmark");
+        if (captureIndex >= 0) {
+            Path directory = Path.of(args[captureIndex + 1]);
+            List<String> range = Files.readAllLines(directory.resolve("range.txt"));
+            long start = Instant.parse(range.get(0)).toEpochMilli();
+            long end = Instant.parse(range.get(1)).toEpochMilli();
+            List<BandData> data = readHapiCapture(directory, start, end);
+            EventQueue.invokeAndWait(() -> {
+                try {
+                    benchmarkHapi(directory, data, start, end);
+                } catch (Exception e) {
+                    throw new AssertionError(e);
+                }
+            });
+        }
         if (args.length > 0 && "--benchmark".equals(args[0])) {
             EventQueue.invokeAndWait(() -> {
                 try {
@@ -84,6 +112,252 @@ public final class TimelineDataTest {
                     throw new AssertionError(e);
                 }
             });
+        }
+    }
+
+    private static Object chartPainter(List<TimelineLayer> layers) throws Exception {
+        Class<?> type = Class.forName("org.helioviewer.jhv.timelines.chart.ChartDrawGraphPane");
+        Constructor<?> constructor = type.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Object chart = constructor.newInstance();
+        Field field = type.getDeclaredField("layers");
+        field.setAccessible(true);
+        field.set(chart, layers);
+        return chart;
+    }
+
+    private static Method chartDrawMethod(Object chart) throws Exception {
+        Method draw = chart.getClass().getDeclaredMethod("drawLayers", Graphics2D.class, Rectangle.class,
+                TimeAxis.class, Point.class, GraphGeometry.class);
+        draw.setAccessible(true);
+        return draw;
+    }
+
+    private static void checkChartPainting() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            Band band = new Band(new BandType(new JSONObject().put("name", "grid-aligned trace").put("range", new JSONArray(List.of(0, 100)))));
+            RadioData radio = new RadioData(null);
+            radio.setEnabled(true);
+            band.setDataColor(Color.RED);
+            List<TimelineLayer> layers = List.of(band, radio);
+            try {
+                Object chart = chartPainter(layers);
+                Method draw = chartDrawMethod(chart);
+                Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                        YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+                build.setAccessible(true);
+                Field graph = Band.class.getDeclaredField("graphData");
+                graph.setAccessible(true);
+                Method setStacked = GraphGeometry.class.getDeclaredMethod("setStacked", boolean.class);
+                setStacked.setAccessible(true);
+                TimeAxis time = new TimeAxis(START, START + 100_000);
+                List<List<BandCache.DateValue>> samples = List.of(
+                        List.of(new BandCache.DateValue(START, 50), new BandCache.DateValue(START + 40_000, 50)),
+                        List.of(new BandCache.DateValue(START + 60_000, 50), new BandCache.DateValue(START + 100_000, 50)));
+                for (boolean stacked : new boolean[]{false, true}) {
+                    GraphGeometry geometry = new GraphGeometry();
+                    geometry.setSize(1000, 600);
+                    setStacked.invoke(geometry, stacked);
+                    geometry.layout(layers);
+                    Rectangle area = geometry.getLayerArea(band);
+                    TimeAxis.Mapper xMapper = geometry.xMapper(time);
+                    YAxis.Mapper yMapper = geometry.yMapper(band.getYAxis(), area);
+                    graph.set(band, build.invoke(null, samples, xMapper, yMapper, LongUnaryOperator.identity(), false));
+                    for (double scale : new double[]{1, 1.25, 1.5, 1.75, 2, 2.5, 3}) {
+                        BufferedImage image = new BufferedImage((int) (1000 * scale), (int) (600 * scale), BufferedImage.TYPE_INT_RGB);
+                        Graphics2D g = image.createGraphics();
+                        try {
+                            g.scale(scale, scale);
+                            draw.invoke(chart, g, geometry.area(), time, null, geometry);
+                        } finally {
+                            g.dispose();
+                        }
+                        int x = (int) (scale * xMapper.toPixel(START + 30_000));
+                        int y = (int) (scale * yMapper.dataToPixel(50));
+                        int redPixels = 0;
+                        for (int dy = -2; dy <= 2; dy++) {
+                            if (image.getRGB(x, y + dy) == Color.RED.getRGB())
+                                redPixels++;
+                        }
+                        check(redPixels == 1, "Grid obscures trace or stroke width changes at scale " + scale + ", stacked=" + stacked);
+                        int gapX = (int) (scale * xMapper.toPixel(START + 50_000));
+                        for (int dy = -2; dy <= 2; dy++)
+                            check(image.getRGB(gapX, y + dy) != Color.RED.getRGB(), "Painting bridges a data gap");
+                        Rectangle radioArea = geometry.getLayerArea(radio);
+                        int gridPixels = 0, backgroundPixels = 0;
+                        int column = (int) (scale * (radioArea.x + radioArea.width * .47));
+                        for (int row = (int) (scale * radioArea.y) + 1; row < scale * (radioArea.y + radioArea.height) - 1; row++) {
+                            int rgb = image.getRGB(column, row);
+                            if (rgb == UIGlobals.TL_TICK_LINE_COLOR.getRGB())
+                                gridPixels++;
+                            if (rgb == Color.GRAY.getRGB())
+                                backgroundPixels++;
+                        }
+                        check(gridPixels > 0 && backgroundPixels > 0, "Grid/radio background missing at scale " + scale + ", stacked=" + stacked + ": " + gridPixels + "/" + backgroundPixels);
+                    }
+                }
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            } finally {
+                band.remove();
+                radio.remove();
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<BandData> readHapiCapture(Path directory, long start, long end) throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            try (exchange) {
+                String name = "catalog.json";
+                String path = exchange.getRequestURI().getPath();
+                if (!"/catalog".equals(path)) {
+                    String id = null;
+                    for (String parameter : exchange.getRequestURI().getRawQuery().split("&")) {
+                        String[] pair = parameter.split("=", 2);
+                        if ("id".equals(pair[0]) || "dataset".equals(pair[0]))
+                            id = URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
+                    }
+                    if (id == null || !id.matches("[A-Za-z0-9._-]+")) {
+                        exchange.sendResponseHeaders(400, -1);
+                        return;
+                    }
+                    name = id + ("/info".equals(path) ? ".info.json" : ".bin");
+                }
+                Path file = directory.resolve(name);
+                exchange.sendResponseHeaders(200, Files.size(file));
+                Files.copy(file, exchange.getResponseBody());
+            }
+        });
+        server.start();
+        Map<Object, Object> catalogs = (Map<Object, Object>) field(BandReaderHapi.class, null, "catalogs");
+        try {
+            Method getCatalog = BandReaderHapi.class.getDeclaredMethod("getCatalog", String.class);
+            getCatalog.setAccessible(true);
+            Object catalog = getCatalog.invoke(null, "http://127.0.0.1:" + server.getAddress().getPort() + "/");
+            Object endpoint = ((Object[]) field(BandReaderHapi.class, null, "catalogEndpoints"))[0];
+            catalogs.put(endpoint, catalog);
+            BandDataset[] datasets = (BandDataset[]) field(catalog.getClass(), catalog, "datasets");
+            List<BandData> result = new ArrayList<>();
+            for (BandDataset dataset : datasets) {
+                Map<BandType, Boolean> resolutions = new HashMap<>();
+                for (BandType type : dataset.bandTypes())
+                    resolutions.put(type, true);
+                result.addAll(BandReaderHapi.dataRequest(resolutions, start, end).call());
+            }
+            check(result.size() == 5, "Expected five nonempty STIX parameters");
+            return result;
+        } finally {
+            catalogs.clear();
+            server.stop(0);
+        }
+    }
+
+    private static void benchmarkHapi(Path directory, List<BandData> data, long start, long end) throws Exception {
+        ThreadMXBean allocations = (ThreadMXBean) ManagementFactory.getThreadMXBean();
+        check(allocations.isThreadAllocatedMemorySupported(), "JVM does not support allocation measurements");
+        allocations.setThreadAllocatedMemoryEnabled(true);
+        List<TimelineLayer> layers = new ArrayList<>();
+        List<BandCache> caches = new ArrayList<>();
+        Color[] colors = {Color.WHITE, Color.CYAN, Color.YELLOW, Color.GREEN, Color.MAGENTA};
+        Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+        build.setAccessible(true);
+        Field graphData = Band.class.getDeclaredField("graphData");
+        graphData.setAccessible(true);
+        Method setStacked = GraphGeometry.class.getDeclaredMethod("setStacked", boolean.class);
+        setStacked.setAccessible(true);
+        try {
+            for (BandData input : data) {
+                check(!input.bandType().isBarPlot() && !input.bandType().hasLevels(), "Benchmark expects single-color line plots");
+                Band band = new Band(input.bandType(), true);
+                band.setDataColor(colors[layers.size()]);
+                layers.add(band);
+                BandCache cache = (BandCache) field(Band.class, band, "bandCache");
+                cache.addToCache(band.getYAxis(), input.values(), input.dates());
+                caches.add(cache);
+                long[] dates = input.dates();
+                check(dates.length > 1, "Capture needs at least two samples per layer");
+                long[] steps = new long[dates.length - 1];
+                for (int i = 1; i < dates.length; i++) {
+                    check(dates[i] >= dates[i - 1], "Capture timestamps are not ordered");
+                    steps[i - 1] = dates[i] - dates[i - 1];
+                }
+                Arrays.sort(steps);
+                System.out.printf("%s: %,d samples, %s to %s, median cadence %d ms%n", band,
+                        dates.length, Instant.ofEpochMilli(dates[0]), Instant.ofEpochMilli(dates[dates.length - 1]), steps[steps.length / 2]);
+                // Verify every drawable sample before timing; gaps and axis clipping follow the production cache.
+                List<BandCache.DateValue> drawable = cache.getValues(1200, start, end).stream().flatMap(List::stream).toList();
+                int index = 0;
+                for (int i = 0; i < dates.length; i++) {
+                    float value = band.getYAxis().clip(input.values()[i]);
+                    if (dates[i] < start || dates[i] > end || value == YAxis.BLANK)
+                        continue;
+                    BandCache.DateValue actual = drawable.get(index++);
+                    check(actual.milli == dates[i] && actual.value == value, "Capture sample changed in cache");
+                }
+                check(index == drawable.size(), "Unexpected drawable samples");
+            }
+            System.out.printf("JVM %s, 1200x700 logical plot, %d warmup runs, %d measured runs%n",
+                    System.getProperty("java.runtime.version"), WARMUP_RUNS, MEASURED_RUNS);
+            System.out.println("Five-layer painting on the EDT, native HAPI axis ranges, grid and labels, no propagation; preparation includes cache extraction and polylines.");
+            Object chart = chartPainter(layers);
+            Method drawChart = chartDrawMethod(chart);
+            for (boolean stacked : new boolean[]{false, true}) {
+                GraphGeometry geometry = new GraphGeometry();
+                geometry.setSize(1200, 700);
+                setStacked.invoke(geometry, stacked);
+                geometry.layout(layers);
+                for (int scale : new int[]{1, 2}) {
+                    String name = (stacked ? "stacked" : "overlay") + "-" + scale + "x";
+                    System.out.println("Measuring " + name);
+                    BufferedImage image = new BufferedImage(1200 * scale, 700 * scale, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D graphics = image.createGraphics();
+                    graphics.scale(scale, scale);
+                    double[][] times = new double[2][MEASURED_RUNS];
+                    double[][] bytes = new double[2][MEASURED_RUNS];
+                    try {
+                        for (int run = 0; run < WARMUP_RUNS + MEASURED_RUNS; run++) {
+                            long allocatedBefore = allocations.getCurrentThreadAllocatedBytes();
+                            long before = System.nanoTime();
+                            for (int i = 0; i < layers.size(); i++) {
+                                Band band = (Band) layers.get(i);
+                                Rectangle area = geometry.getLayerArea(band);
+                                List<List<BandCache.DateValue>> raw = caches.get(i).getValues(scale * area.width, start, end);
+                                Object prepared = build.invoke(null, raw, geometry.xMapper(new TimeAxis(start, end)),
+                                        geometry.yMapper(band.getYAxis(), area), LongUnaryOperator.identity(), false);
+                                graphData.set(band, prepared);
+                            }
+                            long prepared = System.nanoTime();
+                            long allocatedPrepared = allocations.getCurrentThreadAllocatedBytes();
+                            graphics.setClip(null);
+                            graphics.setColor(Color.BLACK);
+                            graphics.fillRect(0, 0, 1200, 700);
+                            long paintStart = System.nanoTime();
+                            long allocatedPaint = allocations.getCurrentThreadAllocatedBytes();
+                            drawChart.invoke(chart, graphics, geometry.area(), new TimeAxis(start, end), null, geometry);
+                            long painted = System.nanoTime();
+                            long allocatedPainted = allocations.getCurrentThreadAllocatedBytes();
+                            if (run >= WARMUP_RUNS) {
+                                int index = run - WARMUP_RUNS;
+                                times[0][index] = (prepared - before) / 1e6;
+                                times[1][index] = (painted - paintStart) / 1e6;
+                                bytes[0][index] = (allocatedPrepared - allocatedBefore) / 1048576.;
+                                bytes[1][index] = (allocatedPainted - allocatedPaint) / 1048576.;
+                            }
+                        }
+                        System.out.printf("%s: preparation %.3f ms / %.3f MiB; painting %.3f ms / %.3f MiB (medians)%n",
+                                name, median(times[0]), median(bytes[0]), median(times[1]), median(bytes[1]));
+                        ImageIO.write(image, "png", directory.resolve(name + ".png").toFile());
+                    } finally {
+                        graphics.dispose();
+                    }
+                }
+            }
+        } finally {
+            for (TimelineLayer layer : layers)
+                ((Band) layer).remove();
         }
     }
 
@@ -530,8 +804,12 @@ public final class TimelineDataTest {
         BandCacheFull cache = benchmarkLoading("100 shuffled batches", dateBatches, valueBatches, order, allocations);
         System.out.printf("Cache reachable footprint: %.2f MiB (includes backing-array capacity, excludes source arrays and graph snapshots)%n",
                 reachableBytes(cache) / 1048576.);
-        benchmarkView("Wide view", cache, START, dates[count - 1], count, allocations);
-        benchmarkView("One-minute view", cache, START + 50_000_000, START + 50_059_900, 600, allocations);
+        benchmarkView("Wide view", cache, START, dates[count - 1], count, 1, allocations);
+        // Keep scaled painting practical to benchmark while retaining the million-sample loading and unscaled case.
+        for (int scale : new int[]{1, 2}) {
+            benchmarkView("Dense view", cache, START, dates[99_999], 100_000, scale, allocations);
+            benchmarkView("One-minute view", cache, START + 50_000_000, START + 50_059_900, 600, scale, allocations);
+        }
     }
 
     private static BandCacheFull benchmarkLoading(String name, long[][] dates, float[][] values, List<Integer> order, ThreadMXBean allocations) {
@@ -574,11 +852,13 @@ public final class TimelineDataTest {
         return cache;
     }
 
-    private static void benchmarkView(String name, BandCacheFull cache, long start, long end, int count, ThreadMXBean allocations)
+    private static void benchmarkView(String name, BandCacheFull cache, long start, long end, int count, int scale, ThreadMXBean allocations)
             throws ReflectiveOperationException {
         Rectangle area = new Rectangle(0, 0, 1200, 500);
-        BufferedImage image = new BufferedImage(area.width, area.height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(scale * area.width, scale * area.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
+        // Match ChartDrawGraphPane's logical coordinates on a display-scaled image.
+        graphics.scale(scale, scale);
         graphics.setClip(area);
         Band band = new Band(new BandType(new JSONObject().put("name", "benchmark")), true);
         band.setDataColor(Color.WHITE);
@@ -611,10 +891,10 @@ public final class TimelineDataTest {
                 band.draw(graphics, area, false);
                 long painted = System.nanoTime();
                 long allocatedPainted = allocations.getCurrentThreadAllocatedBytes();
-                // This exact sample lies on the synthetic trace in both views.
+                // This exact sample lies on the synthetic trace in every view.
                 int sampleX = xMapper.toPixel(start + 5000);
                 int sampleY = yMapper.dataToPixel(50);
-                check(image.getRGB(sampleX, sampleY) == Color.WHITE.getRGB(), "Benchmark did not paint the plot");
+                check(image.getRGB(scale * sampleX, scale * sampleY) == Color.WHITE.getRGB(), "Benchmark did not paint the plot");
                 if (run >= WARMUP_RUNS) {
                     int index = run - WARMUP_RUNS;
                     times[0][index] = (extracted - before) / 1e6;
@@ -625,7 +905,8 @@ public final class TimelineDataTest {
                     bytes[2][index] = (allocatedPainted - allocatedPaint) / 1048576.;
                 }
             }
-            System.out.printf("%s: %,d samples, %dx%d single-color offscreen plot%n", name, count, area.width, area.height);
+            System.out.printf("%s: %,d samples, %dx%d logical plot, %dx display scale, single-color offscreen painting%n",
+                    name, count, area.width, area.height, scale);
             for (int phase = 0; phase < phases.length; phase++)
                 System.out.printf("  %s: %.3f ms, %.3f MiB allocated%n", phases[phase], median(times[phase]), median(bytes[phase]));
         } finally {

@@ -1,9 +1,12 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -251,12 +254,17 @@ public final class Band extends TimelineLayer {
                 }
             }
             case LineGraph lines -> {
+                Stroke stroke = g.getStroke();
+                AffineTransform transform = g.getTransform();
+                double scale = Math.max(transform.getScaleX(), transform.getScaleY());
+                g.setStroke(new BasicStroke((float) (1 / scale)));
                 if (multicolor) {
                     drawMulticolorPolylines(g, lines.polylines);
                 } else {
                     g.setColor(graphColor);
                     lines.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.xPoints.length));
                 }
+                g.setStroke(stroke);
             }
         }
 
