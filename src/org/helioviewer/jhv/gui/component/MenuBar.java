@@ -206,7 +206,7 @@ public final class MenuBar extends JMenuBar {
                 <b>Double-click</b> in an overlaid plot to fit value scales to the visible data; double-click a value-axis label area to restore its default scale.
                 In stacked mode, double-click a plot or its value axis to restore that plot's default scale.
 
-                <b>Overview strip above the plot</b>
+                <b>Overview strip below the plot</b>
                 The highlighted interval is the time range shown in the plot.
                 <b>Drag the highlighted interval</b> — move the range without changing its duration.
                 <b>Left-click</b> — center the range on the clicked time.
