@@ -89,7 +89,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.setToggleClickCount(0);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         if (tree.getCellRenderer() instanceof DefaultTreeCellRenderer renderer) {
             renderer.setOpenIcon(null);
             renderer.setClosedIcon(null);
@@ -159,20 +159,22 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     }
 
     private List<BandType> selectedBandTypes() {
-        TreePath path = tree.getSelectionPath();
-        if (path == null)
-            return List.of();
-
-        DefaultMutableTreeNode selected = (DefaultMutableTreeNode) path.getLastPathComponent();
-        if (selected.getParent() == root)
+        TreePath[] paths = tree.getSelectionPaths();
+        if (paths == null)
             return List.of();
 
         LinkedHashSet<BandType> bandTypes = new LinkedHashSet<>();
-        Enumeration<?> nodes = selected.depthFirstEnumeration();
-        while (nodes.hasMoreElements()) {
-            Object value = ((DefaultMutableTreeNode) nodes.nextElement()).getUserObject();
-            if (value instanceof BandDataset dataset)
-                bandTypes.addAll(dataset.bandTypes());
+        for (TreePath path : paths) {
+            DefaultMutableTreeNode selected = (DefaultMutableTreeNode) path.getLastPathComponent();
+            if (selected.getParent() == root)
+                continue;
+
+            Enumeration<?> nodes = selected.depthFirstEnumeration();
+            while (nodes.hasMoreElements()) {
+                Object value = ((DefaultMutableTreeNode) nodes.nextElement()).getUserObject();
+                if (value instanceof BandDataset dataset)
+                    bandTypes.addAll(dataset.bandTypes());
+            }
         }
         return List.copyOf(bandTypes);
     }
