@@ -7,6 +7,10 @@
 - Add glTF/GLB model layers with surfaces, lines, points, textures, transparency, and lighting
 - Improve rendering quality, performance, and memory handling
 
+### Interaction and UI
+- Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
+- Allow multiple dataset selections in the New Timeline Layer dialog
+
 ### Timeline and events
 - Improve SWEK event loading, filtering, and display, with more reliable updates, related-event handling, and timeline interaction
 

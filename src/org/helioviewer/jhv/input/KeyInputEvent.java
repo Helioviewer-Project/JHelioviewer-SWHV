@@ -6,6 +6,9 @@ public record KeyInputEvent(Key key, boolean shiftDown) {
         BACKSPACE,
         DELETE,
         N,
-        P
+        P,
+        X,
+        Y,
+        Z
     }
 }

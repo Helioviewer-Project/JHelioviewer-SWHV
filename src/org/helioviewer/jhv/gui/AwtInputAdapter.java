@@ -38,6 +38,9 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener, 
             case KeyEvent.VK_DELETE -> KeyInputEvent.Key.DELETE;
             case KeyEvent.VK_N -> KeyInputEvent.Key.N;
             case KeyEvent.VK_P -> KeyInputEvent.Key.P;
+            case KeyEvent.VK_X -> KeyInputEvent.Key.X;
+            case KeyEvent.VK_Y -> KeyInputEvent.Key.Y;
+            case KeyEvent.VK_Z -> KeyInputEvent.Key.Z;
             default -> KeyInputEvent.Key.OTHER;
         }, e.isShiftDown());
     }
@@ -90,7 +93,9 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener, 
     public void keyTyped(KeyEvent e) {}
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        InputController.keyReleased(synthesizeKey(e));
+    }
 
     @Override
     public void focusGained(FocusEvent e) {}

@@ -59,8 +59,12 @@ public final class InputController {
         interaction.keyPressed(e);
     }
 
+    public static void keyReleased(KeyInputEvent e) {
+        interaction.keyReleased(e);
+    }
+
     public static void focusLost() {
-        interaction.mouseReleased();
+        interaction.focusLost();
     }
 
     private static final HashSet<InputMouseListener> mouseListeners = new HashSet<>();

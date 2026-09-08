@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display.interaction;
 
+import java.util.LinkedHashSet;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Settings;
@@ -10,6 +12,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.input.ScrollEvent;
+import org.helioviewer.jhv.math.Vec3;
 
 public final class Interaction {
 
@@ -28,6 +31,8 @@ public final class Interaction {
     private final InteractionPan interactionPan;
     private final InteractionTrackball interactionRotate;
     private final Zoom zoom;
+
+    private final LinkedHashSet<KeyInputEvent.Key> axisKeys = new LinkedHashSet<>();
 
     private Mode mode = Mode.ROTATE;
     @Nullable
@@ -93,8 +98,33 @@ public final class Interaction {
     }
 
     public void keyPressed(KeyInputEvent e) {
-        if (e.shiftDown())
+        if (e.shiftDown()) {
             interactionAnnotate.keyPressed(e);
+        } else if (e.key() == KeyInputEvent.Key.X || e.key() == KeyInputEvent.Key.Y || e.key() == KeyInputEvent.Key.Z) {
+            if (axisKeys.add(e.key()))
+                updateAxis();
+        }
+    }
+
+    public void keyReleased(KeyInputEvent e) {
+        if (axisKeys.remove(e.key()))
+            updateAxis();
+    }
+
+    public void focusLost() {
+        axisKeys.clear();
+        updateAxis();
+        mouseReleased();
+    }
+
+    private void updateAxis() {
+        Vec3 axis = axisKeys.isEmpty() ? null : switch (axisKeys.getLast()) {
+            case X -> Vec3.XAxis;
+            case Y -> Vec3.YAxis;
+            case Z -> Vec3.ZAxis;
+            default -> null;
+        };
+        interactionAxis.setAxisOverride(axis);
     }
 
 }
