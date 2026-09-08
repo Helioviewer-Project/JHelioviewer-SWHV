@@ -69,6 +69,7 @@ public final class TimelineDataTest {
         checkEmpty();
         checkOrderingAndGaps();
         checkUnsortedAndEqualTimestamps();
+        checkGraphSnapshot();
         checkFullSampleCount();
         checkLayerCreation();
         checkSavedState();
@@ -438,6 +439,23 @@ public final class TimelineDataTest {
                 new long[]{START + 100, START + 200, START + 200, START + 200, START + 300, START + 400, START + 400, START + 500},
                 new float[]{10, 20, 21, 22, 30, 40, 41, 50});
         check(cache.getValue(START + 200) == 20, "Equal-timestamp ordering changes the selected value");
+    }
+
+    private static void checkGraphSnapshot() {
+        BandCacheFull cache = new BandCacheFull();
+        cache.addToCache(AXIS, new float[]{YAxis.BLANK, 10, YAxis.BLANK, YAxis.BLANK, 20, YAxis.BLANK},
+                new long[]{START, START + 100, START + 200, START + 300, START + 400, START + 500});
+        List<List<BandCache.DateValue>> snapshot = cache.getValues(100, START, START + 500);
+        check(snapshot.size() == 2, "Leading, consecutive or trailing gaps create extra segments");
+        cache.addToCache(AXIS, new float[]{5, 15, 30}, new long[]{START - 100, START + 250, START + 600});
+        checkSamples(snapshot.get(0), new long[]{START + 100}, new float[]{10});
+        checkSamples(snapshot.get(1), new long[]{START + 400}, new float[]{20});
+        check(cache.getValues(100, START + 200, START + 249).isEmpty(), "An all-missing view contains graph data");
+        check(cache.getValues(100, START + 700, START + 800).isEmpty(), "View beyond the cache contains graph data");
+        List<List<BandCache.DateValue>> updated = cache.getValues(100, START + 250, START + 400);
+        check(updated.size() == 2, "Updated view loses a gap");
+        checkSamples(updated.get(0), new long[]{START + 250}, new float[]{15});
+        checkSamples(updated.get(1), new long[]{START + 400}, new float[]{20});
     }
 
     private static void checkFullSampleCount() {

@@ -57,22 +57,20 @@ class BandCacheFull implements BandCache {
     @Override
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         List<List<DateValue>> ret = new ArrayList<>();
-        List<DateValue> list = new ArrayList<>();
-        for (int i = firstIndexAtOrAfter(start); i < dateVals.size(); i++) {
+        int first = firstIndexAtOrAfter(start);
+        int i = first;
+        for (; i < dateVals.size(); i++) {
             DateValue dv = dateVals.get(i);
             if (dv.milli > end)
                 break;
             if (dv.value == YAxis.BLANK) {
-                if (!list.isEmpty()) {
-                    ret.add(list);
-                    list = new ArrayList<>();
-                }
-            } else {
-                list.add(dv);
+                if (first < i)
+                    ret.add(List.copyOf(dateVals.subList(first, i)));
+                first = i + 1;
             }
         }
-        if (!list.isEmpty())
-            ret.add(list);
+        if (first < i)
+            ret.add(List.copyOf(dateVals.subList(first, i)));
         return ret;
     }
 
