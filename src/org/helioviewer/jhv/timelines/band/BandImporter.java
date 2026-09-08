@@ -18,7 +18,8 @@ import org.json.JSONObject;
 public final class BandImporter {
 
     public static void loadBand(JSONObject jo) {
-        Task.submit("band", new BandLoad(jo), BandImporter::acceptData, BandImporter::onFailure);
+        boolean fullResolution = jo.optBoolean("fullResolution", false);
+        Task.submit("band", new BandLoad(jo), data -> acceptData(data, fullResolution), BandImporter::onFailure);
     }
 
     public static void loadHapi(URI uri) {
@@ -41,11 +42,15 @@ public final class BandImporter {
     }
 
     private static void acceptData(List<BandData> data) {
+        acceptData(data, false);
+    }
+
+    private static void acceptData(List<BandData> data, boolean fullResolution) {
         if (data.isEmpty())
             return;
 
         TimelineLayers layers = Timelines.getLayers();
-        List<Band> bands = layers.addBands(data.stream().map(BandData::bandType).toList());
+        List<Band> bands = layers.addBands(data.stream().map(BandData::bandType).toList(), fullResolution);
         List<Band> changedBands = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             BandData bandData = data.get(i);
@@ -74,7 +79,7 @@ public final class BandImporter {
                 dates = new long[len];
                 for (int i = 0; i < len; i++) {
                     JSONArray entry = data.getJSONArray(i);
-                    dates[i] = entry.getLong(0) * 1000L;
+                    dates[i] = Math.round(entry.getDouble(0) * 1000);
                     values[i] = (float) (entry.getDouble(1) * multiplier);
                 }
             } else {

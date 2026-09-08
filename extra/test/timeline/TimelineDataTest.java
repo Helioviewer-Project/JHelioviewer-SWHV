@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
@@ -25,6 +27,7 @@ import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -44,10 +47,95 @@ public final class TimelineDataTest {
         checkOrderingAndGaps();
         checkFullSampleCount();
         checkLayerCreation();
+        checkSavedState();
+        checkExportImport();
         checkHapiRequests();
         System.out.println("Timeline data tests passed");
         if (args.length > 0 && "--benchmark".equals(args[0]))
             benchmark();
+    }
+
+    private static void checkSavedState() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            TimelineLayers layers = new TimelineLayers();
+            try {
+                BandType type = new BandType(new JSONObject().put("name", "saved"));
+                Band original = layers.addBands(List.of(type), true).getFirst();
+                original.addToCache(new float[]{12, 34}, new long[]{START, START + 100});
+                Object cache = field(Band.class, original, "bandCache");
+                JSONObject state = new JSONObject();
+                original.serialize(state);
+                check(state.getBoolean("fullResolution"), "Saved state omits full resolution");
+                Band restored = (Band) Band.deserialize(new JSONObject(state.toString()));
+                check(restored.isFullResolution(), "Restored state loses full resolution");
+                restored.setDataColor(Color.RED);
+                layers.restore(List.of(restored));
+                check(TimelineLayers.get().getFirst() == original, "Matching resolution discards the existing band");
+                check(field(Band.class, original, "bandCache") == cache && original.hasData(), "Matching resolution discards cached data");
+                check(original.getDataColor().equals(Color.RED), "Reusing a band loses restored appearance");
+
+                state.put("fullResolution", false);
+                Band standard = (Band) Band.deserialize(state);
+                layers.restore(List.of(standard));
+                check(TimelineLayers.get().getFirst() == standard && !standard.isFullResolution(), "Different resolution reuses the old band");
+                check(!original.hasData() && !standard.hasData(), "Different resolution retains the old cache");
+                JSONObject standardState = new JSONObject();
+                standard.serialize(standardState);
+                check(!standardState.getBoolean("fullResolution"), "Standard resolution is not saved");
+                state.remove("fullResolution");
+                Band oldState = (Band) Band.deserialize(state);
+                check(!oldState.isFullResolution(), "State without a resolution setting changes the default");
+                layers.restore(List.of(oldState));
+                check(TimelineLayers.get().getFirst() == standard, "Default state does not reuse standard-resolution data");
+
+                state.put("fullResolution", true);
+                Band full = (Band) Band.deserialize(state);
+                layers.restore(List.of(full));
+                check(TimelineLayers.get().getFirst() == full && layers.getRowCount() == 1, "Restoring full resolution duplicates the layer");
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            } finally {
+                for (TimelineLayer layer : List.copyOf(TimelineLayers.get()))
+                    layers.remove(layer);
+            }
+        });
+    }
+
+    private static void checkExportImport() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            Band band = new Band(new BandType(new JSONObject().put("name", "export")), true);
+            long previousStart = DrawController.selectedAxis.start();
+            long previousEnd = DrawController.selectedAxis.end();
+            try {
+                DrawController.setSelectedInterval(START, START + 60_000);
+                long[] dates = {START, START + 1, START + 100, START + 877, START + 1000};
+                float[] values = {1.5f, 2.25f, YAxis.BLANK, 3, 6};
+                band.addToCache(values, dates);
+                JSONObject document = new JSONObject(band.toJson().toString());
+                JSONObject exported = document.getJSONArray("org.helioviewer.jhv.request.timeline").getJSONObject(0);
+                check(exported.getBoolean("fullResolution"), "Export loses the resolution setting");
+                check(exported.getDouble("multiplier") == 1.5, "Export fixture does not exercise scaled values");
+                checkSamples(asSamples(readExport(exported)), dates, values);
+
+                JSONObject oldExport = new JSONObject().put("bandType", new JSONObject().put("name", "old export"))
+                        .put("multiplier", 2).put("data", new JSONArray().put(new JSONArray().put(1_700_000_000L).put(1.25)));
+                checkSamples(asSamples(readExport(oldExport)), new long[]{1_700_000_000_000L}, new float[]{2.5f});
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            } finally {
+                band.remove();
+                DrawController.setSelectedInterval(previousStart, previousEnd);
+            }
+        });
+    }
+
+    private static BandData readExport(JSONObject exported) throws Exception {
+        Constructor<?> constructor = Class.forName(BandImporter.class.getName() + "$BandLoad").getDeclaredConstructor(JSONObject.class);
+        constructor.setAccessible(true);
+        Callable<?> load = (Callable<?>) constructor.newInstance(exported);
+        List<?> data = (List<?>) load.call();
+        check(data.size() == 1, "Import lost the exported band");
+        return (BandData) data.getFirst();
     }
 
     private static void checkLayerCreation() throws Exception {
