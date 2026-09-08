@@ -9,7 +9,8 @@
 
 ### Interaction and UI
 - Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
-- Allow multiple dataset selections in the New Timeline Layer dialog
+- Allow multiple dataset selections in the New Image Layer and New Timeline Layer dialogs
+- Add general and timeline interaction guides to the Help menu
 
 ### Timeline and events
 - Improve SWEK event loading, filtering, and display, with more reliable updates, related-event handling, and timeline interaction
