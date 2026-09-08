@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 class BandCacheAll implements BandCache {
 
-    private static final int MAX_SIZE = 86400;
-
     private final List<DateValue> dateVals = new ArrayList<>();
 
     @Override
@@ -23,14 +21,12 @@ class BandCacheAll implements BandCache {
     @Override
     public void addToCache(YAxis yAxis, float[] values, long[] dates) {
         int len = values.length;
-        if (len == 0 || dateVals.size() >= MAX_SIZE) {
+        if (len == 0) {
             return;
         }
 
         for (int i = 0; i < len; i++) {
             dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
-            if (dateVals.size() >= MAX_SIZE)
-                break;
         }
         Collections.sort(dateVals);
     }
