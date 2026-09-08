@@ -2,6 +2,8 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -482,12 +484,46 @@ public class BandReaderHapi {
     }
 
     private static long toMillis(String isoTime) throws Exception {
+        if (isCalendarTimestamp(isoTime)) {
+            int year = Integer.parseInt(isoTime, 0, 4, 10);
+            int month = Integer.parseInt(isoTime, 5, 7, 10);
+            int day = Integer.parseInt(isoTime, 8, 10, 10);
+            int hour = Integer.parseInt(isoTime, 11, 13, 10);
+            int minute = Integer.parseInt(isoTime, 14, 16, 10);
+            int second = Integer.parseInt(isoTime, 17, 19, 10);
+            // Keep STIL's rounding before the epoch and its handling of nonstandard clock values.
+            if (year >= 1970 && hour < 24 && minute < 60 && second < 60) {
+                try {
+                    long epochDay = LocalDate.of(year, month, day).toEpochDay();
+                    int millis = isoTime.length() == 24 ? Integer.parseInt(isoTime, 20, 23, 10) : 0;
+                    return epochDay * 86_400_000 + (hour * 3600L + minute * 60L + second) * 1000 + millis;
+                } catch (DateTimeException e) {
+                    // Let STIL handle calendar values outside LocalDate's valid range.
+                }
+            }
+        }
+        // Catalog bounds can be shortened dates; retain support for STIL's other accepted forms.
         double seconds = Times.isoToUnixSeconds(isoTime);
         if (Double.isFinite(seconds)) {
             return (long) (seconds * 1000 + 0.5);
         } else {
             throw new Exception("Could not parse ISO-8601 string: " + isoTime);
         }
+    }
+
+    private static boolean isCalendarTimestamp(String text) {
+        int length = text.length();
+        if ((length != 20 && length != 24) || text.charAt(length - 1) != 'Z'
+                || (length == 24 && text.charAt(19) != '.') || text.charAt(4) != '-' || text.charAt(7) != '-'
+                || text.charAt(10) != 'T' || text.charAt(13) != ':' || text.charAt(16) != ':')
+            return false;
+        for (int i = 0; i < length - 1; i++) {
+            if (i == 4 || i == 7 || i == 10 || i == 13 || i == 16 || i == 19)
+                continue;
+            if (text.charAt(i) < '0' || text.charAt(i) > '9')
+                return false;
+        }
+        return true;
     }
 
 }

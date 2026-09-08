@@ -10,6 +10,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
@@ -58,6 +59,8 @@ import org.json.JSONObject;
 import com.sun.management.ThreadMXBean;
 import com.sun.net.httpserver.HttpServer;
 
+import uk.ac.starlink.hapi.Times;
+
 public final class TimelineDataTest {
 
     private static final int WARMUP_RUNS = 3;
@@ -85,6 +88,7 @@ public final class TimelineDataTest {
         checkLayerCreation();
         checkSavedState();
         checkExportImport();
+        checkHapiTimes();
         checkHapiRequests();
         checkChartPainting();
         System.out.println("Timeline data tests passed");
@@ -249,6 +253,44 @@ public final class TimelineDataTest {
         } finally {
             catalogs.clear();
             server.stop(0);
+        }
+    }
+
+    private static void checkHapiTimes() throws Exception {
+        Method parse = BandReaderHapi.class.getDeclaredMethod("toMillis", String.class);
+        parse.setAccessible(true);
+        String[] forms = {
+                "1970-01-01Z", "2071-01-01Z", "1970-01-01T00:00:00Z", "1970-01-01T00:00:00.000Z",
+                "2026-244Z", "2026-244T12:34:56Z",
+                "2026-09-01T12:34:56", " 2026-09-01T12:34:56Z ", "2026-09-01 12:34:56Z",
+                "2026-09-01T12Z", "2026-09-01T12:34Z", "2026-09-01T12:34:56.1Z",
+                "2026-09-01T12:34:56.12Z", "2026-09-01T12:34:56.1234Z", "2026-09-01T12:34:56.9999Z",
+                "1969-12-31T23:59:59Z", "1969-12-31T23:59:59.999Z", "1500-03-01T00:00:00Z",
+                "2000-02-29T23:59:59.999Z", "2100-02-29T00:00:00Z", "2026-02-30T00:00:00Z",
+                "2026-13-01T00:00:00Z", "2026-09-01T24:00:00Z", "2016-12-31T23:59:60Z",
+                "2026-09-01T12:60:00Z", "9999-12-31T23:59:59.999Z", "",
+                "not a time", "2026-09-01T12:34:56+00:00", "2026-09-01T12:34:56.X23Z",
+                "2026-09-01T+1:34:56Z", "2026-09-01T12:34:56.１２３Z"
+        };
+        for (String text : forms) {
+            double seconds = Times.isoToUnixSeconds(text);
+            try {
+                long actual = (long) parse.invoke(null, text);
+                check(Double.isFinite(seconds) && actual == (long) (seconds * 1000 + 0.5), "Changed timestamp handling: " + text);
+            } catch (InvocationTargetException e) {
+                check(!Double.isFinite(seconds) && e.getCause().getClass() == Exception.class, "Unexpected timestamp failure: " + text);
+            }
+        }
+        // Exercise all millisecond fractions and dates across leap years and century boundaries.
+        Random random = new Random(123);
+        for (int i = 0; i < 10_000; i++) {
+            long seconds = random.nextLong(253_402_300_800L);
+            long expected = seconds * 1000 + i % 1000;
+            String text = Instant.ofEpochMilli(expected).toString();
+            check((long) parse.invoke(null, text) == expected, "Wrong UTC timestamp: " + text);
+            check((long) (Times.isoToUnixSeconds(text) * 1000 + 0.5) == expected, "STIL comparison differs: " + text);
+            text = Instant.ofEpochSecond(seconds).toString();
+            check((long) parse.invoke(null, text) == seconds * 1000, "Wrong whole-second timestamp: " + text);
         }
     }
 
