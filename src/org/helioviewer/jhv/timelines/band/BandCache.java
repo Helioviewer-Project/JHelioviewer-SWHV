@@ -34,7 +34,7 @@ interface BandCache {
         }
 
         void serialize(JSONArray ja, double f) {
-            ja.put(new JSONArray().put(milli / 1000L).put(value * f));
+            ja.put(new JSONArray().put(milli / 1000.).put(value * f));
         }
 
         @Override

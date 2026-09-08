@@ -132,7 +132,7 @@ public class TimelineLayers extends AbstractTableModel {
     private static TimelineLayer reuseBand(TimelineLayer restored) {
         if (restored instanceof Band restoredBand) {
             Band band = findBand(layers, restoredBand.getBandType());
-            if (band != null) {
+            if (band != null && band.isFullResolution() == restoredBand.isFullResolution()) {
                 band.applyStateFrom(restoredBand);
                 return band;
             }

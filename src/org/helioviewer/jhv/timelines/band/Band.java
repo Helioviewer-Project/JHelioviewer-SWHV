@@ -104,6 +104,7 @@ public final class Band extends TimelineLayer {
 
         JSONObject jo = new JSONObject();
         jo.put("multiplier", multiplier);
+        jo.put("fullResolution", fullResolution);
         bandCache.serialize(jo, 1 / multiplier);
         bandType.serialize(jo);
         return new JSONObject().put("org.helioviewer.jhv.request.timeline", new JSONArray().put(jo));
@@ -112,6 +113,7 @@ public final class Band extends TimelineLayer {
     @Override
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
+        jo.put("fullResolution", fullResolution);
         jo.put("color", new JSONObject().put("r", graphColor.getRed()).put("g", graphColor.getGreen()).put("b", graphColor.getBlue()));
         jo.put("multicolor", multicolor);
     }
@@ -120,7 +122,7 @@ public final class Band extends TimelineLayer {
         JSONObject jobt = jo.optJSONObject("bandType");
         if (jobt == null)
             throw new Exception("Missing bandType: " + jo);
-        Band band = new Band(new BandType(jobt));
+        Band band = new Band(new BandType(jobt), jo.optBoolean("fullResolution", false));
 
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {
