@@ -49,6 +49,7 @@ public final class FastRiceVerifier {
         run("float fixture", () -> verifyFloatFixture(resources));
         run("double fixture", () -> verifyDoubleFixture(resources));
         run("synthetic integers", FastRiceVerifier::verifySyntheticIntegerCases);
+        run("short refill boundaries", FastRiceVerifier::verifyShortRefillBoundaries);
         verifySyntheticQuantizedCases();
         verifyEncodedWidths();
         verifyKnownQuantizedValues();
@@ -202,6 +203,44 @@ public final class FastRiceVerifier {
         short[] actual = new short[input.length];
         fast.get(actual);
         assertArrayEquals("synthetic short", nomTam.array(), actual);
+    }
+
+    private static void verifyShortRefillBoundaries() {
+        Random random = new Random(0x71ce);
+        for (int block : new int[]{16, 32}) {
+            for (int length = 1; length <= 256; length++) {
+                short[] expected = new short[length];
+                for (int i = 0; i < length; i++) {
+                    // Alternate constant, Rice-coded, and direct-coded blocks.
+                    expected[i] = switch (i / block % 3) {
+                        case 0 -> 123;
+                        case 1 -> (short) (123 + random.nextInt(16));
+                        default -> (i & 1) == 0 ? 0 : Short.MAX_VALUE;
+                    };
+                }
+                RiceCompressOption option = riceOption(Short.BYTES, block);
+                ByteBuffer compressed = ByteBuffer.allocate(length * 4 + 128);
+                requireCompressed(new RiceCompressor.ShortRiceCompressor(option).compress(ShortBuffer.wrap(expected), compressed));
+                compressed.flip();
+                ShortBuffer reference = ShortBuffer.allocate(length);
+                new RiceCompressor.ShortRiceCompressor(option).decompress(compressed.duplicate(), reference);
+                assertArrayEquals("short refill upstream reference", expected, reference.array());
+
+                // Nonzero array offset and position, with inaccessible padding after the limit.
+                ByteBuffer padded = ByteBuffer.allocate(compressed.remaining() + 32);
+                padded.position(7);
+                ByteBuffer input = padded.slice();
+                input.position(3);
+                input.put(compressed);
+                input.limit(input.position());
+                input.position(3);
+                ShortBuffer output = ShortBuffer.allocate(length);
+                control(short.class).decompress(input, output, option);
+                assertArrayEquals("short refill block=" + block + " length=" + length, expected, output.array());
+                if (input.position() != input.limit() || output.position() != length)
+                    throw new AssertionError("incorrect buffer position after short refill");
+            }
+        }
     }
 
     private static void verifyIntSynthetic(int block, int[] input) {

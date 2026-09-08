@@ -216,6 +216,7 @@ public final class FastRiceProvider implements ICompressorProvider {
 
             byte[] input = inArray;
             int position = inPosition;
+            int limit = inArrayOffset + in.limit();
             long bitBuffer = bits;
             int bitCount = nbits;
 
@@ -236,30 +237,32 @@ public final class FastRiceProvider implements ICompressorProvider {
                     }
                 } else if (fs == fsMax) {
                     for (; i < end; i++) {
-                        int k = bBits - bitCount;
-                        long diff = bitBuffer << k;
-                        for (k -= BITS_PER_BYTE; k >= 0; k -= BITS_PER_BYTE) {
-                            bitBuffer = input[position++] & BYTE_MASK;
-                            diff |= bitBuffer << k;
+                        while (bitCount < bBits) {
+                            bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
+                            bitCount += BITS_PER_BYTE;
                         }
-                        if (bitCount > 0) {
-                            bitBuffer = input[position++] & BYTE_MASK;
-                            diff |= bitBuffer >>> -k;
-                            bitBuffer &= (1L << bitCount) - 1L;
-                        } else {
-                            bitBuffer = 0;
-                        }
+                        bitCount -= bBits;
+                        int diff = (int) (bitBuffer >>> bitCount);
+                        bitBuffer &= (1L << bitCount) - 1L;
 
-                        last += map((int) diff);
+                        last += map(diff);
                         out[offset + i] = (short) last;
                     }
                 } else {
                     for (; i < end; i++) {
+                        // Refill ahead when four bytes remain, without crossing the input limit.
+                        if (bitCount < Short.SIZE && position <= limit - Integer.BYTES) {
+                            int word = (input[position] & BYTE_MASK) << 24 | (input[position + 1] & BYTE_MASK) << 16
+                                    | (input[position + 2] & BYTE_MASK) << 8 | input[position + 3] & BYTE_MASK;
+                            bitBuffer = bitBuffer << Integer.SIZE | Integer.toUnsignedLong(word);
+                            position += Integer.BYTES;
+                            bitCount += Integer.SIZE;
+                        }
                         while (bitBuffer == 0) {
                             bitCount += BITS_PER_BYTE;
                             bitBuffer = input[position++] & BYTE_MASK;
                         }
-                        int nzero = bitCount - (32 - Integer.numberOfLeadingZeros((int) (bitBuffer & BYTE_MASK)));
+                        int nzero = bitCount - (Long.SIZE - Long.numberOfLeadingZeros(bitBuffer));
                         bitCount -= nzero + 1;
                         bitBuffer ^= 1L << bitCount;
 
@@ -278,7 +281,10 @@ public final class FastRiceProvider implements ICompressorProvider {
                 }
             }
 
-            inPosition = position;
+            // Leave prefetched whole bytes unread, matching the byte-at-a-time decoder.
+            inPosition = position - bitCount / BITS_PER_BYTE;
+            bitBuffer >>>= bitCount / BITS_PER_BYTE * BITS_PER_BYTE;
+            bitCount %= BITS_PER_BYTE;
             bits = bitBuffer;
             nbits = bitCount;
         }

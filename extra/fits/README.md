@@ -67,6 +67,7 @@ If no path is given, it defaults to `~/git/nom-tam-fits`.
 
 The verifier checks service-provider selection, the raw Rice fixtures, generated integer and floating-point data,
 all combinations of 1/2/4-byte Rice encoding and byte/short/int output, and heap/direct buffers with sliced input.
+Short-decoder boundary cases cover block transitions, every length from 1 to 256, sliced input, and consumed buffer positions.
 It also compares complete compressed FITS files with their uncompressed reference through JHV's FITS loader.
 Individual failures are reported without skipping subsequent cases. Any failure gives a nonzero exit status.
 
