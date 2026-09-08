@@ -11,7 +11,6 @@ final class InteractionPan extends Interaction.Type {
     private final Camera camera;
     private int lastX;
     private int lastY;
-    private boolean dragStartSet; // avoid freak mouseDragged before mousePressed
 
     InteractionPan(Camera _camera) {
         camera = _camera;
@@ -21,14 +20,10 @@ final class InteractionPan extends Interaction.Type {
     void mousePressed(PointerEvent e, Viewport vp) {
         lastX = e.x();
         lastY = e.y();
-        dragStartSet = true;
     }
 
     @Override
     void mouseDragged(PointerEvent e, Viewport vp) {
-        if (!dragStartSet)
-            return;
-
         int x = e.x() - lastX;
         int y = e.y() - lastY;
         lastX = e.x();
@@ -37,11 +32,6 @@ final class InteractionPan extends Interaction.Type {
         double m = 1 / ViewportMath.getImagePixelFactor(camera, vp);
         camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
         DisplayController.display();
-    }
-
-    @Override
-    void mouseReleased() {
-        dragStartSet = false;
     }
 
 }

@@ -19,7 +19,6 @@ final class InteractionTrackball extends Interaction.Type {
     private Vec3 dragAxis = Vec3.YAxis; // cached drag axis
     private int lastMouseX;
     private int lastMouseY;
-    private boolean dragStartSet; // avoid freak mouseDragged before mousePressed
 
     private InteractionTrackball(Camera _camera, Constraint _constraint) {
         camera = _camera;
@@ -41,13 +40,10 @@ final class InteractionTrackball extends Interaction.Type {
             dragAxis = DisplayController.getViewpointUpdate().dragAxis();
         lastMouseX = e.x();
         lastMouseY = e.y();
-        dragStartSet = true;
     }
 
     @Override
     void mouseDragged(PointerEvent e, Viewport vp) {
-        if (!dragStartSet)
-            return;
         if ((e.x() == lastMouseX) && (e.y() == lastMouseY))
             return;
 
@@ -56,11 +52,6 @@ final class InteractionTrackball extends Interaction.Type {
         lastMouseX = e.x();
         lastMouseY = e.y();
         DisplayController.display();
-    }
-
-    @Override
-    void mouseReleased() {
-        dragStartSet = false;
     }
 
 }

@@ -88,7 +88,5 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
     public void keyTyped(KeyEvent e) {}
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        InputController.keyReleased(synthesizeKey(e));
-    }
+    public void keyReleased(KeyEvent e) {}
 }

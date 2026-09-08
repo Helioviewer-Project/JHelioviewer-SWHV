@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.display.interaction;
 
-import org.helioviewer.jhv.annotation.Annotations;
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -29,7 +30,8 @@ public final class Interaction {
     private final Zoom zoom;
 
     private Mode mode = Mode.ROTATE;
-    private boolean annotating = false;
+    @Nullable
+    private Type activeDrag;
 
     public Interaction() {
         Camera camera = Display.getCamera();
@@ -57,27 +59,20 @@ public final class Interaction {
         };
     }
 
-    private boolean isAnnotating() {
-        return annotating || Annotations.hasPending();
-    }
-
     public void mouseWheelMoved(ScrollEvent e, Viewport vp) {
         zoom.zoom(vp, e.preciseWheelRotation());
     }
 
     public void mouseDragged(PointerEvent e, Viewport vp) {
-        if (isAnnotating())
-            interactionAnnotate.mouseDragged(e, vp);
-        else
-            getType().mouseDragged(e, vp);
+        if (activeDrag != null)
+            activeDrag.mouseDragged(e, vp);
     }
 
     public void mouseReleased() {
-        if (isAnnotating())
-            interactionAnnotate.mouseReleased();
-        else
-            getType().mouseReleased();
-        annotating = false;
+        Type drag = activeDrag;
+        activeDrag = null;
+        if (drag != null)
+            drag.mouseReleased();
     }
 
     public void mouseClicked(PointerEvent e) {
@@ -88,25 +83,14 @@ public final class Interaction {
     }
 
     public void mousePressed(PointerEvent e, Viewport vp) {
-        if (e.shiftDown()) {
-            annotating = true;
-        }
-        if (annotating)
-            interactionAnnotate.mousePressed(e, vp);
-        else
-            getType().mousePressed(e, vp);
+        mouseReleased();
+        activeDrag = e.shiftDown() ? interactionAnnotate : getType();
+        activeDrag.mousePressed(e, vp);
     }
 
     public void keyPressed(KeyInputEvent e) {
-        if (e.shiftDown()) {
-            annotating = true;
-        }
-        if (annotating)
+        if (e.shiftDown())
             interactionAnnotate.keyPressed(e);
-    }
-
-    public void keyReleased(KeyInputEvent e) {
-        annotating = e.shiftDown();
     }
 
 }

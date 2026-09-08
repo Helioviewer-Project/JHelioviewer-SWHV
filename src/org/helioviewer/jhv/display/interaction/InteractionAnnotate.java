@@ -8,8 +8,9 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
 
-final class InteractionAnnotate {
+final class InteractionAnnotate extends Interaction.Type {
 
+    @Override
     void mousePressed(PointerEvent e, Viewport vp) {
         Annotateable annotateable = ViewState.getAnnotationMode().generate(null);
         Annotations.start(annotateable);
@@ -20,6 +21,7 @@ final class InteractionAnnotate {
         DisplayController.display();
     }
 
+    @Override
     void mouseDragged(PointerEvent e, Viewport vp) {
         Annotateable pending = Annotations.pending();
         if (pending != null && pending.isDraggable()) {
@@ -33,6 +35,7 @@ final class InteractionAnnotate {
         DisplayController.display();
     }
 
+    @Override
     void mouseReleased() {
         finishAnnotateable();
     }
