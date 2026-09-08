@@ -34,6 +34,7 @@ import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.timelines.radio.RadioData;
 
 @SuppressWarnings("serial")
 final class ChartDrawGraphPane extends JComponent implements MouseInputListener, MouseWheelListener, ComponentListener, DrawController.Listener {
@@ -132,22 +133,33 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
 
         Graphics2D plotG = (Graphics2D) fullG.create();
-        plotG.setClip(graphArea);
         plotG.setFont(DrawConstants.font);
         TimeAxis xAxis = DrawController.selectedAxis;
         drawLayers(plotG, graphArea, xAxis, mousePosition, geometry);
-        labelPainter.drawStaticLabels(fullG, geometry, xAxis);
 
         plotG.dispose();
         fullG.dispose();
     }
 
     private void drawLayers(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition, GraphGeometry geometry) {
+        // Radio fills its plot area. Put the grid over it, then paint foreground data.
+        for (TimelineLayer layer : layers) {
+            if (layer instanceof RadioData && layer.isEnabled()) {
+                Rectangle area = geometry.getLayerArea(layer);
+                if (area != null) {
+                    g.setClip(area);
+                    layer.draw(g, area, timeAxis, mousePosition);
+                }
+            }
+        }
+        g.setClip(null);
+        labelPainter.drawStaticLabels(g, geometry, timeAxis);
+
         boolean stackedMode = geometry.isStacked();
         boolean warningBandDrawn = false;
 
         for (TimelineLayer layer : layers) {
-            if (!layer.isEnabled())
+            if (!layer.isEnabled() || layer instanceof RadioData)
                 continue;
 
             Rectangle area = graphArea;
