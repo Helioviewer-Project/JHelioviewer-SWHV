@@ -25,10 +25,16 @@ class BandCacheFull implements BandCache {
             return;
         }
 
+        long previous = dateVals.isEmpty() ? Long.MIN_VALUE : dateVals.getLast().milli;
+        boolean sortNeeded = false;
         for (int i = 0; i < len; i++) {
+            if (dates[i] < previous)
+                sortNeeded = true;
             dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
+            previous = dates[i];
         }
-        Collections.sort(dateVals);
+        if (sortNeeded)
+            Collections.sort(dateVals);
     }
 
     @Override

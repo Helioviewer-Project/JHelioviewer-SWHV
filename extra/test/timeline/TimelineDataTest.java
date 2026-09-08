@@ -5,19 +5,27 @@ import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.lang.instrument.Instrumentation;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -40,9 +48,18 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.sun.management.ThreadMXBean;
 import com.sun.net.httpserver.HttpServer;
 
 public final class TimelineDataTest {
+
+    private static final int WARMUP_RUNS = 3;
+    private static final int MEASURED_RUNS = 5;
+    private static Instrumentation instrumentation;
+
+    public static void premain(String options, Instrumentation agent) {
+        instrumentation = agent;
+    }
 
     private static final long START = 1_700_000_000_123L;
     private static final YAxis AXIS = new YAxis(0, 100, YAxis.generateScale("linear", ""));
@@ -51,6 +68,7 @@ public final class TimelineDataTest {
         Directories.createCacheDirs();
         checkEmpty();
         checkOrderingAndGaps();
+        checkUnsortedAndEqualTimestamps();
         checkFullSampleCount();
         checkLayerCreation();
         checkSavedState();
@@ -408,6 +426,20 @@ public final class TimelineDataTest {
         check(cache.getValues(100, START + 600, START + 800).isEmpty(), "Invalid values enter the graph");
     }
 
+    private static void checkUnsortedAndEqualTimestamps() {
+        BandCacheFull cache = new BandCacheFull();
+        cache.addToCache(AXIS, new float[]{20, 10, 21}, new long[]{START + 200, START + 100, START + 200});
+        cache.addToCache(AXIS, new float[]{22, 40, 30}, new long[]{START + 200, START + 400, START + 300});
+        cache.addToCache(AXIS, new float[]{41, 50}, new long[]{START + 400, START + 500});
+        cache.addToCache(AXIS, new float[0], new long[0]);
+        List<List<BandCache.DateValue>> graph = cache.getValues(1, START, START + 500);
+        check(graph.size() == 1, "Sorting splits continuous data");
+        checkSamples(graph.getFirst(),
+                new long[]{START + 100, START + 200, START + 200, START + 200, START + 300, START + 400, START + 400, START + 500},
+                new float[]{10, 20, 21, 22, 30, 40, 41, 50});
+        check(cache.getValue(START + 200) == 20, "Equal-timestamp ordering changes the selected value");
+    }
+
     private static void checkFullSampleCount() {
         int count = 100_000;
         long[] dates = new long[count];
@@ -450,6 +482,10 @@ public final class TimelineDataTest {
 
     private static void benchmark() throws ReflectiveOperationException {
         // Fixed synthetic 10 Hz input for comparisons across revisions. Timings are not pass/fail thresholds.
+        check(instrumentation != null, "Run benchmarks through run_timeline_tests.py --benchmark");
+        ThreadMXBean allocations = (ThreadMXBean) ManagementFactory.getThreadMXBean();
+        check(allocations.isThreadAllocatedMemorySupported(), "JVM does not support allocation measurements");
+        allocations.setThreadAllocatedMemoryEnabled(true);
         int count = 1_000_000;
         long[] dates = new long[count];
         float[] values = new float[count];
@@ -457,6 +493,71 @@ public final class TimelineDataTest {
             dates[i] = START + 100L * i;
             values[i] = i % 100;
         }
+        System.out.printf("Timeline benchmark: %,d samples at 10 Hz, %d warmup runs, %d measured runs (medians)%n",
+                count, WARMUP_RUNS, MEASURED_RUNS);
+        System.out.println("Heap allocations cover the benchmark thread. Input generation and correctness checks are excluded.");
+        benchmarkLoading("Single batch", new long[][]{dates}, new float[][]{values}, List.of(0), allocations);
+        int batchSize = 10_000;
+        long[][] dateBatches = new long[count / batchSize][];
+        float[][] valueBatches = new float[dateBatches.length][];
+        List<Integer> order = new ArrayList<>();
+        for (int i = 0; i < dateBatches.length; i++) {
+            dateBatches[i] = Arrays.copyOfRange(dates, i * batchSize, (i + 1) * batchSize);
+            valueBatches[i] = Arrays.copyOfRange(values, i * batchSize, (i + 1) * batchSize);
+            order.add(i);
+        }
+        benchmarkLoading("100 chronological batches", dateBatches, valueBatches, order, allocations);
+        benchmarkLoading("100 reverse batches", dateBatches, valueBatches, order.reversed(), allocations);
+        Collections.shuffle(order, new Random(1));
+        BandCacheFull cache = benchmarkLoading("100 shuffled batches", dateBatches, valueBatches, order, allocations);
+        System.out.printf("Cache reachable footprint: %.2f MiB (includes backing-array capacity, excludes source arrays and graph snapshots)%n",
+                reachableBytes(cache) / 1048576.);
+        benchmarkView("Wide view", cache, START, dates[count - 1], count, allocations);
+        benchmarkView("One-minute view", cache, START + 50_000_000, START + 50_059_900, 600, allocations);
+    }
+
+    private static BandCacheFull benchmarkLoading(String name, long[][] dates, float[][] values, List<Integer> order, ThreadMXBean allocations) {
+        double[] times = new double[MEASURED_RUNS];
+        double[] bytes = new double[MEASURED_RUNS];
+        double[] lastTimes = new double[MEASURED_RUNS];
+        double[] lastBytes = new double[MEASURED_RUNS];
+        BandCacheFull cache = null;
+        int count = dates.length * dates[0].length;
+        for (int run = 0; run < WARMUP_RUNS + MEASURED_RUNS; run++) {
+            long allocatedBefore = allocations.getCurrentThreadAllocatedBytes();
+            long before = System.nanoTime();
+            cache = new BandCacheFull();
+            long lastBefore = before;
+            long lastAllocated = allocatedBefore;
+            for (int batch : order) {
+                lastAllocated = allocations.getCurrentThreadAllocatedBytes();
+                lastBefore = System.nanoTime();
+                cache.addToCache(AXIS, values[batch], dates[batch]);
+            }
+            long finished = System.nanoTime();
+            long allocatedAfter = allocations.getCurrentThreadAllocatedBytes();
+            if (run >= WARMUP_RUNS) {
+                int index = run - WARMUP_RUNS;
+                times[index] = (finished - before) / 1e6;
+                bytes[index] = (allocatedAfter - allocatedBefore) / 1048576.;
+                lastTimes[index] = (finished - lastBefore) / 1e6;
+                lastBytes[index] = (allocatedAfter - lastAllocated) / 1048576.;
+            }
+            List<List<BandCache.DateValue>> graph = cache.getValues(1200, START, START + (count - 1) * 100L);
+            check(graph.size() == 1 && graph.getFirst().size() == count, "Incremental loading loses or splits samples");
+            for (int i = 0; i < count; i++) {
+                BandCache.DateValue sample = graph.getFirst().get(i);
+                if (sample.milli != START + i * 100L || sample.value != i % 100)
+                    throw new AssertionError("Incremental loading changes sample " + i);
+            }
+        }
+        System.out.printf("%s: %.2f ms, %.2f MiB allocated; final batch %.2f ms, %.2f MiB allocated%n",
+                name, median(times), median(bytes), median(lastTimes), median(lastBytes));
+        return cache;
+    }
+
+    private static void benchmarkView(String name, BandCacheFull cache, long start, long end, int count, ThreadMXBean allocations)
+            throws ReflectiveOperationException {
         Rectangle area = new Rectangle(0, 0, 1200, 500);
         BufferedImage image = new BufferedImage(area.width, area.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
@@ -468,37 +569,100 @@ public final class TimelineDataTest {
         build.setAccessible(true);
         Field graphData = Band.class.getDeclaredField("graphData");
         graphData.setAccessible(true);
-        TimeAxis.Mapper xMapper = new TimeAxis.Mapper(START, dates[count - 1], 0, area.width);
+        TimeAxis.Mapper xMapper = new TimeAxis.Mapper(start, end, 0, area.width);
         YAxis.Mapper yMapper = AXIS.mapper(0, area.height);
-        System.out.println("Timeline benchmark: 1,000,000 samples at 10 Hz, 1200x500 offscreen plot, 3 warmup runs, 5 measured runs");
+        String[] phases = {"extraction", "polylines", "painting"};
+        double[][] times = new double[phases.length][MEASURED_RUNS];
+        double[][] bytes = new double[phases.length][MEASURED_RUNS];
         try {
-            for (int run = 0; run < 8; run++) {
-                BandCacheFull cache = new BandCacheFull();
+            for (int run = 0; run < WARMUP_RUNS + MEASURED_RUNS; run++) {
+                long allocatedBefore = allocations.getCurrentThreadAllocatedBytes();
                 long before = System.nanoTime();
-                cache.addToCache(AXIS, values, dates);
-                long inserted = System.nanoTime();
-                List<List<BandCache.DateValue>> graph = cache.getValues(area.width, START, dates[count - 1]);
+                List<List<BandCache.DateValue>> graph = cache.getValues(area.width, start, end);
                 long extracted = System.nanoTime();
+                long allocatedExtracted = allocations.getCurrentThreadAllocatedBytes();
                 Object prepared = build.invoke(null, graph, xMapper, yMapper, LongUnaryOperator.identity(), false);
                 long built = System.nanoTime();
-                check(graph.size() == 1, "Benchmark data was split");
-                checkSamples(graph.getFirst(), dates, values);
+                long allocatedBuilt = allocations.getCurrentThreadAllocatedBytes();
+                check(graph.size() == 1 && graph.getFirst().size() == count, "Benchmark view loses samples");
                 graphData.set(band, prepared);
                 graphics.setColor(Color.BLACK);
                 graphics.fillRect(0, 0, area.width, area.height);
+                long allocatedPaint = allocations.getCurrentThreadAllocatedBytes();
                 long paintStart = System.nanoTime();
                 band.draw(graphics, area, false);
                 long painted = System.nanoTime();
-                check(image.getRGB(area.width / 2, area.height / 2) == Color.WHITE.getRGB(), "Benchmark did not paint the plot");
-                if (run >= 3)
-                    System.out.printf("Run %d: insertion %.1f ms, extraction %.1f ms, polylines %.1f ms, painting %.1f ms%n",
-                            run - 2, (inserted - before) / 1e6, (extracted - inserted) / 1e6,
-                            (built - extracted) / 1e6, (painted - paintStart) / 1e6);
+                long allocatedPainted = allocations.getCurrentThreadAllocatedBytes();
+                // This exact sample lies on the synthetic trace in both views.
+                int sampleX = xMapper.toPixel(start + 5000);
+                int sampleY = yMapper.dataToPixel(50);
+                check(image.getRGB(sampleX, sampleY) == Color.WHITE.getRGB(), "Benchmark did not paint the plot");
+                if (run >= WARMUP_RUNS) {
+                    int index = run - WARMUP_RUNS;
+                    times[0][index] = (extracted - before) / 1e6;
+                    times[1][index] = (built - extracted) / 1e6;
+                    times[2][index] = (painted - paintStart) / 1e6;
+                    bytes[0][index] = (allocatedExtracted - allocatedBefore) / 1048576.;
+                    bytes[1][index] = (allocatedBuilt - allocatedExtracted) / 1048576.;
+                    bytes[2][index] = (allocatedPainted - allocatedPaint) / 1048576.;
+                }
             }
+            System.out.printf("%s: %,d samples, %dx%d single-color offscreen plot%n", name, count, area.width, area.height);
+            for (int phase = 0; phase < phases.length; phase++)
+                System.out.printf("  %s: %.3f ms, %.3f MiB allocated%n", phases[phase], median(times[phase]), median(bytes[phase]));
         } finally {
             graphics.dispose();
             band.remove();
         }
+    }
+
+    private static double median(double[] values) {
+        Arrays.sort(values);
+        return values[values.length / 2];
+    }
+
+    private static long reachableBytes(Object root) throws IllegalAccessException {
+        // Reachable object sizes, not a whole-heap delta or a claim about exclusive GC retention.
+        IdentityHashMap<Object, Boolean> seen = new IdentityHashMap<>();
+        Map<Class<?>, List<Field>> references = new HashMap<>();
+        ArrayDeque<Object> pending = new ArrayDeque<>();
+        pending.add(root);
+        long bytes = 0;
+        while (!pending.isEmpty()) {
+            Object object = pending.removeLast();
+            if (seen.put(object, true) != null)
+                continue;
+            bytes += instrumentation.getObjectSize(object);
+            Class<?> type = object.getClass();
+            if (type.isArray()) {
+                if (!type.getComponentType().isPrimitive()) {
+                    for (Object value : (Object[]) object) {
+                        if (value != null)
+                            pending.add(value);
+                    }
+                }
+                continue;
+            }
+            List<Field> fields = references.get(type);
+            if (fields == null) {
+                fields = new ArrayList<>();
+                for (Class<?> owner = type; owner != null; owner = owner.getSuperclass()) {
+                    for (Field field : owner.getDeclaredFields()) {
+                        if (!Modifier.isStatic(field.getModifiers()) && !field.getType().isPrimitive()) {
+                            field.setAccessible(true);
+                            fields.add(field);
+                        }
+                    }
+                }
+                references.put(type, fields);
+            }
+            for (Field field : fields) {
+                Object value = field.get(object);
+                if (value != null)
+                    pending.add(value);
+            }
+        }
+        return bytes;
     }
 
     private static void check(boolean condition, String message) {
