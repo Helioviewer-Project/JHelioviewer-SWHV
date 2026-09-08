@@ -55,6 +55,7 @@ public final class Band extends TimelineLayer {
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private final BandType bandType;
+    private final boolean fullResolution;
     private final BandOptions optionsPanel = new BandOptions(this);
 
     private final YAxis yAxis;
@@ -69,7 +70,12 @@ public final class Band extends TimelineLayer {
     private boolean multicolor;
 
     public Band(BandType _bandType) {
+        this(_bandType, false);
+    }
+
+    public Band(BandType _bandType, boolean _fullResolution) {
         bandType = _bandType;
+        fullResolution = _fullResolution;
         multicolor = bandType.hasLevels();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         warnPixels = new int[bandType.getWarningLevels().length];
@@ -78,7 +84,11 @@ public final class Band extends TimelineLayer {
     }
 
     private BandCache createBandCache() {
-        return bandType.cacheAllValues() ? new BandCacheAll() : new BandCacheMinute();
+        return fullResolution ? new BandCacheFull() : new BandCacheMinute();
+    }
+
+    public boolean isFullResolution() {
+        return fullResolution;
     }
 
     JSONObject toJson() {
@@ -420,9 +430,10 @@ public final class Band extends TimelineLayer {
 
         List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
         if (!missingIntervals.isEmpty()) {
-            // extend
-            start -= 7 * TimeUtils.DAY_IN_MILLIS;
-            end += 7 * TimeUtils.DAY_IN_MILLIS;
+            if (!fullResolution) {
+                start -= 7 * TimeUtils.DAY_IN_MILLIS;
+                end += 7 * TimeUtils.DAY_IN_MILLIS;
+            }
 
             List<Interval> intervals = new ArrayList<>();
             requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
