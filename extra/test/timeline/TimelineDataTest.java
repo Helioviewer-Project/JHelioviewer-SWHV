@@ -2,6 +2,9 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -20,6 +23,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.LongUnaryOperator;
+
+import javax.swing.event.TableModelEvent;
 
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.time.Interval;
@@ -51,8 +57,15 @@ public final class TimelineDataTest {
         checkExportImport();
         checkHapiRequests();
         System.out.println("Timeline data tests passed");
-        if (args.length > 0 && "--benchmark".equals(args[0]))
-            benchmark();
+        if (args.length > 0 && "--benchmark".equals(args[0])) {
+            EventQueue.invokeAndWait(() -> {
+                try {
+                    benchmark();
+                } catch (ReflectiveOperationException e) {
+                    throw new AssertionError(e);
+                }
+            });
+        }
     }
 
     private static void checkSavedState() throws Exception {
@@ -145,13 +158,23 @@ public final class TimelineDataTest {
             BandType second = new BandType(new JSONObject().put("name", "second"));
             BandType third = new BandType(new JSONObject().put("name", "third"));
             Band existing = layers.addBands(List.of(first)).getFirst();
+            List<TableModelEvent> events = new ArrayList<>();
+            layers.addTableModelListener(events::add);
             try {
-                List<Band> added = layers.addBands(List.of(first, second, third), true);
+                List<Band> added = layers.addBands(List.of(first, second, second, third, first), true);
                 check(layers.getRowCount() == 3, "Existing selection adds another row");
+                check(added.equals(List.of(existing, added.get(1), added.get(1), added.get(3), existing)),
+                        "Overlapping selections lose their order or create duplicate bands");
                 check(added.get(0) == existing && !existing.isFullResolution(), "Existing layer was changed");
-                check(added.get(1).isFullResolution() && added.get(2).isFullResolution(), "New layers lost the selection setting");
+                check(added.get(1).isFullResolution() && added.get(3).isFullResolution(), "New layers lost the selection setting");
+                check(events.size() == 1 && events.getFirst().getType() == TableModelEvent.INSERT
+                        && events.getFirst().getFirstRow() == 1 && events.getFirst().getLastRow() == 2,
+                        "Adding layers does not report exactly the newly inserted rows");
+                events.clear();
                 check(layers.addBands(List.of(second), false).getFirst() == added.get(1), "Re-adding replaces a layer");
                 check(added.get(1).isFullResolution() && layers.getRowCount() == 3, "Re-adding changes resolution or row count");
+                check(layers.addBands(List.of(), true).isEmpty(), "Empty selection returns bands");
+                check(events.isEmpty(), "Existing or empty selections notify a table change");
             } finally {
                 for (TimelineLayer layer : List.copyOf(TimelineLayers.get()))
                     layers.remove(layer);
@@ -425,7 +448,7 @@ public final class TimelineDataTest {
         }
     }
 
-    private static void benchmark() {
+    private static void benchmark() throws ReflectiveOperationException {
         // Fixed synthetic 10 Hz input for comparisons across revisions. Timings are not pass/fail thresholds.
         int count = 1_000_000;
         long[] dates = new long[count];
@@ -434,19 +457,47 @@ public final class TimelineDataTest {
             dates[i] = START + 100L * i;
             values[i] = i % 100;
         }
-        System.out.println("Cache benchmark: 1,000,000 samples at 10 Hz, 3 warmup runs, 5 measured runs");
-        for (int run = 0; run < 8; run++) {
-            BandCacheFull cache = new BandCacheFull();
-            long before = System.nanoTime();
-            cache.addToCache(AXIS, values, dates);
-            long inserted = System.nanoTime();
-            List<List<BandCache.DateValue>> graph = cache.getValues(1200, START, dates[count - 1]);
-            long extracted = System.nanoTime();
-            check(graph.size() == 1, "Benchmark data was split");
-            checkSamples(graph.getFirst(), dates, values);
-            if (run >= 3)
-                System.out.printf("Run %d: insertion %.1f ms, graph extraction %.1f ms%n",
-                        run - 2, (inserted - before) / 1e6, (extracted - inserted) / 1e6);
+        Rectangle area = new Rectangle(0, 0, 1200, 500);
+        BufferedImage image = new BufferedImage(area.width, area.height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setClip(area);
+        Band band = new Band(new BandType(new JSONObject().put("name", "benchmark")), true);
+        band.setDataColor(Color.WHITE);
+        Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+        build.setAccessible(true);
+        Field graphData = Band.class.getDeclaredField("graphData");
+        graphData.setAccessible(true);
+        TimeAxis.Mapper xMapper = new TimeAxis.Mapper(START, dates[count - 1], 0, area.width);
+        YAxis.Mapper yMapper = AXIS.mapper(0, area.height);
+        System.out.println("Timeline benchmark: 1,000,000 samples at 10 Hz, 1200x500 offscreen plot, 3 warmup runs, 5 measured runs");
+        try {
+            for (int run = 0; run < 8; run++) {
+                BandCacheFull cache = new BandCacheFull();
+                long before = System.nanoTime();
+                cache.addToCache(AXIS, values, dates);
+                long inserted = System.nanoTime();
+                List<List<BandCache.DateValue>> graph = cache.getValues(area.width, START, dates[count - 1]);
+                long extracted = System.nanoTime();
+                Object prepared = build.invoke(null, graph, xMapper, yMapper, LongUnaryOperator.identity(), false);
+                long built = System.nanoTime();
+                check(graph.size() == 1, "Benchmark data was split");
+                checkSamples(graph.getFirst(), dates, values);
+                graphData.set(band, prepared);
+                graphics.setColor(Color.BLACK);
+                graphics.fillRect(0, 0, area.width, area.height);
+                long paintStart = System.nanoTime();
+                band.draw(graphics, area, false);
+                long painted = System.nanoTime();
+                check(image.getRGB(area.width / 2, area.height / 2) == Color.WHITE.getRGB(), "Benchmark did not paint the plot");
+                if (run >= 3)
+                    System.out.printf("Run %d: insertion %.1f ms, extraction %.1f ms, polylines %.1f ms, painting %.1f ms%n",
+                            run - 2, (inserted - before) / 1e6, (extracted - inserted) / 1e6,
+                            (built - extracted) / 1e6, (painted - paintStart) / 1e6);
+            }
+        } finally {
+            graphics.dispose();
+            band.remove();
         }
     }
 

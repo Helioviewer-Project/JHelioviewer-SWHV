@@ -9,7 +9,7 @@ import tempfile
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--benchmark", action="store_true", help="also measure cache insertion and graph extraction")
+parser.add_argument("--benchmark", action="store_true", help="also measure cache insertion, graph preparation and offscreen painting")
 args = parser.parse_args()
 
 root = Path(__file__).resolve().parents[3]
