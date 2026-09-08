@@ -248,7 +248,8 @@ public final class TimelineDataTest {
                     resolutions.put(type, true);
                 result.addAll(BandReaderHapi.dataRequest(resolutions, start, end).call());
             }
-            check(result.size() == 5, "Expected five nonempty STIX parameters");
+            check(!result.isEmpty() && result.size() == Arrays.stream(datasets).mapToInt(dataset -> dataset.bandTypes().size()).sum(),
+                    "Capture has missing or empty parameters");
             return result;
         } finally {
             catalogs.clear();
@@ -310,9 +311,9 @@ public final class TimelineDataTest {
         setStacked.setAccessible(true);
         try {
             for (BandData input : data) {
-                check(!input.bandType().isBarPlot() && !input.bandType().hasLevels(), "Benchmark expects single-color line plots");
+                check(!input.bandType().isBarPlot(), "Benchmark expects line plots");
                 Band band = new Band(input.bandType(), true);
-                band.setDataColor(colors[layers.size()]);
+                band.setDataColor(colors[layers.size() % colors.length]);
                 layers.add(band);
                 BandCache cache = (BandCache) field(Band.class, band, "bandCache");
                 cache.addToCache(band.getYAxis(), input.values(), input.dates());
@@ -341,7 +342,8 @@ public final class TimelineDataTest {
             }
             System.out.printf("JVM %s, 1200x700 logical plot, %d warmup runs, %d measured runs%n",
                     System.getProperty("java.runtime.version"), WARMUP_RUNS, MEASURED_RUNS);
-            System.out.println("Five-layer painting on the EDT, native HAPI axis ranges, grid and labels, no propagation; preparation includes cache extraction and polylines.");
+            System.out.println(layers.size() + "-layer painting on the EDT, HAPI level colors and axis ranges, grid and labels, no propagation.");
+            System.out.println("Elapsed time and thread allocations per iteration; preparation includes cache extraction and polylines.");
             Object chart = chartPainter(layers);
             Method drawChart = chartDrawMethod(chart);
             for (boolean stacked : new boolean[]{false, true}) {
@@ -366,7 +368,7 @@ public final class TimelineDataTest {
                                 Rectangle area = geometry.getLayerArea(band);
                                 List<List<BandCache.DateValue>> raw = caches.get(i).getValues(scale * area.width, start, end);
                                 Object prepared = build.invoke(null, raw, geometry.xMapper(new TimeAxis(start, end)),
-                                        geometry.yMapper(band.getYAxis(), area), LongUnaryOperator.identity(), false);
+                                        geometry.yMapper(band.getYAxis(), area), LongUnaryOperator.identity(), band.isMulticolor());
                                 graphData.set(band, prepared);
                             }
                             long prepared = System.nanoTime();
@@ -387,7 +389,7 @@ public final class TimelineDataTest {
                                 bytes[1][index] = (allocatedPainted - allocatedPaint) / 1048576.;
                             }
                         }
-                        System.out.printf("%s: preparation %.3f ms / %.3f MiB; painting %.3f ms / %.3f MiB (medians)%n",
+                        System.out.printf("%s: preparation %.3f ms / %.3f MiB allocated; painting %.3f ms / %.3f MiB allocated (medians)%n",
                                 name, median(times[0]), median(bytes[0]), median(times[1]), median(bytes[1]));
                         ImageIO.write(image, "png", directory.resolve(name + ".png").toFile());
                     } finally {
@@ -827,7 +829,7 @@ public final class TimelineDataTest {
         }
         System.out.printf("Timeline benchmark: %,d samples at 10 Hz, %d warmup runs, %d measured runs (medians)%n",
                 count, WARMUP_RUNS, MEASURED_RUNS);
-        System.out.println("Heap allocations cover the benchmark thread. Input generation and correctness checks are excluded.");
+        System.out.println("Elapsed time and thread allocations per iteration. Input generation and correctness checks are excluded.");
         benchmarkLoading("Single batch", new long[][]{dates}, new float[][]{values}, List.of(0), allocations);
         int batchSize = 10_000;
         long[][] dateBatches = new long[count / batchSize][];

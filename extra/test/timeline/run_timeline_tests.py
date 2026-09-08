@@ -3,7 +3,9 @@
 
 Capture once with --capture-stix DIRECTORY --start UTC_TIMESTAMP --end UTC_TIMESTAMP.
 Replay with --hapi-benchmark DIRECTORY. The capture stays outside the repository;
-replay writes overlay/stacked PNGs into that directory. Dense 2x painting can take minutes.
+replay writes overlay/stacked PNGs into that directory. Captures can contain single-color
+or multicolor line plots. Benchmarks report elapsed time and allocations, not CPU time
+or whole-application memory usage.
 """
 
 import argparse
