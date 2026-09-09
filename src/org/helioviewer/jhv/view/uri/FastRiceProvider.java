@@ -2,17 +2,13 @@ package org.helioviewer.jhv.view.uri;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.logging.Logger;
 
 import nom.tam.fits.compression.algorithm.api.ICompressOption;
 import nom.tam.fits.compression.algorithm.api.ICompressorControl;
-import nom.tam.fits.compression.algorithm.quant.QuantizeOption;
-import nom.tam.fits.compression.algorithm.quant.RandomSequence;
 import nom.tam.fits.compression.algorithm.rice.RiceCompressOption;
+import nom.tam.fits.compression.algorithm.rice.RiceCompressor;
 import nom.tam.fits.compression.provider.api.ICompressorProvider;
 import nom.tam.fits.header.Compression;
 
@@ -20,14 +16,8 @@ public final class FastRiceProvider implements ICompressorProvider {
 
     private static final int BITS_PER_BYTE = 8;
     private static final int BYTE_MASK = 0xff;
-    private static final int FS_BITS_FOR_BYTE = 3;
     private static final int FS_BITS_FOR_SHORT = 4;
-    private static final int FS_BITS_FOR_INT = 5;
-    private static final int FS_MAX_FOR_BYTE = 6;
     private static final int FS_MAX_FOR_SHORT = 14;
-    private static final int FS_MAX_FOR_INT = 25;
-    private static final int RANDOM_MULTIPLICATOR = 500;
-    private static final int ZERO_VALUE = Integer.MIN_VALUE + 2;
     private static final Logger LOG = Logger.getLogger(FastRiceProvider.class.getName());
 
     public FastRiceProvider() {}
@@ -39,16 +29,10 @@ public final class FastRiceProvider implements ICompressorProvider {
             return null;
         }
 
-        if (quantAlgorithm != null && (baseType == float.class || baseType == double.class)) {
-            return new Control(baseType, true);
-        }
-        if (quantAlgorithm == null && (baseType == byte.class || baseType == short.class || baseType == int.class)) {
-            return new Control(baseType, false);
-        }
-        return null;
+        return quantAlgorithm == null && baseType == short.class ? new Control() : null;
     }
 
-    private record Control(Class<?> baseType, boolean quantized) implements ICompressorControl {
+    private static final class Control implements ICompressorControl {
 
         @Override
         public boolean compress(Buffer in, ByteBuffer out, ICompressOption option) {
@@ -57,57 +41,18 @@ public final class FastRiceProvider implements ICompressorProvider {
 
         @Override
         public void decompress(ByteBuffer in, Buffer out, ICompressOption option) {
-            if (quantized) {
-                QuantizeOption quantize = option.unwrap(QuantizeOption.class);
-                RiceCompressOption rice = option.unwrap(RiceCompressOption.class);
-                if (baseType == float.class) {
-                    decodeFloat(in, (FloatBuffer) out, quantize, rice);
-                } else {
-                    decodeDouble(in, (DoubleBuffer) out, quantize, rice);
-                }
-            } else if (baseType == byte.class) {
-                decodeByte(in, (ByteBuffer) out, option.unwrap(RiceCompressOption.class));
-            } else if (baseType == short.class) {
-                decodeShort(in, (ShortBuffer) out, option.unwrap(RiceCompressOption.class));
-            } else {
-                decodeInt(in, (IntBuffer) out, option.unwrap(RiceCompressOption.class));
-            }
+            RiceCompressOption rice = option.unwrap(RiceCompressOption.class);
+            // Encoded width can differ from the short output type.
+            if (rice.getBytePix() == Short.BYTES)
+                decodeShort(in, (ShortBuffer) out, rice);
+            else
+                new RiceCompressor.ShortRiceCompressor(rice).decompress(in, (ShortBuffer) out);
         }
 
         @Override
         public ICompressOption option() {
-            RiceCompressOption rice = new RiceCompressOption();
-            if (quantized) {
-                return new QuantizeOption(rice);
-            }
-            return rice;
+            return new RiceCompressOption();
         }
-    }
-
-    private static void decodeByte(ByteBuffer in, ByteBuffer out, RiceCompressOption option) {
-        Decoder decoder = new Decoder(in, option, FS_BITS_FOR_BYTE, FS_MAX_FOR_BYTE);
-        int last = decoder.firstByte();
-        int length = out.limit();
-        for (int i = 0; i < length; ) {
-            int fs = decoder.readFs();
-            int end = decoder.blockEnd(i, length);
-            if (fs < 0) {
-                for (; i < end; i++) {
-                    out.put((byte) last);
-                }
-            } else if (fs == decoder.fsMax) {
-                for (; i < end; i++) {
-                    last += map(decoder.readDirect());
-                    out.put((byte) last);
-                }
-            } else {
-                for (; i < end; i++) {
-                    last += map(decoder.readRice(fs));
-                    out.put((byte) last);
-                }
-            }
-        }
-        decoder.finish();
     }
 
     private static void decodeShort(ByteBuffer in, ShortBuffer out, RiceCompressOption option) {
@@ -169,92 +114,6 @@ public final class FastRiceProvider implements ICompressorProvider {
         }
     }
 
-    private static void decodeInt(ByteBuffer in, IntBuffer out, RiceCompressOption option) {
-        Decoder decoder = new Decoder(in, option, FS_BITS_FOR_INT, FS_MAX_FOR_INT);
-        int last = decoder.firstInt();
-        int length = out.limit();
-        for (int i = 0; i < length; ) {
-            int fs = decoder.readFs();
-            int end = decoder.blockEnd(i, length);
-            if (fs < 0) {
-                for (; i < end; i++) {
-                    out.put(last);
-                }
-            } else if (fs == decoder.fsMax) {
-                for (; i < end; i++) {
-                    last += map(decoder.readDirect());
-                    out.put(last);
-                }
-            } else {
-                for (; i < end; i++) {
-                    last += map(decoder.readRice(fs));
-                    out.put(last);
-                }
-            }
-        }
-        decoder.finish();
-    }
-
-    private static void decodeFloat(ByteBuffer in, FloatBuffer out, QuantizeOption quantize, RiceCompressOption option) {
-        Decoder decoder = new Decoder(in, option, FS_BITS_FOR_INT, FS_MAX_FOR_INT);
-        int last = decoder.firstInt();
-        int length = out.limit();
-        Quantizer quantizer = new Quantizer(quantize);
-        for (int i = 0; i < length; ) {
-            int fs = decoder.readFs();
-            int end = decoder.blockEnd(i, length);
-            if (fs < 0) {
-                for (; i < end; i++) {
-                    out.put((float) quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            } else if (fs == decoder.fsMax) {
-                for (; i < end; i++) {
-                    last += map(decoder.readDirect());
-                    out.put((float) quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            } else {
-                for (; i < end; i++) {
-                    last += map(decoder.readRice(fs));
-                    out.put((float) quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            }
-        }
-        decoder.finish();
-    }
-
-    private static void decodeDouble(ByteBuffer in, DoubleBuffer out, QuantizeOption quantize, RiceCompressOption option) {
-        Decoder decoder = new Decoder(in, option, FS_BITS_FOR_INT, FS_MAX_FOR_INT);
-        int last = decoder.firstInt();
-        int length = out.limit();
-        Quantizer quantizer = new Quantizer(quantize);
-        for (int i = 0; i < length; ) {
-            int fs = decoder.readFs();
-            int end = decoder.blockEnd(i, length);
-            if (fs < 0) {
-                for (; i < end; i++) {
-                    out.put(quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            } else if (fs == decoder.fsMax) {
-                for (; i < end; i++) {
-                    last += map(decoder.readDirect());
-                    out.put(quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            } else {
-                for (; i < end; i++) {
-                    last += map(decoder.readRice(fs));
-                    out.put(quantizer.toDouble(last));
-                    quantizer.nextPixel();
-                }
-            }
-        }
-        decoder.finish();
-    }
-
     private static int map(int diff) {
         return (diff >>> 1) ^ -(diff & 1);
     }
@@ -288,20 +147,8 @@ public final class FastRiceProvider implements ICompressorProvider {
             fsMax = _fsMax;
         }
 
-        private int firstByte() {
-            int first = getByte();
-            initBits();
-            return first;
-        }
-
         private int firstShort() {
             int first = getByte() << BITS_PER_BYTE | getByte();
-            initBits();
-            return first;
-        }
-
-        private int firstInt() {
-            int first = getByte() << 24 | getByte() << 16 | getByte() << BITS_PER_BYTE | getByte();
             initBits();
             return first;
         }
@@ -369,6 +216,7 @@ public final class FastRiceProvider implements ICompressorProvider {
 
             byte[] input = inArray;
             int position = inPosition;
+            int limit = inArrayOffset + in.limit();
             long bitBuffer = bits;
             int bitCount = nbits;
 
@@ -389,30 +237,32 @@ public final class FastRiceProvider implements ICompressorProvider {
                     }
                 } else if (fs == fsMax) {
                     for (; i < end; i++) {
-                        int k = bBits - bitCount;
-                        long diff = bitBuffer << k;
-                        for (k -= BITS_PER_BYTE; k >= 0; k -= BITS_PER_BYTE) {
-                            bitBuffer = input[position++] & BYTE_MASK;
-                            diff |= bitBuffer << k;
+                        while (bitCount < bBits) {
+                            bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
+                            bitCount += BITS_PER_BYTE;
                         }
-                        if (bitCount > 0) {
-                            bitBuffer = input[position++] & BYTE_MASK;
-                            diff |= bitBuffer >>> -k;
-                            bitBuffer &= (1L << bitCount) - 1L;
-                        } else {
-                            bitBuffer = 0;
-                        }
+                        bitCount -= bBits;
+                        int diff = (int) (bitBuffer >>> bitCount);
+                        bitBuffer &= (1L << bitCount) - 1L;
 
-                        last += map((int) diff);
+                        last += map(diff);
                         out[offset + i] = (short) last;
                     }
                 } else {
                     for (; i < end; i++) {
+                        // Refill ahead when four bytes remain, without crossing the input limit.
+                        if (bitCount < Short.SIZE && position <= limit - Integer.BYTES) {
+                            int word = (input[position] & BYTE_MASK) << 24 | (input[position + 1] & BYTE_MASK) << 16
+                                    | (input[position + 2] & BYTE_MASK) << 8 | input[position + 3] & BYTE_MASK;
+                            bitBuffer = bitBuffer << Integer.SIZE | Integer.toUnsignedLong(word);
+                            position += Integer.BYTES;
+                            bitCount += Integer.SIZE;
+                        }
                         while (bitBuffer == 0) {
                             bitCount += BITS_PER_BYTE;
                             bitBuffer = input[position++] & BYTE_MASK;
                         }
-                        int nzero = bitCount - (32 - Integer.numberOfLeadingZeros((int) (bitBuffer & BYTE_MASK)));
+                        int nzero = bitCount - (Long.SIZE - Long.numberOfLeadingZeros(bitBuffer));
                         bitCount -= nzero + 1;
                         bitBuffer ^= 1L << bitCount;
 
@@ -431,7 +281,10 @@ public final class FastRiceProvider implements ICompressorProvider {
                 }
             }
 
-            inPosition = position;
+            // Leave prefetched whole bytes unread, matching the byte-at-a-time decoder.
+            inPosition = position - bitCount / BITS_PER_BYTE;
+            bitBuffer >>>= bitCount / BITS_PER_BYTE * BITS_PER_BYTE;
+            bitCount %= BITS_PER_BYTE;
             bits = bitBuffer;
             nbits = bitCount;
         }
@@ -453,72 +306,4 @@ public final class FastRiceProvider implements ICompressorProvider {
         }
     }
 
-    private static final class Quantizer {
-
-        private final boolean dither;
-        private final boolean checkZero;
-        private final boolean checkNull;
-        private final boolean nullIsNaN;
-        private final int nullIndicator;
-        private final double bScale;
-        private final double bZero;
-        private final double nullValue;
-        private int iseed;
-        private int nextRandom;
-
-        private Quantizer(QuantizeOption option) {
-            dither = option.isDither() || option.isDither2();
-            checkZero = option.isCheckZero() || option.isDither2();
-            checkNull = option.isCheckNull();
-            Integer bNull = option.getBNull();
-            nullIndicator = bNull == null ? Integer.MIN_VALUE + 1 : bNull;
-            nullValue = option.getNullValue();
-            nullIsNaN = Double.isNaN(nullValue);
-            bScale = option.getBScale();
-            bZero = option.getBZero();
-            if (dither) {
-                initialize(option.getSeed() + option.getTileIndex());
-            }
-        }
-
-        private void initialize(long seed) {
-            iseed = (int) ((seed - 1) % RandomSequence.length());
-            initI1();
-        }
-
-        private void initI1() {
-            nextRandom = (int) (RandomSequence.get(iseed) * RANDOM_MULTIPLICATOR);
-        }
-
-        private double nextRandom() {
-            return RandomSequence.get(nextRandom);
-        }
-
-        private void nextPixel() {
-            if (!dither) {
-                return;
-            }
-            nextRandom++;
-            if (nextRandom >= RandomSequence.length()) {
-                iseed++;
-                if (iseed >= RandomSequence.length()) {
-                    iseed = 0;
-                }
-                initI1();
-            }
-        }
-
-        private double toDouble(int pixel) {
-            if (checkNull && pixel == nullIndicator) {
-                return nullIsNaN ? Double.NaN : nullValue;
-            }
-            if (checkZero && pixel == ZERO_VALUE) {
-                return 0.;
-            }
-            if (dither) {
-                return (pixel - nextRandom() + .5) * bScale + bZero;
-            }
-            return (pixel + .5) * bScale + bZero;
-        }
-    }
 }

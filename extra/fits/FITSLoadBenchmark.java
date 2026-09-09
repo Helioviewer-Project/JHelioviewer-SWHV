@@ -1,3 +1,5 @@
+package org.helioviewer.jhv.view.uri;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.Buffer;
@@ -9,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
-import org.helioviewer.jhv.view.uri.FITSImage;
+import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageFilter;
 
 import nom.tam.fits.FitsFactory;
 
@@ -89,7 +91,7 @@ public final class FITSLoadBenchmark {
     private static Result load(FITSImage reader, File file, Options options) throws Exception {
         ImageBuffer buffer = switch (options.mode()) {
             case Image -> reader.readImage(file).buffer();
-            case Buffer -> reader.readImageBuffer(file, options.filter());
+            case Buffer -> reader.readImageBuffer(file, ImageFilter.of(options.filter(), null, null));
         };
         return new Result(buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
@@ -132,7 +134,7 @@ public final class FITSLoadBenchmark {
         List<Path> files = new ArrayList<>();
         for (Path input : inputs) {
             if (Files.isDirectory(input)) {
-                try (var stream = recursive ? Files.walk(input) : Files.list(input)) {
+                try (Stream<Path> stream = recursive ? Files.walk(input) : Files.list(input)) {
                     stream.filter(Files::isRegularFile)
                             .filter(FITSLoadBenchmark::isFitsFile)
                             .forEach(files::add);
@@ -181,6 +183,8 @@ public final class FITSLoadBenchmark {
             throw new IllegalArgumentException("Invalid warmup/iteration count");
         if (mode == Mode.Image && filter != ImageFilter.Type.None)
             throw new IllegalArgumentException("--filter requires --mode Buffer");
+        if (filter == ImageFilter.Type.RHEF)
+            throw new IllegalArgumentException("RHEF requires image geometry and is not supported by this benchmark");
 
         return new Options(mode, filter, warmup, iterations, recursive, checksum, inputs);
     }
