@@ -13,7 +13,7 @@
 - Add general and timeline interaction guides to the Help menu
 
 ### Timeline and events
-- Allow HAPI timelines to be loaded at full resolution and significantly improve timeline loading and drawing performance
+- Allow HAPI timelines to be loaded at full time resolution and significantly improve timeline loading and drawing performance
 - Improve SWEK event loading, filtering, display, and related-event handling, with more reliable updates
 
 ### Technical

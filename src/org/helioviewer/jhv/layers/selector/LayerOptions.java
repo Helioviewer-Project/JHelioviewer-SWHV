@@ -22,7 +22,7 @@ import org.helioviewer.jhv.layers.fov.FOVTreePane;
 public final class LayerOptions implements Layers.Listener {
 
     private static final Map<Class<? extends Layer>, Function<Layer, Component>> providers = new HashMap<>();
-    private static final Map<Layer, Component> panels = new IdentityHashMap<>();
+    private static final IdentityHashMap<Layer, Component> panels = new IdentityHashMap<>();
     private static final LayerOptions listener = new LayerOptions();
 
     static {
