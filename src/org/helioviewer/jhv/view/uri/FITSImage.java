@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
@@ -383,19 +382,12 @@ public final class FITSImage implements URIImageReader {
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).clearPixels().finish();
 
-                if (state.clippingMode().percentile() > 0) {
-                    double percentile = state.clippingMode().percentile();
-                    int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
-                    int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
-                    float[] values = sampleData.values();
-                    min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
-                    max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
-                } else {
-                    Arrays.sort(sampleData.values(), 0, sampleLen);
-                    ZScale.ZScaleRange range = ZScale.zscale(sampleData.values(), sampleLen, state.zContrast());
-                    min = range.low();
-                    max = range.high();
-                }
+                double percentile = state.clippingMode().percentile();
+                int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
+                int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
+                float[] values = sampleData.values();
+                min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
+                max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
             }
         }
         if (min >= max) {
