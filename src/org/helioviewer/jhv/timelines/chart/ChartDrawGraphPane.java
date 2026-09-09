@@ -4,7 +4,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -22,7 +21,6 @@ import javax.annotation.Nullable;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.movie.ExportMovie;
@@ -99,13 +97,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     protected void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         GraphGeometry geometry = DrawController.getGeometry();
+        Graphics2D g = (Graphics2D) g1;
 
         if (redrawGraphArea) {
             redrawGraphArea = false;
-            redrawGraph(geometry);
+            redrawGraph(g, geometry);
         }
 
-        Graphics2D g = (Graphics2D) g1;
         if (screenImage != null) {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -115,14 +113,15 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
-    private void redrawGraph(GraphGeometry geometry) {
+    private void redrawGraph(Graphics2D target, GraphGeometry geometry) {
         Rectangle graphSize = geometry.size();
-        double sx = Display.pixelScale[0], sy = Display.pixelScale[1];
+        AffineTransform targetTransform = target.getTransform();
+        double sx = targetTransform.getScaleX(), sy = targetTransform.getScaleY();
         int width = (int) (sx * graphSize.getWidth() + .5);
         int height = (int) (sy * graphSize.getHeight() + .5);
 
         if (screenImage == null || width != screenImage.getWidth() || height != screenImage.getHeight()) {
-            screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
+            screenImage = target.getDeviceConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
         }
 
         Graphics2D fullG = screenImage.createGraphics();
