@@ -151,30 +151,30 @@ public final class MenuBar extends JMenuBar {
                 <b>Shift + N / P</b> — select the next / previous annotation.
                 <b>Shift + Delete / Backspace</b> — delete the selected annotation.
                 <b>Hold X, Y, or Z</b> — choose the axis in Rotate Axis mode. Release to restore the default (normally Y).
-
+                
                 <b>Movie slider and layers</b>
                 With the movie slider focused: <b>Space</b> — play/pause; <b>Left / Right</b> — previous / next frame.
                 <b>Scroll over the movie slider</b> — step through frames.
                 On the slider: <b>⌥ / Alt + drag</b> — trim the nearest range boundary; <b>%1$s + drag</b> — move the playback range.
                 In the layer list: <b>%1$s + C</b> — copy the selected layer's time.
                 <b>Double-click an image layer's name or time</b> — change its dataset. Drag layer rows to reorder them.
-
+                
                 <b>Adjustment controls</b>
                 <b>Scroll over a slider or numeric spinner</b> — adjust its value.
                 <b>Double-click an adjustment slider</b> — reset it. Drag between a range slider's handles to move both together.
-
+                
                 <b>Timeline graph</b>
                 See <b>Help → Timeline Interaction</b> for graph, axis, and overview controls.
-
+                
                 <b>Dataset selection</b>
                 <b>%1$s + click</b> — add or remove individual selections.
                 <b>Shift + click</b> — select a range. Change Dataset accepts only one dataset.
-
+                
                 <b>Type to search</b>
                 Focus a dataset tree or list, the colormap drop-down, or the FITS metadata table, then type.
                 Search ignores case and matches the beginning of a name. Use <b>*text</b> to find text anywhere; <b>?</b> matches one character.
                 Image and timeline dataset trees also search collapsed branches.
-
+                
                 <b>While the search popup is open</b>
                 <b>Up / Down</b> — previous / next match. <b>Home / End</b> — first / last match.
                 <b>Backspace</b> — edit the search. <b>Esc</b> — close the search popup.
@@ -191,7 +191,7 @@ public final class MenuBar extends JMenuBar {
                 <b>Drag the vertical movie-time marker</b> — scrub through movie frames.
                 <b>Drag elsewhere</b> — pan time horizontally and value scales vertically.
                 Click an interactive event or feature to activate it instead of seeking the movie.
-
+                
                 <b>Wheel or trackpad scrolling over the plot</b>
                 <b>Scroll</b> — zoom time around the pointer.
                 <b>Shift + scroll</b> — pan time.
@@ -199,19 +199,19 @@ public final class MenuBar extends JMenuBar {
                 <b>Ctrl + scroll</b> — zoom time and values together.
                 Over the time-axis labels, scrolling zooms time even with modifiers held.
                 Over a value-axis label area, scrolling zooms that value axis without a modifier.
-
+                
                 <b>Which value scales are affected?</b>
                 In overlaid mode, vertical dragging or value zooming over the plot affects all value axes. Start over a value-axis label area to target that axis.
                 In stacked mode, value adjustments affect only the plot under the pointer (or where the drag started). Time is shared by all plots.
                 <b>Double-click</b> in an overlaid plot to fit value scales to the visible data; double-click a value-axis label area to restore its default scale.
                 In stacked mode, double-click a plot or its value axis to restore that plot's default scale.
-
+                
                 <b>Overview strip below the plot</b>
                 The highlighted interval is the time range shown in the plot.
                 <b>Drag the highlighted interval</b> — move the range without changing its duration.
                 <b>Left-click</b> — center the range on the clicked time.
                 <b>Right-click left / right of the range center</b> — shift the range to later / earlier times.
-
+                
                 <b>Timeline controls and layers</b>
                 The range selector chooses a preset duration, the movie interval, or the maximum interval.
                 <b>Synchronize movie with time series</b> — apply timeline range changes to the image movie's time range.

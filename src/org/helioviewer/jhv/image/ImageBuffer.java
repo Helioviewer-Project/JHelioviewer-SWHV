@@ -39,7 +39,7 @@ public final class ImageBuffer {
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter filter) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        if (!shouldFilter(format, filter))
+        if (canUseDirectBuffer(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
         return fromFloats(width, height, filter.apply(data, width, height));
     }
@@ -47,7 +47,7 @@ public final class ImageBuffer {
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        if (!shouldFilter(format, filter))
+        if (canUseDirectBuffer(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
         return fromFloats(width, height, filter.apply(data, width, height));
     }
@@ -120,7 +120,7 @@ public final class ImageBuffer {
             inputFormat = _format;
             filter = _filter;
 
-            if (!ImageBuffer.shouldFilter(inputFormat, filter)) {
+            if (ImageBuffer.canUseDirectBuffer(inputFormat, filter)) {
                 directBuffer = allocate(width, height, inputFormat);
                 writeBuffer = directBuffer.buffer;
             } else if (inputFormat == Format.Gray16F) {
@@ -160,8 +160,8 @@ public final class ImageBuffer {
 
     }
 
-    private static boolean shouldFilter(Format format, ImageFilter filter) {
-        return format != Format.RGBA32 && !filter.isNone();
+    private static boolean canUseDirectBuffer(Format format, ImageFilter filter) {
+        return format == Format.RGBA32 || filter.isNone();
     }
 
     private static final class BufferState implements Runnable {

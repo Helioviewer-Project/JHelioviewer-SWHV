@@ -46,7 +46,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Timelines");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(root);
     private final JTree tree = new JTree(treeModel);
-    private final JCheckBox fullResolution = new JCheckBox("Full resolution");
+    private final JCheckBox fullResolution = new JCheckBox("Full time resolution");
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {

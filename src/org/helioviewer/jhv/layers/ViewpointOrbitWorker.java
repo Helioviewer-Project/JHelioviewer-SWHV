@@ -11,8 +11,6 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.DirectBufVertex;
-import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.thread.LatestWorker;
 
 final class ViewpointOrbitWorker {
