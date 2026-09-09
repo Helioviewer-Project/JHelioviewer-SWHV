@@ -90,6 +90,15 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             displaySettings.fromJson(imageParams);
     }
 
+    public void setFilter(ImageFilter.Type type) {
+        if (type == view.getFilter())
+            return;
+
+        view.clearCache();
+        view.setFilter(type);
+        DisplayController.render(1);
+    }
+
     public void load(APIRequest req) {
         if (removed)
             return;

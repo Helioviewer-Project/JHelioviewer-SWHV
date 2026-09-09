@@ -95,12 +95,10 @@ public final class ImageFilterPanel implements FilterDetails {
 
         upsilonButton.setVisible(layer.getView().getFilter() == ImageFilter.Type.RHEF);
         filterCombo.addActionListener(e -> {
-            if (filterCombo.getSelectedItem() instanceof ImageFilter.Type type && type != layer.getView().getFilter()) {
+            if (filterCombo.getSelectedItem() instanceof ImageFilter.Type type) {
                 filterCombo.setToolTipText(type.description);
                 upsilonButton.setVisible(type == ImageFilter.Type.RHEF);
-                layer.getView().clearCache();
-                layer.getView().setFilter(type);
-                DisplayController.render(1);
+                layer.setFilter(type);
             }
         });
 
