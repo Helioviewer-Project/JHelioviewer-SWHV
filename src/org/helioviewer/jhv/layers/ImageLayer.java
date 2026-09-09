@@ -96,6 +96,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         view.clearCache();
         view.setFilter(type);
+        imageData = prevImageData = baseImageData = null;
         DisplayController.render(1);
     }
 
