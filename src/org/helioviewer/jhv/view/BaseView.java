@@ -94,10 +94,11 @@ public class BaseView implements View {
     protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image) {
         image.imageBuffer().protectFromExplicitFree();
         MetaData m = metaData[frame];
+        ImageFilter.Type decodedFilter = filterType;
 
         View.ImageData data = new View.ImageData(image.imageBuffer(), m, image.region(), viewpoint);
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null)
+            if (dataHandler != null && decodedFilter == filterType)
                 dataHandler.handleData(data);
             else
                 image.imageBuffer().allowExplicitFree();
