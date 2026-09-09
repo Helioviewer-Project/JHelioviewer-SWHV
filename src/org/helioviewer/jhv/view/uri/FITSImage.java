@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
-import java.io.InputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -44,12 +43,6 @@ public final class FITSImage implements URIImageReader {
     public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
         try (Fits f = new Fits(file)) {
             return readHDU(findHDU(f), filter);
-        }
-    }
-
-    public ImageBuffer readImageBuffer(InputStream input) throws Exception {
-        try (Fits f = new Fits(input)) {
-            return readHDU(findHDU(f), ImageFilter.NONE);
         }
     }
 
