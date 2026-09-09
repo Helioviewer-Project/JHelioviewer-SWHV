@@ -55,7 +55,7 @@ public final class Band extends TimelineLayer {
     private static final ExecutorService graphPool =
             Executors.newFixedThreadPool(GRAPH_THREADS, new AppThread.NamedThreadFactory("Timeline-Graph"));
 
-    private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
+    private static final int MAX_REQUEST_DAYS = 21;
 
     private final BandType bandType;
     private final boolean fullResolution;
@@ -438,17 +438,23 @@ public final class Band extends TimelineLayer {
         if (!BandDownloads.hasCatalog(this))
             return;
 
-        List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
-        if (!missingIntervals.isEmpty()) {
-            if (!fullResolution) {
-                start -= 7 * TimeUtils.DAY_IN_MILLIS;
-                end += 7 * TimeUtils.DAY_IN_MILLIS;
-            }
-
-            List<Interval> intervals = new ArrayList<>();
-            requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
+        List<Interval> intervals = reserveDownloadIntervals(start, end);
+        if (!intervals.isEmpty())
             BandDownloads.start(this, intervals);
-        }
+    }
+
+    List<Interval> reserveDownloadIntervals(long start, long end) {
+        if (start == end)
+            return List.of();
+
+        // Round outward to UTC days so small range changes reuse downloaded or in-flight data.
+        long day = TimeUtils.DAY_IN_MILLIS;
+        long requestStart = Math.floorDiv(start, day) * day;
+        long requestEnd = (Math.floorDiv(end - 1, day) + 1) * day;
+        List<Interval> intervals = new ArrayList<>();
+        for (Interval missing : requestCache.adaptRequestCache(requestStart, requestEnd))
+            intervals.addAll(Interval.splitInterval(missing, MAX_REQUEST_DAYS));
+        return intervals;
     }
 
     void requestFailed(Interval interval) {

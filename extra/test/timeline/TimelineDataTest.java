@@ -689,11 +689,12 @@ public final class TimelineDataTest {
                 standard.fetchData(interval);
                 RequestCache fullRequests = (RequestCache) field(Band.class, full, "requestCache");
                 RequestCache standardRequests = (RequestCache) field(Band.class, standard, "requestCache");
-                check(fullRequests.getAllRequestIntervals().equals(List.of(new Interval(start, start + 130_000))),
-                        "Full-resolution requests prefetch outside the selected interval");
-                long padding = 7 * TimeUtils.DAY_IN_MILLIS;
-                check(standardRequests.getAllRequestIntervals().equals(List.of(new Interval(start - padding, start + 130_000 + padding))),
-                        "Default prefetch changed");
+                long dayStart = Math.floorDiv(start, TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS;
+                check(fullRequests.getAllRequestIntervals().equals(List.of(new Interval(dayStart, dayStart + TimeUtils.DAY_IN_MILLIS))),
+                        "Requests must cover complete UTC days");
+                check(standardRequests.getAllRequestIntervals().equals(fullRequests.getAllRequestIntervals()),
+                        "Display resolution changes download coverage");
+                checkDownloadIntervals(type);
             } catch (Exception e) {
                 throw new AssertionError(e);
             } finally {
@@ -701,6 +702,47 @@ public final class TimelineDataTest {
                 standard.remove();
             }
         });
+    }
+
+    private static void checkDownloadIntervals(BandType type) {
+        long minute = TimeUtils.MINUTE_IN_MILLIS;
+        long day = TimeUtils.DAY_IN_MILLIS;
+        for (boolean fullResolution : new boolean[]{false, true}) {
+            Band band = new Band(type, fullResolution);
+            try {
+                check(band.reserveDownloadIntervals(0, 0).isEmpty(), "Empty range reserves data");
+                check(band.reserveDownloadIntervals(0, 7 * day).equals(List.of(new Interval(0, 7 * day))), "Week block coverage");
+                check(band.reserveDownloadIntervals(minute, 7 * day + minute).equals(List.of(new Interval(7 * day, 8 * day))), "Pan misses next day");
+                for (int pan = 1; pan <= 12; pan++) {
+                    long shift = pan * 10 * minute;
+                    check(band.reserveDownloadIntervals(shift, 7 * day + shift).isEmpty(), "Small pan repeats a request");
+                }
+                check(band.reserveDownloadIntervals(day, 8 * day).isEmpty(), "Exact block boundary requests extra data");
+                Interval next = new Interval(8 * day, 9 * day);
+                check(band.reserveDownloadIntervals(day + minute, 8 * day + minute).equals(List.of(next)), "Crossing boundary misses next block");
+                check(band.reserveDownloadIntervals(day + minute, 8 * day + minute).isEmpty(), "In-flight request duplicated");
+                band.requestFailed(next);
+                check(band.reserveDownloadIntervals(day + minute, 8 * day + minute).equals(List.of(next)), "Failed request cannot retry");
+                check(band.reserveDownloadIntervals(0, 8 * day).isEmpty(), "Failure removed neighboring coverage");
+                check(band.reserveDownloadIntervals(-day + minute, 10 * day - minute).equals(List.of(new Interval(-day, 0), new Interval(9 * day, 10 * day))),
+                        "Zoom loses or repeats coverage");
+            } finally {
+                band.remove();
+            }
+            Band large = new Band(type, fullResolution);
+            try {
+                List<Interval> chunks = large.reserveDownloadIntervals(-day, 90 * day);
+                check(Interval.merge(chunks).equals(List.of(new Interval(-day, 90 * day))), "Large request has gaps or wrong bounds");
+                long end = -day;
+                for (Interval chunk : chunks) {
+                    check(chunk.start() == end && chunk.end() - chunk.start() <= 21 * day, "Chunks overlap or exceed request limit");
+                    end = chunk.end();
+                }
+                check(large.reserveDownloadIntervals(0, 90 * day).isEmpty(), "Large in-flight request duplicated");
+            } finally {
+                large.remove();
+            }
+        }
     }
 
     private static Object field(Class<?> owner, Object target, String name) throws Exception {
