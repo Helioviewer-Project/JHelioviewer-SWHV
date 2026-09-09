@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.view.uri.FITSImage;
 import org.helioviewer.jhv.view.uri.FastRiceProvider;
 
@@ -401,12 +401,8 @@ public final class FastRiceVerifier {
         ImageBuffer expected = null, actual = null;
         try {
             FITSImage reader = new FITSImage();
-            try (InputStream in = Files.newInputStream(reference)) {
-                expected = reader.readImageBuffer(in);
-            }
-            try (InputStream in = Files.newInputStream(compressed)) {
-                actual = reader.readImageBuffer(in);
-            }
+            expected = reader.readImageBuffer(reference.toFile(), ImageFilter.NONE);
+            actual = reader.readImageBuffer(compressed.toFile(), ImageFilter.NONE);
             if (expected.width != actual.width || expected.height != actual.height || expected.format != actual.format || !expected.buffer.equals(actual.buffer))
                 throw new AssertionError("compressed and uncompressed images differ");
         } finally {
