@@ -32,6 +32,11 @@ public class Buttons {
     public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_DOWN;
 
+    public static final String fitsRight = "<html>FITS Settings<font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_RIGHT;
+    public static final String fitsDown = "<html>FITS Settings<font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_DOWN;
+
     public static final String adjustmentsRight = "<html>More Adjustments<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_RIGHT;
     public static final String adjustmentsDown = "<html>More Adjustments<font face='Material Design Icons' size=4>" +

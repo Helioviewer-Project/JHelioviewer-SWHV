@@ -54,6 +54,10 @@ public interface View {
         return null;
     }
 
+    default boolean hasFITS() {
+        return false;
+    }
+
     default boolean isMultiFrame() {
         return false;
     }

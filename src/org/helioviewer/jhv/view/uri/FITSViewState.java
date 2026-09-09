@@ -2,8 +2,6 @@ package org.helioviewer.jhv.view.uri;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.display.DisplayController;
-
 import org.json.JSONObject;
 
 public final class FITSViewState {
@@ -96,7 +94,7 @@ public final class FITSViewState {
         }
     }
 
-    record Data(
+    public record Data(
             ClippingMode clippingMode,
             double clippingMin,
             double clippingMax,
@@ -122,38 +120,38 @@ public final class FITSViewState {
         }
     }
 
-    private static double clippingMin = -500;
-    private static double clippingMax = 500;
-    private static ClippingMode clippingMode = ClippingMode.Percentile001;
+    private double clippingMin = -500;
+    private double clippingMax = 500;
+    private ClippingMode clippingMode = ClippingMode.Percentile001;
 
-    private static ScalingMode scalingMode = ScalingMode.Gamma;
-    private static double gamma = 1. / 2.2;
-    private static double beta = 1. / (1 << 6);
-    private static double alpha = Math.pow(10, 3);
-    private static final ArrayList<Listener> listeners = new ArrayList<>();
+    private ScalingMode scalingMode = ScalingMode.Gamma;
+    private double gamma = 1. / 2.2;
+    private double beta = 1. / (1 << 6);
+    private double alpha = Math.pow(10, 3);
+    private final ArrayList<Listener> listeners = new ArrayList<>();
+    private volatile Data data = createData();
+    private final Runnable onChange;
 
-    private static void refresh() {
-        URIView.clearURICache();
-        DisplayController.render(1);
+    public Data data() {
+        return data;
     }
 
-    static Data data() {
+    private Data createData() {
         return new Data(clippingMode, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
     }
 
-    public static JSONObject toJson() {
-        Data data = data();
-        return new JSONObject()
-                .put("clippingMode", data.clippingMode().name())
-                .put("clippingMin", data.clippingMin())
-                .put("clippingMax", data.clippingMax())
-                .put("scalingMode", data.scalingMode().name())
-                .put("gamma", data.gamma())
-                .put("beta", data.beta())
-                .put("alpha", data.alpha());
+    public void serialize(JSONObject jo) {
+        Data current = data();
+        jo.put("clippingMode", current.clippingMode().name());
+        jo.put("clippingMin", current.clippingMin());
+        jo.put("clippingMax", current.clippingMax());
+        jo.put("scalingMode", current.scalingMode().name());
+        jo.put("gamma", current.gamma());
+        jo.put("beta", current.beta());
+        jo.put("alpha", current.alpha());
     }
 
-    public static void fromJson(JSONObject jo) {
+    public void fromJson(JSONObject jo) {
         if (jo == null)
             return;
 
@@ -166,71 +164,68 @@ public final class FITSViewState {
         beta = BETA.clampValue(jo.optDouble("beta", beta));
         alpha = ALPHA.clampValue(jo.optDouble("alpha", alpha));
 
-        if (!old.equals(data())) {
+        if (!old.equals(createData())) {
             notifyListeners();
-            refresh();
+            onChange.run();
         }
     }
 
-    static void setClippingMin(double value) {
+    void setClippingMin(double value) {
         double newClippingMin = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMin(newClippingMin) && clippingMode == ClippingMode.Range)
-            refresh();
+            onChange.run();
     }
 
-    static void setClippingMax(double value) {
+    void setClippingMax(double value) {
         double newClippingMax = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMax(newClippingMax) && clippingMode == ClippingMode.Range)
-            refresh();
+            onChange.run();
     }
 
-    static void setClippingMode(ClippingMode newClippingMode) {
+    void setClippingMode(ClippingMode newClippingMode) {
         if (clippingMode == newClippingMode)
             return;
         clippingMode = newClippingMode;
         notifyListeners();
-        refresh();
+        onChange.run();
     }
 
-    static void setScalingMode(ScalingMode newScalingMode) {
+    void setScalingMode(ScalingMode newScalingMode) {
         if (scalingMode == newScalingMode)
             return;
         scalingMode = newScalingMode;
         notifyListeners();
-        refresh();
+        onChange.run();
     }
 
-    static void setGammaIndex(int value) {
+    void setGammaIndex(int value) {
         double newGamma = GAMMA.fromIndex(value);
         if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma)
-            refresh();
+            onChange.run();
     }
 
-    static void setBetaIndex(int value) {
+    void setBetaIndex(int value) {
         double newBeta = BETA.fromIndex(value);
         if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta)
-            refresh();
+            onChange.run();
     }
 
-    static void setAlphaIndex(int value) {
+    void setAlphaIndex(int value) {
         double newAlpha = ALPHA.fromIndex(value);
         if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha)
-            refresh();
+            onChange.run();
     }
 
-    static void addListener(Listener listener) {
+    void addListener(Listener listener) {
         listeners.add(listener);
     }
 
-    static void removeListener(Listener listener) {
-        listeners.remove(listener);
-    }
-
-    private static void notifyListeners() {
+    private void notifyListeners() {
+        data = createData();
         listeners.forEach(Listener::fitsViewStateChanged);
     }
 
-    private static boolean updateClippingMin(double newClippingMin) {
+    private boolean updateClippingMin(double newClippingMin) {
         if (clippingMin == newClippingMin)
             return false;
         clippingMin = newClippingMin;
@@ -238,7 +233,7 @@ public final class FITSViewState {
         return true;
     }
 
-    private static boolean updateClippingMax(double newClippingMax) {
+    private boolean updateClippingMax(double newClippingMax) {
         if (clippingMax == newClippingMax)
             return false;
         clippingMax = newClippingMax;
@@ -246,7 +241,7 @@ public final class FITSViewState {
         return true;
     }
 
-    private static boolean updateGamma(double newGamma) {
+    private boolean updateGamma(double newGamma) {
         if (gamma == newGamma)
             return false;
         gamma = newGamma;
@@ -254,7 +249,7 @@ public final class FITSViewState {
         return true;
     }
 
-    private static boolean updateBeta(double newBeta) {
+    private boolean updateBeta(double newBeta) {
         if (beta == newBeta)
             return false;
         beta = newBeta;
@@ -262,7 +257,7 @@ public final class FITSViewState {
         return true;
     }
 
-    private static boolean updateAlpha(double newAlpha) {
+    private boolean updateAlpha(double newAlpha) {
         if (alpha == newAlpha)
             return false;
         alpha = newAlpha;
@@ -278,5 +273,7 @@ public final class FITSViewState {
         }
     }
 
-    private FITSViewState() {}
+    public FITSViewState(Runnable _onChange) {
+        onChange = _onChange;
+    }
 }

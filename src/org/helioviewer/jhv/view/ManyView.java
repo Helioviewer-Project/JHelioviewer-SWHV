@@ -19,12 +19,14 @@ public class ManyView implements View {
     private record FrameInfo(View view, JHVTime timeView, int idxView) {}
 
     private final TimeMap<FrameInfo> frameMap = new TimeMap<>();
+    private final boolean hasFITS;
     private int targetFrame;
 
     public ManyView(List<View> views) throws IOException {
         if (views.isEmpty())
             throw new IOException("Empty list of views");
 
+        hasFITS = views.stream().anyMatch(View::hasFITS);
         views.forEach(this::putDates);
         frameMap.buildIndex();
         // unused J2KViews should be abolished by their reaper
@@ -67,6 +69,11 @@ public class ManyView implements View {
     @Override
     public LUT getDefaultLUT() {
         return frameMap.indexedValue(0).view.getDefaultLUT();
+    }
+
+    @Override
+    public boolean hasFITS() {
+        return hasFITS;
     }
 
     @Override

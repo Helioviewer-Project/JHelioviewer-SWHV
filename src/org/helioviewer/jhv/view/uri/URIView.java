@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
@@ -23,22 +24,19 @@ import org.helioviewer.jhv.view.BaseView;
 
 public final class URIView extends BaseView {
 
-    static void clearURICache() {
-        ImageBufferCache.invalidateIf(key -> key instanceof URIDecodeKey);
-    }
-
-    private final URIImageReader reader;
+    private final FITSViewState fitsViewState;
     private final String xml;
     private final Region imageRegion;
 
-    public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri) throws Exception {
+    public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri, FITSViewState _fitsViewState) throws Exception {
         super(_executor, _dataUri);
 
-        reader = dataUri.format() == DataUri.Format.FITS ? new FITSImage() : new GenericImage();
+        fitsViewState = _fitsViewState;
 
         try {
             MetaData m;
-            URIImageReader.Image image = reader.readImage(dataUri.file());
+            URIDecodeKey key = decodeKey(ImageFilter.Type.None);
+            URIImageReader.Image image = reader(key.fitsData()).readImage(dataUri.file());
             ImageBuffer buffer = image.buffer();
 
             String readXml = image.xml();
@@ -55,7 +53,7 @@ public final class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
             metaData[0] = m;
-            ImageBufferCache.put(decodeKey(ImageFilter.Type.None), new DecodedImage(buffer, imageRegion));
+            ImageBufferCache.put(key, new DecodedImage(buffer, imageRegion));
 
             LUT lut = image.lut();
             if (lut != null)
@@ -72,25 +70,28 @@ public final class URIView extends BaseView {
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.cancel();
-            sendDataToHandler(0, viewpoint, image);
+            sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey(filterType)));
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, createFilter(filterType), imageRegion), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion), new Callback(key, viewpoint));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
         return ImageFilter.of(type, imageRegion, metaData[0]);
     }
 
-    private ImageFilter.Type decodeKeyFilter;
-    private URIDecodeKey decodeKey;
+    @Override
+    public boolean hasFITS() {
+        return dataUri.format() == DataUri.Format.FITS;
+    }
 
     private URIDecodeKey decodeKey(ImageFilter.Type filter) {
-        if (decodeKey == null || decodeKeyFilter != filter) {
-            decodeKeyFilter = filter;
-            decodeKey = new URIDecodeKey(dataUri, filter);
-        }
-        return decodeKey;
+        FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
+        return new URIDecodeKey(dataUri, filter, data);
+    }
+
+    private static URIImageReader reader(@Nullable FITSViewState.Data data) {
+        return data == null ? new GenericImage() : new FITSImage(data);
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion) implements Callable<DecodedImage> {
@@ -116,12 +117,12 @@ public final class URIView extends BaseView {
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (key.filter() != filterType) return; // filter changed in-flight
+            if (!key.equals(decodeKey(filterType))) return; // settings or filter changed in-flight
 
             ImageBufferCache.put(key, result);
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
-            sendDataToHandler(0, viewpoint, result);
+            sendDataToHandler(0, viewpoint, result, () -> key.equals(decodeKey(filterType)));
         }
 
         @Override
