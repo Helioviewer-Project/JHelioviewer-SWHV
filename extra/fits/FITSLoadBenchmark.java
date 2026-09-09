@@ -50,7 +50,7 @@ public final class FITSLoadBenchmark {
             System.exit(1);
         }
 
-        FITSImage reader = new FITSImage();
+        FITSImage reader = new FITSImage(new FITSViewState(() -> {}).data());
         System.out.println("file,bytes,width,height,format,mode,filter,iteration,total_ms,checksum,status");
         for (Path file : files)
             benchmarkFile(reader, file, options);

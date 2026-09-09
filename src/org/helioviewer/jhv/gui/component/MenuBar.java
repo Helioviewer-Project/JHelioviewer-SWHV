@@ -16,7 +16,6 @@ import org.helioviewer.jhv.gui.dialog.AboutDialog;
 import org.helioviewer.jhv.gui.dialog.LogDialog;
 import org.helioviewer.jhv.gui.dialog.SettingsDialog;
 import org.helioviewer.jhv.gui.dialog.TextDialog;
-import org.helioviewer.jhv.view.uri.FITSSettings;
 
 // Menu bar of the main window
 @SuppressWarnings("serial")
@@ -91,7 +90,6 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(showStatusBar);
 
         viewMenu.addSeparator();
-        viewMenu.add(new Actions.ShowDialog("FITS Settings...", new FITSSettings.SettingsDialog()));
 
         add(viewMenu);
 

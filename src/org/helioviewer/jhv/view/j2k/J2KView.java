@@ -284,7 +284,7 @@ public class J2KView extends BaseView {
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.cancel();
-            sendDataToHandler(decodeParams.frame, viewpoint, image);
+            sendDataToHandler(decodeParams.frame, viewpoint, image, () -> key.filter() == filterType);
             return;
         }
         submitDecode(decodeParams, viewpoint, cacheResult);
@@ -331,7 +331,7 @@ public class J2KView extends BaseView {
 
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
-            sendDataToHandler(key.params().frame, viewpoint, result);
+            sendDataToHandler(key.params().frame, viewpoint, result, () -> key.filter() == filterType);
         }
 
         @Override

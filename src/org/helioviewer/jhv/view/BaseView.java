@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view;
 
 import java.awt.EventQueue;
+import java.util.function.BooleanSupplier;
 
 import javax.annotation.Nullable;
 
@@ -91,14 +92,13 @@ public class BaseView implements View {
         dataHandler = _dataHandler;
     }
 
-    protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image) {
+    protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image, BooleanSupplier isCurrent) {
         image.imageBuffer().protectFromExplicitFree();
         MetaData m = metaData[frame];
-        ImageFilter.Type decodedFilter = filterType;
 
         View.ImageData data = new View.ImageData(image.imageBuffer(), m, image.region(), viewpoint);
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null && decodedFilter == filterType)
+            if (dataHandler != null && isCurrent.getAsBoolean())
                 dataHandler.handleData(data);
             else
                 image.imageBuffer().allowExplicitFree();

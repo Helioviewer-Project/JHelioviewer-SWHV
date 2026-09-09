@@ -25,6 +25,7 @@ import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
+import org.helioviewer.jhv.view.uri.FITSViewState;
 import org.helioviewer.jhv.view.uri.URIView;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 final class ImageLayerLoader {
 
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("View-Decoder");
+    private final FITSViewState fitsViewState;
     private final Consumer<View> onViewLoaded;
     private final Runnable onUnload;
 
@@ -40,7 +42,8 @@ final class ImageLayerLoader {
     private Future<?> downloadFuture;
     private int loadGeneration;
 
-    ImageLayerLoader(@Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
+    ImageLayerLoader(FITSViewState _fitsViewState, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
+        fitsViewState = _fitsViewState;
         onViewLoaded = _onViewLoaded;
         onUnload = _onUnload;
     }
@@ -146,7 +149,7 @@ final class ImageLayerLoader {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
             case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri);
-            case FITS, PNG, JPEG -> new URIView(executor, dataUri);
+            case FITS, PNG, JPEG -> new URIView(executor, dataUri, fitsViewState);
             case ZIP -> loadZip(dataUri.uri());
             default -> throw new Exception("Unknown image type");
         };

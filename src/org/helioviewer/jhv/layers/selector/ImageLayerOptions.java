@@ -25,6 +25,7 @@ import org.helioviewer.jhv.layers.filters.LUTPanel;
 import org.helioviewer.jhv.layers.filters.RangeSliderFilterPanel;
 import org.helioviewer.jhv.layers.filters.SectorPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
+import org.helioviewer.jhv.view.uri.FITSSettings;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -32,6 +33,8 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 final class ImageLayerOptions extends JPanel {
 
+    private final FITSSettings fitsSettings;
+    private final JideToggleButton fitsButton = new JideToggleButton(Buttons.fitsRight);
     private final LUTPanel lutPanel;
     private final FilterDetails slitPanel;
     private final SectorPanel sectorPanel;
@@ -45,6 +48,7 @@ final class ImageLayerOptions extends JPanel {
     private DownloadProgress downloadProgress;
 
     ImageLayerOptions(ImageLayer layer) {
+        fitsSettings = new FITSSettings(layer.getFITSViewState());
         DifferencePanel differencePanel = new DifferencePanel(layer);
         FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
         FilterDetails blendPanel = SliderFilterPanel.blend(layer);
@@ -158,6 +162,24 @@ final class ImageLayerOptions extends JPanel {
         addToGridBag(c, deltaCRVAL1Panel);
         c.gridy++;
         addToGridBag(c, deltaCRVAL2Panel);
+        fitsButton.addActionListener(e -> {
+            boolean expanded = fitsButton.isSelected();
+            fitsButton.setText(expanded ? Buttons.fitsDown : Buttons.fitsRight);
+            fitsSettings.setVisible(expanded);
+        });
+        c.gridy++;
+        c.gridx = 1;
+        c.gridwidth = 2;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.NONE;
+        add(fitsButton, c);
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 3;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(fitsSettings, c);
         // Usually refreshed through ImageLayer activation; initialize here too in case that activation already happened before panel creation.
         refresh(layer);
     }
@@ -197,6 +219,9 @@ final class ImageLayerOptions extends JPanel {
     public void refresh(Layer layer) {
         ImageLayer imageLayer = (ImageLayer) layer;
         downloadButton.setVisible(!imageLayer.isLocal());
+        boolean hasFITS = imageLayer.getView().hasFITS();
+        fitsButton.setVisible(hasFITS);
+        fitsSettings.setVisible(hasFITS && fitsButton.isSelected());
         lutPanel.refresh();
     }
 

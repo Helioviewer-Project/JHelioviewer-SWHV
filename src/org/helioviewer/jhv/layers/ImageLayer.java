@@ -26,6 +26,7 @@ import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.uri.FITSViewState;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONObject;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
+    private final FITSViewState fitsViewState = new FITSViewState(this::refreshImage);
     private final GLSLImage glImage;
     private final ImageLayerLoader loader;
 
@@ -55,7 +57,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         APIRequest apiRequest = view.getAPIRequest();
         if (apiRequest != null) {
             jo.put("APIRequest", apiRequest.toJson());
-            jo.put("imageParams", displaySettings.toJson());
+            JSONObject imageParams = displaySettings.toJson();
+            fitsViewState.serialize(imageParams);
+            jo.put("imageParams", imageParams);
         }
     }
 
@@ -63,7 +67,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     protected ImageLayer(View _view) {
         view = _view;
         glImage = null;
-        loader = new ImageLayerLoader(v -> {}, () -> {});
+        loader = new ImageLayerLoader(fitsViewState, v -> {}, () -> {});
     }
 
     private ImageLayer(JSONObject jo) {
@@ -74,7 +78,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         glImage = new GLSLImage(displaySettings);
-        loader = new ImageLayerLoader(this::setView, this::unload);
+        loader = new ImageLayerLoader(fitsViewState, this::setView, this::unload);
 
         if (jo != null) {
             applyImageParams(jo.optJSONObject("imageParams"));
@@ -86,16 +90,28 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     public void applyImageParams(@Nullable JSONObject imageParams) {
-        if (imageParams != null)
+        if (imageParams != null) {
             displaySettings.fromJson(imageParams);
+            fitsViewState.fromJson(imageParams);
+        }
     }
 
     public void setFilter(ImageFilter.Type type) {
         if (type == view.getFilter())
             return;
 
-        view.clearCache();
         view.setFilter(type);
+        refreshImage();
+    }
+
+    public FITSViewState getFITSViewState() {
+        return fitsViewState;
+    }
+
+    private void refreshImage() {
+        if (removed)
+            return;
+        view.clearCache();
         imageData = prevImageData = baseImageData = null;
         DisplayController.render(1);
     }

@@ -25,8 +25,13 @@ import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-// essentially static; local or network cache
 public final class FITSImage implements URIImageReader {
+
+    private final FITSViewState.Data state;
+
+    public FITSImage(FITSViewState.Data _state) {
+        state = _state;
+    }
 
     private static final int BAD_PIXEL = Integer.MIN_VALUE;
 
@@ -325,7 +330,7 @@ public final class FITSImage implements URIImageReader {
         return axes;
     }
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter) throws Exception {
+    private ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter) throws Exception {
         Header header = imageHeader(hdu);
         int[] axes = imageAxes(header);
         return readPixels(header, axes, readFlatPixels(hdu, axes), filter);
@@ -349,7 +354,7 @@ public final class FITSImage implements URIImageReader {
         return buffer.array();
     }
 
-    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter) throws Exception {
+    private ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter) throws Exception {
         int height = axes[0];
         int width = axes[1];
 
@@ -368,7 +373,6 @@ public final class FITSImage implements URIImageReader {
         double bscale = header.getDoubleValue(Standard.BSCALE, 1);
         if (!Double.isFinite(bzero) || !Double.isFinite(bscale))
             throw new Exception("Invalid FITS BZERO/BSCALE");
-        FITSViewState.Data state = FITSViewState.data();
 
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
         float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);

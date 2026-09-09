@@ -38,7 +38,6 @@ JHV accepts the following SAMP message types:
 ### View messages
 
 - `jhv.view.set`
-- `jhv.view.fits.set`
 
 ### Recording messages
 
@@ -68,7 +67,6 @@ Restrictions:
 These messages update only the fields they receive:
 
 - `jhv.view.set`
-- `jhv.view.fits.set`
 - `jhv.playback.set`
 - `jhv.record.set`
 - `jhv.record.start`
@@ -80,8 +78,7 @@ For these messages:
 - out-of-range numeric values are clamped
 
 JHV applies those rules at the state boundary. See
-[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) and
-[FITSViewState.java](../src/org/helioviewer/jhv/view/uri/FITSViewState.java)
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
 for the exact implementation.
 
 ### Immediate-action messages
@@ -120,7 +117,6 @@ These messages update real JHV state and leave the resulting state visible in
 the UI after execution:
 
 - `jhv.view.set`
-- `jhv.view.fits.set`
 - `jhv.playback.set`
 - `jhv.record.set`
 - `jhv.record.start`
@@ -186,6 +182,32 @@ For `jhv.load.image`, clients may also send:
 - optional `imageParams`: a JSON object or JSON string with the same shape as
   serialized image-layer `imageParams`; these options are applied before the
   indicated data is loaded
+
+FITS clipping and scaling use the same `imageParams` object:
+
+- `clippingMode`: `Percentile001`, `Percentile05`, or `Range`
+- `clippingMin`, `clippingMax`: manual bounds, clamped to `-1e20` through `1e20`
+- `scalingMode`: `Gamma`, `Beta`, or `Alpha`
+- `gamma`: clamped to `0.25` through `1.0`
+- `beta`: clamped to `0.000244140625` through `0.5`
+- `alpha`: clamped to `10` through `100000`
+
+These settings belong to the image layer. Omitted FITS values retain the layer's
+current values, which start from built-in defaults for a new layer.
+
+```json
+{
+  "url": "https://example.invalid/image.fits",
+  "imageParams": {
+    "opacity": 0.75,
+    "clippingMode": "Range",
+    "clippingMin": -500,
+    "clippingMax": 500,
+    "scalingMode": "Gamma",
+    "gamma": 0.5
+  }
+}
+```
 
 ### URL-or-inline-value load payloads
 
@@ -357,35 +379,6 @@ Example:
   "annotationMode": "Cross",
   "multiview": "false",
   "tracking": "true"
-}
-```
-
-### `jhv.view.fits.set`
-
-Accepted parameters:
-
-- `value`
-
-`value` is a JSON string with the same shape produced by
-`FITSViewState.toJson()`. Omitted fields leave the existing FITS view state
-unchanged. Corrupted enum values fall back to the existing values, and numeric
-values are clamped to the supported ranges.
-
-Accepted keys:
-
-- `clippingMode`: `Percentile001`, `Percentile05`, `Range`
-- `clippingMin`: number, clamped to `-1e20` through `1e20`
-- `clippingMax`: number, clamped to `-1e20` through `1e20`
-- `scalingMode`: `Gamma`, `Beta`, `Alpha`
-- `gamma`: number, clamped to `0.25` through `1.0`
-- `beta`: number, clamped to `0.000244140625` through `0.5`
-- `alpha`: number, clamped to `10` through `100000`
-
-Example:
-
-```json
-{
-  "value": "{\"clippingMode\":\"Percentile001\",\"scalingMode\":\"Gamma\",\"gamma\":0.4545454545}"
 }
 ```
 
