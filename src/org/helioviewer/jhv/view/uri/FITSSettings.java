@@ -41,7 +41,6 @@ public final class FITSSettings {
         private final JLabel alphaLabel = new JLabel("", JLabel.RIGHT);
         private final JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -FITSViewState.CLIP_LIMIT, FITSViewState.CLIP_LIMIT));
         private final JFormattedTextField maxClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -FITSViewState.CLIP_LIMIT, FITSViewState.CLIP_LIMIT));
-        private final JHVSlider contrastSlider;
         private final EnumMap<FITSViewState.ClippingMode, JRadioButton> clippingButtons = new EnumMap<>(FITSViewState.ClippingMode.class);
 
         private static JPanel createScalingPanel(JRadioButton button, JHVSlider slider, JLabel label) {
@@ -79,7 +78,6 @@ public final class FITSSettings {
             gammaSlider = createSlider(FITSViewState.GAMMA, initialState.gammaIndex());
             betaSlider = createSlider(FITSViewState.BETA, initialState.betaIndex());
             alphaSlider = createSlider(FITSViewState.ALPHA, initialState.alphaIndex());
-            contrastSlider = createSlider(FITSViewState.Z_CONTRAST, initialState.zContrastIndex());
             setLocationRelativeTo(MainFrame.get());
             setType(Window.Type.UTILITY);
             setResizable(false);
@@ -123,7 +121,6 @@ public final class FITSSettings {
             JPanel rangePanel = new JPanel(new BorderLayout());
             rangePanel.add(minClip, BorderLayout.LINE_START);
             rangePanel.add(maxClip, BorderLayout.LINE_END);
-            contrastSlider.addChangeListener(e -> FITSViewState.setZContrastIndex(contrastSlider.getValue()));
 
             //
             JPanel content = new JPanel(new GridBagLayout());
@@ -141,10 +138,6 @@ public final class FITSSettings {
                 JRadioButton radio = new JRadioButton(clipping.toString(), clipping == initialState.clippingMode());
                 clippingButtons.put(clipping, radio);
                 boolean rangeMode = clipping == FITSViewState.ClippingMode.Range;
-                boolean zscaleMode = clipping == FITSViewState.ClippingMode.ZScale;
-                if (zscaleMode) {
-                    bindSelectionControls(radio, contrastSlider);
-                }
                 if (rangeMode) {
                     bindSelectionControls(radio, minClip, maxClip);
                 }
@@ -158,9 +151,6 @@ public final class FITSSettings {
                 panel.add(radio, c);
                 if (rangeMode) {
                     panel.add(rangePanel);
-                }
-                if (zscaleMode) {
-                    panel.add(contrastSlider);
                 }
                 content.add(panel, c);
                 c.gridy++;
@@ -199,8 +189,6 @@ public final class FITSSettings {
                 minClip.setValue(data.clippingMin());
             if (differentDoubleValue(maxClip.getValue(), data.clippingMax()))
                 maxClip.setValue(data.clippingMax());
-
-            syncControl(contrastSlider, null, data.zContrastIndex());
 
             boolean rangeMode = data.clippingMode() == FITSViewState.ClippingMode.Range;
             minClip.setEditable(rangeMode);
@@ -241,8 +229,7 @@ public final class FITSSettings {
         private static void syncControl(JSlider slider, JLabel label, int value, String text) {
             if (slider.getValue() != value)
                 slider.setValue(value);
-            if (label != null)
-                label.setText(text);
+            label.setText(text);
         }
 
     }

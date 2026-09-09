@@ -15,7 +15,6 @@ public final class FITSViewState {
     enum ClippingMode {
         Percentile001("Percentile 0.001%", 0.00001),
         Percentile05("Percentile 0.5%", 0.005),
-        ZScale("ZScale", 0),
         Range("Range", 0);
 
         private final String label;
@@ -41,7 +40,6 @@ public final class FITSViewState {
     }
 
     static final double CLIP_LIMIT = 1e20;
-    static final IntParameter Z_CONTRAST = new IntParameter(1, 100, 4);
     static final GammaParameter GAMMA = new GammaParameter(10, 40);
     static final BetaParameter BETA = new BetaParameter(1, 12);
     static final AlphaParameter ALPHA = new AlphaParameter(1, 5);
@@ -50,20 +48,6 @@ public final class FITSViewState {
         int minIndex();
 
         int maxIndex();
-    }
-
-    record IntParameter(int minIndex, int maxIndex, int multiplier) implements IndexedParameter {
-        int toIndex(int value) {
-            return Math.clamp(value / multiplier, minIndex, maxIndex);
-        }
-
-        int fromIndex(int index) {
-            return multiplier * Math.clamp(index, minIndex, maxIndex);
-        }
-
-        int clampValue(int value) {
-            return Math.clamp(value, fromIndex(minIndex), fromIndex(maxIndex));
-        }
     }
 
     record GammaParameter(int minIndex, int maxIndex) implements IndexedParameter {
@@ -114,17 +98,12 @@ public final class FITSViewState {
 
     record Data(
             ClippingMode clippingMode,
-            int zContrast,
             double clippingMin,
             double clippingMax,
             ScalingMode scalingMode,
             double gamma,
             double beta,
             double alpha) {
-
-        public int zContrastIndex() {
-            return Z_CONTRAST.toIndex(zContrast);
-        }
 
         public int gammaIndex() {
             return GAMMA.toIndex(gamma);
@@ -143,7 +122,6 @@ public final class FITSViewState {
         }
     }
 
-    private static int zContrast = 4;
     private static double clippingMin = -500;
     private static double clippingMax = 500;
     private static ClippingMode clippingMode = ClippingMode.Percentile001;
@@ -160,14 +138,13 @@ public final class FITSViewState {
     }
 
     static Data data() {
-        return new Data(clippingMode, zContrast, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
+        return new Data(clippingMode, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
     }
 
     public static JSONObject toJson() {
         Data data = data();
         return new JSONObject()
                 .put("clippingMode", data.clippingMode().name())
-                .put("zContrast", data.zContrast())
                 .put("clippingMin", data.clippingMin())
                 .put("clippingMax", data.clippingMax())
                 .put("scalingMode", data.scalingMode().name())
@@ -181,7 +158,6 @@ public final class FITSViewState {
             return;
 
         Data old = data();
-        zContrast = Z_CONTRAST.clampValue(jo.optInt("zContrast", zContrast));
         clippingMin = Math.clamp(jo.optDouble("clippingMin", clippingMin), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMode = readEnum(ClippingMode.class, jo.optString("clippingMode", clippingMode.name()), clippingMode);
@@ -194,12 +170,6 @@ public final class FITSViewState {
             notifyListeners();
             refresh();
         }
-    }
-
-    static void setZContrastIndex(int value) {
-        int newZContrast = Z_CONTRAST.fromIndex(value);
-        if (updateZContrast(newZContrast) && clippingMode == ClippingMode.ZScale)
-            refresh();
     }
 
     static void setClippingMin(double value) {
@@ -258,14 +228,6 @@ public final class FITSViewState {
 
     private static void notifyListeners() {
         listeners.forEach(Listener::fitsViewStateChanged);
-    }
-
-    private static boolean updateZContrast(int newZContrast) {
-        if (zContrast == newZContrast)
-            return false;
-        zContrast = newZContrast;
-        notifyListeners();
-        return true;
     }
 
     private static boolean updateClippingMin(double newClippingMin) {

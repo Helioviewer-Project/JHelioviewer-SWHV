@@ -48,8 +48,7 @@ def movie_commands(path: str, size: str) -> list[dict]:
             {
                 "value": json.dumps(
                     {
-                        "clippingMode": "ZScale",
-                        "zContrast": 40,
+                        "clippingMode": "Percentile001",
                         "scalingMode": "Gamma",
                         "gamma": 0.4545454545,
                     }

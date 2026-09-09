@@ -373,8 +373,7 @@ values are clamped to the supported ranges.
 
 Accepted keys:
 
-- `clippingMode`: `Percentile001`, `Percentile05`, `ZScale`, `Range`
-- `zContrast`: integer, clamped to `4` through `400`
+- `clippingMode`: `Percentile001`, `Percentile05`, `Range`
 - `clippingMin`: number, clamped to `-1e20` through `1e20`
 - `clippingMax`: number, clamped to `-1e20` through `1e20`
 - `scalingMode`: `Gamma`, `Beta`, `Alpha`
@@ -386,7 +385,7 @@ Example:
 
 ```json
 {
-  "value": "{\"clippingMode\":\"ZScale\",\"zContrast\":40,\"scalingMode\":\"Gamma\",\"gamma\":0.4545454545}"
+  "value": "{\"clippingMode\":\"Percentile001\",\"scalingMode\":\"Gamma\",\"gamma\":0.4545454545}"
 }
 ```
 
