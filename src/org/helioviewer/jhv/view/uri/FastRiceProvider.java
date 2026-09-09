@@ -223,7 +223,7 @@ public final class FastRiceProvider implements ICompressorProvider {
             for (int i = 0; i < length; ) {
                 bitCount -= fsBits;
                 while (bitCount < 0) {
-                    bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
+                    bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
                     bitCount += BITS_PER_BYTE;
                 }
 
@@ -238,7 +238,7 @@ public final class FastRiceProvider implements ICompressorProvider {
                 } else if (fs == fsMax) {
                     for (; i < end; i++) {
                         while (bitCount < bBits) {
-                            bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
+                            bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
                             bitCount += BITS_PER_BYTE;
                         }
                         bitCount -= bBits;
@@ -253,7 +253,7 @@ public final class FastRiceProvider implements ICompressorProvider {
                         // Refill ahead when four bytes remain, without crossing the input limit.
                         if (bitCount < Short.SIZE && position <= limit - Integer.BYTES) {
                             int word = (input[position] & BYTE_MASK) << 24 | (input[position + 1] & BYTE_MASK) << 16
-                                    | (input[position + 2] & BYTE_MASK) << 8 | input[position + 3] & BYTE_MASK;
+                                    | (input[position + 2] & BYTE_MASK) << 8 | (input[position + 3] & BYTE_MASK);
                             bitBuffer = bitBuffer << Integer.SIZE | Integer.toUnsignedLong(word);
                             position += Integer.BYTES;
                             bitCount += Integer.SIZE;
@@ -268,7 +268,7 @@ public final class FastRiceProvider implements ICompressorProvider {
 
                         bitCount -= fs;
                         while (bitCount < 0) {
-                            bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
+                            bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
                             bitCount += BITS_PER_BYTE;
                         }
 
