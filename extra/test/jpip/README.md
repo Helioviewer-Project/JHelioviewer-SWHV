@@ -17,6 +17,8 @@ The default suite is offline and needs no native library:
 - Socket cleanup: a local server verifies graceful channel close and aborting a stalled
   response without sending another request. A stalled constructor handshake is interrupted
   on a virtual thread and must close TCP. No external network or native library is needed.
+- Cache serializer: round trips of every databin record component, empty streams, large identifiers, direct/read-only
+  buffers, unchanged input positions, and rejection of truncated or invalid entries.
 - Cache: failure to obtain the persistence lock leaves caching disabled without repeated logging.
   This replaces the older standalone cache test, updating its retired cache directory name.
 

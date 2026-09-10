@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.logging.Level;
@@ -21,6 +21,8 @@ import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.expiry.ExpiryPolicy;
+import org.ehcache.spi.serialization.Serializer;
+import org.ehcache.spi.serialization.SerializerException;
 
 public class JPIPCacheManager {
 
@@ -28,9 +30,35 @@ public class JPIPCacheManager {
         Log.setLoggerLevel("org.ehcache", Level.WARNING); // shut-up Ehcache info logs
     }
 
-    public record Entry(int level, JPIPStream stream) implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
+    public record Entry(int level, JPIPStream stream) {}
+
+    static final class EntrySerializer implements Serializer<Entry> {
+        @Override
+        public ByteBuffer serialize(Entry entry) {
+            long size = Integer.BYTES + entry.stream().encodedSize();
+            if (size > Integer.MAX_VALUE)
+                throw new SerializerException("JPIP cache entry is too large");
+            ByteBuffer buffer = ByteBuffer.allocate((int) size);
+            buffer.putInt(entry.level());
+            entry.stream().write(buffer);
+            return buffer.flip();
+        }
+
+        @Override
+        public Entry read(ByteBuffer binary) {
+            ByteBuffer buffer = binary.slice();
+            try {
+                int level = buffer.getInt();
+                return new Entry(level, JPIPStream.read(buffer));
+            } catch (BufferUnderflowException | IllegalArgumentException e) {
+                throw new SerializerException("Invalid JPIP cache entry", e);
+            }
+        }
+
+        @Override
+        public boolean equals(Entry entry, ByteBuffer binary) {
+            return serialize(entry).equals(binary);
+        }
     }
 
     private static final Path cacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-7");
@@ -51,7 +79,8 @@ public class JPIPCacheManager {
                             .newCacheConfigurationBuilder(String.class, Entry.class,
                                     ResourcePoolsBuilder.newResourcePoolsBuilder()
                                             .disk(8, MemoryUnit.GB, true))
-                            .withExpiry(expiryPolicy))
+                            .withExpiry(expiryPolicy)
+                            .withValueSerializer(new EntrySerializer()))
                     .build(true);
 
             cache = cacheManager.getCache("JPIPStream", String.class, Entry.class);
@@ -89,11 +118,8 @@ public class JPIPCacheManager {
 
         try {
             Entry entry = currentCache.get(key);
-            if (entry == null || entry.level() > level) {
-                JPIPStream stream = source.get(frame);
-                if (stream != null)
-                    currentCache.put(key, new Entry(level, stream));
-            }
+            if (entry == null || entry.level() > level)
+                currentCache.put(key, new Entry(level, source.scan(frame)));
         } catch (Exception e) {
             Log.error(e);
         }
