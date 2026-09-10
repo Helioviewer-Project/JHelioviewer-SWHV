@@ -68,7 +68,7 @@ public final class URIView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range range) {
         clipRange = hasFITS() ? range : null;
-        URIDecodeKey key = decodeKey(filterType);
+        DecodeKey key = decodeKey(filterType);
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
@@ -94,9 +94,11 @@ public final class URIView extends BaseView {
         return dataUri.format() == DataUri.Format.FITS;
     }
 
-    private URIDecodeKey decodeKey(ImageFilter.Type filter) {
+    private record DecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable FITSViewState.Data fitsData, @Nullable ClipSet.Range clipRange) {}
+
+    private DecodeKey decodeKey(ImageFilter.Type filter) {
         FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-        return new URIDecodeKey(dataUri, filter, data, clipRange);
+        return new DecodeKey(dataUri, filter, data, clipRange);
     }
 
     private static URIImageReader reader(@Nullable FITSViewState.Data data) {
@@ -116,10 +118,10 @@ public final class URIView extends BaseView {
 
     private class Callback implements LatestWorker.Callback<DecodedImage> {
 
-        private final URIDecodeKey key;
+        private final DecodeKey key;
         private final Position viewpoint;
 
-        Callback(URIDecodeKey _key, Position _viewpoint) {
+        Callback(DecodeKey _key, Position _viewpoint) {
             key = _key;
             viewpoint = _viewpoint;
         }
@@ -149,7 +151,7 @@ public final class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        ImageBufferCache.invalidateIf(key -> key instanceof URIDecodeKey k && k.uri() == dataUri);
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey k && k.uri() == dataUri);
     }
 
     @Override
