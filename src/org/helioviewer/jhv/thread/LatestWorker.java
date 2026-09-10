@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +60,7 @@ public final class LatestWorker<T> {
 
     public synchronized void submit(Callable<T> task, Callback<T> callback) {
         if (abolished)
-            throw new IllegalStateException("Worker has been abolished");
+            throw new RejectedExecutionException("Worker has been abolished");
 
         pending = new Request<>(task, callback, ++generation);
         schedule();
