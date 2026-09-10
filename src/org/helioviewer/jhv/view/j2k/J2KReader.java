@@ -36,8 +36,8 @@ class J2KReader implements Runnable {
             throw new IOException("Error in the server communication: " + e.getMessage(), e);
         }
 
-        myThread = new Thread(this, "Reader " + uri);
-        myThread.setDaemon(true);
+        // Virtual-thread interruption also closes a socket still inside its constructor.
+        myThread = Thread.ofVirtual().name("Reader " + uri).unstarted(this);
         myThread.start();
     }
 

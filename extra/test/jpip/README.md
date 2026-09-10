@@ -15,7 +15,8 @@ The default suite is offline and needs no native library:
 - HTTP streams: fixed-length and chunked bodies, response boundaries, byte counts,
   zero-length reads at EOF, premature EOF, and draining a chunked body on close.
 - Socket cleanup: a local server verifies graceful channel close and aborting a stalled
-  response without sending another request. No external network or native library is needed.
+  response without sending another request. A stalled constructor handshake is interrupted
+  on a virtual thread and must close TCP. No external network or native library is needed.
 - Cache: failure to obtain the persistence lock leaves caching disabled without repeated logging.
   This replaces the older standalone cache test, updating its retired cache directory name.
 

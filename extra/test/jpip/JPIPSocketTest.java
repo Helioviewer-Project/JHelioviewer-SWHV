@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class JPIPSocketTest {
 
@@ -20,9 +21,58 @@ public final class JPIPSocketTest {
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
+        testInterruptedHandshake();
         testClose(false);
         testClose(true);
-        System.out.println("PASS: graceful close sends cclose; abort unblocks a response without sending cclose");
+        System.out.println("PASS: graceful close, response abort and interrupted constructor handshake");
+    }
+
+    private static void testInterruptedHandshake() throws Exception {
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(5000);
+            CountDownLatch requestReceived = new CountDownLatch(1);
+            Future<Integer> server = workers.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(5000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII));
+                    readRequest(input);
+                    requestReceived.countDown();
+                    // Do not reply to cnew: the client has no constructed JPIPSocket to abort.
+                    return input.read();
+                }
+            });
+            AtomicReference<Throwable> failure = new AtomicReference<>();
+            Thread reader = Thread.ofVirtual().start(() -> {
+                try {
+                    JPIPSocket client = new JPIPSocket(
+                            URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+                    client.abort();
+                    failure.set(new AssertionError("Stalled handshake completed"));
+                } catch (IOException e) {
+                    if (!Thread.currentThread().isInterrupted())
+                        failure.set(e);
+                } catch (Throwable e) {
+                    failure.set(e);
+                }
+            });
+            try {
+                if (!requestReceived.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Handshake did not reach server");
+                reader.interrupt();
+                reader.join(2000);
+                if (reader.isAlive())
+                    throw new AssertionError("Interrupt did not release the handshake");
+                if (failure.get() != null)
+                    throw new AssertionError("Handshake cancellation failed", failure.get());
+                if (server.get(5, TimeUnit.SECONDS) != -1)
+                    throw new AssertionError("Handshake cancellation did not close TCP");
+            } finally {
+                reader.interrupt();
+                reader.join(2000);
+            }
+        }
     }
 
     private static void testResponse(String framing, boolean valid) throws Exception {
