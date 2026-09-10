@@ -6,6 +6,8 @@ package org.helioviewer.jhv.view.j2k.jpip;
 // field and the EOR message body is stored in the 'data' field.
 class JPIPSegment {
 
+    private static final byte[] EMPTY_BYTES = new byte[0];
+
     // The data-bin in-class identifier
     long binID;
     // The data-bin auxiliary information
@@ -19,7 +21,7 @@ class JPIPSegment {
     // Length of this segment
     int length;
     // The segment data
-    byte[] data;
+    byte[] data = EMPTY_BYTES;
     // Indicates if this segment is the last one (when there is a data segment stream)
     boolean isFinal;
     // Indicates if this segment is an End-Of-Response message

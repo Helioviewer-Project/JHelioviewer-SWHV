@@ -39,12 +39,18 @@ public final class JPIPResponseTest {
         segment = read(response, input);
         check(segment.binID == 4 && segment.klassID == 3 && segment.codestreamID == 7,
                 "inherited identifiers");
-        check(!segment.isFinal && segment.offset == 3 && segment.length == 0 && segment.data == null,
+        check(!segment.isFinal && segment.offset == 3 && segment.length == 0 && segment.data != null && segment.data.length == 0,
                 "empty message");
         segment = read(response, input);
         check(segment.binID == 5 && segment.klassID == 0 && segment.codestreamID == 7
                 && segment.data[0] == 42, "class change preserves stream");
         check(read(response, input) == null, "EOF between messages");
+
+        JPIPSegment empty = read(new JPIPResponse(null), new ByteArrayInputStream(new byte[]{0x40, 6, 3, 0}));
+        JPIPSegment finalMarker = read(new JPIPResponse(null), new ByteArrayInputStream(new byte[]{0x50, 6, 3, 0}));
+        check(finalMarker.isFinal && finalMarker.offset == 3 && finalMarker.length == 0
+                && finalMarker.data != null && finalMarker.data.length == 0, "empty final marker has JNI-safe data");
+        check(finalMarker.data == empty.data, "empty payloads share their array");
 
         int[] wireClasses = {0, 2, 4, 6, 8};
         for (int i = 0; i < wireClasses.length; i++) {
