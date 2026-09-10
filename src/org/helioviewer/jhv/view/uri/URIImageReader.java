@@ -11,10 +11,10 @@ import org.helioviewer.jhv.view.ClipSet;
 
 interface URIImageReader {
 
-    record Image(@Nullable String xml, ImageBuffer buffer, @Nullable LUT lut, @Nullable ClipSet clipSet) {}
+    record Info(@Nullable String xml, int width, int height, @Nullable LUT lut, @Nullable ClipSet clipSet) {}
 
-    Image readImage(File file) throws Exception;
+    Info readInfo(File file) throws Exception;
 
-    ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception;
+    ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception;
 
 }
