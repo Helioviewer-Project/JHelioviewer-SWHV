@@ -49,13 +49,14 @@ public final class JPIPSocket extends HTTPSocket {
                     if (part.startsWith(cnewParam + '='))
                         map.put(cnewParam, part.substring(cnewParam.length() + 1));
 
-            jpipPath = '/' + map.get("path");
+            String path = map.get("path");
             jpipChannelID = map.get("cid");
-            if (jpipChannelID == null)
-                throw new IOException("The channel id was not sent by the server");
-
+            if (jpipChannelID == null || path == null)
+                throw new IOException("The server did not send a channel id and path in JPIP-cnew");
             if (!"http".equals(map.get("transport")))
                 throw new IOException("The client only supports HTTP transport");
+
+            jpipPath = '/' + path;
         } catch (KduException | IOException | RuntimeException | Error e) {
             try {
                 super.close();

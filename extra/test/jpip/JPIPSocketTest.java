@@ -21,11 +21,41 @@ public final class JPIPSocketTest {
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
+        for (String cnew : new String[]{"cid=test,transport=http", "transport=http,path=jpip",
+                "cid=test,path=jpip", "cid=test,transport=http-tcp,path=jpip"})
+            testInvalidChannel(cnew);
         testPipeline();
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
         System.out.println("PASS: graceful close, response abort and interrupted constructor handshake");
+    }
+
+    private static void testInvalidChannel(String cnew) throws Exception {
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(5000);
+            Future<Integer> server = workers.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(5000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII));
+                    readRequest(input);
+                    reply(connection, "JPIP-cnew: " + cnew + "\r\n", 2);
+                    return input.read();
+                }
+            });
+            try {
+                JPIPSocket client = new JPIPSocket(
+                        URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+                client.abort();
+                throw new AssertionError("Accepted unsupported channel: " + cnew);
+            } catch (IOException expected) {
+                // Constructor failure must close TCP without sending a follow-up request.
+            }
+            if (server.get(5, TimeUnit.SECONDS) != -1)
+                throw new AssertionError("Invalid channel caused another request: " + cnew);
+        }
     }
 
     private static void testPipeline() throws Exception {
