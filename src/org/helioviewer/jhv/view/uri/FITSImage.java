@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.view.ClipSet;
 
 import com.google.common.escape.Escaper;
@@ -30,7 +31,7 @@ public final class FITSImage {
         return new URIView.SourceInfo(getHeaderAsXML(data.header()), data.width(), data.height(), null, data.calculateClipSet());
     }
 
-    public static ImageBuffer decode(File file, ImageFilter filter, FITSViewState.Data state, @Nullable ClipSet.Range clipRange) throws Exception {
+    public static ImageBuffer decode(File file, ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
         return readData(file).decode(filter, state, clipRange);
     }
 

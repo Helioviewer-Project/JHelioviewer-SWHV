@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.image.DecodedImage;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
@@ -25,7 +26,6 @@ import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
-import org.helioviewer.jhv.view.uri.FITSViewState;
 import org.helioviewer.jhv.view.uri.URIView;
 
 import org.json.JSONArray;
@@ -34,7 +34,7 @@ import org.json.JSONObject;
 final class ImageLayerLoader {
 
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("View-Decoder");
-    private final FITSViewState fitsViewState;
+    private final ImageProcessingSettings processingSettings;
     private final Consumer<View> onViewLoaded;
     private final Runnable onUnload;
 
@@ -42,8 +42,8 @@ final class ImageLayerLoader {
     private Future<?> downloadFuture;
     private int loadGeneration;
 
-    ImageLayerLoader(FITSViewState _fitsViewState, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
-        fitsViewState = _fitsViewState;
+    ImageLayerLoader(ImageProcessingSettings _processingSettings, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
+        processingSettings = _processingSettings;
         onViewLoaded = _onViewLoaded;
         onUnload = _onUnload;
     }
@@ -148,8 +148,8 @@ final class ImageLayerLoader {
     private View createView(APIRequest req, URI uri) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
-            case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri);
-            case FITS, PNG, JPEG -> new URIView(executor, dataUri, fitsViewState);
+            case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri, processingSettings);
+            case FITS, PNG, JPEG -> new URIView(executor, dataUri, processingSettings);
             case ZIP -> loadZip(dataUri.uri());
             default -> throw new Exception("Unknown image type");
         };

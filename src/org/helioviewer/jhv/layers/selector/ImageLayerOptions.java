@@ -48,7 +48,7 @@ final class ImageLayerOptions extends JPanel {
     private DownloadProgress downloadProgress;
 
     ImageLayerOptions(ImageLayer layer) {
-        fitsSettings = new FITSSettings(layer.getFITSViewState());
+        fitsSettings = new FITSSettings(layer.getProcessingSettings());
         DifferencePanel differencePanel = new DifferencePanel(layer);
         FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
         FilterDetails blendPanel = SliderFilterPanel.blend(layer);

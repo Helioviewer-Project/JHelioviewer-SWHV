@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.Region;
@@ -28,6 +29,7 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 class RadioJ2KData implements View.DataHandler {
 
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("Radio-Decoder");
+    private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(() -> {});
     private final RadioData owner;
     private final J2KViewCallisto view;
     private boolean disposed;
@@ -47,7 +49,7 @@ class RadioJ2KData implements View.DataHandler {
         owner = _owner;
         J2KViewCallisto v = null;
         try {
-            v = new J2KViewCallisto(executor, req, dataUri);
+            v = new J2KViewCallisto(executor, req, dataUri, processingSettings);
 
             ResolutionSet.Level resLevel = v.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width();

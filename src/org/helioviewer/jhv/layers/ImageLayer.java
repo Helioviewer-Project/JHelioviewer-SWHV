@@ -17,6 +17,7 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.image.ImageDisplaySettings.DifferenceMode;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.math.Mat2;
@@ -26,7 +27,6 @@ import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.uri.FITSViewState;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONObject;
@@ -34,7 +34,7 @@ import org.json.JSONObject;
 public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
-    private final FITSViewState fitsViewState = new FITSViewState(this::refreshImage);
+    private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage;
     private final ImageLayerLoader loader;
 
@@ -58,7 +58,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (apiRequest != null) {
             jo.put("APIRequest", apiRequest.toJson());
             JSONObject imageParams = displaySettings.toJson();
-            fitsViewState.serialize(imageParams);
+            processingSettings.serialize(imageParams);
             jo.put("imageParams", imageParams);
         }
     }
@@ -67,18 +67,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     protected ImageLayer(View _view) {
         view = _view;
         glImage = null;
-        loader = new ImageLayerLoader(fitsViewState, v -> {}, () -> {});
+        loader = new ImageLayerLoader(processingSettings, v -> {}, () -> {});
     }
 
     private ImageLayer(JSONObject jo) {
-        try {
-            view = new BaseView(null, null);
-        } catch (Exception e) { // impossible
-            e.printStackTrace();
-        }
+        view = new BaseView(null, null, processingSettings);
 
         glImage = new GLSLImage(displaySettings);
-        loader = new ImageLayerLoader(fitsViewState, this::setView, this::unload);
+        loader = new ImageLayerLoader(processingSettings, this::setView, this::unload);
 
         if (jo != null) {
             applyImageParams(jo.optJSONObject("imageParams"));
@@ -92,24 +88,24 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void applyImageParams(@Nullable JSONObject imageParams) {
         if (imageParams != null) {
             displaySettings.fromJson(imageParams);
-            fitsViewState.fromJson(imageParams);
+            processingSettings.fromJson(imageParams);
         }
     }
 
-    public void setFilter(ImageFilter.Type type) {
-        if (type == view.getFilter())
-            return;
+    public ImageFilter.Type getFilter() {
+        return processingSettings.getFilter();
+    }
 
-        view.setFilter(type);
-        refreshImage();
+    public void setFilter(ImageFilter.Type type) {
+        processingSettings.setFilter(type);
     }
 
     void decode(Position viewpoint, double pixFactor, float factor) {
-        view.decode(viewpoint, pixFactor, factor, fitsViewState.data().clipRange(view.getClipSet()));
+        view.decode(viewpoint, pixFactor, factor, processingSettings.fitsParameters().clipRange(view.getClipSet()));
     }
 
-    public FITSViewState getFITSViewState() {
-        return fitsViewState;
+    public ImageProcessingSettings getProcessingSettings() {
+        return processingSettings;
     }
 
     private void refreshImage() {
@@ -166,11 +162,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     private void replaceView(View newView) {
-        ImageFilter.Type filterType = view.getFilter();
         unsetView();
         view = newView;
         loader.clearLoadFuture();
-        view.setFilter(filterType);
         view.setDataHandler(this);
     }
 
@@ -242,7 +236,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             return;
 
         MetaData meta0 = imageData.metaData();
-        glImage.applyFilters(imageData.imageBuffer(), meta0, view.getFilter() == ImageFilter.Type.RHEF);
+        glImage.applyFilters(imageData.imageBuffer(), meta0, getFilter() == ImageFilter.Type.RHEF);
 
         Position metaViewpoint0 = meta0.getViewpoint();
         View.ImageData imageDataDiff = comparisonImageData();

@@ -11,6 +11,7 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -26,16 +27,13 @@ public final class URIView extends BaseView {
 
     public record SourceInfo(@Nullable String xml, int width, int height, @Nullable LUT lut, @Nullable ClipSet clipSet) {}
 
-    private final FITSViewState fitsViewState;
     private final @Nullable ClipSet clipSet;
     private @Nullable ClipSet.Range clipRange;
     private final String xml;
     private final Region imageRegion;
 
-    public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri, FITSViewState _fitsViewState) throws Exception {
-        super(_executor, _dataUri);
-
-        fitsViewState = _fitsViewState;
+    public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri, ImageProcessingSettings _processingSettings) throws Exception {
+        super(_executor, _dataUri, _processingSettings);
 
         try {
             MetaData m;
@@ -69,12 +67,12 @@ public final class URIView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range range) {
         clipRange = hasFITS() ? range : null;
-        DecodeKey key = decodeKey(filterType);
+        DecodeKey key = decodeKey();
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.cancel();
-            sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey(filterType)));
+            sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey()));
             return;
         }
         ImageFilter filter = createFilter(key.filter());
@@ -96,11 +94,12 @@ public final class URIView extends BaseView {
         return dataUri.format() == DataUri.Format.FITS;
     }
 
-    private record DecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable FITSViewState.Data fitsData, @Nullable ClipSet.Range clipRange) {}
+    private record DecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable ImageProcessingSettings.FITSParameters fitsData,
+                             @Nullable ClipSet.Range clipRange) {}
 
-    private DecodeKey decodeKey(ImageFilter.Type filter) {
-        FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-        return new DecodeKey(dataUri, filter, data, clipRange);
+    private DecodeKey decodeKey() {
+        ImageProcessingSettings.FITSParameters data = hasFITS() ? processingSettings.fitsParameters() : null;
+        return new DecodeKey(dataUri, processingSettings.getFilter(), data, clipRange);
     }
 
     private DecodedImage decodeImage(DecodeKey key, ImageFilter filter) throws Exception {
@@ -125,12 +124,12 @@ public final class URIView extends BaseView {
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (!key.equals(decodeKey(filterType))) return; // settings or filter changed in-flight
+            if (!key.equals(decodeKey())) return; // settings or filter changed in-flight
 
             ImageBufferCache.put(key, result);
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
-            sendDataToHandler(0, viewpoint, result, () -> key.equals(decodeKey(filterType)));
+            sendDataToHandler(0, viewpoint, result, () -> key.equals(decodeKey()));
         }
 
         @Override

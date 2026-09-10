@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.ImageBuffer;
-import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -37,10 +36,6 @@ public interface View {
     default void abolish() {}
 
     default void clearCache() {}
-
-    void setFilter(ImageFilter.Type t);
-
-    ImageFilter.Type getFilter();
 
     default void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {}
 

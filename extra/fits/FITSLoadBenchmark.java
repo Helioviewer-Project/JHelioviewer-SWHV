@@ -16,6 +16,7 @@ import java.util.zip.CRC32;
 
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.view.ClipSet;
 
 import nom.tam.fits.FitsFactory;
@@ -60,7 +61,7 @@ public final class FITSLoadBenchmark {
         File file = path.toFile();
 
         try {
-            FITSViewState.Data state = new FITSViewState(() -> {}).data();
+            ImageProcessingSettings.FITSParameters state = new ImageProcessingSettings(() -> {}).fitsParameters();
             ClipSet.Range clipRange = options.mode() == Mode.Buffer
                     ? state.clipRange(FITSImage.readInfo(file).clipSet()) : null;
             for (int i = 0; i < options.warmup(); i++)
@@ -91,7 +92,7 @@ public final class FITSLoadBenchmark {
         }
     }
 
-    private static Result load(File file, Options options, FITSViewState.Data state, ClipSet.Range clipRange) throws Exception {
+    private static Result load(File file, Options options, ImageProcessingSettings.FITSParameters state, ClipSet.Range clipRange) throws Exception {
         if (options.mode() == Mode.Info) {
             URIView.SourceInfo info = FITSImage.readInfo(file);
             return new Result(info.width(), info.height(), null, "");

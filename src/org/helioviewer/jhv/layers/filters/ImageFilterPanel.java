@@ -59,8 +59,8 @@ public final class ImageFilterPanel implements FilterDetails {
     public ImageFilterPanel(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
         JComboBox<ImageFilter.Type> filterCombo = new JComboBox<>(ImageFilter.Type.values());
-        filterCombo.setSelectedItem(layer.getView().getFilter());
-        filterCombo.setToolTipText(layer.getView().getFilter().description);
+        filterCombo.setSelectedItem(layer.getFilter());
+        filterCombo.setToolTipText(layer.getFilter().description);
 
         JPanel enhancePanel = createEnhancePanel(layer);
         JideSplitButton enhanceButton = new JideSplitButton(Buttons.corona);
@@ -93,7 +93,7 @@ public final class ImageFilterPanel implements FilterDetails {
         upsilonButton.setAlwaysDropdown(true);
         upsilonButton.add(upsilonPanel);
 
-        upsilonButton.setVisible(layer.getView().getFilter() == ImageFilter.Type.RHEF);
+        upsilonButton.setVisible(layer.getFilter() == ImageFilter.Type.RHEF);
         filterCombo.addActionListener(e -> {
             if (filterCombo.getSelectedItem() instanceof ImageFilter.Type type) {
                 filterCombo.setToolTipText(type.description);
