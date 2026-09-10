@@ -21,22 +21,16 @@ import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-public final class FITSImage implements URIImageReader {
+public final class FITSImage {
 
-    private final FITSViewState.Data state;
+    private FITSImage() {}
 
-    public FITSImage(FITSViewState.Data _state) {
-        state = _state;
-    }
-
-    @Override
-    public URIImageReader.Info readInfo(File file) throws Exception {
+    public static URIView.SourceInfo readInfo(File file) throws Exception {
         FITSData data = readData(file);
-        return new URIImageReader.Info(getHeaderAsXML(data.header()), data.width(), data.height(), null, data.calculateClipSet());
+        return new URIView.SourceInfo(getHeaderAsXML(data.header()), data.width(), data.height(), null, data.calculateClipSet());
     }
 
-    @Override
-    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet.Range clipRange) throws Exception {
+    public static ImageBuffer decode(File file, ImageFilter filter, FITSViewState.Data state, @Nullable ClipSet.Range clipRange) throws Exception {
         return readData(file).decode(filter, state, clipRange);
     }
 
