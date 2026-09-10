@@ -328,7 +328,7 @@ public class J2KView extends BaseView {
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (key.filter() != processingSettings.getFilter()) return; // filter changed in-flight
+            if (dataHandler == null || key.filter() != processingSettings.getFilter()) return; // detached or filter changed in-flight
             if (cacheResult) ImageBufferCache.put(key, result);
 
             // This decode was superseded after it started; do not publish it to the layer.
