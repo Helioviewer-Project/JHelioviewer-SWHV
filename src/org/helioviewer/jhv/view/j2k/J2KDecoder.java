@@ -41,7 +41,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
     @Override
     @SuppressWarnings("try")
-    public DecodedImage call() throws Exception {
+    public DecodedImage call() throws KduException {
         try (J2KSource.Use ignored = src.use()) {
             if (src.isJP2())
                 src.open();
