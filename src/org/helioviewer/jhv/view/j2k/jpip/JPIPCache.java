@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
-import javax.annotation.Nullable;
-
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_global;
@@ -14,7 +12,7 @@ public class JPIPCache extends Kdu_cache {
         return complete[0];
     }
 
-    private JPIPStream scan(int frame) throws KduException {
+    JPIPStream scan(int frame) throws KduException {
         int flags = Kdu_global.KDU_CACHE_SCAN_START | Kdu_global.KDU_CACHE_SCAN_FIX_CODESTREAM;
         int[] klassID = new int[1];
         long[] codestreamID = {frame};
@@ -32,14 +30,7 @@ public class JPIPCache extends Kdu_cache {
             if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, binLen[0]))
                 break;
 
-            JPIPSegment seg = new JPIPSegment();
-            seg.binID = binID[0];
-            seg.klassID = klassID[0];
-            seg.codestreamID = codestreamID[0];
-            seg.length = binLen[0];
-            seg.data = data;
-            seg.isFinal = complete[0];
-            stream.segments.add(seg);
+            stream.databins.add(new JPIPStream.Databin(klassID[0], binID[0], complete[0], data));
         }
         return stream;
     }
@@ -49,18 +40,9 @@ public class JPIPCache extends Kdu_cache {
     }
 
     public void put(int frame, JPIPStream stream) throws KduException {
-        for (JPIPSegment seg : stream.segments)
-            put(frame, seg);
-    }
-
-    @Nullable
-    public JPIPStream get(int frame) {
-        try {
-            return scan(frame);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        for (JPIPStream.Databin databin : stream.databins)
+            Add_to_databin(databin.klassID(), frame, databin.binID(), databin.data(), 0,
+                    databin.data().length, databin.complete(), true, false);
     }
 
 }
