@@ -17,9 +17,8 @@ import javax.annotation.Nonnull;
 
 // ChunkedInputStream allows decoding HTTP chunked responses with a simple
 // format. Does not support internal chunk headers.
-class ChunkedInputStream extends InputStream implements TotalLength {
+class ChunkedInputStream extends InputStream {
 
-    private int totalLength = 0;
     // The last chunk length
     private int chunkLength = 0;
     // True if we've reached the end of stream
@@ -33,12 +32,6 @@ class ChunkedInputStream extends InputStream implements TotalLength {
 
     ChunkedInputStream(InputStream _in) {
         in = _in;
-    }
-
-    // Returns the length of the payload read
-    @Override
-    public int getTotalLength() {
-        return totalLength;
     }
 
     // This kind of stream does not support marking.
@@ -77,7 +70,6 @@ class ChunkedInputStream extends InputStream implements TotalLength {
                     throw new EOFException("Premature EOF: expected " + chunkLength + " more bytes in chunk");
 
                 chunkLength -= read;
-                totalLength += read;
                 if (chunkLength == 0)
                     LineRead.readCRLF(in);
                 return read;

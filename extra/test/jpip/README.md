@@ -12,7 +12,7 @@ The default suite is offline and needs no native library:
 - Parser: explicit/inherited identifiers, supported class mapping, payloads, empty messages,
   numeric boundaries, truncated headers/data, invalid integers, and EOR completion reasons.
   It runs with a 64 MB heap to catch oversized allocation from a bogus payload length.
-- HTTP streams: fixed-length and chunked bodies, response boundaries, byte counts,
+- HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, and draining a chunked body on close.
 - Socket cleanup: a local server verifies graceful channel close and aborting a stalled
   response without sending another request. A stalled constructor handshake is interrupted
