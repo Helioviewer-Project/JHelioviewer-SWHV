@@ -24,13 +24,13 @@ public final class FITSLoadBenchmark {
     private static final Method freeImageBuffer = freeImageBufferMethod();
 
     private enum Mode {
-        Image, Buffer
+        Info, Buffer
     }
 
     private record Options(Mode mode, ImageFilter.Type filter, int warmup, int iterations, boolean recursive, boolean checksum,
                            List<Path> inputs) {}
 
-    private record Result(ImageBuffer buffer, String checksum) {}
+    private record Result(int width, int height, ImageBuffer buffer, String checksum) {}
 
     private FITSLoadBenchmark() {}
 
@@ -72,9 +72,9 @@ public final class FITSLoadBenchmark {
                 System.out.printf(Locale.ROOT, "%s,%d,%d,%d,%s,%s,%s,%d,%.3f,%s,OK%n",
                         csv(path.toString()),
                         Files.size(path),
-                        buffer.width,
-                        buffer.height,
-                        buffer.format,
+                        result.width(),
+                        result.height(),
+                        buffer == null ? "" : buffer.format,
                         options.mode(),
                         options.filter(),
                         i,
@@ -89,11 +89,12 @@ public final class FITSLoadBenchmark {
     }
 
     private static Result load(FITSImage reader, File file, Options options) throws Exception {
-        ImageBuffer buffer = switch (options.mode()) {
-            case Image -> reader.readImage(file).buffer();
-            case Buffer -> reader.readImageBuffer(file, ImageFilter.of(options.filter(), null, null), null);
-        };
-        return new Result(buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
+        if (options.mode() == Mode.Info) {
+            URIImageReader.Info info = reader.readInfo(file);
+            return new Result(info.width(), info.height(), null, "");
+        }
+        ImageBuffer buffer = reader.decode(file, ImageFilter.of(options.filter(), null, null), null);
+        return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 
     private static long checksum(ImageBuffer imageBuffer) {
@@ -117,7 +118,8 @@ public final class FITSLoadBenchmark {
     }
 
     private static void free(Result result) throws Exception {
-        freeImageBuffer.invoke(result.buffer());
+        if (result.buffer() != null)
+            freeImageBuffer.invoke(result.buffer());
     }
 
     private static Method freeImageBufferMethod() {
@@ -154,7 +156,7 @@ public final class FITSLoadBenchmark {
     }
 
     private static Options parseOptions(String[] args) {
-        Mode mode = Mode.Image;
+        Mode mode = Mode.Info;
         ImageFilter.Type filter = ImageFilter.Type.None;
         int warmup = 1;
         int iterations = 3;
@@ -181,7 +183,7 @@ public final class FITSLoadBenchmark {
 
         if (warmup < 0 || iterations <= 0)
             throw new IllegalArgumentException("Invalid warmup/iteration count");
-        if (mode == Mode.Image && filter != ImageFilter.Type.None)
+        if (mode == Mode.Info && filter != ImageFilter.Type.None)
             throw new IllegalArgumentException("--filter requires --mode Buffer");
         if (filter == ImageFilter.Type.RHEF)
             throw new IllegalArgumentException("RHEF requires image geometry and is not supported by this benchmark");
@@ -202,7 +204,7 @@ public final class FITSLoadBenchmark {
     private static void usage() {
         System.err.println("Usage: extra/fits/run-benchmark.sh [options] <fits-file-or-directory>...");
         System.err.println("Options:");
-        System.err.println("  --mode Image|Buffer       Image includes header XML path; Buffer decodes pixels only (default: Image)");
+        System.err.println("  --mode Info|Buffer        Info reads metadata and percentiles; Buffer calculates clipping and decodes pixels (default: Info)");
         System.err.println("  --filter None|MGN|WOW     Only valid with --mode Buffer (default: None)");
         System.err.println("  --warmup N                Warmup loads per file (default: 1)");
         System.err.println("  --iterations N            Measured loads per file (default: 3)");

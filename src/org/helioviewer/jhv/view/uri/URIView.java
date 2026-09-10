@@ -38,28 +38,25 @@ public final class URIView extends BaseView {
         try {
             MetaData m;
             FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-            URIImageReader.Image image = reader(data).readImage(dataUri.file());
-            ImageBuffer buffer = image.buffer();
-            clipSet = image.clipSet();
-            URIDecodeKey key = new URIDecodeKey(dataUri, ImageFilter.Type.None, data, clipSet);
+            URIImageReader.Info info = reader(data).readInfo(dataUri.file());
+            clipSet = info.clipSet();
 
-            String readXml = image.xml();
+            String readXml = info.xml();
             try {
                 if (readXml == null)
                     throw new Exception("Missing XML metadata");
                 m = new FitsMetaData(new XMLMetaDataContainer(readXml), dataUri.sourceUri());
             } catch (Exception e) {
                 readXml = EMPTY_METAXML;
-                m = new BasicMetaData(buffer.width, buffer.height, dataUri.baseName(), dataUri.sourceUri());
+                m = new BasicMetaData(info.width(), info.height(), dataUri.baseName(), dataUri.sourceUri());
                 Log.warn("Helioviewer metadata missing for " + dataUri.baseName(), e);
             }
             xml = readXml;
 
-            imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
+            imageRegion = m.roiToRegion(0, 0, info.width(), info.height(), 1, 1);
             metaData[0] = m;
-            ImageBufferCache.put(key, new DecodedImage(buffer, imageRegion));
 
-            LUT lut = image.lut();
+            LUT lut = info.lut();
             if (lut != null)
                 builtinLUT = lut;
         } catch (Exception e) {
@@ -102,7 +99,7 @@ public final class URIView extends BaseView {
         @Nonnull
         @Override
         public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter, clipSet);
+            ImageBuffer imageBuffer = reader.decode(file, filter, clipSet);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return new DecodedImage(imageBuffer, imageRegion);

@@ -24,7 +24,7 @@ Recommended timing run:
 ant compile
 
 JHV_SKIP_COMPILE=1 extra/fits/run-benchmark.sh \
-  --mode Image \
+  --mode Info \
   --warmup 2 \
   --iterations 5 \
   --no-checksum \
@@ -40,7 +40,7 @@ Output is CSV:
 file,bytes,width,height,format,mode,filter,iteration,total_ms,checksum,status
 ```
 
-`--mode Image` uses `FITSImage.readImage`, matching the normal local FITS initial load path including header XML creation. `--mode Buffer` uses `FITSImage.readImageBuffer` and is useful when isolating pixel conversion/filter work.
+`--mode Info` uses `FITSImage.readInfo` to read metadata and collect percentile ranges without creating image buffers. `--mode Buffer` uses `FITSImage.decode` without a retained `ClipSet`, so its timing includes reading pixels, calculating percentile ranges when needed, conversion, and filtering. Checksums and the format column apply only to `Buffer` mode.
 
 For JProfiler startup recording, pass the JVM argument returned by `prepare_profiling`:
 
