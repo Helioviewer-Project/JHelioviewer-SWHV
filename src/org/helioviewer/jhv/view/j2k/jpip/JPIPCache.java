@@ -22,10 +22,10 @@ public class JPIPCache extends Kdu_cache {
 
         JPIPStream stream = new JPIPStream();
         while (Scan_databins(flags, klassID, codestreamID, binID, binLen, complete, null, 0)) {
+            flags &= ~Kdu_global.KDU_CACHE_SCAN_START;
             if (klassID[0] == Constants.KDU.META_DATABIN)
                 continue;
 
-            flags &= ~Kdu_global.KDU_CACHE_SCAN_START;
             byte[] data = new byte[binLen[0]];
             if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, binLen[0]))
                 break;
