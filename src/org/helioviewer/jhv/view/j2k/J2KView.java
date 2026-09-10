@@ -260,7 +260,7 @@ public class J2KView extends BaseView {
 
     private int currentLevel = 10000;
 
-    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
+    private void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
         int level = decodeParams.level;
         boolean priority = !Player.isPlaying();
 
