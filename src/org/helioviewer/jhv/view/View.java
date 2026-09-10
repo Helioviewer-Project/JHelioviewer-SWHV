@@ -42,7 +42,12 @@ public interface View {
 
     ImageFilter.Type getFilter();
 
-    default void decode(Position viewpoint, double pixFactor, float factor) {}
+    default void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {}
+
+    @Nullable
+    default ClipSet getClipSet() {
+        return null;
+    }
 
     @Nullable
     default String getBaseName() {

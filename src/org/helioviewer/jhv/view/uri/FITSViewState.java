@@ -2,6 +2,10 @@ package org.helioviewer.jhv.view.uri;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.view.ClipSet;
+
 import org.json.JSONObject;
 
 public final class FITSViewState {
@@ -102,6 +106,15 @@ public final class FITSViewState {
             double gamma,
             double beta,
             double alpha) {
+
+        @Nullable
+        public ClipSet.Range clipRange(@Nullable ClipSet clipSet) {
+            return switch (clippingMode) {
+                case Percentile001 -> clipSet == null ? null : clipSet.percentile001();
+                case Percentile05 -> clipSet == null ? null : clipSet.percentile05();
+                case Range -> new ClipSet.Range((float) clippingMin, (float) clippingMax);
+            };
+        }
 
         public int gammaIndex() {
             return GAMMA.toIndex(gamma);

@@ -36,8 +36,8 @@ public final class FITSImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception {
-        return readData(file).decode(filter, state, clipSet);
+    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet.Range clipRange) throws Exception {
+        return readData(file).decode(filter, state, clipRange);
     }
 
     private static FITSData readData(File file) throws Exception {

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,6 +21,7 @@ public class ManyView implements View {
 
     private final TimeMap<FrameInfo> frameMap = new TimeMap<>();
     private final boolean hasFITS;
+    private final @Nullable ClipSet clipSet;
     private int targetFrame;
 
     public ManyView(List<View> views) throws IOException {
@@ -29,10 +31,19 @@ public class ManyView implements View {
         hasFITS = views.stream().anyMatch(View::hasFITS);
         views.forEach(this::putDates);
         frameMap.buildIndex();
+        List<ClipSet> clipSets = new ArrayList<>();
+        for (FrameInfo frameInfo : frameMap.values()) {
+            clipSets.add(frameInfo.view.getClipSet());
+        }
+        clipSet = ClipSet.median(clipSets);
         // unused J2KViews should be abolished by their reaper
     }
 
     private void putDates(View v) {
+        if (v instanceof ManyView manyView) {
+            frameMap.putAll(manyView.frameMap);
+            return;
+        }
         int m = v.getMaximumFrameNumber();
         for (int i = 0; i <= m; i++) {
             JHVTime t = v.getFrameTime(i);
@@ -61,14 +72,20 @@ public class ManyView implements View {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
-        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
+    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {
+        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor, clipRange);
     }
 
     @Nullable
     @Override
     public LUT getDefaultLUT() {
         return frameMap.indexedValue(0).view.getDefaultLUT();
+    }
+
+    @Nullable
+    @Override
+    public ClipSet getClipSet() {
+        return clipSet;
     }
 
     @Override

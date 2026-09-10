@@ -27,6 +27,7 @@ public final class URIView extends BaseView {
 
     private final FITSViewState fitsViewState;
     private final @Nullable ClipSet clipSet;
+    private @Nullable ClipSet.Range clipRange;
     private final String xml;
     private final Region imageRegion;
 
@@ -65,7 +66,8 @@ public final class URIView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
+    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range range) {
+        clipRange = hasFITS() ? range : null;
         URIDecodeKey key = decodeKey(filterType);
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
@@ -74,11 +76,17 @@ public final class URIView extends BaseView {
             sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey(filterType)));
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion, key.clipSet()), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion, key.clipRange()), new Callback(key, viewpoint));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
         return ImageFilter.of(type, imageRegion, metaData[0]);
+    }
+
+    @Nullable
+    @Override
+    public ClipSet getClipSet() {
+        return clipSet;
     }
 
     @Override
@@ -88,18 +96,18 @@ public final class URIView extends BaseView {
 
     private URIDecodeKey decodeKey(ImageFilter.Type filter) {
         FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-        return new URIDecodeKey(dataUri, filter, data, clipSet);
+        return new URIDecodeKey(dataUri, filter, data, clipRange);
     }
 
     private static URIImageReader reader(@Nullable FITSViewState.Data data) {
         return data == null ? new GenericImage() : new FITSImage(data);
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion, @Nullable ClipSet clipSet) implements Callable<DecodedImage> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion, @Nullable ClipSet.Range clipRange) implements Callable<DecodedImage> {
         @Nonnull
         @Override
         public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.decode(file, filter, clipSet);
+            ImageBuffer imageBuffer = reader.decode(file, filter, clipRange);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return new DecodedImage(imageBuffer, imageRegion);

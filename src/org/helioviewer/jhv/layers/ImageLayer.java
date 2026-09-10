@@ -104,6 +104,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         refreshImage();
     }
 
+    void decode(Position viewpoint, double pixFactor, float factor) {
+        view.decode(viewpoint, pixFactor, factor, fitsViewState.data().clipRange(view.getClipSet()));
+    }
+
     public FITSViewState getFITSViewState() {
         return fitsViewState;
     }

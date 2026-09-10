@@ -27,6 +27,7 @@ import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.ClipSet;
 
 import kdu_jni.KduException;
 
@@ -271,7 +272,7 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
+    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
         AtomicBoolean status = source.getFrameStatus(decodeParams.frame, decodeParams.level); // before signalling to reader
         boolean cacheResult = status != null && status.get();

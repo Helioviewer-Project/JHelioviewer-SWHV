@@ -15,6 +15,6 @@ interface URIImageReader {
 
     Info readInfo(File file) throws Exception;
 
-    ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception;
+    ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet.Range clipRange) throws Exception;
 
 }

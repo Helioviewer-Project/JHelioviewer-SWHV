@@ -16,6 +16,7 @@ import java.util.zip.CRC32;
 
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.view.ClipSet;
 
 import nom.tam.fits.FitsFactory;
 
@@ -60,12 +61,14 @@ public final class FITSLoadBenchmark {
         File file = path.toFile();
 
         try {
+            ClipSet.Range clipRange = options.mode() == Mode.Buffer
+                    ? new FITSViewState(() -> {}).data().clipRange(reader.readInfo(file).clipSet()) : null;
             for (int i = 0; i < options.warmup(); i++)
-                free(load(reader, file, options));
+                free(load(reader, file, options, clipRange));
 
             for (int i = 0; i < options.iterations(); i++) {
                 long start = System.nanoTime();
-                Result result = load(reader, file, options);
+                Result result = load(reader, file, options, clipRange);
                 long elapsed = System.nanoTime() - start;
                 ImageBuffer buffer = result.buffer();
 
@@ -88,12 +91,12 @@ public final class FITSLoadBenchmark {
         }
     }
 
-    private static Result load(FITSImage reader, File file, Options options) throws Exception {
+    private static Result load(FITSImage reader, File file, Options options, ClipSet.Range clipRange) throws Exception {
         if (options.mode() == Mode.Info) {
             URIImageReader.Info info = reader.readInfo(file);
             return new Result(info.width(), info.height(), null, "");
         }
-        ImageBuffer buffer = reader.decode(file, ImageFilter.of(options.filter(), null, null), null);
+        ImageBuffer buffer = reader.decode(file, ImageFilter.of(options.filter(), null, null), clipRange);
         return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 
@@ -204,7 +207,7 @@ public final class FITSLoadBenchmark {
     private static void usage() {
         System.err.println("Usage: extra/fits/run-benchmark.sh [options] <fits-file-or-directory>...");
         System.err.println("Options:");
-        System.err.println("  --mode Info|Buffer        Info reads metadata and percentiles; Buffer calculates clipping and decodes pixels (default: Info)");
+        System.err.println("  --mode Info|Buffer        Info reads metadata and percentiles; Buffer decodes with prepared clipping (default: Info)");
         System.err.println("  --filter None|MGN|WOW     Only valid with --mode Buffer (default: None)");
         System.err.println("  --warmup N                Warmup loads per file (default: 1)");
         System.err.println("  --iterations N            Measured loads per file (default: 3)");

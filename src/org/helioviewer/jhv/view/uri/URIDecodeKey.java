@@ -6,4 +6,4 @@ import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.view.ClipSet;
 
-record URIDecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable FITSViewState.Data fitsData, @Nullable ClipSet clipSet) {}
+record URIDecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable FITSViewState.Data fitsData, @Nullable ClipSet.Range clipRange) {}

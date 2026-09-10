@@ -40,7 +40,7 @@ Output is CSV:
 file,bytes,width,height,format,mode,filter,iteration,total_ms,checksum,status
 ```
 
-`--mode Info` uses `FITSImage.readInfo` to read metadata and collect percentile ranges without creating image buffers. `--mode Buffer` uses `FITSImage.decode` without a retained `ClipSet`, so its timing includes reading pixels, calculating percentile ranges when needed, conversion, and filtering. Checksums and the format column apply only to `Buffer` mode.
+`--mode Info` uses `FITSImage.readInfo` to read metadata and collect percentile ranges without creating image buffers. `--mode Buffer` prepares the clipping range once before timing. It then uses `FITSImage.decode`, so its timing includes reading pixels, conversion, and filtering. Checksums and the format column apply only to `Buffer` mode.
 
 For JProfiler startup recording, pass the JVM argument returned by `prepare_profiling`:
 
