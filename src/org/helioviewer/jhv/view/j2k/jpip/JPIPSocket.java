@@ -62,6 +62,11 @@ public final class JPIPSocket extends HTTPSocket {
         }
     }
 
+    // Interrupt pending I/O without writing another request.
+    public void abort() throws IOException {
+        super.close();
+    }
+
     // Closes the JPIPChannel
     @Override
     public void close() throws IOException {

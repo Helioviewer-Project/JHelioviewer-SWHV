@@ -21,7 +21,7 @@ class J2KReader implements Runnable {
     private final Thread myThread;
 
     private volatile boolean isAbolished;
-    private JPIPSocket socket;
+    private volatile JPIPSocket socket;
     private String[] cacheKey;
 
     J2KReader(URI _uri, J2KSource.Remote source) throws KduException, IOException {
@@ -55,8 +55,9 @@ class J2KReader implements Runnable {
 
         while (myThread.isAlive()) {
             try {
-                if (socket != null)
-                    socket.close(); // try to unblock i/o
+                JPIPSocket currentSocket = socket;
+                if (currentSocket != null)
+                    currentSocket.abort();
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
@@ -80,7 +81,7 @@ class J2KReader implements Runnable {
     private void initCloseSocket() {
         if (socket != null) {
             try {
-                socket.close();
+                socket.abort();
             } catch (IOException e) {
                 Log.error(e);
             }
@@ -118,7 +119,7 @@ class J2KReader implements Runnable {
     }
 
     private boolean readingInterrupted() {
-        return !signalQueue.isEmpty() || Thread.interrupted();
+        return isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
     }
 
     // Finish the selected frame before spending bandwidth on the rest of the movie.
@@ -221,7 +222,7 @@ class J2KReader implements Runnable {
             } catch (Exception e) {
                 view.setDownloading(false);
                 try {
-                    socket.close();
+                    socket.abort();
                 } catch (IOException ioe) {
                     Log.error("Error closing JPIPSocket", ioe);
                 }

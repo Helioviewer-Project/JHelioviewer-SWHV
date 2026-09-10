@@ -14,6 +14,8 @@ The default suite is offline and needs no native library:
   It runs with a 64 MB heap to catch oversized allocation from a bogus payload length.
 - HTTP streams: fixed-length and chunked bodies, response boundaries, byte counts,
   zero-length reads at EOF, premature EOF, and draining a chunked body on close.
+- Socket cleanup: a local server verifies graceful channel close and aborting a stalled
+  response without sending another request. No external network or native library is needed.
 - Cache: failure to obtain the persistence lock leaves caching disabled without repeated logging.
   This replaces the older standalone cache test, updating its retired cache directory name.
 
@@ -34,8 +36,8 @@ Test classes, extracted native libraries, and cache data use temporary directori
 up on normal exit. The live runner supports the bundled macOS and Linux x86-64 libraries.
 Only macOS arm64 has been exercised. No application settings or user cache are used.
 
-This is an initial suite. It does not cover movie scheduling, cancellation, GUI rendering,
-all HTTP framing errors, or cache replacement/eviction. Parser field assertions use reflection
+This is an initial suite. It does not cover movie scheduling, reader lifecycle races,
+GUI rendering, all HTTP framing errors, or cache replacement/eviction. Parser field assertions use reflection
 to keep production methods private. Live decoding supplies only the coordinate conversion
 needed by the unfiltered decoder, so it does not validate metadata geometry.
 
