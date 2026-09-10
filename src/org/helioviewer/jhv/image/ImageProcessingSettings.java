@@ -42,61 +42,12 @@ public final class ImageProcessingSettings {
     }
 
     public static final double CLIP_LIMIT = 1e20;
-    public static final GammaParameter GAMMA = new GammaParameter(10, 40);
-    public static final BetaParameter BETA = new BetaParameter(1, 12);
-    public static final AlphaParameter ALPHA = new AlphaParameter(1, 5);
-
-    public interface IndexedParameter {
-        int minIndex();
-
-        int maxIndex();
-    }
-
-    public record GammaParameter(int minIndex, int maxIndex) implements IndexedParameter {
-        int toIndex(double value) {
-            return Math.clamp(Math.round(10. / value), minIndex, maxIndex);
-        }
-
-        double fromIndex(int index) {
-            return 10. / Math.clamp(index, minIndex, maxIndex);
-        }
-
-        double displayValue(int index) {
-            return index / 10.;
-        }
-
-        double clampValue(double value) {
-            return Math.clamp(value, fromIndex(maxIndex), fromIndex(minIndex));
-        }
-    }
-
-    public record BetaParameter(int minIndex, int maxIndex) implements IndexedParameter {
-        int toIndex(double value) {
-            return Math.clamp(Math.round(Math.log(1 / value) / Math.log(2)), minIndex, maxIndex);
-        }
-
-        double fromIndex(int index) {
-            return 1. / (1 << Math.clamp(index, minIndex, maxIndex));
-        }
-
-        double clampValue(double value) {
-            return Math.clamp(value, fromIndex(maxIndex), fromIndex(minIndex));
-        }
-    }
-
-    public record AlphaParameter(int minIndex, int maxIndex) implements IndexedParameter {
-        int toIndex(double value) {
-            return Math.clamp(Math.round(Math.log10(value)), minIndex, maxIndex);
-        }
-
-        double fromIndex(int index) {
-            return Math.pow(10, Math.clamp(index, minIndex, maxIndex));
-        }
-
-        double clampValue(double value) {
-            return Math.clamp(value, fromIndex(minIndex), fromIndex(maxIndex));
-        }
-    }
+    public static final double GAMMA_MIN = 0.25;
+    public static final double GAMMA_MAX = 1;
+    public static final double BETA_MIN = 1. / 4096;
+    public static final double BETA_MAX = 0.5;
+    public static final double ALPHA_MIN = 10;
+    public static final double ALPHA_MAX = 100000;
 
     public record FITSParameters(
             ClippingMode clippingMode,
@@ -116,21 +67,6 @@ public final class ImageProcessingSettings {
             };
         }
 
-        public int gammaIndex() {
-            return GAMMA.toIndex(gamma);
-        }
-
-        public double gammaDisplayValue() {
-            return GAMMA.displayValue(gammaIndex());
-        }
-
-        public int betaIndex() {
-            return BETA.toIndex(beta);
-        }
-
-        public int alphaIndex() {
-            return ALPHA.toIndex(alpha);
-        }
     }
 
     private ImageFilter.Type filter = ImageFilter.Type.None;
@@ -186,9 +122,9 @@ public final class ImageProcessingSettings {
         clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMode = readEnum(ClippingMode.class, jo.optString("clippingMode", clippingMode.name()), clippingMode);
         scalingMode = readEnum(ScalingMode.class, jo.optString("scalingMode", scalingMode.name()), scalingMode);
-        gamma = GAMMA.clampValue(jo.optDouble("gamma", gamma));
-        beta = BETA.clampValue(jo.optDouble("beta", beta));
-        alpha = ALPHA.clampValue(jo.optDouble("alpha", alpha));
+        gamma = Math.clamp(jo.optDouble("gamma", gamma), GAMMA_MIN, GAMMA_MAX);
+        beta = Math.clamp(jo.optDouble("beta", beta), BETA_MIN, BETA_MAX);
+        alpha = Math.clamp(jo.optDouble("alpha", alpha), ALPHA_MIN, ALPHA_MAX);
 
         if (!old.equals(createFITSParameters())) {
             notifyFITSListeners();
@@ -224,20 +160,20 @@ public final class ImageProcessingSettings {
         onChange.run();
     }
 
-    public void setGammaIndex(int value) {
-        double newGamma = GAMMA.fromIndex(value);
+    public void setGamma(double value) {
+        double newGamma = Math.clamp(value, GAMMA_MIN, GAMMA_MAX);
         if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma)
             onChange.run();
     }
 
-    public void setBetaIndex(int value) {
-        double newBeta = BETA.fromIndex(value);
+    public void setBeta(double value) {
+        double newBeta = Math.clamp(value, BETA_MIN, BETA_MAX);
         if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta)
             onChange.run();
     }
 
-    public void setAlphaIndex(int value) {
-        double newAlpha = ALPHA.fromIndex(value);
+    public void setAlpha(double value) {
+        double newAlpha = Math.clamp(value, ALPHA_MIN, ALPHA_MAX);
         if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha)
             onChange.run();
     }

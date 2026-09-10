@@ -17,7 +17,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
@@ -73,9 +72,12 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     public FITSSettings(ImageProcessingSettings _state) {
         state = _state;
         ImageProcessingSettings.FITSParameters initialState = state.fitsParameters();
-        gammaSlider = createSlider(ImageProcessingSettings.GAMMA, initialState.gammaIndex());
-        betaSlider = createSlider(ImageProcessingSettings.BETA, initialState.betaIndex());
-        alphaSlider = createSlider(ImageProcessingSettings.ALPHA, initialState.alphaIndex());
+        gammaSlider = createSlider(gammaIndex(ImageProcessingSettings.GAMMA_MAX),
+                gammaIndex(ImageProcessingSettings.GAMMA_MIN), gammaIndex(initialState.gamma()));
+        betaSlider = createSlider(betaIndex(ImageProcessingSettings.BETA_MAX),
+                betaIndex(ImageProcessingSettings.BETA_MIN), betaIndex(initialState.beta()));
+        alphaSlider = createSlider(alphaIndex(ImageProcessingSettings.ALPHA_MIN),
+                alphaIndex(ImageProcessingSettings.ALPHA_MAX), alphaIndex(initialState.alpha()));
         state.addFITSListener(this);
 
         gammaButton.setToolTipText("<html><body>pixel<sup>1/γ</sup>");
@@ -90,17 +92,17 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         gammaSlider.addChangeListener(e -> {
             int value = gammaSlider.getValue();
             if (!syncing)
-                state.setGammaIndex(value);
+                state.setGamma(10. / value);
         });
         betaSlider.addChangeListener(e -> {
             int value = betaSlider.getValue();
             if (!syncing)
-                state.setBetaIndex(value);
+                state.setBeta(1. / (1 << value));
         });
         alphaSlider.addChangeListener(e -> {
             int value = alphaSlider.getValue();
             if (!syncing)
-                state.setAlphaIndex(value);
+                state.setAlpha(Math.pow(10, value));
         });
 
         bindScalingMode(gammaButton, gammaSlider, ImageProcessingSettings.ScalingMode.Gamma);
@@ -181,9 +183,12 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
             alphaButton.setSelected(data.scalingMode() == ImageProcessingSettings.ScalingMode.Alpha);
             clippingButtons.forEach((mode, button) -> button.setSelected(mode == data.clippingMode()));
 
-            syncControl(gammaSlider, gammaLabel, data.gammaIndex(), String.valueOf(data.gammaDisplayValue()));
-            syncControl(betaSlider, betaLabel, data.betaIndex());
-            syncControl(alphaSlider, alphaLabel, data.alphaIndex());
+            gammaSlider.setValue(gammaIndex(data.gamma()));
+            betaSlider.setValue(betaIndex(data.beta()));
+            alphaSlider.setValue(alphaIndex(data.alpha()));
+            gammaLabel.setText(String.valueOf(gammaSlider.getValue() / 10.));
+            betaLabel.setText(String.valueOf(betaSlider.getValue()));
+            alphaLabel.setText(String.valueOf(alphaSlider.getValue()));
 
             if (differentDoubleValue(minClip.getValue(), data.clippingMin()))
                 minClip.setValue(data.clippingMin());
@@ -208,20 +213,22 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
             setter.accept(number.doubleValue());
     }
 
-    private static JHVSlider createSlider(ImageProcessingSettings.IndexedParameter parameter, int value) {
-        JHVSlider slider = new JHVSlider(parameter.minIndex(), parameter.maxIndex(), value);
+    private static int gammaIndex(double value) {
+        return (int) Math.round(10. / value);
+    }
+
+    private static int betaIndex(double value) {
+        return (int) Math.round(Math.log(1 / value) / Math.log(2));
+    }
+
+    private static int alphaIndex(double value) {
+        return (int) Math.round(Math.log10(value));
+    }
+
+    private static JHVSlider createSlider(int min, int max, int value) {
+        JHVSlider slider = new JHVSlider(min, max, Math.clamp(value, min, max));
         slider.setPreferredSize(new Dimension(100, slider.getPreferredSize().height));
         return slider;
-    }
-
-    private static void syncControl(JSlider slider, JLabel label, int value) {
-        syncControl(slider, label, value, String.valueOf(value));
-    }
-
-    private static void syncControl(JSlider slider, JLabel label, int value, String text) {
-        if (slider.getValue() != value)
-            slider.setValue(value);
-        label.setText(text);
     }
 
 }
