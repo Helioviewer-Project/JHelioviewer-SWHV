@@ -21,10 +21,12 @@ import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.ClipSet;
 
 public final class URIView extends BaseView {
 
     private final FITSViewState fitsViewState;
+    private final @Nullable ClipSet clipSet;
     private final String xml;
     private final Region imageRegion;
 
@@ -35,9 +37,11 @@ public final class URIView extends BaseView {
 
         try {
             MetaData m;
-            URIDecodeKey key = decodeKey(ImageFilter.Type.None);
-            URIImageReader.Image image = reader(key.fitsData()).readImage(dataUri.file());
+            FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
+            URIImageReader.Image image = reader(data).readImage(dataUri.file());
             ImageBuffer buffer = image.buffer();
+            clipSet = image.clipSet();
+            URIDecodeKey key = new URIDecodeKey(dataUri, ImageFilter.Type.None, data, clipSet);
 
             String readXml = image.xml();
             try {
@@ -73,7 +77,7 @@ public final class URIView extends BaseView {
             sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey(filterType)));
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion, key.clipSet()), new Callback(key, viewpoint));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
@@ -87,18 +91,18 @@ public final class URIView extends BaseView {
 
     private URIDecodeKey decodeKey(ImageFilter.Type filter) {
         FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-        return new URIDecodeKey(dataUri, filter, data);
+        return new URIDecodeKey(dataUri, filter, data, clipSet);
     }
 
     private static URIImageReader reader(@Nullable FITSViewState.Data data) {
         return data == null ? new GenericImage() : new FITSImage(data);
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion) implements Callable<DecodedImage> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion, @Nullable ClipSet clipSet) implements Callable<DecodedImage> {
         @Nonnull
         @Override
         public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter, clipSet);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return new DecodedImage(imageBuffer, imageRegion);

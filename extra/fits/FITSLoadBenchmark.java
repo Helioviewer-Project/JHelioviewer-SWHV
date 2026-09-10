@@ -91,7 +91,7 @@ public final class FITSLoadBenchmark {
     private static Result load(FITSImage reader, File file, Options options) throws Exception {
         ImageBuffer buffer = switch (options.mode()) {
             case Image -> reader.readImage(file).buffer();
-            case Buffer -> reader.readImageBuffer(file, ImageFilter.of(options.filter(), null, null));
+            case Buffer -> reader.readImageBuffer(file, ImageFilter.of(options.filter(), null, null), null);
         };
         return new Result(buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
