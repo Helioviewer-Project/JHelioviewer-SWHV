@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile and run JPIP regressions after ant compile (JDK 25).
 
-Offline by default. --live also retrieves and decodes a fixed ROB AIA image.
+Offline by default. --live also retrieves and decodes fixed ROB AIA images and a Callisto spectrogram.
 """
 
 import argparse
@@ -11,6 +11,7 @@ import platform
 import subprocess
 import tempfile
 import zipfile
+from urllib.request import urlopen
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -23,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     sources = ["JPIPSerializerTest.java", "JPIPResponseTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
     if args.live:
-        sources.extend(["ROBTest.java", "MovieReaderTest.java"])
+        sources.extend(["ROBTest.java", "MovieReaderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
@@ -53,3 +54,10 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         movie = "jpip://jpip.swhv.oma.be/movies/SDO_AIA_171_F2026-09-08T12.00.00Z_T2026-09-10T12.00.00ZB1800L.jpx"
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", str(work / library), movie],
                        check=True, timeout=180)
+
+        callisto = "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?sourceId=5000&date=2026-09-09T00:00:00Z"
+        print("Retrieving " + callisto, flush=True)
+        with urlopen(callisto, timeout=60) as response:
+            (work / "callisto.jp2").write_bytes(response.read())
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.CallistoTest",
+                        str(work / library), str(work / "callisto.jp2")], check=True, timeout=180)
