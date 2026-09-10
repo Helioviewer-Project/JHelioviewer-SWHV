@@ -59,7 +59,7 @@ public class JPIPResponse {
 
     private static int readIntVBAS(InputStream in) throws IOException {
         long value = readVBAS(in);
-        if (value > Integer.MAX_VALUE)
+        if (value < 0 || value > Integer.MAX_VALUE)
             throw new ProtocolException("JPIP integer exceeds supported range");
         return (int) value;
     }
