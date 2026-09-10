@@ -29,7 +29,6 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     private static final Kdu_quality_limiter qualityLow = new Kdu_quality_limiter(2f / 256);
     private static final Kdu_quality_limiter qualityHigh = new Kdu_quality_limiter(1f / 256);
 
-    private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
     private static final ThreadLocal<DecodeScratch> localScratch = ThreadLocal.withInitial(DecodeScratch::new);
 
     private static final class DecodeScratch {
@@ -51,9 +50,6 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 if (src.isJP2())
                     src.close();
             }
-        } catch (KduException e) {
-            resetThreadEnv();
-            throw e;
         }
     }
 
@@ -62,11 +58,18 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         // kdu_region_decompressor/region output (~23ms vs ~200ms). Compositor stays on
         // Kakadu's optimized 32-bit path; region uses general channel-buffer conversion.
         Kdu_region_compositor compositor = new Kdu_region_compositor();
+        Kdu_thread_env environment = null;
         try {
+            environment = new Kdu_thread_env();
+            environment.Create();
+            int numThreads = Math.min(8, Kdu_global.Kdu_get_num_processors());
+            for (int i = 1; i < numThreads; i++)
+                environment.Add_thread();
+
             compositor.Create(src.jpxSource());
             compositor.Set_surface_initialization_mode(false);
             compositor.Set_quality_limiting(params.factor < 1 ? qualityLow : qualityHigh, -1, -1);
-            compositor.Set_thread_env(localThread.get(), null);
+            compositor.Set_thread_env(environment, null);
 
             J2KParams.SubImage subImage = params.subImage;
             int frame = params.frame;
@@ -124,7 +127,11 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             return new DecodedImage(outBuffer.finish(), imageRegion);
         } finally {
             // Kakadu's destructor stops processing and releases layers and buffers.
-            compositor.Native_destroy();
+            try {
+                compositor.Native_destroy();
+            } finally {
+                destroyThreadEnv(environment);
+            }
         }
     }
 
@@ -142,27 +149,6 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             for (; i < width; ++i, srcByte += 4)
                 dst.put(dstIdx + i, src.get(srcByte));
         }
-    }
-
-    private static Kdu_thread_env createThreadEnv() {
-        Kdu_thread_env kte = new Kdu_thread_env();
-        try {
-            kte.Create();
-            int numThreads = Math.min(8, Kdu_global.Kdu_get_num_processors());
-            for (int i = 1; i < numThreads; i++)
-                kte.Add_thread();
-            return kte;
-        } catch (KduException e) {
-            Log.warn("Failed to create Kakadu thread environment", e);
-            destroyThreadEnv(kte);
-        }
-        return null;
-    }
-
-    private static void resetThreadEnv() {
-        Kdu_thread_env current = localThread.get();
-        destroyThreadEnv(current);
-        localThread.remove();
     }
 
     private static void destroyThreadEnv(Kdu_thread_env kte) {
