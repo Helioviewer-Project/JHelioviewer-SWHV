@@ -62,32 +62,55 @@ abstract class J2KSource {
         }
     }
 
-    void destroy() throws KduException {}
-
-    void close() throws KduException {
+    // Temporary close: JP2 sources reopen for the next decode.
+    final void close() throws KduException {
         if (isClosed)
             return;
-        jpxSrc.Close();
-        jp2Src.Close();
+        KduException failure = null;
+        try {
+            jpxSrc.Close();
+        } catch (KduException e) {
+            failure = e;
+        }
+        try {
+            jp2Src.Close();
+        } catch (KduException e) {
+            if (failure == null)
+                throw e;
+            failure.addSuppressed(e);
+        }
+        if (failure != null)
+            throw failure;
         isClosed = true;
     }
 
-    void closeWhenUnused() throws KduException {
+    // Terminal cleanup: wait for active users before releasing owned native resources.
+    void destroy() throws KduException {
+        boolean interrupted = false;
         synchronized (this) {
             closing = true;
             while (users > 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
-                    // The background abolisher thread is not expected to be interrupted.
-                    // If this wait ever hangs in normal flow, some decode path leaked
-                    // beginUse() without a matching endUse() and that path should be fixed.
-                    Thread.currentThread().interrupt();
-                    break;
+                    interrupted = true;
                 }
             }
         }
-        close();
+        try {
+            try {
+                close();
+            } finally {
+                try {
+                    jpxSrc.Native_destroy();
+                } finally {
+                    jp2Src.Native_destroy();
+                }
+            }
+        } finally {
+            if (interrupted)
+                Thread.currentThread().interrupt();
+        }
     }
 
     // Native access guards
@@ -349,8 +372,11 @@ abstract class J2KSource {
 
         @Override
         void destroy() throws KduException {
-            cache.Close();
-            cache.Native_destroy();
+            try {
+                super.destroy();
+            } finally {
+                cache.Native_destroy();
+            }
         }
 
         @Override

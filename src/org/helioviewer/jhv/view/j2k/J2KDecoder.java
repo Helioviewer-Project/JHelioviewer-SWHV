@@ -151,12 +151,15 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         } finally {
             if (compositor != null)
                 destroyCompositor(compositor);
-            if (sourceInUse)
-                src.endUse();
-            if (sourceOpened)
-                src.close();
-            if (recreateThreadEnv)
-                resetThreadEnv();
+            try {
+                if (sourceOpened)
+                    src.close();
+            } finally {
+                if (sourceInUse)
+                    src.endUse();
+                if (recreateThreadEnv)
+                    resetThreadEnv();
+            }
         }
     }
 

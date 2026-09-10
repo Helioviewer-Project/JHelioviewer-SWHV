@@ -123,10 +123,8 @@ public class J2KView extends BaseView {
             try {
                 if (acquiredReader != null)
                     acquiredReader.stop();
-                if (acquiredSource != null) {
-                    acquiredSource.closeWhenUnused();
+                if (acquiredSource != null)
                     acquiredSource.destroy();
-                }
             } catch (Exception cleanupFailure) {
                 e.addSuppressed(cleanupFailure);
             }
@@ -148,11 +146,11 @@ public class J2KView extends BaseView {
                     if (aReader != null) {
                         aReader.stop();
                     }
-                    aSource.closeWhenUnused();
                     aSource.destroy();
-                    clearCache(aSerial);
                 } catch (KduException e) {
                     Log.error(e);
+                } finally {
+                    clearCache(aSerial);
                 }
             }, "JHV-J2KAbolisher").start();
         }
