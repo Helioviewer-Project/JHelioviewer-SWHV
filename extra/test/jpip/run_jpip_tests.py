@@ -21,14 +21,14 @@ classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"),
                              *(str(p) for p in sorted((root / "lib").rglob("*.jar")))])
 with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
-    sources = ["JPIPResponseTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java"]
+    sources = ["JPIPResponseTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
     if args.live:
         sources.append("ROBTest.java")
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
-    for name in ["JPIPResponseTest", "JPIPCacheManagerTest", "http.HTTPStreamTest"]:
+    for name in ["JPIPResponseTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],
                        check=True, timeout=60)
