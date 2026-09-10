@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -11,28 +12,49 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
 public final class ROBTest {
 
+    private enum Mode { NORMAL, LIMITED, CACHED }
+
     public static void main(String[] arguments) throws Exception {
         System.load(arguments[0]);
         KakaduMessageSystem.startKduMessageSystem();
         URI uri = URI.create(arguments[1]);
-        String[] normal = retrieve(uri, false);
-        String[] limited = retrieve(uri, true);
-        if (!Arrays.equals(normal, limited))
-            throw new AssertionError("Metadata or decoded pixels differ with response byte limit");
-        System.out.println("PASS: independent normal and 16 KB sessions produce identical metadata and pixels");
+        // Reopen the production cache without exposing its shutdown method to application callers.
+        Method close = JPIPCacheManager.class.getDeclaredMethod("close");
+        close.setAccessible(true);
+        JPIPCacheManager.init();
+        try {
+            String[] normal = retrieve(uri, Mode.NORMAL);
+            String[] limited = retrieve(uri, Mode.LIMITED);
+            if (!Arrays.equals(normal, limited))
+                throw new AssertionError("Metadata or decoded pixels differ with response byte limit");
+            close.invoke(null);
+            JPIPCacheManager.init();
+            String[] cached = retrieve(uri, Mode.CACHED);
+            if (!Arrays.equals(normal, cached))
+                throw new AssertionError("Metadata or decoded pixels differ after disk-cache restoration");
+            JPIPCacheManager.clear();
+            if (JPIPCacheManager.get("level0", 0) != null)
+                throw new AssertionError("Cache clear retained the image");
+            System.out.println("PASS: normal, 16 KB and reopened disk-cache sessions produce identical metadata and pixels");
+        } finally {
+            close.invoke(null);
+        }
     }
 
-    private static String[] retrieve(URI uri, boolean limited) throws Exception {
+    private static String[] retrieve(URI uri, Mode mode) throws Exception {
         J2KSource.Remote source = new J2KSource.Remote();
         JPIPSocket socket = null;
         try {
             socket = new JPIPSocket(uri, source.cache());
             socket.init(source.cache());
+            if (mode == Mode.CACHED)
+                socket.close(); // Only metadata and the initial 64x64 image come from the server.
             source.open();
             if (source.maxFrame() != 0)
                 throw new AssertionError("Expected the single-frame ROB fixture");
@@ -53,18 +75,35 @@ public final class ROBTest {
             for (int level : new int[]{2, 0}) {
                 ResolutionSet resolution = source.resolutionSet(0);
                 ResolutionSet.Level size = resolution.getLevel(level);
-                String query = JPIPSocket.createLayerQuery(0, size.width() + "," + size.height());
-                if (limited)
-                    query = query.replaceAll("len=[0-9]+", "len=16384");
                 int requests = 0;
-                JPIPResponse response;
-                do {
-                    if (++requests > 256)
-                        throw new AssertionError("No completion after 256 requests at level " + level);
-                    response = socket.request(query, source.cache(), 0);
-                } while (!response.isResponseComplete());
-                if (limited && requests < 2)
-                    throw new AssertionError("Small response limit did not exercise continuation");
+                if (mode == Mode.CACHED) {
+                    JPIPCacheManager.Entry entry = JPIPCacheManager.get("level" + level, level);
+                    if (entry == null || entry.level() != level)
+                        throw new AssertionError("Missing persisted level " + level);
+                    source.cache().put(0, entry.stream());
+                } else {
+                    String query = JPIPSocket.createLayerQuery(0, size.width() + "," + size.height());
+                    if (mode == Mode.LIMITED)
+                        query = query.replaceAll("len=[0-9]+", "len=16384");
+                    JPIPResponse response;
+                    do {
+                        if (++requests > 256)
+                            throw new AssertionError("No completion after 256 requests at level " + level);
+                        response = socket.request(query, source.cache(), 0);
+                    } while (!response.isResponseComplete());
+                    if (mode == Mode.LIMITED && requests < 2)
+                        throw new AssertionError("Small response limit did not exercise continuation");
+                    if (mode == Mode.NORMAL) {
+                        JPIPCacheManager.store("level" + level, level, source.cache(), 0);
+                        // One key exercises replacement as the image reaches a finer resolution.
+                        JPIPCacheManager.store("upgrade", level, source.cache(), 0);
+                        JPIPCacheManager.Entry upgraded = JPIPCacheManager.get("upgrade", 2);
+                        if (upgraded == null || upgraded.level() != level)
+                            throw new AssertionError("Cache resolution upgrade failed");
+                        if (level == 2 && JPIPCacheManager.get("level2", 0) != null)
+                            throw new AssertionError("Coarse data satisfies a full-resolution request");
+                    }
+                }
                 source.setFrameComplete(0, level);
                 DecodedImage image = new J2KDecoder(source,
                         new J2KParams.Decode(0, size.subImage(), level, 1), resolution.numComps,
@@ -76,7 +115,7 @@ public final class ROBTest {
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(pixels.duplicate());
                 result[resultIndex++] = HexFormat.of().formatHex(hash.digest());
-                System.out.println((limited ? "16 KB" : "Normal") + " level=" + level + " requests=" + requests
+                System.out.println(mode + " level=" + level + " requests=" + requests
                         + " pixels=" + size.width() + "x" + size.height() + " sha256=" + result[resultIndex - 1]);
             }
             return result;
