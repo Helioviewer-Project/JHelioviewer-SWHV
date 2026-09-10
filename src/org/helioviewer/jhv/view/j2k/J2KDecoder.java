@@ -109,33 +109,17 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filter);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
-            Kdu_dims newRegion = scratch.newRegion;
-            newRegion.From_u32(0, 0, 0, 0);
+            // With surface initialization disabled, only the completed buffer is ready to copy.
             while (!compositor.Is_processing_complete()) {
-                if (!compositor.Process(MAX_RENDER_SAMPLES, newRegion))
+                if (!compositor.Process(MAX_RENDER_SAMPLES, scratch.newRegion))
                     throw new KduException("JPEG 2000 rendering failed, invalid scale code "
                             + compositor.Check_invalid_scale_code());
-
-                Kdu_coords newSize = newRegion.Access_size();
-                int newWidth = newSize.Get_x();
-                int newHeight = newSize.Get_y();
-                if (newWidth * newHeight == 0)
-                    continue;
-
-                Kdu_coords newOffset = newRegion.Access_pos();
-                int newX = newOffset.Get_x() - actualX;
-                int newY = newOffset.Get_y() - actualY;
-
-                int dstIdx = newX + newY * actualWidth;
-                int srcIdx = 0;
-
-                if (gray) {
-                    gatherGray(nativeBuffer, outByteBuffer, srcStride[0], actualWidth, srcIdx, dstIdx, newWidth, newHeight);
-                } else {
-                    for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                        outByteBuffer.put(4 * dstIdx, nativeBuffer, 4 * srcIdx, 4 * newWidth);
-                    }
-                }
+            }
+            if (gray) {
+                gatherGray(nativeBuffer, outByteBuffer, srcStride[0], actualWidth, actualHeight);
+            } else {
+                for (int row = 0; row < actualHeight; row++)
+                    outByteBuffer.put(4 * row * actualWidth, nativeBuffer, 4 * row * srcStride[0], 4 * actualWidth);
             }
             return new DecodedImage(outBuffer.finish(), imageRegion);
         } finally {
@@ -144,10 +128,10 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         }
     }
 
-    private static void gatherGray(ByteBuffer src, ByteBuffer dst, int srcStride, int dstStride,
-                                   int srcIdx, int dstIdx, int width, int height) {
-        for (int j = 0; j < height; ++j, dstIdx += dstStride, srcIdx += srcStride) {
-            int srcByte = 4 * srcIdx;
+    private static void gatherGray(ByteBuffer src, ByteBuffer dst, int srcStride, int width, int height) {
+        for (int row = 0; row < height; row++) {
+            int dstIdx = row * width;
+            int srcByte = 4 * row * srcStride;
             int i = 0;
             for (; i <= width - 4; i += 4, srcByte += 16) { // doesn't help much, more is definitely harmful
                 dst.put(dstIdx + i, src.get(srcByte));
