@@ -51,10 +51,11 @@ class FilterMGN implements ImageFilter.Algorithm {
             return n;
         }
 
-        private void gaussianConv3(float[] dst, float[] src, int N, int stride, int offset, float[] scratch) {
+        private void gaussianConv3(float[] dst, float[] src, int N, int stride, int offset, double[] scratch) {
             int pad = radii[0] + 1;
-            float accum = 0;
+            double accum = 0;
 
+            // Use double precision to preserve small differences between cumulative sums.
             // Compute cumulative sum of src over n = -pad,..., N + pad - 1
             for (int n = -pad; n < 0; ++n) {
                 accum += src[offset + stride * extension(N, n)];
@@ -75,9 +76,9 @@ class FilterMGN implements ImageFilter.Algorithm {
             int dstPos = offset;
             for (int n = 0; n < N; ++n) {
                 int center = pad + n;
-                dst[dstPos] = weights[0] * (scratch[center + radii[0]] - scratch[center - radii[0] - 1]) +
+                dst[dstPos] = (float) (weights[0] * (scratch[center + radii[0]] - scratch[center - radii[0] - 1]) +
                         weights[1] * (scratch[center + radii[1]] - scratch[center - radii[1] - 1]) +
-                        weights[2] * (scratch[center + radii[2]] - scratch[center - radii[2] - 1]);
+                        weights[2] * (scratch[center + radii[2]] - scratch[center - radii[2] - 1]));
                 dstPos += stride;
             }
         }
@@ -85,12 +86,12 @@ class FilterMGN implements ImageFilter.Algorithm {
         void gaussianConvImage(float[] dst, float[] src, int width, int height) {
             int pad = radii[0] + 1;
             ParallelRange.run(height, (from, to) -> {
-                float[] scratch = new float[width + 2 * pad];
+                double[] scratch = new double[width + 2 * pad];
                 for (int y = from; y < to; y++)
                     gaussianConv3(dst, src, width, 1, width * y, scratch);
             });
             ParallelRange.run(width, (from, to) -> {
-                float[] scratch = new float[height + 2 * pad];
+                double[] scratch = new double[height + 2 * pad];
                 for (int x = from; x < to; x++)
                     gaussianConv3(dst, dst, height, width, x, scratch);
             });
@@ -110,24 +111,18 @@ class FilterMGN implements ImageFilter.Algorithm {
                                             float[] conv, float[] conv2, float[] accum) {
         filter.gaussianConvImage(conv, data, width, height);
         ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int i = rowBase; i < rowEnd; i++) {
-                    float v = data[i] - conv[i];
-                    conv[i] = v;
-                    conv2[i] = v * v;
-                }
+            int end = to * width;
+            for (int i = from * width; i < end; i++) {
+                float v = data[i] - conv[i];
+                conv[i] = v;
+                conv2[i] = v * v;
             }
         });
         filter.gaussianConvImage(conv2, conv2, width, height);
         ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int i = rowBase; i < rowEnd; i++) {
-                    accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] / (float) Math.sqrt(conv2[i]);
-                }
+            int end = to * width;
+            for (int i = from * width; i < end; i++) {
+                accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] / (float) Math.sqrt(conv2[i]);
             }
         });
     }
@@ -147,12 +142,9 @@ class FilterMGN implements ImageFilter.Algorithm {
         }
 
         ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int i = rowBase; i < rowEnd; i++) {
-                    accum[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
-                }
+            int end = to * width;
+            for (int i = from * width; i < end; i++) {
+                accum[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
             }
         });
         return accum;
