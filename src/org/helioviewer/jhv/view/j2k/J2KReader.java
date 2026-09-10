@@ -175,6 +175,7 @@ class J2KReader implements Runnable {
     @Override
     @SuppressWarnings("try")
     public void run() {
+        int retries = 0;
         while (!isAbolished) {
             J2KParams.Read params;
             // wait for signal
@@ -238,5 +239,4 @@ class J2KReader implements Runnable {
         }
     }
 
-    private int retries = 0;
 }
