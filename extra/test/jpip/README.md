@@ -16,7 +16,10 @@ The default suite is offline and needs no native library:
   zero-length reads at EOF, premature EOF, and draining a chunked body on close.
 - Socket cleanup: a local server verifies graceful channel close and aborting a stalled
   response without sending another request. A stalled constructor handshake is interrupted
-  on a virtual thread and must close TCP. No external network or native library is needed.
+  on a virtual thread and must close TCP. Two queued requests are also aborted together.
+  Pipelining checks response-to-frame matching, pending counts, partial/complete response order,
+  and sequential use after draining.
+  No external network or native library is needed.
 - Cache serializer: round trips of every databin record component, empty streams, large identifiers, direct/read-only
   buffers, unchanged input positions, and rejection of truncated or invalid entries.
 - Cache: failure to obtain the persistence lock leaves caching disabled without repeated logging.
@@ -40,11 +43,17 @@ The limited session must require multiple requests. Hashes are compared between 
 not pinned across KDU versions. Allow up to three minutes and several MB of network traffic.
 A service outage or removed fixture fails the test, rather than silently skipping it.
 
+The live suite also compares the first four frames of a fixed ROB movie using sequential
+requests, the actual reader prefetch pump, and reopened disk-cache restoration. A controlled
+signal after two sends checks that two sent responses are drained before
+switching work. The pump is invoked directly without a GUI view, while its worker remains idle.
+This does not exercise the outer reader retry loop or GUI priority refresh.
+
 Test classes, extracted native libraries, and cache data use temporary directories, cleaned
 up on normal exit. The live runner supports the bundled macOS and Linux x86-64 libraries.
 Only macOS arm64 has been exercised. No application settings or user cache are used.
 
-This is an initial suite. It does not cover movie scheduling, reader lifecycle races,
+This is an initial suite. It does not cover all reader lifecycle races,
 GUI rendering, all HTTP framing errors, or cache eviction. Parser field assertions use reflection
 to keep production methods private. Live decoding supplies only the coordinate conversion
 needed by the unfiltered decoder, so it does not validate metadata geometry.

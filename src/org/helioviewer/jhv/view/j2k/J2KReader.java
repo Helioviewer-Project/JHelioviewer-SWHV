@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -9,7 +10,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
 import kdu_jni.KduException;
@@ -90,82 +90,86 @@ class J2KReader implements Runnable {
     }
 
     @SuppressWarnings("try")
-    private boolean readFrame(J2KSource.Remote source, int frame, int level, String query) throws KduException, IOException {
-        String key = cacheKey[frame];
-        boolean complete;
+    private boolean restoreFrame(J2KSource.Remote source, int frame, int level) throws KduException {
         try (J2KSource.Use ignored = source.use()) {
             AtomicBoolean status = source.getFrameStatus(frame, level);
             if (status != null && status.get())
                 return true;
 
-            JPIPCache cache = source.cache();
+            String key = cacheKey[frame];
             JPIPCacheManager.Entry entry = key == null ? null : JPIPCacheManager.get(key, level);
-            if (entry == null) {
-                JPIPResponse response = socket.request(query, cache, frame);
-                complete = response.isResponseComplete();
-                if (complete && key != null)
-                    JPIPCacheManager.store(key, level, cache, frame);
-            } else {
-                cache.put(frame, entry.stream());
-                level = entry.level();
-                complete = true;
-            }
+            if (entry == null)
+                return false;
+            source.cache().put(frame, entry.stream());
+            level = entry.level();
         }
-        if (complete)
-            source.setFrameComplete(frame, level);
+        source.setFrameComplete(frame, level);
+        return true;
+    }
+
+    @SuppressWarnings("try")
+    private JPIPSocket.FrameResponse receiveFrame(J2KSource.Remote source, int level) throws KduException, IOException {
+        JPIPSocket.FrameResponse response;
+        try (J2KSource.Use ignored = source.use()) {
+            JPIPCache cache = source.cache();
+            response = socket.receiveFrame(cache);
+            String key = cacheKey[response.frame()];
+            if (response.complete() && key != null)
+                JPIPCacheManager.store(key, level, cache, response.frame());
+        }
+        if (response.complete())
+            source.setFrameComplete(response.frame(), level);
         else
-            source.setFramePartial(frame);
-        return complete;
+            source.setFramePartial(response.frame());
+        return response;
     }
 
     private boolean readingInterrupted() {
         return isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
     }
 
-    // Finish the selected frame before spending bandwidth on the rest of the movie.
-    private boolean readPriorityFrame(J2KParams.Read params, String size) throws KduException, IOException {
-        J2KParams.Decode decode = params.decodeParams();
-        String query = JPIPSocket.createLayerQuery(decode.frame, size);
-        while (true) {
-            boolean complete = readFrame(params.source(), decode.frame, decode.level, query);
-            if (complete)
-                params.view().refreshDecodeFromReader(decode, params.viewpoint());
-            UITimer.completionChanged();
-            if (readingInterrupted())
-                return false;
-            if (complete)
-                return true;
-        }
-    }
-
-    // Advance even after partial responses so the movie becomes usable progressively.
-    private boolean prefetchMovie(J2KParams.Read params, String size) throws KduException, IOException {
+    private boolean readFrames(J2KParams.Read params, String size, boolean singleFrame) throws KduException, IOException {
         J2KSource.Remote source = params.source();
         J2KParams.Decode decode = params.decodeParams();
-        String[] queries = new String[cacheKey.length];
-        for (int frame = 0; frame < queries.length; frame++)
-            queries[frame] = JPIPSocket.createLayerQuery(frame, size);
-
-        int partial = source.getPartialUntil();
-        int frame = partial < queries.length - 1 ? partial : decode.frame;
-        int remaining = queries.length;
-        while (remaining > 0) {
-            if (frame >= queries.length)
-                frame = 0;
-            if (queries[frame] == null) {
-                frame++;
-                continue;
-            }
-            if (readFrame(source, frame, decode.level, queries[frame])) {
-                queries[frame] = null;
-                remaining--;
-            }
-            UITimer.completionChanged();
-            frame++;
-            if (readingInterrupted())
-                return false;
+        ArrayDeque<Integer> remaining = new ArrayDeque<>();
+        if (singleFrame) {
+            remaining.add(decode.frame);
+        } else {
+            int partial = source.getPartialUntil();
+            int first = partial < cacheKey.length - 1 ? partial : decode.frame;
+            for (int i = 0; i < cacheKey.length; i++)
+                remaining.add((first + i) % cacheKey.length);
         }
-        return true;
+
+        // The source and resolution stay fixed until all sent responses have been consumed.
+        int limit = singleFrame ? 1 : 2;
+        boolean draining = false;
+        while (true) {
+            // On newer work, drain sent responses without issuing any more requests.
+            draining |= readingInterrupted();
+            int frame;
+            boolean complete;
+            if (!draining && socket.pendingCount() < limit && !remaining.isEmpty()) {
+                frame = remaining.removeFirst();
+                if (!restoreFrame(source, frame, decode.level)) {
+                    socket.sendFrame(frame, size);
+                    continue;
+                }
+                complete = true;
+            } else if (socket.pendingCount() > 0) {
+                JPIPSocket.FrameResponse response = receiveFrame(source, decode.level);
+                frame = response.frame();
+                complete = response.complete();
+            } else {
+                return !draining;
+            }
+
+            if (!complete)
+                remaining.addLast(frame); // Revisit partial frames after the rest of the movie.
+            else if (singleFrame)
+                params.view().refreshDecodeFromReader(decode, params.viewpoint());
+            UITimer.completionChanged();
+        }
     }
 
     @Override
@@ -202,9 +206,7 @@ class J2KReader implements Runnable {
 
                 boolean singleFrame = cacheKey.length <= 1 || params.priority();
                 String size = width + "," + height;
-                boolean finished = singleFrame ? readPriorityFrame(params, size) : prefetchMovie(params, size);
-
-                view.setDownloading(false);
+                boolean finished = readFrames(params, size, singleFrame);
 
                 // suicide if fully done
                 if (source.isComplete(0)) {
@@ -220,7 +222,6 @@ class J2KReader implements Runnable {
                 // retry limit applies to consecutive failures only
                 retries = 0;
             } catch (Exception e) {
-                view.setDownloading(false);
                 try {
                     socket.abort();
                 } catch (IOException ioe) {
@@ -231,6 +232,8 @@ class J2KReader implements Runnable {
                     queueIfEmpty(params); // retry unless newer work is pending
                 else
                     Log.error("Retry limit reached: " + uri); // something may be terribly wrong
+            } finally {
+                view.setDownloading(false);
             }
         }
     }

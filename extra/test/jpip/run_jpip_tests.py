@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     sources = ["JPIPSerializerTest.java", "JPIPResponseTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
     if args.live:
-        sources.append("ROBTest.java")
+        sources.extend(["ROBTest.java", "MovieReaderTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
@@ -48,4 +48,8 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         uri = "jpip://jpip.swhv.oma.be/aia_171/2026/09/09/2026_09_09__12_00_33_349__SDO_AIA_AIA_171.jp2"
         print("Retrieving " + uri, flush=True)
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.ROBTest", str(work / library), uri],
+                       check=True, timeout=180)
+
+        movie = "jpip://jpip.swhv.oma.be/movies/SDO_AIA_171_F2026-09-08T12.00.00Z_T2026-09-10T12.00.00ZB1800L.jpx"
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", str(work / library), movie],
                        check=True, timeout=180)
