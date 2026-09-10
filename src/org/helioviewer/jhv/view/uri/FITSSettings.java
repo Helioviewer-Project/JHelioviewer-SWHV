@@ -41,10 +41,11 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     private final EnumMap<ImageProcessingSettings.ClippingMode, JRadioButton> clippingButtons = new EnumMap<>(ImageProcessingSettings.ClippingMode.class);
 
     private static JPanel createScalingPanel(JRadioButton button, JHVSlider slider, JLabel label) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-        panel.add(button);
-        panel.add(slider);
-        panel.add(label);
+        JPanel panel = new JPanel(new BorderLayout(5, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        panel.add(button, BorderLayout.LINE_START);
+        panel.add(slider, BorderLayout.CENTER);
+        panel.add(label, BorderLayout.LINE_END);
         return panel;
     }
 
@@ -134,6 +135,7 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
 
         ButtonGroup clippingGroup = new ButtonGroup();
         c.gridx = 1;
+        c.weightx = 1;
         for (ImageProcessingSettings.ClippingMode clipping : ImageProcessingSettings.ClippingMode.values()) {
             JRadioButton radio = new JRadioButton(clipping.toString(), clipping == initialState.clippingMode());
             clippingButtons.put(clipping, radio);
@@ -157,9 +159,11 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         }
 
         c.gridx = 0;
+        c.weightx = 0;
         content.add(new JLabel("Scaling:", JLabel.RIGHT), c);
 
         c.gridx = 1;
+        c.weightx = 1;
         content.add(gammaPanel, c);
         c.gridy++;
         content.add(betaPanel, c);
