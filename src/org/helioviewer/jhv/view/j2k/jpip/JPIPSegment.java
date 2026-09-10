@@ -10,7 +10,7 @@ import java.io.Serializable;
 class JPIPSegment implements Serializable {
 
     @Serial
-    static final long serialVersionUID = 42L;
+    private static final long serialVersionUID = 1L;
 
     // The data-bin in-class identifier
     long binID;

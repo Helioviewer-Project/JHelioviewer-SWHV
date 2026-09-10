@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class JPIPStream implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = JPIPSegment.serialVersionUID;
+    private static final long serialVersionUID = 1L;
 
     final ArrayList<JPIPSegment> segments = new ArrayList<>();
 
