@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
 import org.helioviewer.jhv.view.ClipSet;
@@ -15,7 +16,7 @@ import org.helioviewer.jhv.view.ClipSet;
 import nom.tam.fits.Header;
 
 record FITSData(Header header, Object pixels, int width, int height, boolean hasBlank, long blank,
-               double bzero, double bscale, @Nullable ClipSet.Range headerRange) {
+                double bzero, double bscale, @Nullable ClipSet.Range headerRange) {
 
     private static final int BAD_PIXEL = Integer.MIN_VALUE;
     private static final int SAMPLE = 4;
@@ -33,11 +34,11 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
         if (sample.length() < MIN_SAMPLES)
             return new ClipSet(null, null);
         Arrays.sort(sample.values(), 0, sample.length());
-        return new ClipSet(percentileRange(sample, FITSViewState.ClippingMode.Percentile001.percentile()),
-                percentileRange(sample, FITSViewState.ClippingMode.Percentile05.percentile()));
+        return new ClipSet(percentileRange(sample, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
+                percentileRange(sample, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
     }
 
-    ImageBuffer decode(ImageFilter filter, FITSViewState.Data state, @Nullable ClipSet.Range clipRange) throws Exception {
+    ImageBuffer decode(ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
         if (pixels instanceof byte[] inData) {
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter);
             ByteBuffer outData = outBuffer.byteBuffer();
@@ -143,7 +144,7 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
         return values;
     }
 
-    private void convertPixels(ShortBuffer outData, float min, float max, FITSViewState.Data state) throws Exception {
+    private void convertPixels(ShortBuffer outData, float min, float max, ImageProcessingSettings.FITSParameters state) throws Exception {
         float range = max - min;
         double toUnit = 1. / range;
         double toIndex = SCALE_LOOKUP_SIZE / (double) range;
@@ -273,7 +274,7 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
         return new NormalizedLookup(values);
     }
 
-    private static NormalizedMapping normalizedMapping(FITSViewState.Data state, float range) {
+    private static NormalizedMapping normalizedMapping(ImageProcessingSettings.FITSParameters state, float range) {
         return switch (state.scalingMode()) {
             case Gamma -> {
                 double gamma = state.gamma();

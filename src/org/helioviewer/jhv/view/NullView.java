@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -40,14 +39,6 @@ public class NullView implements View {
     private NullView(long milli) {
         time = new JHVTime(milli);
         metaData = new NullMetaData(time);
-    }
-
-    @Override
-    public void setFilter(ImageFilter.Type t) {}
-
-    @Override
-    public ImageFilter.Type getFilter() {
-        return ImageFilter.Type.None;
     }
 
     @Override

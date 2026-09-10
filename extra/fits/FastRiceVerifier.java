@@ -16,8 +16,8 @@ import java.util.Random;
 
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.view.uri.FITSImage;
-import org.helioviewer.jhv.view.uri.FITSViewState;
 import org.helioviewer.jhv.view.uri.FastRiceProvider;
 
 import nom.tam.fits.compression.algorithm.api.ICompressorControl;
@@ -401,7 +401,7 @@ public final class FastRiceVerifier {
     private static void verifyImage(Path reference, Path compressed) throws Exception {
         ImageBuffer expected = null, actual = null;
         try {
-            FITSViewState.Data state = new FITSViewState(() -> {}).data();
+            ImageProcessingSettings.FITSParameters state = new ImageProcessingSettings(() -> {}).fitsParameters();
             expected = FITSImage.decode(reference.toFile(), ImageFilter.NONE, state, state.clipRange(FITSImage.readInfo(reference.toFile()).clipSet()));
             actual = FITSImage.decode(compressed.toFile(), ImageFilter.NONE, state, state.clipRange(FITSImage.readInfo(compressed.toFile()).clipSet()));
             if (expected.width != actual.width || expected.height != actual.height || expected.format != actual.format || !expected.buffer.equals(actual.buffer))

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.image;
 
 import java.util.ArrayList;
 
@@ -8,13 +8,13 @@ import org.helioviewer.jhv.view.ClipSet;
 
 import org.json.JSONObject;
 
-public final class FITSViewState {
+public final class ImageProcessingSettings {
 
-    interface Listener {
-        void fitsViewStateChanged();
+    public interface FITSListener {
+        void fitsParametersChanged();
     }
 
-    enum ClippingMode {
+    public enum ClippingMode {
         Percentile001("Percentile 0.001%", 0.00001),
         Percentile05("Percentile 0.5%", 0.005),
         Range("Range", 0);
@@ -27,7 +27,7 @@ public final class FITSViewState {
             percentile = _percentile;
         }
 
-        double percentile() {
+        public double percentile() {
             return percentile;
         }
 
@@ -37,22 +37,22 @@ public final class FITSViewState {
         }
     }
 
-    enum ScalingMode {
+    public enum ScalingMode {
         Gamma, Beta, Alpha
     }
 
-    static final double CLIP_LIMIT = 1e20;
-    static final GammaParameter GAMMA = new GammaParameter(10, 40);
-    static final BetaParameter BETA = new BetaParameter(1, 12);
-    static final AlphaParameter ALPHA = new AlphaParameter(1, 5);
+    public static final double CLIP_LIMIT = 1e20;
+    public static final GammaParameter GAMMA = new GammaParameter(10, 40);
+    public static final BetaParameter BETA = new BetaParameter(1, 12);
+    public static final AlphaParameter ALPHA = new AlphaParameter(1, 5);
 
-    interface IndexedParameter {
+    public interface IndexedParameter {
         int minIndex();
 
         int maxIndex();
     }
 
-    record GammaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+    public record GammaParameter(int minIndex, int maxIndex) implements IndexedParameter {
         int toIndex(double value) {
             return Math.clamp(Math.round(10. / value), minIndex, maxIndex);
         }
@@ -70,7 +70,7 @@ public final class FITSViewState {
         }
     }
 
-    record BetaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+    public record BetaParameter(int minIndex, int maxIndex) implements IndexedParameter {
         int toIndex(double value) {
             return Math.clamp(Math.round(Math.log(1 / value) / Math.log(2)), minIndex, maxIndex);
         }
@@ -84,7 +84,7 @@ public final class FITSViewState {
         }
     }
 
-    record AlphaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+    public record AlphaParameter(int minIndex, int maxIndex) implements IndexedParameter {
         int toIndex(double value) {
             return Math.clamp(Math.round(Math.log10(value)), minIndex, maxIndex);
         }
@@ -98,7 +98,7 @@ public final class FITSViewState {
         }
     }
 
-    public record Data(
+    public record FITSParameters(
             ClippingMode clippingMode,
             double clippingMin,
             double clippingMax,
@@ -133,6 +133,8 @@ public final class FITSViewState {
         }
     }
 
+    private ImageFilter.Type filter = ImageFilter.Type.None;
+
     private double clippingMin = -500;
     private double clippingMax = 500;
     private ClippingMode clippingMode = ClippingMode.Percentile001;
@@ -141,20 +143,31 @@ public final class FITSViewState {
     private double gamma = 1. / 2.2;
     private double beta = 1. / (1 << 6);
     private double alpha = Math.pow(10, 3);
-    private final ArrayList<Listener> listeners = new ArrayList<>();
-    private volatile Data data = createData();
+    private final ArrayList<FITSListener> listeners = new ArrayList<>();
+    private volatile FITSParameters fitsParameters = createFITSParameters();
     private final Runnable onChange;
 
-    public Data data() {
-        return data;
+    public ImageFilter.Type getFilter() {
+        return filter;
     }
 
-    private Data createData() {
-        return new Data(clippingMode, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
+    public void setFilter(ImageFilter.Type type) {
+        if (filter == type)
+            return;
+        filter = type;
+        onChange.run();
+    }
+
+    public FITSParameters fitsParameters() {
+        return fitsParameters;
+    }
+
+    private FITSParameters createFITSParameters() {
+        return new FITSParameters(clippingMode, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
     }
 
     public void serialize(JSONObject jo) {
-        Data current = data();
+        FITSParameters current = fitsParameters();
         jo.put("clippingMode", current.clippingMode().name());
         jo.put("clippingMin", current.clippingMin());
         jo.put("clippingMax", current.clippingMax());
@@ -168,7 +181,7 @@ public final class FITSViewState {
         if (jo == null)
             return;
 
-        Data old = data();
+        FITSParameters old = fitsParameters();
         clippingMin = Math.clamp(jo.optDouble("clippingMin", clippingMin), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMode = readEnum(ClippingMode.class, jo.optString("clippingMode", clippingMode.name()), clippingMode);
@@ -177,72 +190,72 @@ public final class FITSViewState {
         beta = BETA.clampValue(jo.optDouble("beta", beta));
         alpha = ALPHA.clampValue(jo.optDouble("alpha", alpha));
 
-        if (!old.equals(createData())) {
-            notifyListeners();
+        if (!old.equals(createFITSParameters())) {
+            notifyFITSListeners();
             onChange.run();
         }
     }
 
-    void setClippingMin(double value) {
+    public void setClippingMin(double value) {
         double newClippingMin = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMin(newClippingMin) && clippingMode == ClippingMode.Range)
             onChange.run();
     }
 
-    void setClippingMax(double value) {
+    public void setClippingMax(double value) {
         double newClippingMax = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMax(newClippingMax) && clippingMode == ClippingMode.Range)
             onChange.run();
     }
 
-    void setClippingMode(ClippingMode newClippingMode) {
+    public void setClippingMode(ClippingMode newClippingMode) {
         if (clippingMode == newClippingMode)
             return;
         clippingMode = newClippingMode;
-        notifyListeners();
+        notifyFITSListeners();
         onChange.run();
     }
 
-    void setScalingMode(ScalingMode newScalingMode) {
+    public void setScalingMode(ScalingMode newScalingMode) {
         if (scalingMode == newScalingMode)
             return;
         scalingMode = newScalingMode;
-        notifyListeners();
+        notifyFITSListeners();
         onChange.run();
     }
 
-    void setGammaIndex(int value) {
+    public void setGammaIndex(int value) {
         double newGamma = GAMMA.fromIndex(value);
         if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma)
             onChange.run();
     }
 
-    void setBetaIndex(int value) {
+    public void setBetaIndex(int value) {
         double newBeta = BETA.fromIndex(value);
         if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta)
             onChange.run();
     }
 
-    void setAlphaIndex(int value) {
+    public void setAlphaIndex(int value) {
         double newAlpha = ALPHA.fromIndex(value);
         if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha)
             onChange.run();
     }
 
-    void addListener(Listener listener) {
+    public void addFITSListener(FITSListener listener) {
         listeners.add(listener);
     }
 
-    private void notifyListeners() {
-        data = createData();
-        listeners.forEach(Listener::fitsViewStateChanged);
+    private void notifyFITSListeners() {
+        fitsParameters = createFITSParameters();
+        listeners.forEach(FITSListener::fitsParametersChanged);
     }
 
     private boolean updateClippingMin(double newClippingMin) {
         if (clippingMin == newClippingMin)
             return false;
         clippingMin = newClippingMin;
-        notifyListeners();
+        notifyFITSListeners();
         return true;
     }
 
@@ -250,7 +263,7 @@ public final class FITSViewState {
         if (clippingMax == newClippingMax)
             return false;
         clippingMax = newClippingMax;
-        notifyListeners();
+        notifyFITSListeners();
         return true;
     }
 
@@ -258,7 +271,7 @@ public final class FITSViewState {
         if (gamma == newGamma)
             return false;
         gamma = newGamma;
-        notifyListeners();
+        notifyFITSListeners();
         return true;
     }
 
@@ -266,7 +279,7 @@ public final class FITSViewState {
         if (beta == newBeta)
             return false;
         beta = newBeta;
-        notifyListeners();
+        notifyFITSListeners();
         return true;
     }
 
@@ -274,7 +287,7 @@ public final class FITSViewState {
         if (alpha == newAlpha)
             return false;
         alpha = newAlpha;
-        notifyListeners();
+        notifyFITSListeners();
         return true;
     }
 
@@ -286,7 +299,7 @@ public final class FITSViewState {
         }
     }
 
-    public FITSViewState(Runnable _onChange) {
+    public ImageProcessingSettings(Runnable _onChange) {
         onChange = _onChange;
     }
 }
