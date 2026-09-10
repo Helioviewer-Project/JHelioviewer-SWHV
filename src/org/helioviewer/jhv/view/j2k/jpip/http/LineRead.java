@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k.jpip.http;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,8 @@ class LineRead {
             while ((ch = in.read()) >= 0 && ch != LF) {
                 baos.write(ch);
             }
+            if (ch < 0)
+                throw new EOFException("Incomplete HTTP line");
             return baos.toString(StandardCharsets.US_ASCII).trim();
         }
     }

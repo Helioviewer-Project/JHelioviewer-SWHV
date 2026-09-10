@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k.jpip.http;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -39,6 +40,22 @@ public final class HTTPStreamTest {
                 check(chunked.getTotalLength() == 1, "truncated chunk byte count");
             }
         }
+
+        for (String incomplete : new String[]{"", "HTTP/1.1 200 OK", "Content-Length: 3\r"}) {
+            try {
+                LineRead.readAsciiLine(bytes(incomplete));
+                throw new AssertionError("Accepted incomplete HTTP line");
+            } catch (EOFException expected) {
+            }
+        }
+        check(LineRead.readAsciiLine(bytes("\r\n")).isEmpty(), "complete empty HTTP line");
+        ByteArrayInputStream invalidBody = bytes("-1\r\nUNREAD");
+        try (InputStream invalid = new ChunkedInputStream(invalidBody)) {
+            readBody(invalid, false);
+            throw new AssertionError("Accepted negative chunk length");
+        } catch (IOException expected) {
+        }
+        check(invalidBody.read() == 'U', "close tried to drain invalid chunk framing");
 
         ByteArrayInputStream input = bytes("3\r\nabc\r\n0\r\n\r\nNEXT");
         ChunkedInputStream chunked = new ChunkedInputStream(input);

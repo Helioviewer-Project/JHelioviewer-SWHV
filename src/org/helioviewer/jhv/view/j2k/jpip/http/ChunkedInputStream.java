@@ -90,12 +90,16 @@ class ChunkedInputStream extends InputStream implements TotalLength {
                 // int separator = line.indexOf(';');
                 // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
                 try {
-                    chunkLength = Integer.parseInt(line, 16);
-                    if (chunkLength <= 0) {
+                    int length = Integer.parseInt(line, 16);
+                    if (length < 0)
+                        throw new NumberFormatException("Negative length");
+                    chunkLength = length;
+                    if (chunkLength == 0) {
                         LineRead.readCRLF(in);
                         eof = true;
                     }
                 } catch (NumberFormatException ex) {
+                    eof = true; // The chunk boundary is unknown; close must not try to drain it.
                     throw new ProtocolException("Invalid chunk length format");
                 }
             }

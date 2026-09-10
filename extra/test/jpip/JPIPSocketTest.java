@@ -17,9 +17,44 @@ import java.util.concurrent.TimeUnit;
 public final class JPIPSocketTest {
 
     public static void main(String[] arguments) throws Exception {
+        testResponse("content-length: 3\r\n\r\n", true);
+        testResponse("Content-Length: -1\r\n\r\n", false);
+        testResponse("Content-Length: 3\r\n", false);
         testClose(false);
         testClose(true);
         System.out.println("PASS: graceful close sends cclose; abort unblocks a response without sending cclose");
+    }
+
+    private static void testResponse(String framing, boolean valid) throws Exception {
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(5000);
+            Future<?> server = workers.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(5000);
+                    readRequest(new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII)));
+                    connection.getOutputStream().write(("HTTP/1.1 200 OK\r\n"
+                            + "content-type: image/jpp-stream\r\n"
+                            + "jpip-cnew: cid=test,transport=http,path=jpip\r\n"
+                            + framing).getBytes(StandardCharsets.US_ASCII));
+                    if (valid)
+                        connection.getOutputStream().write(new byte[]{0, 2, 0});
+                }
+                return null;
+            });
+            try {
+                JPIPSocket client = new JPIPSocket(
+                        URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+                client.abort();
+                if (!valid)
+                    throw new AssertionError("Accepted invalid response framing: " + framing);
+            } catch (IOException e) {
+                if (valid)
+                    throw e;
+            }
+            server.get(5, TimeUnit.SECONDS);
+        }
     }
 
     private static void testClose(boolean abort) throws Exception {
