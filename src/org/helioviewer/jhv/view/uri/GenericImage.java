@@ -67,7 +67,7 @@ final class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception {
+    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet.Range clipRange) throws Exception {
         return withReader(file, reader -> convertImage(reader.read(0), filter));
     }
 

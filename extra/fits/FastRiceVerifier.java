@@ -401,9 +401,10 @@ public final class FastRiceVerifier {
     private static void verifyImage(Path reference, Path compressed) throws Exception {
         ImageBuffer expected = null, actual = null;
         try {
-            FITSImage reader = new FITSImage(new FITSViewState(() -> {}).data());
-            expected = reader.decode(reference.toFile(), ImageFilter.NONE, null);
-            actual = reader.decode(compressed.toFile(), ImageFilter.NONE, null);
+            FITSViewState.Data state = new FITSViewState(() -> {}).data();
+            FITSImage reader = new FITSImage(state);
+            expected = reader.decode(reference.toFile(), ImageFilter.NONE, state.clipRange(reader.readInfo(reference.toFile()).clipSet()));
+            actual = reader.decode(compressed.toFile(), ImageFilter.NONE, state.clipRange(reader.readInfo(compressed.toFile()).clipSet()));
             if (expected.width != actual.width || expected.height != actual.height || expected.format != actual.format || !expected.buffer.equals(actual.buffer))
                 throw new AssertionError("compressed and uncompressed images differ");
         } finally {

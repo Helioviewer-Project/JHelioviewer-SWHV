@@ -37,7 +37,7 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
                 percentileRange(sample, FITSViewState.ClippingMode.Percentile05.percentile()));
     }
 
-    ImageBuffer decode(ImageFilter filter, FITSViewState.Data state, @Nullable ClipSet clipSet) throws Exception {
+    ImageBuffer decode(ImageFilter filter, FITSViewState.Data state, @Nullable ClipSet.Range clipRange) throws Exception {
         if (pixels instanceof byte[] inData) {
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter);
             ByteBuffer outData = outBuffer.byteBuffer();
@@ -47,16 +47,7 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
             return outBuffer.finish();
         }
 
-        ClipSet.Range range = headerRange;
-        if (range == null) {
-            if (clipSet == null)
-                clipSet = calculateClipSet();
-            range = switch (state.clippingMode()) {
-                case Percentile001 -> clipSet.percentile001();
-                case Percentile05 -> clipSet.percentile05();
-                case Range -> new ClipSet.Range((float) state.clippingMin(), (float) state.clippingMax());
-            };
-        }
+        ClipSet.Range range = headerRange != null ? headerRange : clipRange;
         if (range == null)
             return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).clearPixels().finish();
         float min = range.lower();

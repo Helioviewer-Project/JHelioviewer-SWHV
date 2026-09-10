@@ -32,7 +32,7 @@ public final class ImageLayers {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
                 double pixFactor = DisplayController.getImagePixelFactor(Display.getViewport(idx));
-                layer.getView().decode(viewpoint, pixFactor, factor);
+                layer.decode(viewpoint, pixFactor, factor);
                 decoded = true;
             }
         }
