@@ -12,6 +12,7 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
@@ -82,15 +83,22 @@ public final class ROBTest {
                         throw new AssertionError("Missing persisted level " + level);
                     source.cache().put(0, entry.stream());
                 } else {
-                    String query = JPIPSocket.createLayerQuery(0, size.width() + "," + size.height());
-                    if (mode == Mode.LIMITED)
-                        query = query.replaceAll("len=[0-9]+", "len=16384");
-                    JPIPResponse response;
+                    String dimensions = size.width() + "," + size.height();
+                    boolean complete;
                     do {
                         if (++requests > 256)
                             throw new AssertionError("No completion after 256 requests at level " + level);
-                        response = socket.request(query, source.cache(), 0);
-                    } while (!response.isResponseComplete());
+                        if (mode == Mode.LIMITED) {
+                            // Exercise small response limits without exposing raw queries in the public API.
+                            Method request = JPIPSocket.class.getDeclaredMethod("requestInitialization", String.class, JPIPCache.class);
+                            request.setAccessible(true);
+                            String query = "stream=0&fsiz=" + dimensions + ",closest&rsiz=" + dimensions + "&roff=0,0&len=16384";
+                            complete = ((JPIPResponse) request.invoke(socket, query, source.cache())).isResponseComplete();
+                        } else {
+                            socket.sendFrame(0, dimensions);
+                            complete = socket.receiveFrame(source.cache()).complete();
+                        }
+                    } while (!complete);
                     if (mode == Mode.LIMITED && requests < 2)
                         throw new AssertionError("Small response limit did not exercise continuation");
                     if (mode == Mode.NORMAL) {

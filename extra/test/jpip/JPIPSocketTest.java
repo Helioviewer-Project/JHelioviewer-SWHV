@@ -21,10 +21,62 @@ public final class JPIPSocketTest {
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
+        testPipeline();
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
         System.out.println("PASS: graceful close, response abort and interrupted constructor handshake");
+    }
+
+    private static void testPipeline() throws Exception {
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(5000);
+            Future<?> server = workers.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(5000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII));
+                    readRequest(input);
+                    reply(connection, "JPIP-cnew: cid=test,transport=http,path=jpip\r\n", 2);
+                    // Require both requests before responding, proving the client sends ahead.
+                    readRequest(input);
+                    readRequest(input);
+                    reply(connection, "", 3); // Partial response, followed by a complete one.
+                    reply(connection, "", 2);
+                    readRequest(input);
+                    reply(connection, "Connection: close\r\n", 2);
+                }
+                return null;
+            });
+            JPIPSocket client = new JPIPSocket(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+            try {
+                client.sendFrame(0, "64,64");
+                client.sendFrame(1, "64,64");
+                if (client.pendingCount() != 2)
+                    throw new AssertionError("Missing pending requests");
+                JPIPSocket.FrameResponse first = client.receiveFrame(null);
+                if (first.frame() != 0 || first.complete() || client.pendingCount() != 1)
+                    throw new AssertionError("First response should belong to frame 0 and be partial");
+                JPIPSocket.FrameResponse second = client.receiveFrame(null);
+                if (second.frame() != 1 || !second.complete() || client.pendingCount() != 0)
+                    throw new AssertionError("Second response should belong to frame 1 and be complete");
+                client.sendFrame(0, "64,64");
+                if (!client.receiveFrame(null).complete())
+                    throw new AssertionError("Sequential request after draining failed");
+                if (!client.isClosed())
+                    throw new AssertionError("Server close was ignored");
+            } finally {
+                client.abort();
+            }
+            server.get(5, TimeUnit.SECONDS);
+        }
+    }
+
+    private static void reply(Socket connection, String headers, int reason) throws IOException {
+        connection.getOutputStream().write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\n"
+                + headers + "Content-Length: 3\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+        connection.getOutputStream().write(new byte[]{0, (byte) reason, 0});
     }
 
     private static void testInterruptedHandshake() throws Exception {
@@ -125,6 +177,7 @@ public final class JPIPSocketTest {
                     connection.getOutputStream().write(new byte[]{0, 2, 0});
                     if (abort) {
                         readRequest(input);
+                        readRequest(input);
                         requestReceived.countDown();
                         // Leave the response pending until the client aborts the connection.
                     }
@@ -136,7 +189,9 @@ public final class JPIPSocketTest {
                 if (abort) {
                     Future<?> pending = workers.submit(() -> {
                         try {
-                            client.request(JPIPSocket.createLayerQuery(0, "64,64"), null, 0);
+                            client.sendFrame(0, "64,64");
+                            client.sendFrame(1, "64,64");
+                            client.receiveFrame(null);
                             throw new AssertionError("Stalled response completed successfully");
                         } catch (IOException expected) {
                             // Closing TCP must release the blocked read.
