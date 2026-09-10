@@ -8,21 +8,15 @@ import javax.annotation.Nonnull;
 
 // Input stream with a fixed size. After reading the expected number of bytes
 // this input stream will behave as if the end of the stream has been reached.
-class FixedSizedInputStream extends InputStream implements TotalLength {
+class FixedSizedInputStream extends InputStream {
 
     private int remainingBytes;
 
-    private final int expectedBytes;
     private final InputStream in;
 
     FixedSizedInputStream(InputStream _in, int _expectedBytes) {
-        remainingBytes = expectedBytes = _expectedBytes;
+        remainingBytes = _expectedBytes;
         in = _in;
-    }
-
-    @Override
-    public int getTotalLength() {
-        return expectedBytes - remainingBytes;
     }
 
     @Override

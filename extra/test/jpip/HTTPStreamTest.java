@@ -14,14 +14,12 @@ public final class HTTPStreamTest {
             ByteArrayInputStream input = bytes("3\r\nabc\r\n2\r\nde\r\n0\r\n\r\nNEXT");
             ChunkedInputStream chunked = new ChunkedInputStream(input);
             check(readBody(chunked, singleByte).equals("abcde"), "chunked body");
-            check(chunked.getTotalLength() == 5, "chunked byte count");
             check(input.read() == 'N', "chunked read consumed next response");
             check(chunked.read(new byte[0]) == 0, "empty chunked read at EOF");
 
             input = bytes("abcdeNEXT");
             FixedSizedInputStream fixed = new FixedSizedInputStream(input, 5);
             check(readBody(fixed, singleByte).equals("abcde"), "fixed-length body");
-            check(fixed.getTotalLength() == 5, "fixed-length byte count");
             check(input.read() == 'N', "fixed-length read consumed next response");
             check(fixed.read(new byte[0]) == 0, "empty fixed-length read at EOF");
 
@@ -30,14 +28,12 @@ public final class HTTPStreamTest {
                 readBody(fixed, singleByte);
                 throw new AssertionError("Accepted truncated fixed-length body");
             } catch (EOFException expected) {
-                check(fixed.getTotalLength() == 1, "truncated body byte count");
             }
             chunked = new ChunkedInputStream(bytes("3\r\na"));
             try {
                 readBody(chunked, singleByte);
                 throw new AssertionError("Accepted truncated chunk payload");
             } catch (EOFException expected) {
-                check(chunked.getTotalLength() == 1, "truncated chunk byte count");
             }
         }
 
@@ -63,7 +59,7 @@ public final class HTTPStreamTest {
         chunked.close();
         chunked.close();
         check(input.read() == 'N', "close must drain only the current response");
-        System.out.println("PASS: HTTP bodies, response boundaries, byte counts, truncation and close draining");
+        System.out.println("PASS: HTTP bodies, response boundaries, truncation and close draining");
     }
 
     private static String readBody(InputStream input, boolean singleByte) throws Exception {
