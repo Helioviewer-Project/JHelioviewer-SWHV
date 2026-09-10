@@ -23,9 +23,10 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
-import org.helioviewer.jhv.view.ClipSet;
 
-final class GenericImage implements URIImageReader {
+final class GenericImage {
+
+    private GenericImage() {}
 
     private interface ReaderAction<T> {
         T run(ImageReader reader) throws Exception;
@@ -46,8 +47,7 @@ final class GenericImage implements URIImageReader {
         }
     }
 
-    @Override
-    public URIImageReader.Info readInfo(File file) throws Exception {
+    static URIView.SourceInfo readInfo(File file) throws Exception {
         return withReader(file, reader -> {
             String xml = null;
             // read metadata of first image
@@ -62,12 +62,11 @@ final class GenericImage implements URIImageReader {
                 Log.error(file.toString(), e);
             }
             LUT lut = readLUT(reader.getImageTypes(0).next().getColorModel());
-            return new URIImageReader.Info(xml, reader.getWidth(0), reader.getHeight(0), lut, null);
+            return new URIView.SourceInfo(xml, reader.getWidth(0), reader.getHeight(0), lut, null);
         });
     }
 
-    @Override
-    public ImageBuffer decode(File file, ImageFilter filter, @Nullable ClipSet.Range clipRange) throws Exception {
+    static ImageBuffer decode(File file, ImageFilter filter) throws Exception {
         return withReader(file, reader -> convertImage(reader.read(0), filter));
     }
 

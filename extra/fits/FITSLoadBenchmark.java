@@ -51,24 +51,24 @@ public final class FITSLoadBenchmark {
             System.exit(1);
         }
 
-        FITSImage reader = new FITSImage(new FITSViewState(() -> {}).data());
         System.out.println("file,bytes,width,height,format,mode,filter,iteration,total_ms,checksum,status");
         for (Path file : files)
-            benchmarkFile(reader, file, options);
+            benchmarkFile(file, options);
     }
 
-    private static void benchmarkFile(FITSImage reader, Path path, Options options) {
+    private static void benchmarkFile(Path path, Options options) {
         File file = path.toFile();
 
         try {
+            FITSViewState.Data state = new FITSViewState(() -> {}).data();
             ClipSet.Range clipRange = options.mode() == Mode.Buffer
-                    ? new FITSViewState(() -> {}).data().clipRange(reader.readInfo(file).clipSet()) : null;
+                    ? state.clipRange(FITSImage.readInfo(file).clipSet()) : null;
             for (int i = 0; i < options.warmup(); i++)
-                free(load(reader, file, options, clipRange));
+                free(load(file, options, state, clipRange));
 
             for (int i = 0; i < options.iterations(); i++) {
                 long start = System.nanoTime();
-                Result result = load(reader, file, options, clipRange);
+                Result result = load(file, options, state, clipRange);
                 long elapsed = System.nanoTime() - start;
                 ImageBuffer buffer = result.buffer();
 
@@ -91,12 +91,12 @@ public final class FITSLoadBenchmark {
         }
     }
 
-    private static Result load(FITSImage reader, File file, Options options, ClipSet.Range clipRange) throws Exception {
+    private static Result load(File file, Options options, FITSViewState.Data state, ClipSet.Range clipRange) throws Exception {
         if (options.mode() == Mode.Info) {
-            URIImageReader.Info info = reader.readInfo(file);
+            URIView.SourceInfo info = FITSImage.readInfo(file);
             return new Result(info.width(), info.height(), null, "");
         }
-        ImageBuffer buffer = reader.decode(file, ImageFilter.of(options.filter(), null, null), clipRange);
+        ImageBuffer buffer = FITSImage.decode(file, ImageFilter.of(options.filter(), null, null), state, clipRange);
         return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 

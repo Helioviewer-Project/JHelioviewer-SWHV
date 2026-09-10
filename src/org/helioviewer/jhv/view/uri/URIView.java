@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,6 +24,8 @@ import org.helioviewer.jhv.view.ClipSet;
 
 public final class URIView extends BaseView {
 
+    public record SourceInfo(@Nullable String xml, int width, int height, @Nullable LUT lut, @Nullable ClipSet clipSet) {}
+
     private final FITSViewState fitsViewState;
     private final @Nullable ClipSet clipSet;
     private @Nullable ClipSet.Range clipRange;
@@ -38,8 +39,8 @@ public final class URIView extends BaseView {
 
         try {
             MetaData m;
-            FITSViewState.Data data = hasFITS() ? fitsViewState.data() : null;
-            URIImageReader.Info info = reader(data).readInfo(dataUri.file());
+            File file = dataUri.file();
+            SourceInfo info = hasFITS() ? FITSImage.readInfo(file) : GenericImage.readInfo(file);
             clipSet = info.clipSet();
 
             String readXml = info.xml();
@@ -76,7 +77,8 @@ public final class URIView extends BaseView {
             sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey(filterType)));
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader(key.fitsData()), createFilter(filterType), imageRegion, key.clipRange()), new Callback(key, viewpoint));
+        ImageFilter filter = createFilter(key.filter());
+        executor.submit(() -> decodeImage(key, filter), new Callback(key, viewpoint));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
@@ -101,19 +103,14 @@ public final class URIView extends BaseView {
         return new DecodeKey(dataUri, filter, data, clipRange);
     }
 
-    private static URIImageReader reader(@Nullable FITSViewState.Data data) {
-        return data == null ? new GenericImage() : new FITSImage(data);
-    }
-
-    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion, @Nullable ClipSet.Range clipRange) implements Callable<DecodedImage> {
-        @Nonnull
-        @Override
-        public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.decode(file, filter, clipRange);
-            if (imageBuffer == null) // e.g. FITS
-                throw new Exception("Could not read: " + file);
-            return new DecodedImage(imageBuffer, imageRegion);
-        }
+    private DecodedImage decodeImage(DecodeKey key, ImageFilter filter) throws Exception {
+        File file = key.uri().file();
+        ImageBuffer imageBuffer = hasFITS()
+                ? FITSImage.decode(file, filter, key.fitsData(), key.clipRange())
+                : GenericImage.decode(file, filter);
+        if (imageBuffer == null) // e.g. FITS
+            throw new Exception("Could not read: " + file);
+        return new DecodedImage(imageBuffer, imageRegion);
     }
 
     private class Callback implements LatestWorker.Callback<DecodedImage> {
