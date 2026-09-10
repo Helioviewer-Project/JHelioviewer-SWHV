@@ -23,6 +23,7 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
+import org.helioviewer.jhv.view.ClipSet;
 //import org.helioviewer.jhv.io.XMLUtils;
 
 // essentially static; local or network cache
@@ -72,12 +73,12 @@ final class GenericImage implements URIImageReader {
             LUT lut = readLUT(image);
             ImageBuffer imageBuffer = readBuffered(image, ImageFilter.NONE);
 
-            return new URIImageReader.Image(xml, imageBuffer, lut);
+            return new URIImageReader.Image(xml, imageBuffer, lut, null);
         });
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception {
         return withReader(file, reader -> readBuffered(reader.read(0), filter));
     }
 

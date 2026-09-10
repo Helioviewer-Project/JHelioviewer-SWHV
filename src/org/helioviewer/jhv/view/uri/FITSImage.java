@@ -4,14 +4,15 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
+import org.helioviewer.jhv.view.ClipSet;
 
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
@@ -37,16 +38,17 @@ public final class FITSImage implements URIImageReader {
 
     @Override
     public URIImageReader.Image readImage(File file) throws Exception {
-        try (Fits f = new Fits(file)) {
-            BasicHDU<?> hdu = findHDU(f);
-            return new URIImageReader.Image(getHeaderAsXML(imageHeader(hdu)), readHDU(hdu, ImageFilter.NONE), null);
-        }
+        return readImage(file, ImageFilter.NONE, null, true);
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable ClipSet clipSet) throws Exception {
+        return readImage(file, filter, clipSet, false).buffer();
+    }
+
+    private URIImageReader.Image readImage(File file, ImageFilter filter, @Nullable ClipSet clipSet, boolean readMetadata) throws Exception {
         try (Fits f = new Fits(file)) {
-            return readHDU(findHDU(f), filter);
+            return readHDU(findHDU(f), filter, clipSet, readMetadata);
         }
     }
 
@@ -159,6 +161,21 @@ public final class FITSImage implements URIImageReader {
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
         }
         return new SampleBuffer(samples, sampleLen);
+    }
+
+    private static ClipSet calculateClipSet(SampleBuffer sample) {
+        if (sample.length() < MIN_SAMPLES)
+            return new ClipSet(null, null);
+        Arrays.sort(sample.values(), 0, sample.length());
+        return new ClipSet(percentileRange(sample, FITSViewState.ClippingMode.Percentile001.percentile()),
+                percentileRange(sample, FITSViewState.ClippingMode.Percentile05.percentile()));
+    }
+
+    private static ClipSet.Range percentileRange(SampleBuffer sample, double percentile) {
+        int length = sample.length();
+        float lower = sample.values()[Math.clamp((int) (percentile * length), 0, length - 1)];
+        float upper = sample.values()[Math.clamp((int) ((1 - percentile) * length), 0, length - 1)];
+        return new ClipSet.Range(lower, upper);
     }
 
     private interface NormalizedMapping {
@@ -330,12 +347,6 @@ public final class FITSImage implements URIImageReader {
         return axes;
     }
 
-    private ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter) throws Exception {
-        Header header = imageHeader(hdu);
-        int[] axes = imageAxes(header);
-        return readPixels(header, axes, readFlatPixels(hdu, axes), filter);
-    }
-
     @SuppressWarnings("deprecation")
     private static Object readFlatPixels(BasicHDU<?> hdu, int[] axes) throws Exception {
         if (hdu instanceof CompressedImageHDU chdu) {
@@ -354,7 +365,11 @@ public final class FITSImage implements URIImageReader {
         return buffer.array();
     }
 
-    private ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter) throws Exception {
+    private URIImageReader.Image readHDU(BasicHDU<?> hdu, ImageFilter filter, @Nullable ClipSet clipSet, boolean readMetadata) throws Exception {
+        Header header = imageHeader(hdu);
+        int[] axes = imageAxes(header);
+        Object pixels = readFlatPixels(hdu, axes);
+        String xml = readMetadata ? getHeaderAsXML(header) : null;
         int height = axes[0];
         int width = axes[1];
 
@@ -364,7 +379,7 @@ public final class FITSImage implements URIImageReader {
             for (int j = 0; j < height; j++) {
                 outData.put(width * (height - 1 - j), inData, width * j, width);
             }
-            return outBuffer.finish();
+            return new URIImageReader.Image(xml, outBuffer.finish(), null, null);
         }
 
         boolean hasBlank = header.containsKey(Standard.BLANK);
@@ -377,31 +392,28 @@ public final class FITSImage implements URIImageReader {
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
         float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
         if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
-            if (state.clippingMode() == FITSViewState.ClippingMode.Range) {
-                min = (float) state.clippingMin();
-                max = (float) state.clippingMax();
-            } else {
-                SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
-                int sampleLen = sampleData.length();
-                if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).clearPixels().finish();
-
-                double percentile = state.clippingMode().percentile();
-                int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
-                int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
-                float[] values = sampleData.values();
-                min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
-                max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
+            if (clipSet == null)
+                clipSet = calculateClipSet(sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height));
+            ClipSet.Range range = switch (state.clippingMode()) {
+                case Percentile001 -> clipSet.percentile001();
+                case Percentile05 -> clipSet.percentile05();
+                case Range -> new ClipSet.Range((float) state.clippingMin(), (float) state.clippingMax());
+            };
+            if (range == null) {
+                ImageBuffer buffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter)
+                        .clearPixels().finish();
+                return new URIImageReader.Image(xml, buffer, null, clipSet);
             }
+            min = range.lower();
+            max = range.upper();
         }
         if (min >= max) {
             max = min + 1;
         }
-        // System.out.println(">>> " + min + ' ' + max);
 
         ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16F, filter);
         convertPixels(pixels, outBuffer.shortBuffer(), hasBlank, blank, bzero, bscale, width, height, min, max, state);
-        return outBuffer.finish();
+        return new URIImageReader.Image(xml, outBuffer.finish(), null, clipSet);
     }
 
     private static final String nl = System.lineSeparator();
