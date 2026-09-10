@@ -11,7 +11,6 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 import kdu_jni.KduException;
 
@@ -99,14 +98,15 @@ class J2KReader implements Runnable {
                 return true;
 
             JPIPCache cache = source.cache();
-            JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
-            if (stream == null) {
+            JPIPCacheManager.Entry entry = key == null ? null : JPIPCacheManager.get(key, level);
+            if (entry == null) {
                 JPIPResponse response = socket.request(query, cache, frame);
                 complete = response.isResponseComplete();
                 if (complete && key != null)
                     JPIPCacheManager.store(key, level, cache, frame);
             } else {
-                cache.put(frame, stream);
+                cache.put(frame, entry.stream());
+                level = entry.level();
                 complete = true;
             }
         }
