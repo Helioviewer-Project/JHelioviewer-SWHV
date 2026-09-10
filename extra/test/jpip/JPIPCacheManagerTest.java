@@ -22,7 +22,7 @@ public final class JPIPCacheManagerTest {
         Platform.init();
         Directories.createCacheDirs();
 
-        Path cacheDirectory = Path.of(Directories.CACHE.getPath(), "JPIPLevel-4");
+        Path cacheDirectory = Path.of(Directories.CACHE.getPath(), "JPIPStream-7");
         PersistentCacheManager lockHolder = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(cacheDirectory.toString()))
                 .build(true);
@@ -45,6 +45,7 @@ public final class JPIPCacheManagerTest {
                 check(JPIPCacheManager.get("test", 1) == null, "disabled cache returned data");
             JPIPCacheManager.clear();
             check(logCounter.records == startupRecords, "disabled cache produced additional log records");
+            System.out.println("PASS: failed cache initialization stays disabled without repeated logging");
         } finally {
             rootLogger.removeHandler(logCounter);
             for (Handler handler : existingHandlers)
