@@ -206,7 +206,7 @@ public final class FITSLoadBenchmark {
     }
 
     private static void usage() {
-        System.err.println("Usage: extra/fits/run-benchmark.sh [options] <fits-file-or-directory>...");
+        System.err.println("Usage: extra/test/uri/run-benchmark.sh [options] <fits-file-or-directory>...");
         System.err.println("Options:");
         System.err.println("  --mode Info|Buffer        Info reads metadata and percentiles; Buffer decodes with prepared clipping (default: Info)");
         System.err.println("  --filter None|MGN|WOW     Only valid with --mode Buffer (default: None)");

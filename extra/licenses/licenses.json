@@ -1,5 +1,5 @@
 {
-  "generated_by": "extra/sync_licenses.py",
+  "generated_by": "extra/licenses/sync_licenses.py",
   "description": "Installed artifacts and sources of notices. Supplemental texts are not automatically verified against new builds.",
   "shared_licenses": [
     "resources/licenses/Apache-2.0.txt",

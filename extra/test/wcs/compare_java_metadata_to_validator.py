@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
 SUITE = SCRIPT_DIR / "run_jhv_wcs_hpc_validation_suite.py"
 JAVA_SOURCE = SCRIPT_DIR / "JHVMetadataDump.java"
@@ -90,7 +90,7 @@ def generated_matrix_cases(
     validator,
     output_dir: Path,
 ) -> tuple[list[tuple[Path, int | None]], set[Path], Path]:
-    source = SCRIPT_DIR / "data" / "sample.171.fits"
+    source = SCRIPT_DIR.parent / "data" / "sample.171.fits"
     with validator.fits.open(source) as hdul:
         source_header = validator.find_image_hdu(hdul, 1).header.copy()
 
@@ -263,7 +263,7 @@ def generated_matrix_cases(
     surface_cases = (
         (
             "car_pc_unequal_negative",
-            SCRIPT_DIR / "data" / "sunerf_map.fits",
+            SCRIPT_DIR.parent / "data" / "sunerf_map.fits",
             {
                 "CDELT1": -0.08,
                 "CDELT2": 0.05,
@@ -275,7 +275,7 @@ def generated_matrix_cases(
         ),
         (
             "car_pc_radian_units",
-            SCRIPT_DIR / "data" / "sunerf_map.fits",
+            SCRIPT_DIR.parent / "data" / "sunerf_map.fits",
             {
                 "CUNIT1": "rad",
                 "CUNIT2": "rad",
@@ -291,7 +291,7 @@ def generated_matrix_cases(
         ),
         (
             "cea_pc_unequal_negative",
-            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            SCRIPT_DIR.parent / "data" / "mrzqs260301t2314c2308_169.fits",
             {
                 "CDELT1": -0.8,
                 "CDELT2": 0.006,
@@ -303,7 +303,7 @@ def generated_matrix_cases(
         ),
         (
             "cea_pc_degree_units",
-            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            SCRIPT_DIR.parent / "data" / "mrzqs260301t2314c2308_169.fits",
             {
                 "CUNIT1": "deg",
                 "CUNIT2": "deg",
@@ -319,7 +319,7 @@ def generated_matrix_cases(
         ),
         (
             "car_cd",
-            SCRIPT_DIR / "data" / "sunerf_map.fits",
+            SCRIPT_DIR.parent / "data" / "sunerf_map.fits",
             {
                 "CD1_1": -0.08,
                 "CD1_2": 0.01,
@@ -329,7 +329,7 @@ def generated_matrix_cases(
         ),
         (
             "cea_cd",
-            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            SCRIPT_DIR.parent / "data" / "mrzqs260301t2314c2308_169.fits",
             {
                 "CD1_1": -0.8,
                 "CD1_2": 0.01,
@@ -339,7 +339,7 @@ def generated_matrix_cases(
         ),
         (
             "cea_cd_radian_units",
-            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            SCRIPT_DIR.parent / "data" / "mrzqs260301t2314c2308_169.fits",
             {
                 "CUNIT1": "rad",
                 "CUNIT2": "rad",

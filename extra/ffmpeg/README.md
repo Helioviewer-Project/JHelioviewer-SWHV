@@ -3,11 +3,11 @@
 From the repository root, run:
 
 ```sh
-python3 extra/update_ffmpeg.py
+python3 extra/ffmpeg/update_ffmpeg.py
 ```
 
 The script discovers the current stable prebuilt releases, obtains the providers'
-checksums, and updates the four native JARs. It generates `extra/ffmpeg.json` and
+checksums, and updates the four native JARs. It generates `extra/ffmpeg/ffmpeg.json` and
 the About-dialog notice in `resources/licenses/FFmpeg-Notices.txt` with the selected
 versions, download URLs, hashes, and source links. **Do not prepare or edit the
 JSON file before updating.** It is the record of what was installed.
@@ -17,8 +17,8 @@ the recorded versions and hashes stay matched to the binaries in the repository.
 For a preview or an offline check of the installed files:
 
 ```sh
-python3 extra/update_ffmpeg.py --list
-python3 extra/update_ffmpeg.py --check
+python3 extra/ffmpeg/update_ffmpeg.py --list
+python3 extra/ffmpeg/update_ffmpeg.py --check
 ```
 
 The providers are [Martin Riedl](https://ffmpeg.martin-riedl.de/) for macOS
@@ -47,5 +47,5 @@ target systems. The updater's integrity checks do not replace runtime testing.
 Offline tests for discovery, archive handling, and safe replacement:
 
 ```sh
-python3 -m unittest discover -s extra/test -p test_update_ffmpeg.py -v
+python3 -m unittest discover -s extra/ffmpeg -p test_update_ffmpeg.py -v
 ```

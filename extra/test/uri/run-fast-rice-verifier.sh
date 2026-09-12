@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 
 if [[ "${JHV_SKIP_COMPILE:-0}" != "1" ]]; then
@@ -33,5 +33,5 @@ if [[ -n "${JHV_NOM_TAM_JAR:-}" ]]; then
   CP="$BUILD_DIR:$CP"
 fi
 
-javac --release 25 -cp "$CP" -d "$BUILD_DIR" extra/fits/FastRiceVerifier.java
+javac --release 25 -cp "$CP" -d "$BUILD_DIR" extra/test/uri/FastRiceVerifier.java
 java --enable-native-access=ALL-UNNAMED -Duser.timezone=UTC -Duser.language=en -Duser.country=US -cp "$BUILD_DIR:$CP" FastRiceVerifier "$@"

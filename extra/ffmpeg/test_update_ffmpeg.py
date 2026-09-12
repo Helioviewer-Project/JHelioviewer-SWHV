@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import update_ffmpeg as updater
 
 CONFIG = (
@@ -31,8 +31,8 @@ class UpdateFFmpegTest(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         (self.root / "lib/jhv").mkdir(parents=True)
-        (self.root / "extra").mkdir()
-        self.record = self.root / "extra/ffmpeg.json"
+        (self.root / "extra/ffmpeg").mkdir(parents=True)
+        self.record = self.root / "extra/ffmpeg/ffmpeg.json"
         self.notice = self.root / "resources/licenses/FFmpeg-Notices.txt"
         self.notice.parent.mkdir(parents=True)
         self.notice.write_text("old notice\n")

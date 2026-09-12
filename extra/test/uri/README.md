@@ -6,16 +6,16 @@ The runner uses `bin:resources` plus `lib/*.jar` as the classpath, so JHV servic
 Run from the repository root:
 
 ```sh
-extra/fits/run-benchmark.sh /path/to/fits/files
+extra/test/uri/run-benchmark.sh /path/to/fits/files
 ```
 
 Useful options:
 
 ```sh
-extra/fits/run-benchmark.sh --warmup 2 --iterations 5 /path/to/fits/files
-extra/fits/run-benchmark.sh --mode Buffer --filter None /path/to/fits/files
-extra/fits/run-benchmark.sh --mode Buffer --filter MGN /path/to/fits/files
-extra/fits/run-benchmark.sh --no-checksum /path/to/fits/files
+extra/test/uri/run-benchmark.sh --warmup 2 --iterations 5 /path/to/fits/files
+extra/test/uri/run-benchmark.sh --mode Buffer --filter None /path/to/fits/files
+extra/test/uri/run-benchmark.sh --mode Buffer --filter MGN /path/to/fits/files
+extra/test/uri/run-benchmark.sh --no-checksum /path/to/fits/files
 ```
 
 Recommended timing run:
@@ -23,7 +23,7 @@ Recommended timing run:
 ```sh
 ant compile
 
-JHV_SKIP_COMPILE=1 extra/fits/run-benchmark.sh \
+JHV_SKIP_COMPILE=1 extra/test/uri/run-benchmark.sh \
   --mode Info \
   --warmup 2 \
   --iterations 5 \
@@ -46,7 +46,7 @@ For JProfiler startup recording, pass the JVM argument returned by `prepare_prof
 
 ```sh
 JHV_BENCHMARK_JVMARG='-agentpath:/path/to/libjprofilerti.jnilib=record=/path/to/conf.xml' \
-  JHV_SKIP_COMPILE=1 extra/fits/run-benchmark.sh \
+  JHV_SKIP_COMPILE=1 extra/test/uri/run-benchmark.sh \
   --warmup 2 \
   --iterations 1 \
   --no-checksum \
@@ -60,7 +60,7 @@ The runner filters JProfiler status lines out of the CSV output and prints `JPRO
 Run the FastRice provider against nom-tam's Rice test fixtures and synthetic comparison cases:
 
 ```sh
-extra/fits/run-fast-rice-verifier.sh ~/git/nom-tam-fits
+extra/test/uri/run-fast-rice-verifier.sh ~/git/nom-tam-fits
 ```
 
 If no path is given, it defaults to `~/git/nom-tam-fits`.
@@ -83,7 +83,7 @@ To check a candidate nom-tam JAR without replacing the bundled library:
 
 ```sh
 JHV_NOM_TAM_JAR=/absolute/path/to/nom-tam-fits-candidate.jar \
-  extra/fits/run-fast-rice-verifier.sh ~/git/nom-tam-fits
+  extra/test/uri/run-fast-rice-verifier.sh ~/git/nom-tam-fits
 ```
 
 Both runners support `JHV_NOM_TAM_JAR`. They exclude the bundled nom-tam JAR and compile all current JHV sources

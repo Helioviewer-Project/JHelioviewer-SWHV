@@ -852,7 +852,7 @@ public final class TimelineDataTest {
 
     private static void benchmark() throws ReflectiveOperationException {
         // Fixed synthetic 10 Hz input for comparisons across revisions. Timings are not pass/fail thresholds.
-        check(instrumentation != null, "Run benchmarks through run_timeline_tests.py --benchmark");
+        check(instrumentation != null, "Run benchmarks through run_timelines_tests.py --benchmark");
         ThreadMXBean allocations = (ThreadMXBean) ManagementFactory.getThreadMXBean();
         check(allocations.isThreadAllocatedMemorySupported(), "JVM does not support allocation measurements");
         allocations.setThreadAllocatedMemoryEnabled(true);

@@ -62,8 +62,8 @@ classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), *(str(p
 with tempfile.TemporaryDirectory(prefix="jhv-timeline-tests-") as classes:
     subprocess.run([
         "javac", "-cp", classpath, "-d", classes,
-        str(root / "extra/test/timeline/TimelineDataTest.java"),
-        str(root / "extra/test/timeline/HapiCatalogTest.java"),
+        str(root / "extra/test/timelines/TimelineDataTest.java"),
+        str(root / "extra/test/timelines/HapiCatalogTest.java"),
     ], check=True)
     subprocess.run(["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + classes,
                     "-cp", os.pathsep.join([classes, classpath]),

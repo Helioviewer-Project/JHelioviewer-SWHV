@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
 GLSL_DIR = REPO_ROOT / "resources" / "glsl"
 
 COMMON_FRAGMENT = GLSL_DIR / "imageCommon.frag"

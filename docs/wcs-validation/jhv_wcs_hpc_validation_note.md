@@ -317,26 +317,26 @@ pixels, with an independently mapped reference value.
 
 The main Python validator is:
 
-- `extra/test/validate_jhv_wcs_against_astropy.py`
+- `extra/test/wcs/validate_jhv_wcs_against_astropy.py`
 
 The documented test set can also be run as a suite with:
 
-- `extra/test/run_jhv_wcs_hpc_validation_suite.py`
+- `extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py`
 
 The suite includes the Java/Python metadata-comparison check:
 
-- `extra/test/compare_java_metadata_to_validator.py`
+- `extra/test/wcs/compare_java_metadata_to_validator.py`
 
 Run the prioritized CPU, GLSL-syntax, and Java-metadata suite with:
 
 ```text
-python3 extra/test/run_jhv_wcs_hpc_validation_suite.py
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py
 ```
 
 Add the focused Metal/ANGLE and SwiftShader shader checks with:
 
 ```text
-python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --include-electron
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --include-electron
 ```
 
 The helper checks execute the production coordinate and WCS sampling helpers
@@ -368,7 +368,7 @@ among the pass/fail checks in `--extended`.
 Run only those focused shader checks with:
 
 ```text
-python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --electron-only
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --electron-only
 ```
 
 Successful suite runs write generated PNGs and Electron float buffers to
@@ -382,7 +382,7 @@ documented larger sizes, or `--only <name> [...]` for selected diagnostics.
 Run the Python validator with:
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
 ```
 
 The Python validator uses four comparison regions:
@@ -406,11 +406,11 @@ FITS headers in the same way as the Python model.
 
 To check that point, this note also uses a small Java-side metadata dumper:
 
-- `extra/test/JHVMetadataDump.java`
+- `extra/test/wcs/JHVMetadataDump.java`
 
 and a Python driver that compiles and runs that helper:
 
-- `extra/test/compare_java_metadata_to_validator.py`
+- `extra/test/wcs/compare_java_metadata_to_validator.py`
 
 The comparison driver:
 
@@ -501,8 +501,8 @@ compilation.
 To test the shader path outside the application, the suite also includes an
 Electron/WebGL2 runner:
 
-- `extra/test/validate_jhv_wcs_with_electron.py`
-- `extra/test/electron_webgl_runner/runner.html`
+- `extra/test/wcs/validate_jhv_wcs_with_electron.py`
+- `extra/test/wcs/electron_webgl_runner/runner.html`
 
 The Electron runner:
 
@@ -522,7 +522,7 @@ numerical comparison. The older "color smoke" checks establish only that the
 shader produces finite output in range. An opaque black image can pass such a
 check, so these runs are not evidence of correct colors or subtraction.
 
-`extra/test/test_wcs_rendering.py` adds quantitative production-fragment tests:
+`extra/test/wcs/test_wcs_rendering.py` adds quantitative production-fragment tests:
 
 - all six supported FITS projections in JHV's orthographic mode, with sphere
   and off-limb samples, camera rotation, panning, and zooming;
@@ -564,7 +564,7 @@ paths because its transcendental/math behavior differs.
 
 ## Failure checks and acceptance limits
 
-`extra/test/test_wcs_validation.py` deliberately supplies incorrect results to
+`extra/test/wcs/test_wcs_validation.py` deliberately supplies incorrect results to
 the validators. It checks rejection of wrong inverse coordinates, nonfinite
 values, missing pixels, missing Astropy comparisons, GL errors, incorrect
 production colors, and out-of-order failures in the parallel suite runner.
@@ -597,7 +597,7 @@ on an execution error, but completing it is not proof of rendering accuracy.
 1. Forward WCS sampled validation
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20241224_194245_d4c2A.fts
 ```
 
@@ -615,7 +615,7 @@ It reports:
 2. Full pixel-center validation
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20250622_000831_s4h1A.fts \
   --all-pixels
 ```
@@ -637,7 +637,7 @@ correctly applies the FITS default of degrees to the original missing unit.
 3. Inverse `TAN`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sample.171.fits \
   --hdu 1 \
   --inverse-tan
@@ -654,7 +654,7 @@ It validates:
 4. Inverse `ARC`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/PUNCH_L3_CAM_20260425001600_v0k.fits \
   --hdu 1 \
   --inverse-arc
@@ -671,7 +671,7 @@ It validates:
 5. Inverse `AZP`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20250622_000831_s4h1A.fts \
   --inverse-azp
 ```
@@ -687,7 +687,7 @@ It validates:
 6. Inverse primary-branch `ZPN`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits \
   --inverse-zpn
 ```
@@ -703,7 +703,7 @@ It validates:
 7. `HPC` render comparison
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20241224_194245_d4c2A.fts \
   --hpc-render-compare \
   --render-size 2048
@@ -741,7 +741,7 @@ Interpretation:
 8. Inverse `CAR`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sunerf_map.fits \
   --inverse-car
 ```
@@ -757,7 +757,7 @@ It validates:
 9. Inverse `CEA`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/mrzqs260301t2314c2308_169.fits \
   --inverse-cea
 ```
@@ -775,7 +775,7 @@ It validates:
 1. `formal-TAN` vs JHV `HPC`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sample.171.fits \
   --hdu 1 \
   --ortho-vs-hpc-screen-compare \
@@ -805,7 +805,7 @@ Interpretation:
 2. `simple-TAN` vs JHV `HPC`
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sample.171.fits \
   --hdu 1 \
   --compare-initial-tan-vs-hpc
@@ -839,7 +839,7 @@ Interpretation:
 3. `simple-TAN` vs `formal-TAN` over the full image frame
 
 ```text
-python3 extra/test/validate_jhv_wcs_against_astropy.py \
+python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sample.171.fits \
   --hdu 1 \
   --compare-initial-tan-image-frame

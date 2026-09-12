@@ -299,7 +299,7 @@ accommodate those uses.
 
 ### Overview
 
-`extra/test/create_coconut_scene.py` shows how Qorona, PyVista/VTK, and pygltflib can be combined to produce a glTF
+`extra/examples/create_coconut_scene.py` shows how Qorona, PyVista/VTK, and pygltflib can be combined to produce a glTF
 asset using the features JHV supports. It is a starting point for model-specific converters, not a general COCONUT
 exporter, and is tailored to the supplied COCONUT sample CFmesh. The resulting `coconut-corona-scene.glb` contains:
 
@@ -328,7 +328,7 @@ The following command runs the converter from the repository root in an environm
 PyVista/VTK, Matplotlib, and pygltflib:
 
 ```shell
-python extra/test/create_coconut_scene.py \
+python extra/examples/create_coconut_scene.py \
     /path/to/coconut_corona.CFmesh.xz \
     --timestamp 2025-10-09T18:19:52 \
     --output extra/test/data/coconut-corona-scene.glb

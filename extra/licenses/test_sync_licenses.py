@@ -14,7 +14,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 import zipfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sync_licenses as syncer
 
 
@@ -25,7 +25,7 @@ class LicenseSyncTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.sources = self.root / "extra/licenses"
         self.output = self.root / "resources/licenses"
-        self.report_path = self.root / "extra/licenses.json"
+        self.report_path = self.root / "extra/licenses/licenses.json"
         for directory in (self.sources, self.output, self.root / "lib"):
             directory.mkdir(parents=True)
         self.apache = "Apache License\nExample terms retained in full."

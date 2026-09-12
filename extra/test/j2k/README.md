@@ -1,10 +1,10 @@
-# JPIP tests
+# JPEG 2000 and JPIP tests
 
 Requires JDK 25, Python 3, and compiled JHV classes. From the repository root:
 
 ```sh
 ant compile
-python3 extra/test/jpip/run_jpip_tests.py
+python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 The default suite is offline and needs no native library:
@@ -28,7 +28,7 @@ The default suite is offline and needs no native library:
 To also retrieve from ROB using the actual JPIP socket, native cache, and decoder:
 
 ```sh
-python3 extra/test/jpip/run_jpip_tests.py --live
+python3 extra/test/j2k/run_j2k_tests.py --live
 ```
 
 The live test uses a fixed single-frame AIA 171 image from September 9, 2026. It opens

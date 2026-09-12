@@ -44,7 +44,7 @@ from validate_jhv_wcs_against_astropy import (
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
 RUNNER_DIR = SCRIPT_DIR / "electron_webgl_runner"
 ELECTRON_LAUNCH_LOCK = Path(gettempdir()) / "jhv-electron-webgl-runner.lock"
 DEFAULT_ELECTRON = Path(os.environ.get(
@@ -779,7 +779,7 @@ def compare_differential_rotation(
     max_sample_error: float,
     backend: str,
 ) -> int:
-    fits_file = SCRIPT_DIR / "data" / "sample.171.fits"
+    fits_file = SCRIPT_DIR.parent / "data" / "sample.171.fits"
     image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, 1)
     # ImageLayer converts an elapsed millisecond interval to the shader's time
     # unit with a factor of 1e-9.
@@ -829,8 +829,8 @@ def compare_distinct_wcs_slots(
     max_error_px: float,
     backend: str,
 ) -> int:
-    primary_file = SCRIPT_DIR / "data" / "sample.171.fits"
-    secondary_file = SCRIPT_DIR / "data" / "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"
+    primary_file = SCRIPT_DIR.parent / "data" / "sample.171.fits"
+    secondary_file = SCRIPT_DIR.parent / "data" / "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"
     primary_image, primary_meta, _, _ = load_validation_context(primary_file, 1)
     secondary_image, secondary_meta, _, _ = load_validation_context(secondary_file, None)
     # Shear and unequal axis scales expose matrix transposition and packing
@@ -903,7 +903,7 @@ def compare_planar_masks(
     render_size: int,
     backend: str,
 ) -> int:
-    fits_file = SCRIPT_DIR / "data" / "sample.171.fits"
+    fits_file = SCRIPT_DIR.parent / "data" / "sample.171.fits"
     _image_data, meta, _, _ = load_validation_context(fits_file, 1)
     cases = (
         ("hpc_metadata_sector", "hpc", {"metadataSector": [0.4, 0.37]}),
@@ -1225,7 +1225,7 @@ def compare_tan_all_modes_case_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL TAN all-modes validation does not support projection {meta.projection!r} for {fits_file}")
@@ -1314,7 +1314,7 @@ def compare_tan_all_modes_color_smoke_batch(
     metadata: list[dict] = []
     suffix = "color_diff_smoke" if diff_mode else "color_smoke"
     for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL TAN all-modes color smoke does not support projection {meta.projection!r} for {fits_file}")
@@ -1376,7 +1376,7 @@ def compare_tan_screen_case_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL TAN screen validation does not support projection {meta.projection!r} for {fits_file}")
@@ -1461,7 +1461,7 @@ def compare_tan_screen_color_smoke_batch(
     metadata: list[dict] = []
     suffix = "color_diff_smoke" if diff_mode else "color_smoke"
     for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL TAN color smoke does not support projection {meta.projection!r} for {fits_file}")
@@ -1554,7 +1554,7 @@ def hpc_projection_jobs(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in HPC_PROJECTION_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL HPC validation does not support projection {meta.projection!r} for {fits_file}")
@@ -1665,7 +1665,7 @@ def compare_hpc_render_case_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in HPC_RENDER_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL HPC validation does not support projection {meta.projection!r} for {fits_file}")
@@ -1832,7 +1832,7 @@ def compare_surface_map_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename in SURFACE_MAP_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, None)
         if not is_surface_map_projection(meta):
             raise ValueError(f"Electron WebGL surface-map validation does not support projection {meta.projection!r} for {fits_file}")
@@ -1880,7 +1880,7 @@ def compare_surface_map_color_smoke_batch(
     metadata: list[dict] = []
     suffix = "color_diff_smoke" if diff_mode else "color_smoke"
     for name, filename in SURFACE_MAP_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
         if not is_surface_map_projection(meta):
             raise ValueError(f"Electron WebGL surface-map color smoke does not support projection {meta.projection!r} for {fits_file}")
@@ -1923,7 +1923,7 @@ def compare_surface_map_diff_selfcheck_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename in SURFACE_MAP_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
         if not is_surface_map_projection(meta):
             raise ValueError(f"Electron WebGL surface-map diff selfcheck does not support projection {meta.projection!r} for {fits_file}")
@@ -2080,7 +2080,7 @@ def compare_hpc_projection_diff_selfcheck_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in HPC_PROJECTION_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL HPC diff selfcheck does not support projection {meta.projection!r} for {fits_file}")
@@ -2123,7 +2123,7 @@ def compare_hpc_projection_color_smoke_batch(
     jobs: list[dict] = []
     metadata: list[dict] = []
     for name, filename, hdu in HPC_PROJECTION_CASES:
-        fits_file = SCRIPT_DIR / "data" / filename
+        fits_file = SCRIPT_DIR.parent / "data" / filename
         _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL HPC color smoke does not support projection {meta.projection!r} for {fits_file}")

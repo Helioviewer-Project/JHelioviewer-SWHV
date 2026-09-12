@@ -37,12 +37,12 @@ class ValidationResult:
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
-GLSL_VALIDATOR = SCRIPT_DIR / "validate_glsl_syntax.py"
+GLSL_VALIDATOR = SCRIPT_DIR.parent / "opengl" / "validate_glsl_syntax.py"
 ELECTRON_VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_with_electron.py"
 JAVA_METADATA_VALIDATOR = SCRIPT_DIR / "compare_java_metadata_to_validator.py"
-DATA = SCRIPT_DIR / "data"
+DATA = SCRIPT_DIR.parent / "data"
 
 
 # Keep this list in the same order as the validation note. It should cover both

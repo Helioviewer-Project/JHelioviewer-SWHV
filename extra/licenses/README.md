@@ -3,7 +3,7 @@
 After adding, updating, or removing JARs in `lib`, run:
 
 ```sh
-python3 extra/sync_licenses.py
+python3 extra/licenses/sync_licenses.py
 ```
 
 The script scans the installed JARs and writes the extracted notices to
@@ -11,7 +11,7 @@ The script scans the installed JARs and writes the extracted notices to
 shared files, and supplemental notices are included only when needed by the
 installed artifacts.
 
-`extra/licenses.json` is the generated inventory of artifacts, checksums, and
+`extra/licenses/licenses.json` is the generated inventory of artifacts, checksums, and
 notice sources. It is not configuration and does not control extraction.
 Deleting it is harmless, as the next run recreates it from the installed files.
 Commit the inventory and generated notices with dependency changes.
@@ -19,7 +19,7 @@ Commit the inventory and generated notices with dependency changes.
 To check without writing or deleting anything:
 
 ```sh
-python3 extra/sync_licenses.py --check
+python3 extra/licenses/sync_licenses.py --check
 ```
 
 Python 3.11 or later is required. The script runs offline using the standard
@@ -72,5 +72,5 @@ All input validation finishes before writing begins.
 ## Tests
 
 ```sh
-python3 -m unittest discover -s extra/test -p test_sync_licenses.py -v
+python3 -m unittest discover -s extra/licenses -p test_sync_licenses.py -v
 ```

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 
 if [[ "${JHV_SKIP_COMPILE:-0}" != "1" ]]; then
@@ -33,7 +33,7 @@ if [[ -n "${JHV_NOM_TAM_JAR:-}" ]]; then
   CP="$BUILD_DIR:$CP"
 fi
 
-javac --release 25 -cp "$CP" -d "$BUILD_DIR" extra/fits/FITSLoadBenchmark.java
+javac --release 25 -cp "$CP" -d "$BUILD_DIR" extra/test/uri/FITSLoadBenchmark.java
 
 JAVA_ARGS=()
 if [[ -n "${JHV_BENCHMARK_JVMARG:-}" ]]; then

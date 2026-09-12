@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -113,15 +112,6 @@ public final class ColoredVertexRenderingTest {
         check(buffer.remaining() == 65 * BufVertex.BYTES_PER_VERTEX, "Incorrect grown buffer size");
         checkVertex(buffer, 0, 0, 0, 0, 1, firstColor);
         checkVertex(buffer, 64, 64, -64, 32, 1, firstColor);
-
-        check(BufVertex.join(List.of(grown)) == grown, "Single buffer join made a copy");
-        boolean emptyJoinRejected = false;
-        try {
-            BufVertex.join(List.of());
-        } catch (IllegalArgumentException e) {
-            emptyJoinRejected = true;
-        }
-        check(emptyJoinRejected, "Empty buffer join was accepted");
     }
 
     private static void checkVertex(ByteBuffer buffer, int index, float x, float y, float z, float w, byte[] color) {
@@ -167,21 +157,19 @@ public final class ColoredVertexRenderingTest {
     }
 
     private static void drawLines(GLSLLine line, Viewport vp) {
-        BufVertex vertices = BufVertex.join(List.of(
-                polyline(Colors.Yellow.bytes(), -1.65f, 0.2f, -0.9f, -0.15f, -0.2f, 0.2f),
-                polyline(Colors.Blue.bytes(), 0.2f, 0.25f, 0.7f, -0.25f),
-                polyline(Colors.Blue.bytes(), 1.1f, -0.25f, 1.6f, 0.25f)));
+        BufVertex vertices = new BufVertex();
+        polyline(vertices, Colors.Yellow.bytes(), -1.65f, 0.2f, -0.9f, -0.15f, -0.2f, 0.2f);
+        polyline(vertices, Colors.Blue.bytes(), 0.2f, 0.25f, 0.7f, -0.25f);
+        polyline(vertices, Colors.Blue.bytes(), 1.1f, -0.25f, 1.6f, 0.25f);
         line.upload(new DirectBufVertex(vertices));
         line.renderLine(vp, 0.025);
     }
 
-    private static BufVertex polyline(byte[] color, float... coordinates) {
-        BufVertex vertices = new BufVertex(coordinates.length / 2 + 2);
+    private static void polyline(BufVertex vertices, byte[] color, float... coordinates) {
         vertices.startLine(coordinates[0], coordinates[1], 0, 1, color);
         for (int i = 2; i < coordinates.length; i += 2)
             vertices.putVertex(coordinates[i], coordinates[i + 1], 0, 1, color);
         vertices.endLine();
-        return vertices;
     }
 
     private static ByteBuffer readPixels() {

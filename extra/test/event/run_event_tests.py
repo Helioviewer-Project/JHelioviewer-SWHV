@@ -23,10 +23,10 @@ with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
     classes = work / "classes"
     classes.mkdir()
     fixture = work / "hek-events.json"
-    fixture.write_bytes(gzip.decompress((root / "extra/test/swek/hek-events.json.gz").read_bytes()))
+    fixture.write_bytes(gzip.decompress((root / "extra/test/event/hek-events.json.gz").read_bytes()))
     subprocess.run([
         "javac", "-cp", classpath, "-d", str(classes),
-        *("extra/test/swek/" + name + ".java" for name in tests),
+        *("extra/test/event/" + name + ".java" for name in tests),
     ], cwd=root, check=True)
 
     def run(name, *args, cache=None, resources=None):
