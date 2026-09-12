@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -56,7 +58,7 @@ public class BandReaderHapi {
     private static final LatestWorker<Catalog[]> catalogWorker = new LatestWorker<>("HAPI-Catalog");
 
     public static void requestCatalog(Consumer<CatalogData> listener) {
-        catalogWorker.submit(BandReaderHapi::loadCatalogs, (loaded, fresh) -> {
+        catalogWorker.submit(() -> loadCatalogs(catalogEndpoints), (loaded, fresh) -> {
             if (fresh)
                 onSuccessCatalogs(loaded, listener);
         });
@@ -92,21 +94,21 @@ public class BandReaderHapi {
 
     record DatasetRef(String key, String title) {}
 
-    private static Catalog[] loadCatalogs() {
-        return Arrays.stream(catalogEndpoints).parallel()
-                .map(BandReaderHapi::loadCatalog)
-                .toArray(Catalog[]::new);
-    }
-
-    @Nullable
-    private static Catalog loadCatalog(CatalogEndpoint catalogEndpoint) {
-        String server = catalogEndpoint.server;
-        String endpoint = server.endsWith("/") ? server : server + '/';
-        try {
-            return getCatalog(endpoint);
-        } catch (Exception e) {
-            Log.error(endpoint, e);
-            return null;
+    private static Catalog[] loadCatalogs(CatalogEndpoint[] endpoints) throws InterruptedException {
+        try (ExecutorService requests = HapiRequests.createExecutor("HAPI-Catalog-Request")) {
+            Catalog[] loaded = new Catalog[endpoints.length];
+            for (int i = 0; i < endpoints.length; i++) {
+                String server = endpoints[i].server;
+                String endpoint = server.endsWith("/") ? server : server + '/';
+                try {
+                    loaded[i] = getCatalog(endpoint, requests);
+                } catch (InterruptedException e) {
+                    throw e;
+                } catch (Exception e) {
+                    Log.error(endpoint, e);
+                }
+            }
+            return loaded;
         }
     }
 
@@ -198,10 +200,8 @@ public class BandReaderHapi {
 
     private record BandDecoder(BandType type, int valueColumn, boolean rebin) {}
 
-    private static Catalog getCatalog(String server) throws Exception {
+    private static Catalog getCatalog(String server, ExecutorService requests) throws Exception {
         String urlCatalog = server + "catalog";
-        String urlInfo = server + "info";
-        String urlData = server + "data";
 
         JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(urlCatalog)));
         HapiVersion version = HapiVersion.fromText(joCatalog.optString("HAPI", null));
@@ -210,31 +210,19 @@ public class BandReaderHapi {
         if (jaCatalog == null)
             throw new Exception("Missing catalog object");
 
-        int numIds = jaCatalog.length();
-        List<JSONObject> ids = new ArrayList<>(numIds);
-        for (Object o : jaCatalog) {
-            if (o instanceof JSONObject jo)
-                ids.add(jo);
+        List<Callable<Dataset>> tasks = new ArrayList<>(jaCatalog.length());
+        for (Object value : jaCatalog) {
+            if (value instanceof JSONObject item)
+                tasks.add(() -> loadDataset(server, version, item));
         }
 
-        List<Dataset> datasets = ids.parallelStream().map(item -> {
-                    String id = item.optString("id", null);
-                    if (id == null)
-                        return null;
-                    String title = item.optString("title", id);
-
-                    UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-                    String uri = new UriTemplate(urlInfo).expand(vars);
-                    try {
-                        JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                        return getDataset(version, urlData, id, title, joInfo);
-                    } catch (Exception e) {
-                        Log.error(uri, e);
-                    }
-                    return null;
-                }).filter(Objects::nonNull)
-                .filter(dataset -> !dataset.parameters.isEmpty())
-                .toList();
+        // invokeAll preserves submission order and cancels unfinished tasks on interruption.
+        List<Dataset> datasets = new ArrayList<>();
+        for (Future<Dataset> result : requests.invokeAll(tasks)) {
+            Dataset dataset = result.get();
+            if (dataset != null && !dataset.parameters.isEmpty())
+                datasets.add(dataset);
+        }
         if (datasets.isEmpty())
             throw new Exception("Empty catalog");
 
@@ -255,6 +243,23 @@ public class BandReaderHapi {
                         dataset.parameters.stream().map(DatasetParameter::type).toList()))
                 .toArray(BandDataset[]::new);
         return new Catalog(datasetsByParameter, datasetArray, createPredefinedGroups(typeArray));
+    }
+
+    @Nullable
+    private static Dataset loadDataset(String server, HapiVersion version, JSONObject item) {
+        String id = item.optString("id", null);
+        if (id == null)
+            return null;
+        String title = item.optString("title", id);
+        UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+        String uri = new UriTemplate(server + "info").expand(vars);
+        try {
+            JSONObject info = verifyResponse(JSONUtils.get(new URI(uri)));
+            return getDataset(version, server + "data", id, title, info);
+        } catch (Exception e) {
+            Log.error(uri, e);
+            return null;
+        }
     }
 
     private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {

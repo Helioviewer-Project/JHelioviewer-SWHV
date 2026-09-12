@@ -235,9 +235,7 @@ public final class TimelineDataTest {
         server.start();
         Map<Object, Object> catalogs = (Map<Object, Object>) field(BandReaderHapi.class, null, "catalogs");
         try {
-            Method getCatalog = BandReaderHapi.class.getDeclaredMethod("getCatalog", String.class);
-            getCatalog.setAccessible(true);
-            Object catalog = getCatalog.invoke(null, "http://127.0.0.1:" + server.getAddress().getPort() + "/");
+            Object catalog = HapiCatalogTest.load("http://127.0.0.1:" + server.getAddress().getPort() + "/")[0];
             Object endpoint = ((Object[]) field(BandReaderHapi.class, null, "catalogEndpoints"))[0];
             catalogs.put(endpoint, catalog);
             BandDataset[] datasets = (BandDataset[]) field(catalog.getClass(), catalog, "datasets");
@@ -582,9 +580,7 @@ public final class TimelineDataTest {
         server.start();
         Map<Object, Object> catalogs = (Map<Object, Object>) field(BandReaderHapi.class, null, "catalogs");
         try {
-            Method getCatalog = BandReaderHapi.class.getDeclaredMethod("getCatalog", String.class);
-            getCatalog.setAccessible(true);
-            Object catalog = getCatalog.invoke(null, "http://127.0.0.1:" + server.getAddress().getPort() + "/");
+            Object catalog = HapiCatalogTest.load("http://127.0.0.1:" + server.getAddress().getPort() + "/")[0];
             Object endpoint = ((Object[]) field(BandReaderHapi.class, null, "catalogEndpoints"))[0];
             catalogs.put(endpoint, catalog);
             BandDataset[] datasets = (BandDataset[]) field(catalog.getClass(), catalog, "datasets");

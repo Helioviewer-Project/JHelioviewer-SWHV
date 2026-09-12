@@ -9,23 +9,16 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.TimeUtils;
 
 final class BandDownloads {
 
-    private static final int DOWNLOAD_THREADS = 8;
-    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(
-            DOWNLOAD_THREADS, DOWNLOAD_THREADS, 0, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(),
-            new AppThread.NamedThreadFactory("Timeline-Download"));
+    private static final ThreadPoolExecutor downloadPool = HapiRequests.createExecutor("Timeline-Download");
     private static final HashMap<RequestKey, Download> pendingDownloads = new HashMap<>();
     private static final ArrayList<Download> activeDownloads = new ArrayList<>();
     private static boolean submitPendingScheduled;

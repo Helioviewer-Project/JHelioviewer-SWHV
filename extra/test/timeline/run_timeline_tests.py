@@ -63,7 +63,11 @@ with tempfile.TemporaryDirectory(prefix="jhv-timeline-tests-") as classes:
     subprocess.run([
         "javac", "-cp", classpath, "-d", classes,
         str(root / "extra/test/timeline/TimelineDataTest.java"),
+        str(root / "extra/test/timeline/HapiCatalogTest.java"),
     ], check=True)
+    subprocess.run(["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + classes,
+                    "-cp", os.pathsep.join([classes, classpath]),
+                    "org.helioviewer.jhv.timelines.band.HapiCatalogTest"], check=True, timeout=60)
     benchmark_options = []
     if args.benchmark:
         agent = Path(classes) / "timeline-benchmark-agent.jar"
