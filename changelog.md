@@ -6,11 +6,14 @@
 ### Display and rendering
 - Add glTF/GLB model layers with surfaces, lines, points, textures, transparency, and lighting
 - Improve rendering quality, performance, and memory handling
+- Use consistent percentile clipping across FITS sequences to reduce brightness flicker, and remove ZScale
+- Fix MGN numerical artifacts and refresh queued and difference images when changing filters
 
 ### Interaction and UI
 - Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
 - Allow multiple dataset selections in the New Image Layer and New Timeline Layer dialogs
 - Add general and timeline interaction guides to the Help menu
+- Move FITS clipping and scaling controls into image-layer options, with SAMP settings supplied through layer `imageParams` instead of the global FITS command
 
 ### Timeline and events
 - Allow HAPI timelines to be loaded at full time resolution and significantly improve timeline loading and drawing performance
@@ -18,7 +21,9 @@
 
 ### Technical
 - Document the heliocentric 3D data interface and add a COCONUT conversion example
-- Expand rendering regression tests and WCS validation coverage
+- Improve JPIP movie download throughput, cache memory handling, cancellation, and JPEG 2000 resource cleanup
+- Accelerate Rice-compressed 16-bit FITS decoding
+- Expand rendering, WCS, JPIP retrieval and cache restoration, and Callisto decoding regression coverage
 - Update bundled libraries
 - Various bug fixes, cleanups, and internal refactoring
 
