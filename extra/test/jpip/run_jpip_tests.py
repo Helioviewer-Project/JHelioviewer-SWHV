@@ -5,6 +5,7 @@ Offline by default. --live also retrieves and decodes fixed ROB AIA images and a
 """
 
 import argparse
+import json
 import os
 from pathlib import Path
 import platform
@@ -51,7 +52,12 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.ROBTest", str(work / library), uri],
                        check=True, timeout=180)
 
-        movie = "jpip://jpip.swhv.oma.be/movies/SDO_AIA_171_F2026-09-08T12.00.00Z_T2026-09-10T12.00.00ZB1800L.jpx"
+        movie_request = ("https://api.swhv.oma.be/hv_docpage/v2/getJPX/?sourceId=10"
+                         "&startTime=2026-09-08T12:00:00Z&endTime=2026-09-10T12:00:00Z"
+                         "&cadence=1800&verbose=true&linked=true&jpip=true")
+        print("Preparing movie through " + movie_request, flush=True)
+        with urlopen(movie_request, timeout=180) as response:
+            movie = json.load(response)["uri"]
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", str(work / library), movie],
                        check=True, timeout=180)
 

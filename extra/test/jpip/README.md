@@ -43,7 +43,8 @@ The limited session must require multiple requests. Hashes are compared between 
 not pinned across KDU versions. Allow up to three minutes and several MB of network traffic.
 A service outage or removed fixture fails the test, rather than silently skipping it.
 
-The live suite also compares the first four frames of a fixed ROB movie using sequential
+The live suite requests a fixed ROB movie through the `getJPX` API so the server creates
+it if needed, then uses the returned JPIP URI. It compares the first four frames using sequential
 requests, the actual reader prefetch pump, and reopened disk-cache restoration. A controlled
 signal after two sends checks that two sent responses are drained before
 switching work. The pump is invoked directly without a GUI view, while its worker remains idle.
