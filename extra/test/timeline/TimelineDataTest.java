@@ -236,8 +236,7 @@ public final class TimelineDataTest {
         Map<Object, Object> catalogs = (Map<Object, Object>) field(BandReaderHapi.class, null, "catalogs");
         try {
             Object catalog = HapiCatalogTest.load("http://127.0.0.1:" + server.getAddress().getPort() + "/")[0];
-            Object endpoint = ((Object[]) field(BandReaderHapi.class, null, "catalogEndpoints"))[0];
-            catalogs.put(endpoint, catalog);
+            catalogs.put("Test", catalog);
             BandDataset[] datasets = (BandDataset[]) field(catalog.getClass(), catalog, "datasets");
             List<BandData> result = new ArrayList<>();
             for (BandDataset dataset : datasets) {
@@ -581,8 +580,7 @@ public final class TimelineDataTest {
         Map<Object, Object> catalogs = (Map<Object, Object>) field(BandReaderHapi.class, null, "catalogs");
         try {
             Object catalog = HapiCatalogTest.load("http://127.0.0.1:" + server.getAddress().getPort() + "/")[0];
-            Object endpoint = ((Object[]) field(BandReaderHapi.class, null, "catalogEndpoints"))[0];
-            catalogs.put(endpoint, catalog);
+            catalogs.put("Test", catalog);
             BandDataset[] datasets = (BandDataset[]) field(catalog.getClass(), catalog, "datasets");
             List<BandType> types = datasets[0].bandTypes();
             check(types.size() == 3, "Fixture parameters missing from catalog");

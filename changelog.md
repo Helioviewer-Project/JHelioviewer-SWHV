@@ -16,6 +16,7 @@
 - Move FITS clipping and scaling controls into image-layer options, with SAMP settings supplied through layer `imageParams` instead of the global FITS command
 
 ### Timeline and events
+- Allow additional HAPI servers to be configured by user in `sources.json`, alongside image API servers
 - Allow HAPI timelines to be loaded at full time resolution and significantly improve timeline loading and drawing performance
 - Improve SWEK event loading, filtering, display, and related-event handling, with more reliable updates
 

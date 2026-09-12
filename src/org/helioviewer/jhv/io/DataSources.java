@@ -27,9 +27,10 @@ public class DataSources {
 
     private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe,RHESSI,GOES,PUNCH]";
 
-    private static ImmutableMap<String, Server> servers;
+    private static ImmutableMap<String, Server> imageServers;
+    private static ImmutableMap<String, String> hapiServers;
 
-    private static Server createServer(String api, String label, @Nullable String availability) {
+    private static Server createImageServer(String api, String label, @Nullable String availability) {
         return new Server(label,
                 api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2,
                 api + "getJP2Image/?",
@@ -37,45 +38,75 @@ public class DataSources {
                 availability);
     }
 
-    private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Server> builder) {
-        JSONArray ja = json.optJSONArray("org.helioviewer.jhv.source.image");
-        if (ja != null) {
-            int len = ja.length();
-            for (int i = 0; i < len; i++) {
+    private static JSONObject readUserSources() {
+        Path userSources = Path.of(Directories.SETTINGS.getPath(), "sources.json");
+        if (Files.exists(userSources)) {
+            try (BufferedReader reader = Files.newBufferedReader(userSources)) {
+                return JSONUtils.get(reader);
+            } catch (Exception e) {
+                Log.warn(e);
+            }
+        }
+        return new JSONObject();
+    }
+
+    private static ImmutableMap<String, Server> loadImageServers(JSONObject json) {
+        ImmutableMap.Builder<String, Server> builder = new ImmutableMap.Builder<>();
+        JSONArray entries = json.optJSONArray("org.helioviewer.jhv.source.image");
+        if (entries != null) {
+            for (int i = 0; i < entries.length(); i++) {
                 try {
-                    JSONObject jo = ja.getJSONObject(i);
-                    builder.put(jo.getString("name"), createServer(jo.getString("api"), jo.getString("label"), jo.optString("availability", null)));
+                    JSONObject entry = entries.getJSONObject(i);
+                    builder.put(entry.getString("name"), createImageServer(entry.getString("api"), entry.getString("label"), entry.optString("availability", null)));
                 } catch (Exception e) {
                     Log.warn(e);
                 }
             }
         }
+        builder.put("ROB", createImageServer("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?"))
+                .put("IAS", createImageServer("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null))
+                .put("GSFC", createImageServer("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null));
+        return builder.buildKeepingLast();
+    }
+
+    private static ImmutableMap<String, String> loadHapiServers(JSONObject json) {
+        ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
+        JSONArray entries = json.optJSONArray("org.helioviewer.jhv.source.hapi");
+        if (entries != null) {
+            for (int i = 0; i < entries.length(); i++) {
+                try {
+                    JSONObject entry = entries.getJSONObject(i);
+                    String name = entry.getString("name");
+                    String api = entry.getString("api");
+                    if (name.isBlank() || api.isBlank())
+                        throw new IllegalArgumentException("HAPI server name and api must not be blank");
+                    builder.put(name, api.endsWith("/") ? api : api + '/');
+                } catch (Exception e) {
+                    Log.warn(e);
+                }
+            }
+        }
+        builder.put("ROB", "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/");
+        return builder.buildKeepingLast();
     }
 
     public static void initSources() {
-        ImmutableMap.Builder<String, Server> builder = new ImmutableMap.Builder<>();
-        Path userSources = Path.of(Directories.SETTINGS.getPath(), "sources.json");
-        if (Files.exists(userSources)) { // user servers
-            try (BufferedReader reader = Files.newBufferedReader(userSources)) {
-                loadUserServers(JSONUtils.get(reader), builder);
-            } catch (Exception e) {
-                Log.warn(e);
-            }
-        }
+        JSONObject json = readUserSources();
+        imageServers = loadImageServers(json);
+        hapiServers = loadHapiServers(json);
+    }
 
-        builder.put("ROB", createServer("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?"))
-                .put("IAS", createServer("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null))
-                .put("GSFC", createServer("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null));
-        servers = builder.buildKeepingLast(); // Avoid crash on duplicated server names
+    public static Map<String, String> getHapiServers() {
+        return hapiServers;
     }
 
     public static Set<String> getServers() {
-        return servers.keySet();
+        return imageServers.keySet();
     }
 
     @Nullable
     public static Server getServer(@Nullable String name) {
-        return servers.get(name);
+        return imageServers.get(name);
     }
 
     private static Listener listener;
@@ -89,9 +120,9 @@ public class DataSources {
 
     public static void loadSources(boolean requestAfterLoad) {
         datasetMap.clear(); // clear stale datasets on reload of DataSources
-        toLoad = servers.size();
+        toLoad = imageServers.size();
         loadCommandLineRequest = requestAfterLoad;
-        servers.forEach(LoadSources::submit);
+        imageServers.forEach(LoadSources::submit);
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {

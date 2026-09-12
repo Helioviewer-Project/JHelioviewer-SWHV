@@ -15,5 +15,11 @@
       "label": "European Space Astronomy Center",
       "api": "https://soar.esac.esa.int/jpip-api/v2/",
     },
+  ],
+  "org.helioviewer.jhv.source.hapi": [
+    {
+      "name": "ROB Test",
+      "api": "http://swhv-test:4000/hapi/",
+    },
   ]
 }

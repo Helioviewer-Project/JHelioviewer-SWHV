@@ -1,11 +1,14 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.Directories;
 
 import org.json.JSONArray;
@@ -22,19 +26,17 @@ import com.sun.net.httpserver.HttpServer;
 
 public final class HapiCatalogTest {
     static Object[] load(String... urls) throws Exception {
-        Class<?> endpointType = Class.forName(BandReaderHapi.class.getName() + "$CatalogEndpoint");
-        Constructor<?> constructor = endpointType.getDeclaredConstructor(String.class, String.class);
-        constructor.setAccessible(true);
-        Object endpoints = Array.newInstance(endpointType, urls.length);
+        Map<String, String> servers = new LinkedHashMap<>();
         for (int i = 0; i < urls.length; i++)
-            Array.set(endpoints, i, constructor.newInstance("Test" + i, urls[i]));
-        Method load = BandReaderHapi.class.getDeclaredMethod("loadCatalogs", endpoints.getClass());
+            servers.put("Test" + i, urls[i]);
+        Method load = BandReaderHapi.class.getDeclaredMethod("loadCatalogs", Map.class);
         load.setAccessible(true);
-        return (Object[]) load.invoke(null, endpoints);
+        return ((Map<?, ?>) load.invoke(null, servers)).values().toArray();
     }
 
     public static void main(String[] args) throws Exception {
         Directories.createCacheDirs();
+        checkConfiguration();
         int workers = 8;
         int datasetCount = Math.max(17, workers + 1);
         AtomicInteger active = new AtomicInteger();
@@ -105,6 +107,9 @@ public final class HapiCatalogTest {
                         int expected = i < 5 ? i : i + 1;
                         if (!datasets[i].title().equals("Dataset " + expected) || datasets[i].bandTypes().size() != 1)
                             throw new AssertionError("Dataset order or parameters changed");
+                        String endpointPath = endpoint == 0 ? "/first/" : "/last/";
+                        if (!datasets[i].bandTypes().getFirst().getBaseUrl().startsWith(base + endpointPath))
+                            throw new AssertionError("Overlapping dataset IDs lost their server identity");
                     }
                 }
                 if (peak.get() != workers || calls.get() != 3 * datasetCount)
@@ -156,6 +161,54 @@ public final class HapiCatalogTest {
                 server.stop(0);
             }
         }
+    }
+
+    private static void checkConfiguration() throws Exception {
+        Path config = Path.of(Directories.SETTINGS.getPath(), "sources.json");
+        if (Files.exists(config))
+            throw new AssertionError("Run with an isolated user.home; sources.json already exists");
+        Files.createDirectories(config.getParent());
+        DataSources.initSources();
+        String rob = DataSources.getHapiServers().get("ROB");
+        if (DataSources.getHapiServers().size() != 1 || rob == null)
+            throw new AssertionError("Missing built-in HAPI server");
+        try {
+            Files.writeString(config, """
+                    {"org.helioviewer.jhv.source.image":[
+                      {"name":"Image Test","label":"Test image API","api":"http://localhost/image/"}],
+                     "org.helioviewer.jhv.source.hapi":[
+                      {"name":"First","api":"http://localhost/old"},
+                      {"name":"Second","api":"http://localhost/second/"},
+                      {"name":"Missing API"}, 123,
+                      {"name":"Blank","api":""},
+                      {"name":"First","api":"http://localhost/first"},
+                      {"name":"ROB","api":"http://localhost/override"}]}
+                    """);
+            DataSources.initSources();
+            Map<String, String> servers = DataSources.getHapiServers();
+            if (!List.copyOf(servers.keySet()).equals(List.of("First", "Second", "ROB"))
+                    || !servers.get("First").equals("http://localhost/first/")
+                    || !servers.get("Second").equals("http://localhost/second/")
+                    || !servers.get("ROB").equals(rob)
+                    || DataSources.getServer("Image Test") == null)
+                throw new AssertionError("Server configuration order, precedence or parsing changed");
+            try {
+                servers.put("Unexpected", "http://localhost/");
+                throw new AssertionError("HAPI configuration is mutable");
+            } catch (UnsupportedOperationException expected) {}
+            Files.writeString(config, "{}");
+            DataSources.initSources();
+            if (DataSources.getHapiServers().size() != 1)
+                throw new AssertionError("Absent HAPI section retained user servers");
+            Files.writeString(config, "invalid JSON");
+            DataSources.initSources();
+            if (!DataSources.getHapiServers().equals(Map.of("ROB", rob)))
+                throw new AssertionError("Malformed file removed built-in HAPI server");
+        } finally {
+            Files.delete(config);
+            DataSources.initSources();
+        }
+        System.out.println("PASS: image/HAPI configuration, duplicate names, malformed entries and URL normalization");
     }
 
     private HapiCatalogTest() {}

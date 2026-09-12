@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -49,16 +49,12 @@ public class BandReaderHapi {
                               Map<String, List<BandType>> predefinedGroups) {}
 
     private static final String hapiFormat = "binary";
-    private static final CatalogEndpoint[] catalogEndpoints = {
-            new CatalogEndpoint("ROB", "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/"),
-            //new CatalogEndpoint("ROB Test", "http://swhv-test:4000/hapi/")
-    };
-
-    private static final HashMap<CatalogEndpoint, Catalog> catalogs = new HashMap<>();
-    private static final LatestWorker<Catalog[]> catalogWorker = new LatestWorker<>("HAPI-Catalog");
+    private static final LinkedHashMap<String, Catalog> catalogs = new LinkedHashMap<>();
+    private static final LatestWorker<Map<String, Catalog>> catalogWorker = new LatestWorker<>("HAPI-Catalog");
 
     public static void requestCatalog(Consumer<CatalogData> listener) {
-        catalogWorker.submit(() -> loadCatalogs(catalogEndpoints), (loaded, fresh) -> {
+        Map<String, String> servers = DataSources.getHapiServers();
+        catalogWorker.submit(() -> loadCatalogs(servers), (loaded, fresh) -> {
             if (fresh)
                 onSuccessCatalogs(loaded, listener);
         });
@@ -94,35 +90,32 @@ public class BandReaderHapi {
 
     record DatasetRef(String key, String title) {}
 
-    private static Catalog[] loadCatalogs(CatalogEndpoint[] endpoints) throws InterruptedException {
+    private static Map<String, Catalog> loadCatalogs(Map<String, String> servers) throws InterruptedException {
         try (ExecutorService requests = HapiRequests.createExecutor("HAPI-Catalog-Request")) {
-            Catalog[] loaded = new Catalog[endpoints.length];
-            for (int i = 0; i < endpoints.length; i++) {
-                String server = endpoints[i].server;
-                String endpoint = server.endsWith("/") ? server : server + '/';
+            Map<String, Catalog> loaded = new LinkedHashMap<>();
+            for (Map.Entry<String, String> server : servers.entrySet()) {
+                Catalog catalog = null;
                 try {
-                    loaded[i] = getCatalog(endpoint, requests);
+                    catalog = getCatalog(server.getValue(), requests);
                 } catch (InterruptedException e) {
                     throw e;
                 } catch (Exception e) {
-                    Log.error(endpoint, e);
+                    Log.error(server.getValue(), e);
                 }
+                loaded.put(server.getKey(), catalog);
             }
             return loaded;
         }
     }
 
-    private static void onSuccessCatalogs(Catalog[] loadedCatalogs, Consumer<CatalogData> listener) {
+    private static void onSuccessCatalogs(Map<String, Catalog> loaded, Consumer<CatalogData> listener) {
         catalogs.clear();
         LinkedHashMap<String, BandDataset[]> datasets = new LinkedHashMap<>();
-        for (int i = 0; i < loadedCatalogs.length; i++) {
-            Catalog catalog = loadedCatalogs[i];
-            CatalogEndpoint endpoint = catalogEndpoints[i];
-            if (catalog != null) {
-                catalogs.put(endpoint, catalog);
-            }
-            datasets.put(endpoint.groupName, catalog == null ? new BandDataset[0] : catalog.datasets);
-        }
+        loaded.forEach((name, catalog) -> {
+            if (catalog != null)
+                catalogs.put(name, catalog);
+            datasets.put(name, catalog == null ? new BandDataset[0] : catalog.datasets);
+        });
         listener.accept(new CatalogData(Collections.unmodifiableMap(datasets), combinedPredefinedGroups()));
     }
 
@@ -133,12 +126,9 @@ public class BandReaderHapi {
             return catalogs.values().iterator().next().predefinedGroups;
 
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
-        for (CatalogEndpoint endpoint : catalogEndpoints) {
-            Catalog catalog = catalogs.get(endpoint);
-            if (catalog != null) {
-                catalog.predefinedGroups.forEach((name, bandTypes) ->
-                        groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
-            }
+        for (Catalog catalog : catalogs.values()) {
+            catalog.predefinedGroups.forEach((name, bandTypes) ->
+                    groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
         }
         return finishPredefinedGroups(groups);
     }
@@ -185,8 +175,6 @@ public class BandReaderHapi {
         }
         return 0;
     }
-
-    private record CatalogEndpoint(String groupName, String server) {}
 
     private record Catalog(Map<String, Dataset> datasetsByParameter, BandDataset[] datasets,
                            Map<String, List<BandType>> predefinedGroups) {}
