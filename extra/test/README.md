@@ -34,7 +34,7 @@ silently skipping it. Some failure-path tests deliberately log exceptions.
 | `timelines` | HAPI server configuration and catalog loading, partial failures and cancellation, timeline data, request coverage, cache, export, and Java2D drawing | Yes |
 | `event` | HEK fixture parsing, event database persistence, filtering, cache/download coordination, and SWEK configuration | Yes |
 | `shaders` (`opengl/`) | GLSL syntax and program linking using `glslangValidator` | No |
-| `opengl` | Production ANGLE rendering of colored vertices and models, framebuffer readback, and export geometry/state | No |
+| `opengl` | Production ANGLE grids, image shaders, colored vertices and models, framebuffer readback, and export geometry/state | No |
 | `uri` | FITS Rice decoding, provider selection, buffer boundaries, and compressed/uncompressed loader comparisons using nom-tam fixtures | No |
 | `wcs` | FITS coordinate comparisons against Astropy, Java metadata, validator failure checks, and GLSL syntax | No |
 
@@ -46,7 +46,7 @@ packages so they can exercise package-private code without widening its API.
 
 ```sh
 python3 extra/test/run_tests.py shaders opengl
-~/jhv-validator/bin/python extra/test/run_tests.py wcs
+python3 extra/test/run_tests.py wcs
 ```
 
 `shaders` needs `glslangValidator` on `PATH`. `opengl` needs a supported
@@ -55,19 +55,22 @@ but still exercises the graphics driver. A pass on one backend does not establis
 behavior on every platform or verify the interactive GUI.
 
 `wcs` needs NumPy, Astropy, Pillow, and `glslangValidator`. Use a Python environment
-containing these dependencies, such as `~/jhv-validator`. Its detailed runner
+containing these dependencies. Its detailed runner
 supports named subsets and optional Electron/WebGL checks:
 
 ```sh
-~/jhv-validator/bin/python extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --list
-~/jhv-validator/bin/python extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --only java_metadata
-~/jhv-validator/bin/python extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --include-electron
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --list
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --only java_metadata
+python3 extra/test/wcs/run_jhv_wcs_hpc_validation_suite.py --include-electron
 ```
 
 Set `JHV_ELECTRON` to the Electron executable for GPU validation. See the
 [WCS validation guide](../../docs/wcs-validation/jhv_wcs_hpc_validation_note.md)
 for modes, reference assumptions, and diagnostic output. Diagnostic runs are
 reported separately from correctness assertions.
+
+ANGLE updates and old/new image comparisons are documented in
+[the ANGLE updater guide](../angle/README.md).
 
 ## Live services and benchmarks
 

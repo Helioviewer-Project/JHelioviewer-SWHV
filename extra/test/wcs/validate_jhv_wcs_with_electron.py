@@ -47,9 +47,10 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 RUNNER_DIR = SCRIPT_DIR / "electron_webgl_runner"
 ELECTRON_LAUNCH_LOCK = Path(gettempdir()) / "jhv-electron-webgl-runner.lock"
+ANGLE_VERSION = json.loads((REPO_ROOT / "extra/angle/angle.json").read_text())["electron_version"]
 DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
-    str(Path.home() / "electron-v43.2.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
+    str(Path.home() / f"electron-v{ANGLE_VERSION}-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
 WARP_MODES = ("radial_warp", "rect_warp")

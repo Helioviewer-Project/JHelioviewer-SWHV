@@ -44,8 +44,9 @@ information that the artifacts omit:
 - Native dependencies are identified from actual archive members, with separate
   notices for the incorporated libraries.
 
-These supplemental texts are not automatically refreshed or verified against
-new builds. When updating an affected dependency, check whether its upstream
+The ANGLE updater refreshes its supplemental text from the checksummed build
+artifacts and runs this synchronizer after installation. Other supplemental
+texts are not automatically refreshed or verified against new builds. When updating an affected dependency, check whether its upstream
 terms or incorporated components changed. The inventory distinguishes extracted
 documents, declarations, and supplemental sources. It does not certify that a
 licensing review has been performed.

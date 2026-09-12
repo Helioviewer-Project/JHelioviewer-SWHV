@@ -1,7 +1,7 @@
 ANGLE
 =====
 
-Source: https://chromium.googlesource.com/angle/angle/+/7217eaf9834a6375113920f2d01940a66c4cf1e0/LICENSE
+Source: https://chromium.googlesource.com/angle/angle/+/736ed80c7552a4b267bd54a282b971aa4555cb3e/LICENSE
 
 Copyright 2018 The ANGLE Project Authors.
 All rights reserved.

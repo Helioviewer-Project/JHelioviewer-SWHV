@@ -22,13 +22,20 @@ SCRIPTS = {
 }
 JAVA_TESTS = {
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
-    "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest"],
+    "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest"],
 }
 
 
-def run_java_suite(suite):
-    classpath = os.pathsep.join([str(ROOT / "bin"), str(ROOT / "resources"),
-                                *(str(p) for p in sorted((ROOT / "lib").rglob("*.jar")))])
+def run_java_suite(suite, native_jars=None, render_output=None):
+    native_jars = native_jars.resolve() if native_jars else None
+    render_output = render_output.resolve() if render_output else None
+    jars = sorted((ROOT / "lib").rglob("*.jar"))
+    if native_jars:
+        jars = [native_jars / p.name if p.parent == ROOT / "lib/jhv" else p for p in jars]
+        for jar in jars:
+            if not jar.is_file():
+                raise FileNotFoundError(jar)
+    classpath = os.pathsep.join([str(ROOT / "bin"), str(ROOT / "resources"), *map(str, jars)])
     with tempfile.TemporaryDirectory(prefix="jhv-" + suite + "-tests-") as temporary:
         sources = [TESTS / suite / (name.rsplit(".", 1)[-1] + ".java") for name in JAVA_TESTS[suite]]
         subprocess.run(["javac", "-cp", classpath, "-d", temporary, *map(str, sources)],
@@ -37,10 +44,15 @@ def run_java_suite(suite):
             home = Path(temporary) / name
             home.mkdir()
             print("Running " + name, flush=True)
+            output_args = []
+            if render_output and name in ("opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest"):
+                render_output.mkdir(parents=True, exist_ok=True)
+                filename = name.rsplit(".", 1)[1]
+                output_args = [str(render_output / (filename if filename in ("GridRenderingTest", "ImageRenderingTest") else filename + ".png"))]
             subprocess.run([
                 "java", "--enable-native-access=ALL-UNNAMED", "-Djava.awt.headless=true",
                 "-Duser.timezone=UTC", "-Duser.language=en", "-Duser.country=US", "-Duser.home=" + str(home),
-                "-cp", os.pathsep.join([temporary, classpath]), "org.helioviewer.jhv." + name,
+                "-cp", os.pathsep.join([temporary, classpath]), "org.helioviewer.jhv." + name, *output_args,
             ], cwd=ROOT, check=True, timeout=120)
 
 
@@ -49,6 +61,8 @@ def main():
     parser.add_argument("suites", nargs="*", choices=[*DEFAULT_SUITES, "shaders", "wcs", "opengl", "uri"],
                         default=DEFAULT_SUITES, help="suites to run (default: %(default)s)")
     parser.add_argument("--no-build", action="store_true", help="skip the initial ant compile")
+    parser.add_argument("--native-jars", type=Path, help="use staged native jars instead of lib/jhv")
+    parser.add_argument("--render-output", type=Path, help="save OpenGL regression images")
     args = parser.parse_args()
     if not args.no_build and any(suite != "maintenance" and suite != "shaders" for suite in args.suites):
         subprocess.run(["ant", "compile"], cwd=ROOT, check=True)
@@ -58,7 +72,7 @@ def main():
         start = time.monotonic()
         try:
             if suite in JAVA_TESTS:
-                run_java_suite(suite)
+                run_java_suite(suite, args.native_jars, args.render_output)
             elif suite == "uri":
                 subprocess.run(["bash", str(TESTS / "uri/run-fast-rice-verifier.sh")],
                                cwd=ROOT, env={**os.environ, "JHV_SKIP_COMPILE": "1"}, check=True)

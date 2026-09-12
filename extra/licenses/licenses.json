@@ -387,7 +387,7 @@
     },
     {
       "path": "lib/jhv/jhv-natives-linux.jar",
-      "sha256": "d0150f11fdd358c8c6b47ed3e8db11a57b895602f0966ac28b2fee523c211ae3",
+      "sha256": "1801173bc54bfcf4f4413655dcda13a1d59c347c4b1f11b473b9a42285745271",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -408,7 +408,7 @@
     },
     {
       "path": "lib/jhv/jhv-natives-macos-arm64.jar",
-      "sha256": "31473f747eeb7f05ad4a7fa442d790c343caca7d51382507fafa0f4be887e5ba",
+      "sha256": "ed063bd75813b3902396d991c48834003dbf4a9503e8dc80548371f9ee2241d2",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -429,7 +429,7 @@
     },
     {
       "path": "lib/jhv/jhv-natives-macos.jar",
-      "sha256": "43e61f25936e5e2b2583b9945751c24babd4eec97d3369e4f2eecbfbb1ca0db2",
+      "sha256": "805699a54a20fd46c3e71b14d0289b875c802338542d837af39b1cbdd7d48bd8",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -450,7 +450,7 @@
     },
     {
       "path": "lib/jhv/jhv-natives-windows.jar",
-      "sha256": "e77eedb18d9f004aa3fdb93c6ea7f3fac947783c486d6bdaaf1ac88a44c6b57c",
+      "sha256": "e7afd668a4df382fce1a960d113b596e8994228d6617cd4ed6f966b605959556",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [

@@ -1,0 +1,29 @@
+{
+  "electron_version": "44.3.0",
+  "binaries": {
+    "macos-arm64": {
+      "libEGL.dylib": "6fba1a2d1cb3c1d3be7628fda81392cc025d169c157ae663f9dd69f02c3a147b",
+      "libGLESv2.dylib": "47286731bfb95378bd85d7698ac6e9983d8001b287ac03e85479be5555ffbed1"
+    },
+    "macos-x64": {
+      "libEGL.dylib": "d10427dc4d24e9e8fc5e5e17b0b2b5c8b36c0ae97209c383daaa7e08e9f82efa",
+      "libGLESv2.dylib": "edfaa533c696f16b83dea3e8d62f22f6282aefc634054f396e989f4b20e54128"
+    },
+    "linux-x64": {
+      "libEGL.so": "d81961dc27f4f4c4d711d8459dbf2d84697f4e9e090aee575b52159a78df553e",
+      "libGLESv2.so": "2b9f66e77af39342c4fd5c647ae68cc3183b0e82e59a25d560ad3a3cbb758c76"
+    },
+    "windows-x64": {
+      "libEGL.dll": "f9845093b9a883ea69ca6c8c255bcc40bf755555de7b39e23ff4a1cbde1350e2",
+      "libGLESv2.dll": "efc567c86046e939318f672c2d133592b113769f0edf02c703a590f10451116f"
+    }
+  },
+  "build": {
+    "ELECTRON_VERSION": "44.3.0",
+    "CHROMIUM_VERSION": "152.0.7977.78",
+    "ANGLE_SHA": "736ed80c7552a4b267bd54a282b971aa4555cb3e",
+    "DEPOT_TOOLS_SHA": "f9399feb8b1e361b6d690f5ab087e7878142aca2",
+    "XCODE_VERSION": "16.4",
+    "WINDOWS_SDK": "10.0.26100.0"
+  }
+}
