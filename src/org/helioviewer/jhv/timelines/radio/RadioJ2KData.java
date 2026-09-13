@@ -29,7 +29,6 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 class RadioJ2KData implements View.DataHandler {
 
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("Radio-Decoder");
-    private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(() -> {});
     private final RadioData owner;
     private final J2KViewCallisto view;
     private boolean disposed;
@@ -49,6 +48,7 @@ class RadioJ2KData implements View.DataHandler {
         owner = _owner;
         J2KViewCallisto v = null;
         try {
+            ImageProcessingSettings processingSettings = new ImageProcessingSettings(() -> {});
             v = new J2KViewCallisto(executor, req, dataUri, processingSettings);
 
             ResolutionSet.Level resLevel = v.getResolutionLevel(0, 0);
