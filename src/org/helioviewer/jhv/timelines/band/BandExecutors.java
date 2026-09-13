@@ -6,15 +6,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.thread.AppThread;
 
-final class HapiRequests {
+final class BandExecutors {
 
     // Catalog and data requests use separate pools so catalog loading cannot delay data requests in the queue.
-    private static final int CONCURRENCY = 8;
+    static final int REQUEST_THREADS = 8;
 
-    static ThreadPoolExecutor createExecutor(String name) {
-        return new ThreadPoolExecutor(CONCURRENCY, CONCURRENCY, 0, TimeUnit.MILLISECONDS,
+    static ThreadPoolExecutor create(String name, int concurrency) {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(concurrency, concurrency, 10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(), new AppThread.NamedThreadFactory(name));
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 
-    private HapiRequests() {}
+    private BandExecutors() {}
 }

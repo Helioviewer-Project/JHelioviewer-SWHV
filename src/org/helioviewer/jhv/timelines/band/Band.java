@@ -11,7 +11,6 @@ import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.LongUnaryOperator;
 
 import javax.annotation.Nullable;
@@ -20,7 +19,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.event.GOESLevel;
-import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -53,7 +51,7 @@ public final class Band extends TimelineLayer {
     private static final Colors.Data bandColors = new Colors.Data();
     private static final int GRAPH_THREADS = Math.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 8);
     private static final ExecutorService graphPool =
-            Executors.newFixedThreadPool(GRAPH_THREADS, new AppThread.NamedThreadFactory("Timeline-Graph"));
+            BandExecutors.create("Timeline-Graph", GRAPH_THREADS);
 
     private static final int MAX_REQUEST_DAYS = 21;
 
