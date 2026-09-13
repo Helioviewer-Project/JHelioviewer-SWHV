@@ -17,11 +17,11 @@ import org.json.JSONObject;
 class LoadState {
 
     static void submit(@Nullable Commands.OperationContext context, @Nonnull URI uri) {
-        Task.submit(uri.toString(), new LoadStateURI(uri), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
+        Task.submitBackground(uri.toString(), new LoadStateURI(uri), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
     }
 
     static void submit(@Nullable Commands.OperationContext context, @Nonnull String json) {
-        Task.submit("state", new LoadStateString(json), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
+        Task.submitBackground("state", new LoadStateString(json), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
     }
 
     private static void onSuccess(@Nullable Commands.OperationContext context, JSONObject state) {

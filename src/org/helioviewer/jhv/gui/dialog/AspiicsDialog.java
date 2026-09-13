@@ -197,7 +197,7 @@ public class AspiicsDialog extends StandardDialog {
         loadingOrbits = true;
         foundLabel.setText("Loading orbits...");
         updateButtonState();
-        Task.submit("ASPIICS orbits", new LoadOrbits(), this::onLoadOrbitsSuccess, (logContext, t) -> onLoadOrbitsFailure());
+        Task.submitBackground("ASPIICS orbits", new LoadOrbits(), this::onLoadOrbitsSuccess, (logContext, t) -> onLoadOrbitsFailure());
     }
 
     private void onLoadOrbitsSuccess(List<Orbit> orbits) {
@@ -221,7 +221,7 @@ public class AspiicsDialog extends StandardDialog {
         searching = true;
         clearProducts("Searching...");
         boolean jp2 = jp2Button.isSelected();
-        Task.submit("ASPIICS search", new SearchProducts(orbit.orbitId(), jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
+        Task.submitBackground("ASPIICS search", new SearchProducts(orbit.orbitId(), jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
     }
 
     private void onSearchSuccess(List<String> result) {

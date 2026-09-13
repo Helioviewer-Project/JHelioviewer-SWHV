@@ -34,7 +34,7 @@ public class DownloadLayer {
     @Nullable
     public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName, @Nonnull Progress progress) {
         Path dstPath = Path.of(Directories.DOWNLOADS.getPath(), baseName);
-        return Task.submit(baseName,
+        return Task.submitBackground(baseName,
                 new LayerDownload(req, progress, dstPath),
                 result -> onSuccess(layer, progress, result),
                 (logContext, t) -> onFailure(progress, t));

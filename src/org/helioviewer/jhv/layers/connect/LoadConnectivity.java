@@ -26,7 +26,7 @@ public class LoadConnectivity {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Task.submit(uri.toString(), new ConnectivityLoad(uri), receiver::setConnectivity, "Error getting the data");
+        Task.submitBackground(uri.toString(), new ConnectivityLoad(uri), receiver::setConnectivity, "Error getting the data");
     }
 
     private record ConnectivityLoad(URI uri) implements Callable<Connectivity> {

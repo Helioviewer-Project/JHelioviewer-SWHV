@@ -19,11 +19,11 @@ public final class BandImporter {
 
     public static void loadBand(JSONObject jo) {
         boolean fullResolution = jo.optBoolean("fullResolution", false);
-        Task.submit("band", new BandLoad(jo), data -> acceptData(data, fullResolution), BandImporter::onFailure);
+        Task.submitBackground("band", new BandLoad(jo), data -> acceptData(data, fullResolution), BandImporter::onFailure);
     }
 
     public static void loadHapi(URI uri) {
-        Task.submit(uri.toString(), () -> BandReaderHapi.readUri(uri), BandImporter::acceptData,
+        Task.submitBackground(uri.toString(), () -> BandReaderHapi.readUri(uri), BandImporter::acceptData,
                 BandImporter::onFailure);
     }
 

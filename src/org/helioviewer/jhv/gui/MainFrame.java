@@ -215,7 +215,7 @@ public final class MainFrame {
     }
 
     private static void startAngleWarmup() {
-        Task.submit("angle-warmup", () -> {
+        Task.submitBackground("angle-warmup", () -> {
             if (Platform.isMacOS())
                 MacAngleBridge.prewarm();
             AngleRenderer.prewarm();

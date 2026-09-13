@@ -21,7 +21,7 @@ public class LoadHCS {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Task.submit(uri.toString(), new HCS(uri), receiver::setHCS, "Error getting the data");
+        Task.submitBackground(uri.toString(), new HCS(uri), receiver::setHCS, "Error getting the data");
     }
 
     private record HCS(URI uri) implements Callable<List<Vec3>> {

@@ -33,7 +33,7 @@ public final class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        Task.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
+        Task.submitBackground("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -45,7 +45,7 @@ public final class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        Task.submit("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
+        Task.submitBackground("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
                 "An error occurred querying the server");
     }
 
@@ -69,7 +69,7 @@ public final class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        Task.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
+        Task.submitBackground(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {

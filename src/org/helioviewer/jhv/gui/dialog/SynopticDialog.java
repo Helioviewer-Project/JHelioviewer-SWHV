@@ -151,7 +151,7 @@ public class SynopticDialog extends StandardDialog {
             selectedLabel.setText("0 selected");
             listPane.setListData(new URI[0]);
             updateButtonState();
-            Task.submit(server, new SearchSynoptic(server, hmiButton.isSelected() ? hmiQuery : aiaQuery, buildQuery()), this::onSearchSuccess,
+            Task.submitBackground(server, new SearchSynoptic(server, hmiButton.isSelected() ? hmiQuery : aiaQuery, buildQuery()), this::onSearchSuccess,
                     (logContext, t) -> onSearchFailure(t));
         });
         gc.gridx = 0;

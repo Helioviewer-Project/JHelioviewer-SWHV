@@ -19,7 +19,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 final class BandDownloads {
 
-    private static final ThreadPoolExecutor downloadPool = AppThread.createExecutor("Timeline-Download", BandReaderHapi.REQUEST_THREADS);
+    private static final ThreadPoolExecutor downloadPool = AppThread.createIdleExecutor("Timeline-Download", BandReaderHapi.REQUEST_THREADS);
     private static final HashMap<RequestKey, Download> pendingDownloads = new HashMap<>();
     private static final ArrayList<Download> activeDownloads = new ArrayList<>();
     private static boolean submitPendingScheduled;

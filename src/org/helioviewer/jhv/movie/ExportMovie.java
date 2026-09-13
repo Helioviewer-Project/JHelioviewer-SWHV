@@ -31,7 +31,7 @@ public final class ExportMovie {
     public record TimelineFrame(BufferedImage image, int movieLinePosition) {}
 
     private static final int MACROBLOCK = 8;
-    private static final ExecutorService encodeExecutor = AppThread.createExecutor("JHV-EncodeMovie", 1);
+    private static final ExecutorService encodeExecutor = AppThread.createIdleExecutor("JHV-EncodeMovie", 1);
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
     private static @Nullable RecordingSession recordingSession;

@@ -98,7 +98,7 @@ public final class PositionLoad {
     public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
 
-        Future<PositionResponse> future = Task.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
+        Future<PositionResponse> future = Task.submitBackground(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
                 result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
         return new PositionLoad(receiver, target, future);
     }

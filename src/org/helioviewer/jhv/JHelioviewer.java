@@ -135,7 +135,7 @@ public class JHelioviewer {
     }
 
     private static void startInitialization(boolean webProfilePopup) {
-        Task.submit("init", () -> {
+        Task.submitBackground("init", () -> {
             AppInit.init(webProfilePopup);
             return null;
         }, JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);

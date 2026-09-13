@@ -55,7 +55,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
 
     private void updateCacheSize() {
-        Task.submit("cache-size",
+        Task.submitBackground("cache-size",
                 JPIPCacheManager::getSize,
                 size -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))),
                 Log::error);
@@ -238,7 +238,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             clearCache.setEnabled(false);
-            Task.submit("clear-cache", () -> {
+            Task.submitBackground("clear-cache", () -> {
                 JPIPCacheManager.clear();
                 return null;
             }, _ -> {

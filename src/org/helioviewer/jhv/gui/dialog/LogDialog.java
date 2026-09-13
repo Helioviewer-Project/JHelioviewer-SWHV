@@ -24,7 +24,7 @@ public class LogDialog implements Interfaces.ShowableDialog {
 
     @Override
     public void showDialog() {
-        Task.submit("log", Log::get, LogDialog::showDialog, Log::error);
+        Task.submitBackground("log", Log::get, LogDialog::showDialog, Log::error);
     }
 
     private static void showDialog(String log) {

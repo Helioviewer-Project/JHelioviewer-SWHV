@@ -38,7 +38,7 @@ public final class GaiaClient {
     }
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
-        Task.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
+        Task.submitBackground("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
     }
 
     public interface Receiver {

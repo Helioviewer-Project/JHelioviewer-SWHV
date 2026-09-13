@@ -95,7 +95,7 @@ public class BandReaderHapi {
     record DatasetRef(String key, String title) {}
 
     private static Map<String, Catalog> loadCatalogs(Map<String, String> servers) throws InterruptedException {
-        try (ExecutorService requests = AppThread.createExecutor("HAPI-CatalogRequest", REQUEST_THREADS)) {
+        try (ExecutorService requests = AppThread.createIdleExecutor("HAPI-CatalogRequest", REQUEST_THREADS)) {
             Map<String, Catalog> loaded = new LinkedHashMap<>();
             for (Map.Entry<String, String> server : servers.entrySet()) {
                 Catalog catalog = null;

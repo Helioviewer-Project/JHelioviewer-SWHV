@@ -45,7 +45,7 @@ class PfssLoader {
 
     private static <T> void submit(String logContext, Callable<T> task, Consumer<T> onSuccess, Task.FailureHandler onFailure) {
         cache().beginDownload();
-        Task.submit(logContext, task, onSuccess, onFailure);
+        Task.submitBackground(logContext, task, onSuccess, onFailure);
     }
 
     private record ListLoader(long start, long end) implements Callable<Void> {

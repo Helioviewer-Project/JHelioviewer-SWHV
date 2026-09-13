@@ -50,15 +50,15 @@ public final class PunchClient {
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
-        Task.submit("punch", new QueryItems(level, product, start, end, cadence), receiver::setPunchResponseItems, "Error listing the PUNCH archive");
+        Task.submitBackground("punch", new QueryItems(level, product, start, end, cadence), receiver::setPunchResponseItems, "Error listing the PUNCH archive");
     }
 
     public static void submitGetProducts(@Nonnull ReceiverProducts receiver, @Nonnull String level) {
-        Task.submit("punch", new QueryProducts(level), receiver::setPunchResponseProducts, "Error listing the PUNCH archive");
+        Task.submitBackground("punch", new QueryProducts(level), receiver::setPunchResponseProducts, "Error listing the PUNCH archive");
     }
 
     public static void submitGetCoverage(@Nonnull ReceiverCoverage receiver, @Nonnull String level, @Nonnull String product) {
-        Task.submit("punch", new QueryCoverage(level, product), receiver::setPunchResponseCoverage, "Error listing the PUNCH archive");
+        Task.submitBackground("punch", new QueryCoverage(level, product), receiver::setPunchResponseCoverage, "Error listing the PUNCH archive");
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {

@@ -72,7 +72,7 @@ public final class SWEKEventInformationDialog extends JDialog {
 
         add(allTablePanel, allTablePanelConstraint);
 
-        Task.submit("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
+        Task.submitBackground("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
     }
 
     private record DatabaseCallable(SolarEvent event) implements Callable<EventDatabase.EventDetails> {

@@ -20,15 +20,15 @@ import org.json.JSONObject;
 class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        Task.submit(uri.toString(), new LoadRequestURI(uri), Task::doNothing, "Error getting the data");
+        Task.submitBackground(uri.toString(), new LoadRequestURI(uri), Task::doNothing, "Error getting the data");
     }
 
     static void submit(@Nonnull String json) {
-        Task.submit("request", new LoadRequestString(json), Task::doNothing, "Error getting the data");
+        Task.submitBackground("request", new LoadRequestString(json), Task::doNothing, "Error getting the data");
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
-        Task.submit("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
+        Task.submitBackground("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
         Timelines.dc.setStatus("Loading...");
     }
 

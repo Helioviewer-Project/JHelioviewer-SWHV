@@ -193,7 +193,7 @@ public final class Actions {
                 return;
 
             URI uri = file.toURI();
-            Task.submit(uri.toString(), () -> new ModelLayer(uri), Layers::add, "Error loading model");
+            Task.submitBackground(uri.toString(), () -> new ModelLayer(uri), Layers::add, "Error loading model");
         }
     }
 

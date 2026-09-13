@@ -74,7 +74,7 @@ class BandOptions extends JPanel {
                     band.getBandType().getName().replace(' ', '_') + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
             JSONObject jo = band.toJson();
 
-            Task.submit(() -> {
+            Task.submitBackground(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     jo.write(writer);
                 }

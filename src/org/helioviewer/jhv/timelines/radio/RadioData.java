@@ -114,7 +114,7 @@ public final class RadioData extends TimelineLayer {
                 RadioJPXDownload download = new RadioJPXDownload(date);
                 downloads.put(date, download);
                 notifyStateChanged();
-                Task.submit(Long.toString(date), download, result -> onSuccessRadioJPX(download, result),
+                Task.submitBackground(Long.toString(date), download, result -> onSuccessRadioJPX(download, result),
                         (logContext, t) -> onFailureRadioJPX(download, t));
             }
         }

@@ -51,7 +51,7 @@ final class ImageLayerLoader {
     void load(APIRequest req) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Task.submit("request", () -> {
+        loadFuture = Task.submitBackground("request", () -> {
                     URI uri = requestAPI(req.toJpipRequest());
                     return uri == null ? null : createView(req, uri);
                 },
@@ -62,7 +62,7 @@ final class ImageLayerLoader {
     void load(List<URI> uriList) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Task.submit(uriList.toString(), () -> loadUri(uriList),
+        loadFuture = Task.submitBackground(uriList.toString(), () -> loadUri(uriList),
                 result -> onSuccess(result, gen),
                 (logContext, t) -> onFailure(t, gen));
     }

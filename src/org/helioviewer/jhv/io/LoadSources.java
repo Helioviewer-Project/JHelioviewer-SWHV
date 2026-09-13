@@ -18,7 +18,7 @@ import org.json.JSONObject;
 class LoadSources {
 
     static void submit(@Nonnull String serverName, @Nonnull DataSources.Server server) {
-        Task.submit(serverName, () -> load(serverName, server), DataSources::setupSources, LoadSources::onFailure);
+        Task.submitBackground(serverName, () -> load(serverName, server), DataSources::setupSources, LoadSources::onFailure);
     }
 
     private static DataSourcesParser load(String serverName, DataSources.Server server) throws Exception {

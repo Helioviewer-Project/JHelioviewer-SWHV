@@ -200,7 +200,7 @@ public final class State {
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
         Callback callback = new Callback(context, newLayers, masterLayer, time, modeData);
-        Task.submit(
+        Task.submitBackground(
                 new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
                 callback::onSuccess,
                 callback::onFailure);

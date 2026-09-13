@@ -36,7 +36,7 @@ public final class LatestWorker<T> {
     private boolean abolished;
 
     public LatestWorker(String name) {
-        this(AppThread.createExecutor(name, 1, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.AbortPolicy()), true);
+        this(AppThread.createIdleExecutor(name, 1, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.AbortPolicy()), true);
     }
 
     public LatestWorker(ExecutorService _executor) {

@@ -21,14 +21,14 @@ public final class TransferAccess {
         try {
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                Task.submit(() -> {
+                Task.submitBackground(() -> {
                     TransferLoad.transferFileList(objects);
                     return null;
                 }, Task::doNothing, t -> Log.warn("Import error", t));
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                Task.submit(() -> {
+                Task.submitBackground(() -> {
                     TransferLoad.transferStringArray(loc);
                     return null;
                 }, Task::doNothing, t -> Log.warn("Import error", t));

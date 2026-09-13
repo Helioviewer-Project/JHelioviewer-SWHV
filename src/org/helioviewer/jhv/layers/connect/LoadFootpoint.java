@@ -25,7 +25,7 @@ public class LoadFootpoint {
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Task.submit(uri.toString(), new Footpoint(uri), receiver::setPositionMap, "Error getting the data");
+        Task.submitBackground(uri.toString(), new Footpoint(uri), receiver::setPositionMap, "Error getting the data");
     }
 
     private record Footpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {

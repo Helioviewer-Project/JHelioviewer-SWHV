@@ -25,13 +25,13 @@ public class LoadSunJSON {
     public static void submit(@Nonnull List<URI> uriList) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            Task.submit("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);
+            Task.submitBackground("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     public static void submit(@Nonnull String json) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            Task.submit("sunjson", new LoadSunJSONString(json), receiver::setGeometry, LoadSunJSON::onFailure);
+            Task.submitBackground("sunjson", new LoadSunJSONString(json), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSONTypes.GeometryCollection>> {

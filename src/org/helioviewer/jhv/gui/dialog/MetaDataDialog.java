@@ -143,7 +143,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Observation Date: " + fitsMetadata.getViewpoint().time +
                 (hasSourceUri ? "<br/>" + sourceText : ""));
 
-        Task.submit("metadata", () -> parseMetadata(layer, fitsMetadata), parsed -> applyMetadata(request, parsed), Log::error);
+        Task.submitBackground("metadata", () -> parseMetadata(layer, fitsMetadata), parsed -> applyMetadata(request, parsed), Log::error);
     }
 
     private void applyMetadata(int request, ParsedMetadata parsed) {
@@ -186,7 +186,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         if (xml == null || filename == null)
             return;
 
-        Task.submit("metadata-export", () -> {
+        Task.submitBackground("metadata-export", () -> {
             Path path = Path.of(Directories.EXPORTS.getPath(), filename);
             try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                 writer.write(xml, 0, xml.length());

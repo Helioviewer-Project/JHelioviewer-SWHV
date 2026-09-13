@@ -162,7 +162,7 @@ public final class Commands {
             return future;
         }
 
-        Task.submit(() -> FileUtils.resolveURIList(uris), resolved -> {
+        Task.submitBackground(() -> FileUtils.resolveURIList(uris), resolved -> {
             if (resolved.isEmpty()) {
                 future.complete(null);
                 return;

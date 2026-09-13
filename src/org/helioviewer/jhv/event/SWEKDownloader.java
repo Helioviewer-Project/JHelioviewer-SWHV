@@ -28,7 +28,7 @@ public class SWEKDownloader {
     private static final int NUMBER_THREADS = 8;
     private static final FilterManager.Listener filterListener = SWEKDownloader::filtersChanged;
     private static Consumer<SWEKGroup> groupChanged = _ -> {};
-    private static final ThreadPoolExecutor downloadPool = AppThread.createExecutor(
+    private static final ThreadPoolExecutor downloadPool = AppThread.createIdleExecutor(
             "SWEK-Download", NUMBER_THREADS, new PriorityBlockingQueue<>(2048), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final class SupplierRequests {
