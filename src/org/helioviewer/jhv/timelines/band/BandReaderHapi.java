@@ -116,37 +116,23 @@ public class BandReaderHapi {
                 catalogs.put(name, catalog);
             datasets.put(name, catalog == null ? new BandDataset[0] : catalog.datasets);
         });
-        listener.accept(new CatalogData(Collections.unmodifiableMap(datasets), combinedPredefinedGroups()));
+        listener.accept(new CatalogData(Collections.unmodifiableMap(datasets), createPredefinedGroups()));
     }
 
-    private static Map<String, List<BandType>> combinedPredefinedGroups() {
-        if (catalogs.isEmpty())
-            return Map.of();
-        if (catalogs.size() == 1)
-            return catalogs.values().iterator().next().predefinedGroups;
-
+    private static Map<String, List<BandType>> createPredefinedGroups() {
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
         for (Catalog catalog : catalogs.values()) {
-            catalog.predefinedGroups.forEach((name, bandTypes) ->
-                    groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
+            for (BandDataset dataset : catalog.datasets) {
+                for (BandType type : dataset.bandTypes()) {
+                    for (BandType.PredefinedEntry entry : type.getPredefinedEntries())
+                        groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
+                }
+            }
         }
-        return finishPredefinedGroups(groups);
-    }
-
-    private static Map<String, List<BandType>> createPredefinedGroups(List<BandType> types) {
-        LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
-        for (BandType type : types) {
-            BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
-            for (BandType.PredefinedEntry entry : entries)
-                groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
-        }
-        return finishPredefinedGroups(groups);
-    }
-
-    private static Map<String, List<BandType>> finishPredefinedGroups(LinkedHashMap<String, List<BandType>> groups) {
-        for (Map.Entry<String, List<BandType>> e : groups.entrySet())
-            e.getValue().sort(Comparator.comparingInt(type -> orderFor(type, e.getKey())));
-        groups.replaceAll((name, bandTypes) -> List.copyOf(bandTypes));
+        groups.replaceAll((name, types) -> {
+            types.sort(Comparator.comparingInt(type -> orderFor(type, name)));
+            return List.copyOf(types);
+        });
         return Collections.unmodifiableMap(groups);
     }
 
@@ -176,8 +162,7 @@ public class BandReaderHapi {
         return 0;
     }
 
-    private record Catalog(Map<String, Dataset> datasetsByParameter, BandDataset[] datasets,
-                           Map<String, List<BandType>> predefinedGroups) {}
+    private record Catalog(Map<String, Dataset> datasetsByParameter, BandDataset[] datasets) {}
 
     private record Dataset(HapiVersion version, String title, String requestUrl, HapiParam timeParameter,
                            List<DatasetParameter> parameters, long start, long stop) {}
@@ -215,7 +200,6 @@ public class BandReaderHapi {
             throw new Exception("Empty catalog");
 
         LinkedHashMap<String, Dataset> datasetsByParameter = new LinkedHashMap<>();
-        List<BandType> types = new ArrayList<>();
         List<BandDataset> catalogDatasets = new ArrayList<>(datasets.size());
         for (Dataset dataset : datasets) {
             List<BandType> datasetTypes = new ArrayList<>(dataset.parameters.size());
@@ -223,10 +207,9 @@ public class BandReaderHapi {
                 datasetsByParameter.put(parameter.type.getBaseUrl(), dataset);
                 datasetTypes.add(parameter.type);
             }
-            types.addAll(datasetTypes);
             catalogDatasets.add(new BandDataset(dataset.title, datasetTypes));
         }
-        return new Catalog(datasetsByParameter, catalogDatasets.toArray(BandDataset[]::new), createPredefinedGroups(types));
+        return new Catalog(datasetsByParameter, catalogDatasets.toArray(BandDataset[]::new));
     }
 
     @Nullable
