@@ -2,10 +2,12 @@ package org.helioviewer.jhv.view.j2k.jpip;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public final class JPIPResponseTest {
@@ -89,7 +91,39 @@ public final class JPIPResponseTest {
             response.readSegments(new ByteArrayInputStream(new byte[]{0, (byte) reason, 0}), null, 0);
             check(response.isResponseComplete() == (reason == 1 || reason == 2), "EOR " + reason);
         }
-        System.out.println("PASS: JPIP identifiers, inheritance, payloads, numeric bounds, truncation and EOR");
+
+        response = new JPIPResponse(null);
+        ArrayList<JPIPSegment> segments = new ArrayList<>();
+        response.readSegments(new ByteArrayInputStream(new byte[]{
+                0x60, 8, 0, 0, 2, 1, 2,
+                0x20, 2, 2, 3, 4,
+                0x30, 4, 1, 5,
+                0, 2, 0}), segments::add);
+        check(segments.size() == 1, "contiguous messages were not coalesced");
+        segment = segments.getFirst();
+        check(segment.offset == 0 && segment.length == 5 && segment.isFinal, "coalesced message fields");
+        check(Arrays.equals(segment.data, new byte[]{1, 2, 3, 4, 5}), "coalesced message payload");
+        check(response.isResponseComplete(), "coalesced response EOR");
+
+        response = new JPIPResponse(null);
+        segments.clear();
+        try {
+            response.readSegments(new ByteArrayInputStream(new byte[]{
+                    0x60, 8, 0, 0, 2, 1, 2,
+                    0x20, 3, 1, 3,
+                    0x20, 0, 2, 4}), segments::add);
+            throw new AssertionError("Accepted truncated response");
+        } catch (EOFException expected) {
+            check(segments.size() == 2, "complete runs before truncation were not retained");
+            segment = segments.getFirst();
+            check(segment.binID == 0 && segment.length == 2 && segment.data[1] == 2,
+                    "retained run fields");
+            segment = segments.getLast();
+            check(segment.offset == 3 && segment.length == 1 && segment.data[0] == 3,
+                    "retained non-contiguous run fields");
+        }
+
+        System.out.println("PASS: JPIP identifiers, inheritance, payloads, numeric bounds, truncation, EOR and streaming coalescing");
     }
 
     private static JPIPSegment read(JPIPResponse response, InputStream input) throws Exception {

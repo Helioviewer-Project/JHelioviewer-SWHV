@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,11 @@ import kdu_jni.KduException;
 
 // A response to a JPIPRequest, encapsulates the JPIPSegments
 public class JPIPResponse {
+
+    @FunctionalInterface
+    interface Sink {
+        void put(JPIPSegment seg) throws KduException;
+    }
 
     // The status: could be EOR_WINDOW_DONE or EOR_IMAGE_DONE
     private long status = -1;
@@ -118,13 +124,50 @@ public class JPIPResponse {
     }
 
     void readSegments(InputStream in, JPIPCache cache, int frame) throws KduException, IOException {
-        JPIPSegment seg;
-        while ((seg = readSegment(in)) != null) {
-            if (seg.isEOR) {
-                status = seg.binID;
-            } else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
-                cache.put(frame, seg);
+        readSegments(in, seg -> cache.put(frame, seg));
+    }
+
+    void readSegments(InputStream in, Sink sink) throws KduException, IOException {
+        JPIPSegment pending = null;
+        ByteArrayOutputStream buf = null;
+        try {
+            JPIPSegment seg;
+            while ((seg = readSegment(in)) != null) {
+                if (seg.isEOR) {
+                    put(sink, pending, buf);
+                    pending = null;
+                    buf = null;
+                    status = seg.binID;
+                } else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
+                    if (pending != null && !pending.isFinal && pending.klassID == seg.klassID
+                            && pending.codestreamID == seg.codestreamID && pending.binID == seg.binID
+                            && pending.aux == seg.aux && pending.offset + pending.length == seg.offset) {
+                        if (buf == null) {
+                            buf = new ByteArrayOutputStream(pending.length + seg.length);
+                            buf.writeBytes(pending.data);
+                        }
+                        buf.writeBytes(seg.data);
+                        pending.length += seg.length;
+                        pending.isFinal = seg.isFinal;
+                    } else {
+                        put(sink, pending, buf);
+                        pending = seg;
+                        buf = null;
+                    }
+                }
             }
+        } catch (IOException e) {
+            put(sink, pending, buf);
+            throw e;
+        }
+        put(sink, pending, buf);
+    }
+
+    private static void put(Sink sink, JPIPSegment seg, ByteArrayOutputStream buf) throws KduException {
+        if (seg != null) {
+            if (buf != null)
+                seg.data = buf.toByteArray();
+            sink.put(seg);
         }
     }
 
