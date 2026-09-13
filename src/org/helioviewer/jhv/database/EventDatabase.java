@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
@@ -64,86 +65,13 @@ public class EventDatabase {
     private static final HashMap<String, PreparedStatement> statements = new HashMap<>();
     private static final HashMap<SWEKSupplier, RequestCache> storedIntervals = new HashMap<>();
 
-    private static PreparedStatement getPreparedStatement(String statement) throws Exception {
-        PreparedStatement pstat = statements.get(statement);
-        if (pstat == null) {
-            pstat = EventDatabaseConnection.getConnection().prepareStatement(statement);
-            pstat.setQueryTimeout(30);
-            statements.put(statement, pstat);
-        }
-        return pstat;
-    }
+    public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
-    private static int findOrInsertEventTypeId(SWEKSupplier supplier) throws Exception {
-        int typeId = findEventTypeId(supplier);
-        if (typeId == -1) {
-            insertEventTypeIfNotExist(supplier);
-            typeId = findEventTypeId(supplier);
-        }
-        if (typeId == -1)
-            throw new SQLException("Could not create event type " + supplier.id());
-        return typeId;
-    }
+    private record StoredEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
-    private static int findEventTypeId(SWEKSupplier supplier) throws Exception {
-        int typeId = -1;
-        PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
-        pstatement.setString(1, supplier.group().getName());
-        pstatement.setString(2, supplier.id());
+    private record StoredDetails(StoredEvent event, List<StoredEvent> relatedEvents) {}
 
-        try (ResultSet rs = pstatement.executeQuery()) {
-            if (rs.next()) {
-                typeId = rs.getInt(1);
-            }
-        }
-        return typeId;
-    }
-
-    private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws Exception {
-        PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT_TYPE);
-        pstatement.setString(1, eventType.group().getName());
-        pstatement.setString(2, eventType.id());
-        pstatement.executeUpdate();
-    }
-
-    private static int findOrInsertEventId(String uid) throws Exception {
-        int id = findEventId(uid);
-        if (id == -1) {
-            insertVoidEvent(uid);
-            id = findEventId(uid);
-        }
-        if (id == -1)
-            throw new SQLException("Could not create event " + uid);
-        return id;
-    }
-
-    private static int findEventId(String uid) throws Exception {
-        int id = -1;
-        PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_ID_FROM_UID);
-        pstatement.setString(1, uid);
-
-        try (ResultSet rs = pstatement.executeQuery()) {
-            if (rs.next()) {
-                id = rs.getInt(1);
-            }
-        }
-        return id;
-    }
-
-    private static void insertVoidEvent(String uid) throws Exception {
-        PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT);
-        pstatement.setString(1, uid);
-        pstatement.executeUpdate();
-    }
-
-    private static void insertAssociation(PreparedStatement statement, int id0, int id1) throws SQLException {
-        if (id0 == id1)
-            return;
-
-        statement.setInt(1, Math.min(id0, id1));
-        statement.setInt(2, Math.max(id0, id1));
-        statement.executeUpdate();
-    }
+    private record StoredBatch(long sequence, List<StoredEvent> events, List<SolarEvent.Link> associations) {}
 
     public static boolean storeRemotePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) {
         try {
@@ -170,20 +98,13 @@ public class EventDatabase {
         }
     }
 
-    private static void storeAssociations(List<SolarEvent.LinkRef> links) throws Exception {
-        PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
-
-        for (SolarEvent.LinkRef link : links) {
-            int id0 = findOrInsertEventId(link.firstUid());
-            int id1 = findOrInsertEventId(link.secondUid());
-            insertAssociation(pstatement, id0, id1);
-        }
-    }
-
     private static void storeEvents(List<SWEKHandler.RemoteEvent> remoteEvents, SWEKSupplier supplier) throws Exception {
         int typeId = findOrInsertEventTypeId(supplier);
 
         PreparedStatement statement = getPreparedStatement(UPSERT_EVENT);
+        PreparedStatement delete = getPreparedStatement(DELETE_PARAMETERS);
+        PreparedStatement parameter = getPreparedStatement(INSERT_PARAMETER);
+        Set<String> fields = SWEKCatalog.indexedParameters(supplier).keySet();
 
         for (SWEKHandler.RemoteEvent remoteEvent : remoteEvents) {
             statement.setInt(1, typeId);
@@ -199,11 +120,9 @@ public class EventDatabase {
                 eventId = rs.getInt(1);
             }
 
-            PreparedStatement delete = getPreparedStatement(DELETE_PARAMETERS);
             delete.setInt(1, eventId);
             delete.executeUpdate();
-            PreparedStatement parameter = getPreparedStatement(INSERT_PARAMETER);
-            for (String field : SWEKCatalog.indexedParameters(supplier).keySet()) {
+            for (String field : fields) {
                 Number value = remoteEvent.indexedValues().get(field);
                 if (value == null) continue;
                 parameter.setInt(1, eventId);
@@ -219,28 +138,112 @@ public class EventDatabase {
         }
     }
 
-    private static SolarEvent parseJSON(StoredEvent storedEvent, boolean full) throws Exception {
-        try (InputStream bais = new ByteArrayInputStream(storedEvent.json); InputStream is = new GZIPInputStream(bais)) {
-            return storedEvent.type.source().handler().parseEventJSON(JSONUtils.get(is), storedEvent.type, storedEvent.id, storedEvent.start, storedEvent.end, full);
+    private static void storeAssociations(List<SolarEvent.LinkRef> links) throws Exception {
+        PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
+
+        for (SolarEvent.LinkRef link : links) {
+            int id0 = findOrInsertEventId(link.firstUid());
+            int id1 = findOrInsertEventId(link.secondUid());
+            insertAssociation(pstatement, id0, id1);
         }
     }
 
-    private static List<SolarEvent> parseEvents(List<StoredEvent> storedEvents, boolean full) {
-        HashSet<Integer> ids = new HashSet<>();
-        List<SolarEvent> events = new ArrayList<>();
-        for (int i = 0; i < storedEvents.size(); i++) {
-            StoredEvent storedEvent = storedEvents.get(i);
-            storedEvents.set(i, null);
-            if (!ids.add(storedEvent.id))
-                continue;
+    private static void insertAssociation(PreparedStatement statement, int id0, int id1) throws SQLException {
+        if (id0 == id1)
+            return;
 
-            try {
-                events.add(parseJSON(storedEvent, full));
-            } catch (Exception e) {
-                Log.error(e);
+        statement.setInt(1, Math.min(id0, id1));
+        statement.setInt(2, Math.max(id0, id1));
+        statement.executeUpdate();
+    }
+
+    public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+        StoredBatch batch = executor.submit(() -> new StoredBatch(++batchSequence,
+                queryEvents(start, end, type, params), queryAssociations(start, end, type))).get();
+        return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
+    }
+
+    private static List<StoredEvent> queryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+        List<StoredEvent> eventList = new ArrayList<>();
+        int typeId = findEventTypeId(type);
+        if (typeId == -1)
+            return eventList;
+
+        StringBuilder joins = new StringBuilder();
+        for (int i = 0; i < params.size(); i++) {
+            SWEK.Param param = params.get(i);
+            if (!SWEKCatalog.indexedParameters(type).containsKey(param.name()))
+                throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
+            String alias = "p" + i;
+            joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
+                    .append(alias).append(".type_id=e.type_id AND ").append(alias).append(".name=? AND ")
+                    .append(alias).append(".value").append(param.operand().representation).append('?');
+        }
+        String sql = "SELECT e.id, e.start, e.end, e.data FROM events AS e" + joins +
+                " WHERE e.type_id=? AND e.start<=? AND e.end>=? ORDER BY e.start, e.end";
+        PreparedStatement pstatement = getPreparedStatement(sql);
+        int parameterIndex = 1;
+        for (SWEK.Param param : params) {
+            pstatement.setString(parameterIndex++, param.name());
+            pstatement.setDouble(parameterIndex++, param.value());
+        }
+        pstatement.setInt(parameterIndex++, typeId);
+        pstatement.setLong(parameterIndex++, end);
+        pstatement.setLong(parameterIndex, start);
+
+        try (ResultSet rs = pstatement.executeQuery()) {
+            while (rs.next()) {
+                eventList.add(readStoredEvent(rs, type));
             }
         }
-        return events;
+        return eventList;
+    }
+
+    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
+        List<SolarEvent.Link> links = new ArrayList<>();
+        int typeId = findEventTypeId(type);
+        if (typeId == -1)
+            return links;
+
+        List<SWEK.RelatedOn> parameters = associationParameters(type.group());
+        String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
+        PreparedStatement pstatement = getPreparedStatement(sql);
+        pstatement.setInt(1, typeId);
+        pstatement.setLong(2, end);
+        pstatement.setLong(3, start);
+        pstatement.setInt(4, typeId);
+        pstatement.setLong(5, end);
+        pstatement.setLong(6, start);
+        int index = 7;
+        for (SWEK.RelatedOn field : parameters) {
+            pstatement.setInt(index++, typeId);
+            pstatement.setLong(index++, end);
+            pstatement.setLong(index++, start);
+            pstatement.setString(index++, field.parameterFrom());
+            pstatement.setInt(index++, typeId);
+            pstatement.setString(index++, field.parameterWith());
+        }
+
+        try (ResultSet rs = pstatement.executeQuery()) {
+            while (rs.next()) {
+                links.add(new SolarEvent.Link(rs.getInt(1), rs.getInt(2)));
+            }
+        }
+        return links;
+    }
+
+    private static List<SWEK.RelatedOn> associationParameters(SWEKGroup group) {
+        List<SWEK.RelatedOn> parameters = new ArrayList<>();
+        for (SWEK.Relation relation : SWEKCatalog.getRelations()) {
+            if (relation.group() != group || relation.relatedWith() != group)
+                continue;
+            for (SWEK.RelatedOn field : relation.relatedOnList()) {
+                parameters.add(field);
+                if (!field.parameterFrom().equals(field.parameterWith()))
+                    parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
+            }
+        }
+        return parameters;
     }
 
     public static EventDetails getEventDetails(int id) throws Exception {
@@ -257,8 +260,7 @@ public class EventDatabase {
         try (ResultSet result = statement.executeQuery()) {
             if (!result.next())
                 throw new SQLException("Event not found: " + id);
-            return new StoredEvent(result.getBytes(4), SWEKCatalog.getSupplier(result.getString(5)),
-                    result.getInt(1), result.getLong(2), result.getLong(3));
+            return readStoredEvent(result, SWEKCatalog.getSupplier(result.getString(5)));
         }
     }
 
@@ -299,6 +301,31 @@ public class EventDatabase {
                 Log.error(e);
             }
         }
+    }
+
+    private static List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
+                                                         String leftParameter, String rightParameter) throws Exception {
+        List<StoredEvent> ret = new ArrayList<>();
+        int rightTypeId = findEventTypeId(rightType);
+        if (rightTypeId == -1)
+            return ret;
+
+        String sql = "SELECT e.id, e.start, e.end, e.data FROM events AS e WHERE e.id IN (" +
+                "SELECT tr.event_id " +
+                "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
+                "WHERE tl.event_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
+        PreparedStatement statement = getPreparedStatement(sql);
+        statement.setInt(1, eventId);
+        statement.setInt(2, rightTypeId);
+        statement.setString(3, leftParameter);
+        statement.setString(4, rightParameter);
+
+        try (ResultSet rs = statement.executeQuery()) {
+            while (rs.next()) {
+                ret.add(readStoredEvent(rs, rightType));
+            }
+        }
+        return ret;
     }
 
     public static boolean addStoredInterval(long start, long end, SWEKSupplier type) {
@@ -401,134 +428,88 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
-
-    private record StoredEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
-
-    private record StoredDetails(StoredEvent event, List<StoredEvent> relatedEvents) {}
-
-    private record StoredBatch(long sequence, List<StoredEvent> events, List<SolarEvent.Link> associations) {}
-
-    public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        StoredBatch batch = executor.submit(() -> new StoredBatch(++batchSequence,
-                queryEvents(start, end, type, params), queryAssociations(start, end, type))).get();
-        return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
+    private static int findOrInsertEventTypeId(SWEKSupplier supplier) throws Exception {
+        int typeId = findEventTypeId(supplier);
+        if (typeId == -1) {
+            PreparedStatement statement = getPreparedStatement(INSERT_EVENT_TYPE);
+            statement.setString(1, supplier.group().getName());
+            statement.setString(2, supplier.id());
+            statement.executeUpdate();
+            typeId = findEventTypeId(supplier);
+        }
+        if (typeId == -1)
+            throw new SQLException("Could not create event type " + supplier.id());
+        return typeId;
     }
 
-    private static List<StoredEvent> queryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        List<StoredEvent> eventList = new ArrayList<>();
-        int typeId = findEventTypeId(type);
-        if (typeId == -1)
-            return eventList;
-
-        StringBuilder joins = new StringBuilder();
-        for (int i = 0; i < params.size(); i++) {
-            SWEK.Param param = params.get(i);
-            if (!SWEKCatalog.indexedParameters(type).containsKey(param.name()))
-                throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
-            String alias = "p" + i;
-            joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
-                    .append(alias).append(".type_id=e.type_id AND ").append(alias).append(".name=? AND ")
-                    .append(alias).append(".value").append(param.operand().representation).append('?');
-        }
-        String sql = "SELECT e.id, e.start, e.end, e.data FROM events AS e" + joins +
-                " WHERE e.type_id=? AND e.start<=? AND e.end>=? ORDER BY e.start, e.end";
-        PreparedStatement pstatement = getPreparedStatement(sql);
-        int parameterIndex = 1;
-        for (SWEK.Param param : params) {
-            pstatement.setString(parameterIndex++, param.name());
-            pstatement.setDouble(parameterIndex++, param.value());
-        }
-        pstatement.setInt(parameterIndex++, typeId);
-        pstatement.setLong(parameterIndex++, end);
-        pstatement.setLong(parameterIndex, start);
+    private static int findEventTypeId(SWEKSupplier supplier) throws Exception {
+        PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
+        pstatement.setString(1, supplier.group().getName());
+        pstatement.setString(2, supplier.id());
 
         try (ResultSet rs = pstatement.executeQuery()) {
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                long _start = rs.getLong(2);
-                long _end = rs.getLong(3);
-                byte[] json = rs.getBytes(4);
-                eventList.add(new StoredEvent(json, type, id, _start, _end));
-            }
+            return rs.next() ? rs.getInt(1) : -1;
         }
-        return eventList;
     }
 
-    private static List<SWEK.RelatedOn> associationParameters(SWEKGroup group) {
-        List<SWEK.RelatedOn> parameters = new ArrayList<>();
-        for (SWEK.Relation relation : SWEKCatalog.getRelations()) {
-            if (relation.group() != group || relation.relatedWith() != group)
+    private static int findOrInsertEventId(String uid) throws Exception {
+        int id = findEventId(uid);
+        if (id == -1) {
+            PreparedStatement statement = getPreparedStatement(INSERT_EVENT);
+            statement.setString(1, uid);
+            statement.executeUpdate();
+            id = findEventId(uid);
+        }
+        if (id == -1)
+            throw new SQLException("Could not create event " + uid);
+        return id;
+    }
+
+    private static int findEventId(String uid) throws Exception {
+        PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_ID_FROM_UID);
+        pstatement.setString(1, uid);
+
+        try (ResultSet rs = pstatement.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : -1;
+        }
+    }
+
+    private static PreparedStatement getPreparedStatement(String statement) throws Exception {
+        PreparedStatement pstat = statements.get(statement);
+        if (pstat == null) {
+            pstat = EventDatabaseConnection.getConnection().prepareStatement(statement);
+            pstat.setQueryTimeout(30);
+            statements.put(statement, pstat);
+        }
+        return pstat;
+    }
+
+    private static StoredEvent readStoredEvent(ResultSet result, SWEKSupplier supplier) throws SQLException {
+        return new StoredEvent(result.getBytes(4), supplier, result.getInt(1), result.getLong(2), result.getLong(3));
+    }
+
+    private static SolarEvent parseJSON(StoredEvent storedEvent, boolean full) throws Exception {
+        try (InputStream bais = new ByteArrayInputStream(storedEvent.json); InputStream is = new GZIPInputStream(bais)) {
+            return storedEvent.type.source().handler().parseEventJSON(JSONUtils.get(is), storedEvent.type, storedEvent.id, storedEvent.start, storedEvent.end, full);
+        }
+    }
+
+    private static List<SolarEvent> parseEvents(List<StoredEvent> storedEvents, boolean full) {
+        HashSet<Integer> ids = new HashSet<>();
+        List<SolarEvent> events = new ArrayList<>();
+        for (int i = 0; i < storedEvents.size(); i++) {
+            StoredEvent storedEvent = storedEvents.get(i);
+            storedEvents.set(i, null);
+            if (!ids.add(storedEvent.id))
                 continue;
-            for (SWEK.RelatedOn field : relation.relatedOnList()) {
-                parameters.add(field);
-                if (!field.parameterFrom().equals(field.parameterWith()))
-                    parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
+
+            try {
+                events.add(parseJSON(storedEvent, full));
+            } catch (Exception e) {
+                Log.error(e);
             }
         }
-        return parameters;
-    }
-
-    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
-        List<SolarEvent.Link> links = new ArrayList<>();
-        int typeId = findEventTypeId(type);
-        if (typeId == -1)
-            return links;
-
-        List<SWEK.RelatedOn> parameters = associationParameters(type.group());
-        String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
-        PreparedStatement pstatement = getPreparedStatement(sql);
-        pstatement.setInt(1, typeId);
-        pstatement.setLong(2, end);
-        pstatement.setLong(3, start);
-        pstatement.setInt(4, typeId);
-        pstatement.setLong(5, end);
-        pstatement.setLong(6, start);
-        int index = 7;
-        for (SWEK.RelatedOn field : parameters) {
-            pstatement.setInt(index++, typeId);
-            pstatement.setLong(index++, end);
-            pstatement.setLong(index++, start);
-            pstatement.setString(index++, field.parameterFrom());
-            pstatement.setInt(index++, typeId);
-            pstatement.setString(index++, field.parameterWith());
-        }
-
-        try (ResultSet rs = pstatement.executeQuery()) {
-            while (rs.next()) {
-                links.add(new SolarEvent.Link(rs.getInt(1), rs.getInt(2)));
-            }
-        }
-        return links;
-    }
-
-    private static List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
-                                                         String leftParameter, String rightParameter) throws Exception {
-        List<StoredEvent> ret = new ArrayList<>();
-        int rightTypeId = findEventTypeId(rightType);
-        if (rightTypeId == -1)
-            return ret;
-
-        String sql = "SELECT e.id, e.start, e.end, e.data FROM events AS e WHERE e.id IN (" +
-                "SELECT tr.event_id " +
-                "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
-                "WHERE tl.event_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
-        PreparedStatement statement = getPreparedStatement(sql);
-        statement.setInt(1, eventId);
-        statement.setInt(2, rightTypeId);
-        statement.setString(3, leftParameter);
-        statement.setString(4, rightParameter);
-
-        try (ResultSet rs = statement.executeQuery()) {
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                long start = rs.getLong(2);
-                long end = rs.getLong(3);
-                byte[] json = rs.getBytes(4);
-                ret.add(new StoredEvent(json, rightType, id, start, end));
-            }
-        }
-        return ret;
+        return events;
     }
 
 }
