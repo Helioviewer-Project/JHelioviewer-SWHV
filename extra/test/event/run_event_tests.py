@@ -55,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
 
     for name in tests:
         if name == "EventDatabaseTest":
-            for scenario in ("store", "reload", "parameters", "relations", "decoding"):
+            for scenario in ("store", "reload", "parameters", "relations", "decoding", "schema-failure", "setup-failure"):
                 cache = "persistence" if scenario in ("store", "reload") else scenario
                 run(name, scenario, cache=cache)
         elif name == "EventCacheTest":

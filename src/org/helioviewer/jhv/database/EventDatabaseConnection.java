@@ -13,16 +13,16 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.Directories;
 
-final class EventDatabaseThread {
+final class EventDatabaseConnection {
 
     private static final int CURRENT_VERSION_SCHEMA = 12;
     private static Connection connection;
 
-    private EventDatabaseThread() {
+    private EventDatabaseConnection() {
     }
 
-    private static void createSchema() throws Exception {
-        try (Statement statement = connection.createStatement()) {
+    private static void createSchema(Connection database) throws Exception {
+        try (Statement statement = database.createStatement()) {
             statement.setQueryTimeout(30);
             statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, supplier TEXT, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
             statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid TEXT, start INTEGER, end INTEGER, archiv INTEGER, data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT FAIL)");
@@ -38,7 +38,7 @@ final class EventDatabaseThread {
             statement.executeUpdate("CREATE TABLE if not exists version (version INTEGER PRIMARY KEY, hash INTEGER)");
         }
 
-        try (PreparedStatement pstatement = connection.prepareStatement("INSERT INTO version(version, hash) VALUES(?, ?)")) {
+        try (PreparedStatement pstatement = database.prepareStatement("INSERT INTO version(version, hash) VALUES(?, ?)")) {
             pstatement.setQueryTimeout(30);
             pstatement.setInt(1, CURRENT_VERSION_SCHEMA);
             pstatement.setInt(2, EventDatabase.config_hash);
@@ -48,40 +48,47 @@ final class EventDatabaseThread {
 
     @Nonnull
     static Connection getConnection() throws Exception {
-        if (connection != null)
-            return connection;
-
-        Path path = Path.of(Directories.CACHE.getPath(), "events.db");
-        boolean fexist = Files.exists(path);
-        connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-
-        if (fexist) {
-            int found_version = -1;
-            int found_hash = -1;
-            try (PreparedStatement pstatement = connection.prepareStatement("SELECT version, hash from version LIMIT 1")) {
-                pstatement.setQueryTimeout(30);
-                try (ResultSet rs = pstatement.executeQuery()) {
-                    if (rs.next()) {
-                        found_version = rs.getInt(1);
-                        found_hash = rs.getInt(2);
-                    }
-                }
-            } catch (Exception e) {
-                Log.warn("Could not read version table, database might be corrupted or outdated: " + e.getMessage());
-            }
-
-            if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
-                connection.close();
-                Files.delete(path);
-                connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-                createSchema();
-            }
-        } else {
-            createSchema();
-        }
-
-        connection.setAutoCommit(false);
+        if (connection == null)
+            connection = openConnection();
         return connection;
+    }
+
+    private static Connection openConnection() throws Exception {
+        Path path = Path.of(Directories.CACHE.getPath(), "events.db");
+        boolean exists = Files.exists(path);
+        Connection database = DriverManager.getConnection("jdbc:sqlite:" + path);
+        try {
+            if (exists && !hasCurrentSchema(database)) {
+                database.close();
+                Files.delete(path);
+                database = DriverManager.getConnection("jdbc:sqlite:" + path);
+                exists = false;
+            }
+            if (!exists)
+                createSchema(database);
+            database.setAutoCommit(false);
+            return database;
+        } catch (Exception | Error e) {
+            try {
+                database.close();
+            } catch (Exception closeFailure) {
+                e.addSuppressed(closeFailure);
+            }
+            throw e;
+        }
+    }
+
+    private static boolean hasCurrentSchema(Connection database) {
+        try (PreparedStatement statement = database.prepareStatement("SELECT version, hash from version LIMIT 1")) {
+            statement.setQueryTimeout(30);
+            try (ResultSet result = statement.executeQuery()) {
+                return result.next() && result.getInt(1) == CURRENT_VERSION_SCHEMA
+                        && result.getInt(2) == EventDatabase.config_hash;
+            }
+        } catch (Exception e) {
+            Log.warn("Could not read version table, database might be corrupted or outdated: " + e.getMessage());
+            return false;
+        }
     }
 
 }

@@ -1,14 +1,21 @@
 package org.helioviewer.jhv.database;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -31,6 +38,7 @@ import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sqlite.JDBC;
 
 public final class EventDatabaseTest {
 
@@ -41,9 +49,63 @@ public final class EventDatabaseTest {
             case "parameters" -> checkParameters();
             case "relations" -> checkRelations();
             case "decoding" -> checkDecoding();
+            case "schema-failure", "setup-failure" -> checkConnectionRecovery(args[0]);
             default -> throw new IllegalArgumentException("Unknown database test: " + args[0]);
         }
         System.out.println("EventDatabaseTest " + args[0] + " passed");
+    }
+
+    private static void checkConnectionRecovery(String scenario) throws Exception {
+        Files.createDirectories(Path.of(Directories.CACHE.getPath()));
+        Class.forName("org.sqlite.JDBC");
+        for (Driver driver : DriverManager.drivers().toList()) {
+            if (driver instanceof JDBC)
+                DriverManager.deregisterDriver(driver);
+        }
+        String failingMethod = scenario.equals("schema-failure") ? "createStatement" : "setAutoCommit";
+        FailingDriver driver = new FailingDriver(failingMethod);
+        DriverManager.registerDriver(driver);
+        try {
+            EventDatabaseConnection.getConnection();
+            throw new AssertionError("Initialization should fail");
+        } catch (SQLException expected) {
+            check(expected.getMessage().equals("Injected initialization failure"), "original failure preserved");
+        }
+        check(driver.firstConnection.isClosed(), "failed initialization closes connection");
+        Connection recovered = EventDatabaseConnection.getConnection();
+        check(!recovered.isClosed() && !recovered.getAutoCommit(), "retry initializes transaction mode");
+        check(recovered == EventDatabaseConnection.getConnection(), "successful connection is reused");
+        try (Statement statement = recovered.createStatement();
+             ResultSet result = statement.executeQuery("SELECT count(*) FROM version")) {
+            check(result.next() && result.getInt(1) == 1, "retry leaves a complete schema");
+        }
+    }
+
+    private static final class FailingDriver extends JDBC {
+        private final String failingMethod;
+        private Connection firstConnection;
+
+        FailingDriver(String _failingMethod) {
+            failingMethod = _failingMethod;
+        }
+
+        @Override
+        public Connection connect(String url, Properties properties) throws SQLException {
+            Connection database = super.connect(url, properties);
+            if (database == null || firstConnection != null)
+                return database;
+            firstConnection = database;
+            return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(), new Class<?>[]{Connection.class},
+                    (proxy, method, args) -> {
+                        if (method.getName().equals(failingMethod))
+                            throw new SQLException("Injected initialization failure");
+                        try {
+                            return method.invoke(database, args);
+                        } catch (InvocationTargetException e) {
+                            throw e.getCause();
+                        }
+                    });
+        }
     }
 
     private static void checkPersistence(String[] args) throws Exception {
@@ -182,10 +244,10 @@ public final class EventDatabaseTest {
         check(EventDatabase.loadEvents(150, 150, first, List.of()).associations().size() == 1, "placeholder association survives");
         check(storeIndexed(first, indexedEvent("a", Map.of("speed", 13.0))), "remove one indexed value");
         check(number("SELECT count(*) FROM event_parameter WHERE name='region'") == 0, "removed value is deleted");
-        try (Statement statement = EventDatabaseThread.getConnection().createStatement()) {
+        try (Statement statement = EventDatabaseConnection.getConnection().createStatement()) {
             statement.executeUpdate("CREATE TRIGGER reject_parameter BEFORE INSERT ON event_parameter WHEN NEW.value=99 BEGIN SELECT RAISE(ABORT,'test rollback'); END");
         }
-        EventDatabaseThread.getConnection().commit();
+        EventDatabaseConnection.getConnection().commit();
         check(!storeIndexed(first, indexedEvent("a", Map.of("speed", 99.0))), "parameter failure rolls back replacement");
         check(number("SELECT value FROM event_parameter JOIN events ON events.id=event_id WHERE uid='a'") == 13, "rollback restores deleted parameter rows");
         check(!EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false,
@@ -214,7 +276,7 @@ public final class EventDatabaseTest {
     }
 
     private static long number(String sql) throws Exception {
-        try (Statement statement = EventDatabaseThread.getConnection().createStatement(); ResultSet row = statement.executeQuery(sql)) {
+        try (Statement statement = EventDatabaseConnection.getConnection().createStatement(); ResultSet row = statement.executeQuery(sql)) {
             row.next();
             return row.getLong(1);
         }
@@ -260,10 +322,10 @@ public final class EventDatabaseTest {
         checkAsymmetricAssociations();
         checkAsymmetricDetails();
 
-        try (Statement statement = EventDatabaseThread.getConnection().createStatement()) {
+        try (Statement statement = EventDatabaseConnection.getConnection().createStatement()) {
             statement.executeUpdate("CREATE TRIGGER reject_event BEFORE INSERT ON events WHEN NEW.uid='reject' BEGIN SELECT RAISE(ABORT, 'test rollback'); END");
         }
-        EventDatabaseThread.getConnection().commit();
+        EventDatabaseConnection.getConnection().commit();
         SWEKSupplier failed = supplier(ce, source, "failed");
         SWEKCatalog.setRelations(SWEKCatalog.getRelations());
         check(!EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false, List.of(event("rollback", null), event("reject", null)), List.of()), failed), "storage failure reaches caller");

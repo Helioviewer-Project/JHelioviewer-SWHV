@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
@@ -68,7 +67,7 @@ public class EventDatabase {
     private static PreparedStatement getPreparedStatement(String statement) throws Exception {
         PreparedStatement pstat = statements.get(statement);
         if (pstat == null) {
-            pstat = EventDatabaseThread.getConnection().prepareStatement(statement);
+            pstat = EventDatabaseConnection.getConnection().prepareStatement(statement);
             pstat.setQueryTimeout(30);
             statements.put(statement, pstat);
         }
@@ -148,7 +147,10 @@ public class EventDatabase {
 
     public static boolean storeRemotePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) {
         try {
-            executor.submit(new StoreRemotePage(remotePage, supplier)).get();
+            executor.submit(() -> {
+                storePage(remotePage, supplier);
+                return null;
+            }).get();
             return true;
         } catch (Exception e) {
             Log.error("Could not store event page", e);
@@ -156,20 +158,15 @@ public class EventDatabase {
         }
     }
 
-    private record StoreRemotePage(SWEKHandler.RemotePage remotePage,
-                                   SWEKSupplier supplier) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            Connection connection = EventDatabaseThread.getConnection();
-            try {
-                storeEvents(remotePage.events(), supplier);
-                storeAssociations(remotePage.associations());
-                connection.commit();
-            } catch (Exception e) {
-                connection.rollback();
-                throw e;
-            }
-            return null;
+    private static void storePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) throws Exception {
+        Connection connection = EventDatabaseConnection.getConnection();
+        try {
+            storeEvents(remotePage.events(), supplier);
+            storeAssociations(remotePage.associations());
+            connection.commit();
+        } catch (Exception e) {
+            connection.rollback();
+            throw e;
         }
     }
 
@@ -306,7 +303,10 @@ public class EventDatabase {
 
     public static boolean addStoredInterval(long start, long end, SWEKSupplier type) {
         try {
-            executor.submit(new AddStoredInterval(start, end, type)).get();
+            executor.submit(() -> {
+                storeInterval(start, end, type);
+                return null;
+            }).get();
             return true;
         } catch (Exception e) {
             Log.error("Could not store event date range", e);
@@ -314,55 +314,48 @@ public class EventDatabase {
         }
     }
 
-    private record AddStoredInterval(long start, long end, SWEKSupplier type) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            RequestCache typedCache = getStoredIntervals(type);
-            int typeId = findOrInsertEventTypeId(type);
-            Connection connection = EventDatabaseThread.getConnection();
-            typedCache.adaptRequestCache(start, end);
-            try {
-                PreparedStatement delete = getPreparedStatement(DELETE_DATERANGES);
-                delete.setInt(1, typeId);
-                delete.executeUpdate();
+    private static void storeInterval(long start, long end, SWEKSupplier type) throws Exception {
+        RequestCache typedCache = getStoredIntervals(type);
+        int typeId = findOrInsertEventTypeId(type);
+        Connection connection = EventDatabaseConnection.getConnection();
+        typedCache.adaptRequestCache(start, end);
+        try {
+            PreparedStatement delete = getPreparedStatement(DELETE_DATERANGES);
+            delete.setInt(1, typeId);
+            delete.executeUpdate();
 
-                PreparedStatement pstatement = getPreparedStatement(INSERT_DATERANGE);
-                for (Interval interval : typedCache.getAllRequestIntervals()) {
-                    pstatement.setInt(1, typeId);
-                    pstatement.setLong(2, interval.start());
-                    pstatement.setLong(3, interval.end());
-                    pstatement.executeUpdate();
-                }
-                connection.commit();
-            } catch (Exception e) {
-                connection.rollback();
-                storedIntervals.remove(type);
-                throw e;
+            PreparedStatement pstatement = getPreparedStatement(INSERT_DATERANGE);
+            for (Interval interval : typedCache.getAllRequestIntervals()) {
+                pstatement.setInt(1, typeId);
+                pstatement.setLong(2, interval.start());
+                pstatement.setLong(3, interval.end());
+                pstatement.executeUpdate();
             }
-            return null;
+            connection.commit();
+        } catch (Exception e) {
+            connection.rollback();
+            storedIntervals.remove(type);
+            throw e;
         }
     }
 
     public static boolean isStored(long start, long end, SWEKSupplier type) {
         try {
-            return executor.submit(new IsStored(start, end, type)).get();
+            return executor.submit(() -> containsInterval(start, end, type)).get();
         } catch (Exception e) {
             Log.error(e);
             return false;
         }
     }
 
-    private record IsStored(long start, long end, SWEKSupplier type) implements Callable<Boolean> {
-        @Override
-        public Boolean call() throws Exception {
-            for (Interval interval : getStoredIntervals(type).getAllRequestIntervals()) {
-                if (interval.start() > start)
-                    return false;
-                if (interval.end() >= end)
-                    return true;
-            }
-            return false;
+    private static boolean containsInterval(long start, long end, SWEKSupplier type) throws Exception {
+        for (Interval interval : getStoredIntervals(type).getAllRequestIntervals()) {
+            if (interval.start() > start)
+                return false;
+            if (interval.end() >= end)
+                return true;
         }
+        return false;
     }
 
     private static RequestCache getStoredIntervals(SWEKSupplier type) throws Exception {
