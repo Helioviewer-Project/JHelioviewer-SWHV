@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.event.GOESLevel;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -50,8 +51,7 @@ public final class Band extends TimelineLayer {
     private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
     private static final Colors.Data bandColors = new Colors.Data();
     private static final int GRAPH_THREADS = Math.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 8);
-    private static final ExecutorService graphPool =
-            BandExecutors.create("Timeline-Graph", GRAPH_THREADS);
+    private static final ExecutorService graphPool = AppThread.createExecutor("Timeline-Graph", GRAPH_THREADS);
 
     private static final int MAX_REQUEST_DAYS = 21;
 

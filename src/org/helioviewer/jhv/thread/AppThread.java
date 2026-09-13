@@ -2,8 +2,13 @@ package org.helioviewer.jhv.thread;
 
 import java.io.InterruptedIOException;
 import java.nio.channels.ClosedByInterruptException;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -18,6 +23,18 @@ public final class AppThread {
 
     public static Thread create(Runnable task, String name) {
         return new NamedThreadFactory(name).newThread(task);
+    }
+
+    public static ThreadPoolExecutor createExecutor(String name, int concurrency) {
+        return createExecutor(name, concurrency, new LinkedBlockingQueue<>(), new ThreadPoolExecutor.AbortPolicy());
+    }
+
+    public static ThreadPoolExecutor createExecutor(String name, int concurrency,
+                                                    BlockingQueue<Runnable> queue, RejectedExecutionHandler rejectionHandler) {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(concurrency, concurrency, 10L, TimeUnit.SECONDS,
+                queue, new NamedThreadFactory(name), rejectionHandler);
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 
     // this creates daemon threads

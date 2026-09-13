@@ -3,7 +3,6 @@ package org.helioviewer.jhv.movie;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
@@ -32,8 +31,7 @@ public final class ExportMovie {
     public record TimelineFrame(BufferedImage image, int movieLinePosition) {}
 
     private static final int MACROBLOCK = 8;
-    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(
-            new AppThread.NamedThreadFactory("JHV-EncodeMovie"));
+    private static final ExecutorService encodeExecutor = AppThread.createExecutor("JHV-EncodeMovie", 1);
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
     private static @Nullable RecordingSession recordingSession;

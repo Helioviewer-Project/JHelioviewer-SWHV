@@ -27,6 +27,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.io.UriTemplate;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -47,6 +48,9 @@ public class BandReaderHapi {
 
     public record CatalogData(Map<String, BandDataset[]> datasets,
                               Map<String, List<BandType>> predefinedGroups) {}
+
+    // Separate catalog and data pools keep catalog requests from delaying timeline downloads.
+    static final int REQUEST_THREADS = 8;
 
     private static final String hapiFormat = "binary";
     private static final LinkedHashMap<String, Catalog> catalogs = new LinkedHashMap<>();
@@ -91,7 +95,7 @@ public class BandReaderHapi {
     record DatasetRef(String key, String title) {}
 
     private static Map<String, Catalog> loadCatalogs(Map<String, String> servers) throws InterruptedException {
-        try (ExecutorService requests = BandExecutors.create("HAPI-Catalog-Request", BandExecutors.REQUEST_THREADS)) {
+        try (ExecutorService requests = AppThread.createExecutor("HAPI-CatalogRequest", REQUEST_THREADS)) {
             Map<String, Catalog> loaded = new LinkedHashMap<>();
             for (Map.Entry<String, String> server : servers.entrySet()) {
                 Catalog catalog = null;

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -29,11 +28,8 @@ public class SWEKDownloader {
     private static final int NUMBER_THREADS = 8;
     private static final FilterManager.Listener filterListener = SWEKDownloader::filtersChanged;
     private static Consumer<SWEKGroup> groupChanged = _ -> {};
-    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(
-            NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
-            new PriorityBlockingQueue<>(2048),
-            new AppThread.NamedThreadFactory("SWEK Download"),
-            new ThreadPoolExecutor.DiscardPolicy());
+    private static final ThreadPoolExecutor downloadPool = AppThread.createExecutor(
+            "SWEK-Download", NUMBER_THREADS, new PriorityBlockingQueue<>(2048), new ThreadPoolExecutor.DiscardPolicy());
 
     private static final class SupplierRequests {
         private final SWEKSupplier supplier;

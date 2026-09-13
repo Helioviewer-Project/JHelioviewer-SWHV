@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -37,7 +36,7 @@ public final class LatestWorker<T> {
     private boolean abolished;
 
     public LatestWorker(String name) {
-        this(createExecutor(name), true);
+        this(AppThread.createExecutor(name, 1, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.AbortPolicy()), true);
     }
 
     public LatestWorker(ExecutorService _executor) {
@@ -47,15 +46,6 @@ public final class LatestWorker<T> {
     private LatestWorker(ExecutorService _executor, boolean _ownsExecutor) {
         executor = _executor;
         ownsExecutor = _ownsExecutor;
-    }
-
-    private static ExecutorService createExecutor(String name) {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                1, 1, 10000L, TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(1),
-                new AppThread.NamedThreadFactory(name));
-        executor.allowCoreThreadTimeOut(true);
-        return executor;
     }
 
     public synchronized void submit(Callable<T> task, Callback<T> callback) {

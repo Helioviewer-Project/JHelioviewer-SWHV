@@ -12,13 +12,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.TimeUtils;
 
 final class BandDownloads {
 
-    private static final ThreadPoolExecutor downloadPool = BandExecutors.create("Timeline-Download", BandExecutors.REQUEST_THREADS);
+    private static final ThreadPoolExecutor downloadPool = AppThread.createExecutor("Timeline-Download", BandReaderHapi.REQUEST_THREADS);
     private static final HashMap<RequestKey, Download> pendingDownloads = new HashMap<>();
     private static final ArrayList<Download> activeDownloads = new ArrayList<>();
     private static boolean submitPendingScheduled;
