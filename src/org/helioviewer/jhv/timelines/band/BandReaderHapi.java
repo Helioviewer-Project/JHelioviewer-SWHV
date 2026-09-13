@@ -88,10 +88,6 @@ public class BandReaderHapi {
         return () -> getHapiStream(dataset, schema, start, end);
     }
 
-    static List<BandData> readUri(URI uri) throws Exception {
-        return getHapiUri(uri);
-    }
-
     record DatasetRef(String key, String title) {}
 
     private static Map<String, Catalog> loadCatalogs(Map<String, String> servers) throws InterruptedException {
@@ -137,7 +133,7 @@ public class BandReaderHapi {
         return finishPredefinedGroups(groups);
     }
 
-    private static Map<String, List<BandType>> createPredefinedGroups(BandType[] types) {
+    private static Map<String, List<BandType>> createPredefinedGroups(List<BandType> types) {
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
         for (BandType type : types) {
             BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
@@ -219,22 +215,18 @@ public class BandReaderHapi {
             throw new Exception("Empty catalog");
 
         LinkedHashMap<String, Dataset> datasetsByParameter = new LinkedHashMap<>();
+        List<BandType> types = new ArrayList<>();
+        List<BandDataset> catalogDatasets = new ArrayList<>(datasets.size());
         for (Dataset dataset : datasets) {
-            for (DatasetParameter parameter : dataset.parameters)
+            List<BandType> datasetTypes = new ArrayList<>(dataset.parameters.size());
+            for (DatasetParameter parameter : dataset.parameters) {
                 datasetsByParameter.put(parameter.type.getBaseUrl(), dataset);
+                datasetTypes.add(parameter.type);
+            }
+            types.addAll(datasetTypes);
+            catalogDatasets.add(new BandDataset(dataset.title, datasetTypes));
         }
-        if (datasetsByParameter.isEmpty())
-            throw new Exception("Catalog contains no supported parameters");
-
-        BandType[] typeArray = datasets.stream()
-                .flatMap(dataset -> dataset.parameters.stream())
-                .map(DatasetParameter::type)
-                .toArray(BandType[]::new);
-        BandDataset[] datasetArray = datasets.stream()
-                .map(dataset -> new BandDataset(dataset.title,
-                        dataset.parameters.stream().map(DatasetParameter::type).toList()))
-                .toArray(BandDataset[]::new);
-        return new Catalog(datasetsByParameter, datasetArray, createPredefinedGroups(typeArray));
+        return new Catalog(datasetsByParameter, catalogDatasets.toArray(BandDataset[]::new), createPredefinedGroups(types));
     }
 
     @Nullable
@@ -378,7 +370,23 @@ public class BandReaderHapi {
         }
     }
 
-    private static List<BandData> getHapiLocalCSV(DataUri dataUri) throws Exception {
+    static List<BandData> readUri(URI uri) throws Exception {
+        DataUri dataUri = NetFileCache.get(uri);
+        return switch (dataUri.format()) {
+            case ZIP -> readZip(dataUri);
+            case CSV -> readCsv(dataUri);
+            default -> throw new Exception("Unsupported HAPI data format: " + dataUri.format());
+        };
+    }
+
+    private static List<BandData> readZip(DataUri dataUri) throws Exception {
+        List<URI> uriList = FileUtils.unZip(dataUri.uri());
+        if (uriList.size() != 1)
+            throw new Exception("Only one CSV file per zip supported");
+        return readUri(uriList.getFirst());
+    }
+
+    private static List<BandData> readCsv(DataUri dataUri) throws Exception {
         URI uri = dataUri.uri();
         try (NetClient nc = NetClient.of(uri)) {
             InputStream in = nc.getStream();
@@ -462,22 +470,6 @@ public class BandReaderHapi {
         if (1200 != status.optInt("code", -1) || !"OK".equals(status.optString("message", null)))
             throw new Exception("HAPI status not OK: " + status);
         return jo;
-    }
-
-    private static List<BandData> getHapiUri(URI uri) throws Exception { // tbd
-        DataUri dataUri = NetFileCache.get(uri);
-        return switch (dataUri.format()) {
-            case ZIP -> loadZIP(dataUri);
-            case CSV -> getHapiLocalCSV(dataUri);
-            default -> throw new Exception("Unknown image type");
-        };
-    }
-
-    private static List<BandData> loadZIP(DataUri dataUri) throws Exception {
-        List<URI> uriList = FileUtils.unZip(dataUri.uri());
-        if (uriList.size() != 1)
-            throw new Exception("Only one CSV file per zip supported");
-        return getHapiUri(uriList.getFirst());
     }
 
     private static long toMillis(String isoTime) throws Exception {
