@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
@@ -23,13 +25,12 @@ import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.AppThread;
-import org.helioviewer.jhv.thread.SingleExecutor;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 
 public class EventDatabase {
 
-    private static final SingleExecutor executor = new SingleExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
     private static long batchSequence;
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
@@ -147,7 +148,7 @@ public class EventDatabase {
 
     public static boolean storeRemotePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) {
         try {
-            executor.invokeAndWait(new StoreRemotePage(remotePage, supplier));
+            executor.submit(new StoreRemotePage(remotePage, supplier)).get();
             return true;
         } catch (Exception e) {
             Log.error("Could not store event page", e);
@@ -246,10 +247,10 @@ public class EventDatabase {
     }
 
     public static EventDetails getEventDetails(int id) throws Exception {
-        StoredDetails details = executor.invokeAndWait(() -> {
+        StoredDetails details = executor.submit(() -> {
             StoredEvent event = queryEvent(id);
             return new StoredDetails(event, collectRelationEvents(id, event.type()));
-        });
+        }).get();
         return new EventDetails(parseJSON(details.event(), true), parseEvents(details.relatedEvents(), true));
     }
 
@@ -305,7 +306,7 @@ public class EventDatabase {
 
     public static boolean addStoredInterval(long start, long end, SWEKSupplier type) {
         try {
-            executor.invokeAndWait(new AddStoredInterval(start, end, type));
+            executor.submit(new AddStoredInterval(start, end, type)).get();
             return true;
         } catch (Exception e) {
             Log.error("Could not store event date range", e);
@@ -344,7 +345,7 @@ public class EventDatabase {
 
     public static boolean isStored(long start, long end, SWEKSupplier type) {
         try {
-            return executor.invokeAndWait(new IsStored(start, end, type));
+            return executor.submit(new IsStored(start, end, type)).get();
         } catch (Exception e) {
             Log.error(e);
             return false;
@@ -416,8 +417,8 @@ public class EventDatabase {
     private record StoredBatch(long sequence, List<StoredEvent> events, List<SolarEvent.Link> associations) {}
 
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        StoredBatch batch = executor.invokeAndWait(() -> new StoredBatch(++batchSequence,
-                queryEvents(start, end, type, params), queryAssociations(start, end, type)));
+        StoredBatch batch = executor.submit(() -> new StoredBatch(++batchSequence,
+                queryEvents(start, end, type, params), queryAssociations(start, end, type))).get();
         return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
     }
 
