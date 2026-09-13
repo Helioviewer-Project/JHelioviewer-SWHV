@@ -13,6 +13,8 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 
+// Runs one task at a time, retaining only the latest pending request.
+// Callbacks run on the EDT, including stale results with fresh == false.
 public final class LatestWorker<T> {
 
     private record Request<T>(Callable<T> task, Callback<T> callback, int generation) {}
@@ -33,12 +35,14 @@ public final class LatestWorker<T> {
     private Future<?> scheduled;
 
     private int generation;
-    private boolean abolished;
+    private boolean disposed;
 
+    // Creates and owns a single-worker executor.
     public LatestWorker(String name) {
         this(AppThread.createIdleExecutor(name, 1, new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.AbortPolicy()), true);
     }
 
+    // Uses an executor owned by the caller.
     public LatestWorker(ExecutorService _executor) {
         this(_executor, false);
     }
@@ -49,8 +53,8 @@ public final class LatestWorker<T> {
     }
 
     public synchronized void submit(Callable<T> task, Callback<T> callback) {
-        if (abolished)
-            throw new RejectedExecutionException("Worker has been abolished");
+        if (disposed)
+            throw new RejectedExecutionException("Worker has been disposed");
 
         pending = new Request<>(task, callback, ++generation);
         schedule();
@@ -82,7 +86,7 @@ public final class LatestWorker<T> {
         } finally {
             synchronized (this) {
                 scheduled = null;
-                if (!abolished)
+                if (!disposed)
                     schedule();
             }
         }
@@ -92,14 +96,16 @@ public final class LatestWorker<T> {
         return request == generation;
     }
 
-    public synchronized void cancel() {
+    // Drops pending work and marks results stale without interrupting the running task.
+    public synchronized void invalidate() {
         generation++;
         pending = null;
     }
 
-    public synchronized void abolish() {
+    // Permanently disables this worker, interrupts its task, and shuts down an owned executor.
+    public synchronized void dispose() {
         generation++;
-        abolished = true;
+        disposed = true;
         pending = null;
         if (scheduled != null)
             scheduled.cancel(true);

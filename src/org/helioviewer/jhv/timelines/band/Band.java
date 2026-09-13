@@ -172,7 +172,7 @@ public final class Band extends TimelineLayer {
 
     @Override
     public void remove() {
-        graphWorker.abolish();
+        graphWorker.dispose();
         graphData = EMPTY_GRAPH_DATA;
         BandDownloads.stop(this);
         requestCache = new RequestCache();
@@ -308,14 +308,14 @@ public final class Band extends TimelineLayer {
 
     private void updateGraph() {
         if (!enabled) {
-            graphWorker.cancel();
+            graphWorker.invalidate();
             return;
         }
 
         GraphGeometry geometry = DrawController.getGeometry();
         Rectangle drawArea = geometry.getLayerArea(this);
         if (drawArea == null) {
-            graphWorker.cancel();
+            graphWorker.invalidate();
             return;
         }
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
@@ -337,7 +337,7 @@ public final class Band extends TimelineLayer {
                 Display.pixelScale[0] * drawArea.width,
                 start - barWidthMillis, end + barWidthMillis);
         if (rawData.stream().allMatch(List::isEmpty)) {
-            graphWorker.cancel();
+            graphWorker.invalidate();
             graphData = EMPTY_GRAPH_DATA;
             DrawController.drawRequest();
             return;

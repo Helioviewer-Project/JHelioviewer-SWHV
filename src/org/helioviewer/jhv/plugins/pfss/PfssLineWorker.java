@@ -28,7 +28,7 @@ final class PfssLineWorker {
     }
 
     void cancel() {
-        worker.cancel();
+        worker.invalidate();
         submittedParameters = null;
     }
 

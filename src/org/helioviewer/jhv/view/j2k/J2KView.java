@@ -283,7 +283,7 @@ public class J2KView extends BaseView {
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
-            executor.cancel();
+            executor.invalidate();
             sendDataToHandler(decodeParams.frame, viewpoint, image, () -> key.filter() == processingSettings.getFilter());
             return;
         }

@@ -37,7 +37,7 @@ final class ViewpointOrbitWorker {
     }
 
     void cancel() {
-        worker.cancel();
+        worker.invalidate();
         submittedParameters = null;
     }
 

@@ -68,7 +68,7 @@ class RadioJ2KData implements View.DataHandler {
             willDraw = startDate == req.startTime(); // didn't get closest
             view = v;
         } catch (Exception e) {
-            executor.abolish();
+            executor.dispose();
             if (v != null) {
                 v.setDataHandler(null);
                 v.abolish();
@@ -82,7 +82,7 @@ class RadioJ2KData implements View.DataHandler {
             return;
         }
         disposed = true;
-        executor.abolish();
+        executor.dispose();
         view.setDataHandler(null);
         view.abolish();
         bufferedImage = null;

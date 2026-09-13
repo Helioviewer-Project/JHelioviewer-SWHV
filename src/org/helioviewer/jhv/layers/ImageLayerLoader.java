@@ -98,7 +98,7 @@ final class ImageLayerLoader {
     void abolish() {
         cancelLoad();
         cancelDownload();
-        executor.abolish();
+        executor.dispose();
     }
 
     private void onSuccess(View result, int gen) {

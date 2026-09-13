@@ -42,7 +42,7 @@ public final class AppThread {
     }
 
     public static ThreadPoolExecutor createIdleExecutor(String name, int concurrency,
-                                                    BlockingQueue<Runnable> queue, RejectedExecutionHandler rejectionHandler) {
+                                                        BlockingQueue<Runnable> queue, RejectedExecutionHandler rejectionHandler) {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(concurrency, concurrency, 10L, TimeUnit.SECONDS,
                 queue, new NamedThreadFactory(name), rejectionHandler);
         executor.allowCoreThreadTimeOut(true);
