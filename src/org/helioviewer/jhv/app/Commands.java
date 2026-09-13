@@ -13,6 +13,7 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
@@ -161,7 +162,7 @@ public final class Commands {
             return future;
         }
 
-        FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
+        Task.submit(() -> FileUtils.resolveURIList(uris), resolved -> {
             if (resolved.isEmpty()) {
                 future.complete(null);
                 return;
@@ -175,7 +176,7 @@ public final class Commands {
             } catch (Exception e) {
                 future.completeExceptionally(e);
             }
-        });
+        }, future::completeExceptionally);
         return future;
     }
 

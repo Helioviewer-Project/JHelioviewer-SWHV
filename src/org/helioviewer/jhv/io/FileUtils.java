@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -19,11 +18,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.thread.AppThread;
 
 public final class FileUtils {
 
@@ -151,19 +148,17 @@ public final class FileUtils {
         return listDir(path);
     }
 
-    public static void resolveURIListOffEDT(List<URI> uris, String threadName, Consumer<List<URI>> callback) {
-        AppThread.create(() -> {
-            List<URI> resolved = new ArrayList<>();
-            for (URI uri : uris) {
-                try {
-                    resolved.addAll(expandURI(uri));
-                } catch (Exception e) {
-                    Log.warn("Error reading directory: " + uri, e);
-                    resolved.add(uri);
-                }
+    public static List<URI> resolveURIList(List<URI> uris) {
+        List<URI> resolved = new ArrayList<>();
+        for (URI uri : uris) {
+            try {
+                resolved.addAll(expandURI(uri));
+            } catch (Exception e) {
+                Log.warn("Error reading directory: " + uri, e);
+                resolved.add(uri);
             }
-            EventQueue.invokeLater(() -> callback.accept(resolved));
-        }, threadName).start();
+        }
+        return resolved;
     }
 
     private static final String lockSuffix = ".lck";
