@@ -44,7 +44,7 @@ import uk.ac.starlink.hapi.ParamReader;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
 
-public class BandReaderHapi {
+public final class BandReaderHapi {
 
     public record CatalogData(Map<String, BandDataset[]> datasets,
                               Map<String, List<BandType>> predefinedGroups) {}
@@ -85,7 +85,7 @@ public class BandReaderHapi {
             throw new IllegalArgumentException("HAPI parameters do not belong to one dataset");
 
         RequestSchema schema = createRequestSchema(dataset, parameters, resolutions);
-        return () -> getHapiStream(dataset, schema, start, end);
+        return () -> readRemoteData(dataset, schema, start, end);
     }
 
     record DatasetRef(String key, String title) {}
@@ -96,7 +96,7 @@ public class BandReaderHapi {
             for (Map.Entry<String, String> server : servers.entrySet()) {
                 Catalog catalog = null;
                 try {
-                    catalog = getCatalog(server.getValue(), requests);
+                    catalog = loadCatalog(server.getValue(), requests);
                 } catch (InterruptedException e) {
                     throw e;
                 } catch (Exception e) {
@@ -173,7 +173,7 @@ public class BandReaderHapi {
 
     private record BandDecoder(BandType type, int valueColumn, boolean rebin) {}
 
-    private static Catalog getCatalog(String server, ExecutorService requests) throws Exception {
+    private static Catalog loadCatalog(String server, ExecutorService requests) throws Exception {
         String urlCatalog = server + "catalog";
 
         JSONObject joCatalog = verifyResponse(JSONUtils.get(new URI(urlCatalog)));
@@ -222,14 +222,14 @@ public class BandReaderHapi {
         String uri = new UriTemplate(server + "info").expand(vars);
         try {
             JSONObject info = verifyResponse(JSONUtils.get(new URI(uri)));
-            return getDataset(version, server + "data", id, title, info);
+            return parseDataset(version, server + "data", id, title, info);
         } catch (Exception e) {
             Log.error(uri, e);
             return null;
         }
     }
 
-    private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
+    private static Dataset parseDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
         long start = TimeUtils.MINIMAL_TIME.milli;
         long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
@@ -317,22 +317,17 @@ public class BandReaderHapi {
     private static BandType createBandType(String baseUrl, @Nullable String id, @Nullable String title,
                                            JSONObject joParameter, HapiParam param) {
         String name = Objects.requireNonNullElse(param.getName(), "unknown");
-        JSONObject options = getBandOptions(joParameter.optJSONObject("jhvparams")).
-                put("baseUrl", baseUrl).
+        JSONObject jhvparams = joParameter.optJSONObject("jhvparams");
+        JSONObject options = jhvparams == null ? new JSONObject() :
+                new JSONObject(jhvparams, "scale", "range", "plotType", "barWidth", "levels", "warningLevels", "groups", "predefined");
+        options.put("baseUrl", baseUrl).
                 put("unitLabel", getUnit(param)).
                 put("name", id == null ? name : id + ' ' + name).
                 put("label", title == null ? name : title + ' ' + name);
         return new BandType(options);
     }
 
-    private static JSONObject getBandOptions(@Nullable JSONObject jhvparams) {
-        if (jhvparams == null)
-            return new JSONObject();
-
-        return new JSONObject(jhvparams, "scale", "range", "plotType", "barWidth", "levels", "warningLevels", "groups", "predefined");
-    }
-
-    private static List<BandData> getHapiStream(Dataset dataset, RequestSchema schema,
+    private static List<BandData> readRemoteData(Dataset dataset, RequestSchema schema,
                                                 long startTime, long endTime) throws Exception {
         startTime = Math.max(startTime, dataset.start);
         endTime = Math.min(endTime, dataset.stop);
@@ -497,5 +492,7 @@ public class BandReaderHapi {
         }
         return true;
     }
+
+    private BandReaderHapi() {}
 
 }
