@@ -93,7 +93,7 @@ public final class MovieReaderTest {
                     queueField.set(reader, signals);
                     if ((boolean) readFrames.invoke(reader, params, "4096,4096", false))
                         throw new AssertionError("Pump ignored newer work");
-                    if (!source.getFrameStatus(0, 0).get() || !source.getFrameStatus(1, 0).get()
+                    if (source.getFrameStatus(0, 0) == null || source.getFrameStatus(1, 0) == null
                             || source.getFrameStatus(2, 0) != null)
                         throw new AssertionError("Pump did not stop after draining the two sent responses");
                     signals.clear();
