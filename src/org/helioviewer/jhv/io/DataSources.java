@@ -25,7 +25,7 @@ public class DataSources {
 
     public record Server(String label, String catalogURL, String jp2URL, String jpxURL, @Nullable String availabilityURL) {}
 
-    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe,RHESSI,GOES,PUNCH]";
+    private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe,RHESSI,GOES,PUNCH,Proba-3]";
 
     private static ImmutableMap<String, Server> imageServers;
     private static ImmutableMap<String, String> hapiServers;
