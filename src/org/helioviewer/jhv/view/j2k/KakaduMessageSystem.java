@@ -1,17 +1,57 @@
 package org.helioviewer.jhv.view.j2k;
 
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.helioviewer.jhv.app.Log;
+
 import kdu_jni.KduException;
 import kdu_jni.Kdu_global;
+import kdu_jni.Kdu_message;
 import kdu_jni.Kdu_message_formatter;
-import kdu_jni.Kdu_message_queue;
 
 // This class takes care of setting up the internal Kakadu messaging objects.
 public class KakaduMessageSystem {
 
     // This class allows printing Kakadu error messages, throwing Java exceptions if necessary.
-    private static class JHV_Kdu_message extends Kdu_message_queue {
-        JHV_Kdu_message(boolean throwExceptions) throws KduException {
-            Configure(1, true, throwExceptions, Kdu_global.KDU_ERROR_EXCEPTION);
+    private static class JHV_Kdu_message extends Kdu_message {
+        private final boolean error;
+        private final ReentrantLock lock = new ReentrantLock();
+        private final StringBuilder message = new StringBuilder();
+
+        JHV_Kdu_message(boolean _error) {
+            error = _error;
+        }
+
+        @Override
+        public void Start_message() {
+            // Kakadu shares each formatter across its worker threads. Keep all
+            // fragments of one message together until the terminal flush.
+            lock.lock();
+            message.setLength(0);
+        }
+
+        @Override
+        public void Put_text(String text) {
+            message.append(text);
+        }
+
+        @Override
+        public void Flush(boolean endOfMessage) throws KduException {
+            if (!endOfMessage)
+                return;
+
+            String text = message.toString().stripTrailing();
+            try {
+                if (error)
+                    Log.error(text);
+                else
+                    Log.warn(text);
+            } finally {
+                lock.unlock();
+            }
+
+            if (error)
+                throw new KduException(Kdu_global.KDU_ERROR_EXCEPTION, text);
         }
     }
 
