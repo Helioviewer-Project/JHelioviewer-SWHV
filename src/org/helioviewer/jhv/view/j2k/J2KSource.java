@@ -167,22 +167,22 @@ abstract class J2KSource {
             }
 
             int maxDWT = stream.Get_min_dwt_levels();
-            ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
+            ResolutionSet.Level[] levels = new ResolutionSet.Level[maxDWT + 1];
 
             stream.Get_dims(0, dims);
             Kdu_coords siz = dims.Access_size();
             int width0 = siz.Get_x(), height0 = siz.Get_y();
-            res.addLevel(0, width0, height0, 1, 1);
+            levels[0] = new ResolutionSet.Level(0, width0, height0, 1, 1);
 
             for (int i = 1; i <= maxDWT; i++) {
                 stream.Apply_input_restrictions(0, 0, i, 0, null, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
                 stream.Get_dims(0, dims);
                 siz = dims.Access_size();
                 int width = siz.Get_x(), height = siz.Get_y();
-                res.addLevel(i, width, height, width0 / (double) width, height0 / (double) height);
+                levels[i] = new ResolutionSet.Level(i, width, height, width0 / (double) width, height0 / (double) height);
             }
 
-            return res;
+            return new ResolutionSet(levels, maxComponents);
         } finally {
             try {
                 if (stream.Exists())

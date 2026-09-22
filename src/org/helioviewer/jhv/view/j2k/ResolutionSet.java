@@ -11,10 +11,10 @@ public class ResolutionSet {
     private final int numLevels;
     final int numComps;
 
-    ResolutionSet(int _numLevels, int _numComps) {
-        numLevels = _numLevels;
+    ResolutionSet(Level[] _resolutions, int _numComps) {
+        resolutions = _resolutions;
+        numLevels = resolutions.length;
         numComps = _numComps;
-        resolutions = new Level[numLevels];
 
         complete = new AtomicBoolean[numLevels];
         for (int i = 0; i < numLevels; i++)
@@ -28,10 +28,6 @@ public class ResolutionSet {
 
     AtomicBoolean getComplete(int level) {
         return complete[Math.min(level, numLevels - 1)];
-    }
-
-    void addLevel(int discardLayer, int width, int height, double scaleX, double scaleY) {
-        resolutions[discardLayer] = new Level(discardLayer, width, height, scaleX, scaleY);
     }
 
     Level getLevel(int idx) {
