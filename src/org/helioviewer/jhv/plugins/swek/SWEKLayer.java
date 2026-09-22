@@ -45,8 +45,6 @@ import org.json.JSONObject;
 public final class SWEKLayer extends AbstractLayer implements EventListener.Handle, TimeListener.Range {
     record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
 
-    private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
-
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
@@ -132,20 +130,12 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         vexBuf.endLine();
     }
 
-    private static CactusArcParams cactusArcParams(SolarEvent evt, long timestamp) {
-        double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
-        double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
-        double distSun = SWEKData.cactusDistance(evt, timestamp);
-        return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
-    }
-
     private void drawCactusArc(RelatedEvents relatedEvents, SolarEvent evt, long timestamp) {
-        CactusArcParams params = cactusArcParams(evt, timestamp);
-        double angularWidthDegree = params.angularWidthDegree();
+        double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
         double angularWidth = Math.toRadians(angularWidthDegree);
-        double principalAngleDegree = params.principalAngleDegree();
+        double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
         double principalAngle = Math.toRadians(principalAngleDegree);
-        double distSun = params.distSun();
+        double distSun = SWEKData.cactusDistance(evt, timestamp);
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
@@ -276,10 +266,9 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     }
 
     private void drawCactusArcScale(Viewport vp, RelatedEvents relatedEvents, SolarEvent evt, long timestamp, MapScale scale) {
-        CactusArcParams params = cactusArcParams(evt, timestamp);
-        double angularWidthDegree = params.angularWidthDegree();
-        double principalAngleDegree = params.principalAngleDegree();
-        double distSun = params.distSun();
+        double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
+        double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
+        double distSun = SWEKData.cactusDistance(evt, timestamp);
 
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
