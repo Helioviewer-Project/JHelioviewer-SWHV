@@ -1,15 +1,12 @@
 package org.helioviewer.jhv.layers.fov;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
 import org.json.JSONObject;
 
-@SuppressWarnings("serial")
-class FOVInstrument extends DefaultMutableTreeNode {
+class FOVInstrument {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 

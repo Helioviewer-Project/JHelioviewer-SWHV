@@ -34,11 +34,8 @@ public final class FOVTreePane extends JScrollPane {
             TreeNodeComponent platformNode = new TreeNodeComponent(platform, createPlatformComponent(platform));
             root.add(platformNode);
 
-            Enumeration<?> instruments = platform.children();
-            while (instruments.hasMoreElements()) {
-                FOVInstrument instrument = (FOVInstrument) instruments.nextElement();
+            for (FOVInstrument instrument : platform.instruments())
                 platformNode.add(new TreeNodeComponent(instrument, createInstrumentComponent(instrument)));
-            }
         });
         tree = new JTree(root);
         tree.setRootVisible(false);

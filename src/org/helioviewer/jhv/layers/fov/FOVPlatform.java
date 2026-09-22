@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.layers.fov;
 
-import java.util.Enumeration;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
@@ -26,8 +23,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
-@SuppressWarnings("serial")
-class FOVPlatform extends DefaultMutableTreeNode {
+class FOVPlatform {
 
     static final double MIN_CENTER_ARCMIN = -60;
     static final double MAX_CENTER_ARCMIN = 60;
@@ -40,6 +36,8 @@ class FOVPlatform extends DefaultMutableTreeNode {
     private final GLSLShape instrumentCenters = new GLSLShape(true);
     private final BufVertex lineBuf = new BufVertex();
     private final BufVertex centerBuf = new BufVertex();
+
+    private final List<FOVInstrument> instruments = new ArrayList<>();
 
     private final String name;
     private final String observer;
@@ -59,13 +57,14 @@ class FOVPlatform extends DefaultMutableTreeNode {
         centerY = Math.clamp(jo.optDouble("centerY", 0), MIN_CENTER_ARCMIN, MAX_CENTER_ARCMIN);
     }
 
-    @Override
-    public void add(MutableTreeNode newChild) {
-        super.add(newChild);
-        if (newChild instanceof FOVInstrument instrument) {
-            instrument.setCenterX(control2Center(centerX));
-            instrument.setCenterY(control2Center(centerY));
-        }
+    void add(FOVInstrument instrument) {
+        instruments.add(instrument);
+        instrument.setCenterX(control2Center(centerX));
+        instrument.setCenterY(control2Center(centerY));
+    }
+
+    List<FOVInstrument> instruments() {
+        return instruments;
     }
 
     private void putHemiLine() {
@@ -116,7 +115,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         renderer.begin3DRendering();
         renderer.setSurfacePut();
 
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, LINEWIDTH_FOV, color, renderer, lineBuf, centerBuf));
+        instruments.forEach(instrument -> instrument.putGeometry(obsPosition.distance, LINEWIDTH_FOV, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.uploadAndClear(centerBuf);
         instrumentCenters.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
@@ -130,9 +129,8 @@ class FOVPlatform extends DefaultMutableTreeNode {
     }
 
     private boolean hasEnabled() {
-        Enumeration<TreeNode> e = children();
-        while (e.hasMoreElements()) {
-            if (((FOVInstrument) e.nextElement()).isEnabled())
+        for (FOVInstrument instrument : instruments) {
+            if (instrument.isEnabled())
                 return true;
         }
         return false;
@@ -152,13 +150,13 @@ class FOVPlatform extends DefaultMutableTreeNode {
 
     void setCenterX(double centerX) {
         this.centerX = centerX;
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterX(control2Center(centerX)));
+        instruments.forEach(instrument -> instrument.setCenterX(control2Center(centerX)));
         DisplayController.display();
     }
 
     void setCenterY(double centerY) {
         this.centerY = centerY;
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterY(control2Center(centerY)));
+        instruments.forEach(instrument -> instrument.setCenterY(control2Center(centerY)));
         DisplayController.display();
     }
 
@@ -167,11 +165,8 @@ class FOVPlatform extends DefaultMutableTreeNode {
         jo.put("centerX", centerX);
         jo.put("centerY", centerY);
 
-        Enumeration<TreeNode> e = children();
-        while (e.hasMoreElements()) {
-            FOVInstrument instrument = (FOVInstrument) e.nextElement();
+        for (FOVInstrument instrument : instruments)
             jo.put(instrument.toString(), instrument.isEnabled());
-        }
         return jo;
     }
 
