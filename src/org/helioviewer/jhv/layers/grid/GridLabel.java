@@ -101,7 +101,10 @@ public class GridLabel {
         double size = Sun.Radius * 1.05;
 
         List<TransformedGridLabel> labels = new ArrayList<>();
-        for (double theta = 0; theta <= 180.; theta += lonStep) {
+        int lonMax = (int) (180 / lonStep);
+        int lonMin = 1 - (int) Math.ceil(180 / lonStep);
+        for (int i = 0; i <= lonMax; i++) {
+            double theta = i * lonStep;
             String txt = FastFormat.rounded1(theta);
             double angle = (90 - theta) * Math.PI / 180.;
             float x = (float) (Math.cos(angle) * size);
@@ -112,7 +115,8 @@ public class GridLabel {
             m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
             labels.add(makeTransformedLabel(txt, x, y, m));
         }
-        for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
+        for (int i = -1; i >= lonMin; i--) {
+            double theta = i * lonStep;
             String txt = FastFormat.rounded1(gridType.displayLongitude(theta));
             double angle = (90 - theta) * Math.PI / 180.;
             float x = (float) (Math.cos(angle) * size);
