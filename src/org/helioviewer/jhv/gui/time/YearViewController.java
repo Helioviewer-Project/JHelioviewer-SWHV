@@ -63,7 +63,8 @@ class YearViewController implements CalendarViewController {
     @Override
     public void setTimeOfCellValue(Object value) {
         if (value instanceof Integer v) {
-            calendar.set(Calendar.YEAR, v);
+            // add pins Feb 29 to Feb 28 in a common year, set would roll over
+            calendar.add(Calendar.YEAR, v - calendar.get(Calendar.YEAR));
         }
     }
 

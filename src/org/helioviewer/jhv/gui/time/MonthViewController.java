@@ -73,7 +73,8 @@ class MonthViewController implements CalendarViewController {
 
             for (int i = 0; i < 12; i++) {
                 if (months[i].equals(value)) {
-                    calendar.set(Calendar.MONTH, i);
+                    // add pins the day of month to the target month's length, set would roll over
+                    calendar.add(Calendar.MONTH, i - calendar.get(Calendar.MONTH));
                 }
             }
         }
