@@ -107,49 +107,44 @@ public class GridMath {
     }
 
     public static void initGrid(GLSLLine gridLine, double lonstepDegrees, double latstepDegrees, byte[] color) {
-        int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
-        int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
+        // meridians at multiples of lonstep in (-180, 180], parallels at multiples of latstep in (-90, 90), as the labels
+        int lonMin = 1 - (int) Math.ceil(180 / lonstepDegrees);
+        int lonMax = (int) (180 / lonstepDegrees);
+        int latMax = (int) Math.ceil(90 / latstepDegrees) - 1;
         int HALFDIVISIONS = SUBDIVISIONS / 2;
-        int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
+        int no_points = (lonMax - lonMin + 1 + 2 * latMax + 1) * (HALFDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points);
 
-        double rotation;
-        for (int j = 0; j < no_lon_steps; j++) {
-            for (int k = -1; k <= 1; k += 2) {
-                rotation = lonstepDegrees * j * k;
-                Quat q = Quat.createAxisY(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation);
-                for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    double a = -Math.PI / 2 + Math.PI * i / HALFDIVISIONS;
-                    Vec3 rotv = q.rotateVector(new Vec3(GRID_RADIUS * Math.cos(a), GRID_RADIUS * Math.sin(a), 0));
+        for (int j = lonMin; j <= lonMax; j++) {
+            Quat q = Quat.createAxisY(Math.PI / 2 + Math.PI + (Math.PI / 180) * lonstepDegrees * j);
+            for (int i = 0; i <= HALFDIVISIONS; i++) {
+                double a = -Math.PI / 2 + Math.PI * i / HALFDIVISIONS;
+                Vec3 rotv = q.rotateVector(new Vec3(GRID_RADIUS * Math.cos(a), GRID_RADIUS * Math.sin(a), 0));
 
-                    if (i == 0)
-                        vexBuf.startLine(rotv, color);
-                    else
-                        vexBuf.putVertex(rotv, color);
-                    if (i == HALFDIVISIONS)
-                        vexBuf.endLine();
-                }
+                if (i == 0)
+                    vexBuf.startLine(rotv, color);
+                else
+                    vexBuf.putVertex(rotv, color);
+                if (i == HALFDIVISIONS)
+                    vexBuf.endLine();
             }
         }
-        for (int j = 0; j < no_lat_steps; j++) {
-            for (int k = -1; k <= 1; k += 2) {
-                rotation = latstepDegrees * j * k;
-                double scale = Math.cos((Math.PI / 180.) * (90 - rotation));
-                double radialScale = Math.sqrt(1. - scale * scale);
-                for (int i = 0; i <= HALFDIVISIONS; i++) {
-                    double a = 2 * Math.PI * i / HALFDIVISIONS;
-                    Vec3 v = new Vec3(
-                            GRID_RADIUS * radialScale * Math.sin(a),
-                            GRID_RADIUS * scale,
-                            GRID_RADIUS * radialScale * Math.cos(a));
+        for (int j = -latMax; j <= latMax; j++) {
+            double scale = Math.cos((Math.PI / 180.) * (90 - latstepDegrees * j));
+            double radialScale = Math.sqrt(1. - scale * scale);
+            for (int i = 0; i <= HALFDIVISIONS; i++) {
+                double a = 2 * Math.PI * i / HALFDIVISIONS;
+                Vec3 v = new Vec3(
+                        GRID_RADIUS * radialScale * Math.sin(a),
+                        GRID_RADIUS * scale,
+                        GRID_RADIUS * radialScale * Math.cos(a));
 
-                    if (i == 0)
-                        vexBuf.startLine(v, color);
-                    else
-                        vexBuf.putVertex(v, color);
-                    if (i == HALFDIVISIONS)
-                        vexBuf.endLine();
-                }
+                if (i == 0)
+                    vexBuf.startLine(v, color);
+                else
+                    vexBuf.putVertex(v, color);
+                if (i == HALFDIVISIONS)
+                    vexBuf.endLine();
             }
         }
 
