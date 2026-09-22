@@ -13,7 +13,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 
@@ -66,18 +65,14 @@ public final class MainContentPanel extends JPanel {
         if (plugin == null || pluginList.contains(plugin) || plugin.getVisualInterfaces().isEmpty()) {
             return;
         }
-        ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), collapsiblePane.toggleButton.isSelected());
         pluginList.add(plugin);
         updateLayout();
     }
 
     // Removes a plug-in and the associated GUI from the container
     public void removePlugin(Interfaces.MainContentPanelPlugin plugin) {
-        if (pluginList.remove(plugin)) {
-            if (!plugin.getVisualInterfaces().isEmpty())
-                ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), false);
+        if (pluginList.remove(plugin))
             updateLayout();
-        }
     }
 
     // Updates the layout of the container and its subcomponents. Plug-ins will

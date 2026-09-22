@@ -10,6 +10,7 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -65,6 +66,10 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0)
+                showingChanged(isShowing());
+        });
         DrawController.setGraphSize(getWidth(), getHeight());
     }
 
@@ -81,10 +86,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         super.removeNotify();
     }
 
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (visible) {
+    // draw and provide movie frames only while on screen
+    private void showingChanged(boolean showing) {
+        if (showing) {
             ExportMovie.setTimelineFrameSource(recordingSource);
             DrawController.start();
         } else {

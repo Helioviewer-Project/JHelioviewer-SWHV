@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 // This panel consists of a toggle button and one arbitrary component. Clicking
@@ -24,7 +23,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         setLayout(new BorderLayout());
 
         managed = _managed;
-        ComponentUtils.setVisible(managed, startExpanded);
+        managed.setVisible(startExpanded);
 
         toggleButton = new CollapsiblePaneButton();
         toggleButton.setSelected(startExpanded);
@@ -55,7 +54,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean toggle = !managed.isVisible();
-        ComponentUtils.setVisible(managed, toggle);
+        managed.setVisible(toggle);
         toggleButton.setSelected(toggle);
         setTitle(title);
     }

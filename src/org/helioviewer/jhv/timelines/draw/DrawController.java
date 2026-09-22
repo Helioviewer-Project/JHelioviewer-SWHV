@@ -301,7 +301,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         toDraw = true;
     }
 
-    private static boolean stopped;
+    private static boolean stopped = true; // until the graph pane is showing
     private static boolean toDraw;
     private static boolean drawMovieLine;
 
