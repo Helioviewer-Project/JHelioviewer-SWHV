@@ -131,10 +131,10 @@ final class ImageLayerOptions extends JPanel {
         progressBar.setUI(new CircularProgressUI());
         progressBar.setForeground(downloadButton.getForeground());
 
-        MetaDataDialog metaDialog = new MetaDataDialog();
         JideButton metaButton = new JideButton(Buttons.info);
         metaButton.setToolTipText("Show metadata of selected layer");
         metaButton.addActionListener(e -> {
+            MetaDataDialog metaDialog = MetaDataDialog.getInstance();
             metaDialog.setMetaData(layer);
             metaDialog.showDialog();
         });

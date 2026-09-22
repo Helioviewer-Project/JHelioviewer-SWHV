@@ -58,7 +58,14 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     private String exportFilename;
     private int metadataRequest;
 
-    public MetaDataDialog() {
+    private static MetaDataDialog instance;
+
+    // Shared by all image layers: a shown window stays referenced by AWT until disposed.
+    public static MetaDataDialog getInstance() {
+        return instance == null ? instance = new MetaDataDialog() : instance;
+    }
+
+    private MetaDataDialog() {
         super(MainFrame.get(), "Image Information");
 
         fitsTable.setModel(fitsModel);
