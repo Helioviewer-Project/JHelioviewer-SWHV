@@ -78,8 +78,7 @@ public final class JPIPSocket extends HTTPSocket {
             return;
 
         try {
-            if (jpipChannelID != null)
-                writeRequest(createQuery(0, "cclose", jpipChannelID));
+            writeRequest(createQuery(0, "cclose", jpipChannelID));
         } catch (IOException ignore) { // no problem, server may have closed the socket
         } finally {
             super.close();
