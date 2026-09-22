@@ -100,12 +100,11 @@ public final class YAxis {
         double scaledStart = scale(start);
         double scaledEnd = scale(end);
         double scaled = scaledStart + (scaledEnd - scaledStart) * (relativeY / height);
-        double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
 
-        double newScaledStart = Math.clamp((1 + delta) * scaledStart - delta * scaled,
-                scaledLowerLimit, scaledUpperLimit);
-        double newScaledEnd = Math.clamp((1 + delta) * scaledEnd - delta * scaled,
-                scaledLowerLimit, scaledUpperLimit);
+        // exponential so that the span factor stays positive: a fast scroll can neither collapse nor invert the range
+        double factor = Math.exp(scrollValue * ZOOMSTEP_PERCENTAGE);
+        double newScaledStart = Math.clamp(scaled + factor * (scaledStart - scaled), scaledLowerLimit, scaledUpperLimit);
+        double newScaledEnd = Math.clamp(scaled + factor * (scaledEnd - scaled), scaledLowerLimit, scaledUpperLimit);
 
         start = invScale(newScaledStart);
         end = invScale(newScaledEnd);
