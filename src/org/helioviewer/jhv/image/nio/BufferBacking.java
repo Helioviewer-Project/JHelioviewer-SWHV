@@ -2,6 +2,7 @@ package org.helioviewer.jhv.image.nio;
 
 import java.awt.image.DataBuffer;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
@@ -10,7 +11,6 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.Directories;
@@ -47,9 +47,9 @@ final class BufferBacking {
 
         Path tempPath = Files.createTempFile(Directories.exportCacheDir.toPath(), "mbuf", null);
         Arena arena = Arena.ofShared();
-        try (FileChannel channel = FileChannel.open(tempPath, StandardOpenOption.READ, StandardOpenOption.WRITE)) {
-            channel.truncate(length);
-            MemorySegment segment = channel.map(FileChannel.MapMode.READ_WRITE, 0, length, arena);
+        try (RandomAccessFile file = new RandomAccessFile(tempPath.toFile(), "rw")) {
+            file.setLength(length);
+            MemorySegment segment = file.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, length, arena);
             return new BufferBacking(createTypedView(type, segment.asByteBuffer()), arena, tempPath);
         } catch (IOException | RuntimeException | Error e) {
             arena.close();
