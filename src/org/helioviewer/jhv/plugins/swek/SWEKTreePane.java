@@ -63,7 +63,6 @@ final class SWEKTreePane extends JPanel {
             tree.expandRow(i);
 
         loadingTimer = new Timer(500, e -> repaintBusyGroups());
-        SWEKDownloader.setGroupChangedCallback(this::groupBusyChanged);
 
         setBorder(BorderFactory.createEmptyBorder());
         add(tree, BorderLayout.CENTER);
@@ -181,6 +180,12 @@ final class SWEKTreePane extends JPanel {
         tree.setEnabled(enabled);
         groupComponents.values().forEach(component -> setEnabledRecursively(component, enabled));
         supplierComponents.values().forEach(component -> setEnabledRecursively(component, enabled));
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        SWEKDownloader.setGroupChangedCallback(this::groupBusyChanged);
     }
 
     @Override
