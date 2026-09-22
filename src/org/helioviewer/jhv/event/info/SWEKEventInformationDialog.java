@@ -47,7 +47,10 @@ public final class SWEKEventInformationDialog extends JDialog {
         related = _related;
 
         initAllTablePanel();
-        initParameterCollapsiblePanels();
+        initParameterCollapsiblePanels(true, false);
+        List<SolarEvent> relatedEvents = related.getAssociatedEvents(event);
+        if (!relatedEvents.isEmpty())
+            relatedEventsPanel = createRelatedEventsCollapsiblePane(related, relatedEvents);
         setCollapsiblePanels();
 
         setLayout(new GridBagLayout());
@@ -83,12 +86,16 @@ public final class SWEKEventInformationDialog extends JDialog {
     }
 
     private void onSuccessDatabase(@Nonnull EventDatabase.EventDetails details) {
+        if (!isDisplayable()) // closed (disposed) before the result arrived, pack() would recreate the native peer
+            return;
+
         event = details.event();
         List<SolarEvent> relatedEvents = details.relatedEvents();
         if (!relatedEvents.isEmpty())
             otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane(relatedEvents);
 
-        initParameterCollapsiblePanels();
+        // the stored event carries the full parameter set; keep what the user expanded meanwhile
+        initParameterCollapsiblePanels(standardParameters.isExpanded(), allParameters.isExpanded());
         repack();
         repaint();
     }
@@ -101,16 +108,12 @@ public final class SWEKEventInformationDialog extends JDialog {
         allTablePanel = new JPanel(new GridBagLayout());
     }
 
-    private void initParameterCollapsiblePanels() {
+    private void initParameterCollapsiblePanels(boolean standardExpanded, boolean allExpanded) {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
-        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, this::repack);
+        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, standardExpanded, this::repack);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
-        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, this::repack);
-
-        List<SolarEvent> relatedEvents = related.getAssociatedEvents(event);
-        if (!relatedEvents.isEmpty())
-            relatedEventsPanel = createRelatedEventsCollapsiblePane(related, relatedEvents);
+        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, allExpanded, this::repack);
     }
 
     private void setCollapsiblePanels() {
