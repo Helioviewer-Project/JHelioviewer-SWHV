@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -133,6 +132,7 @@ public final class Layers {
         layers.remove(row);
         if (layer instanceof ImageLayer) {
             imageLayersCount--;
+            ImageLayers.arrangeMultiView();
         }
         detach(layer);
 
@@ -203,10 +203,7 @@ public final class Layers {
 
         layers.remove(fromIndex);
         layers.add(target, toMove);
-
-        if (Display.multiview) {
-            ImageLayers.arrangeMultiView(true);
-        }
+        ImageLayers.arrangeMultiView();
     }
 
     public static void fireTimeUpdated(Layer layer) {
@@ -314,7 +311,7 @@ public final class Layers {
 
         setActiveImageLayer(null);
         listeners.forEach(Listener::layersCleared);
-        DisplayController.display();
+        ImageLayers.arrangeMultiView();
     }
 
     private Layers() {}

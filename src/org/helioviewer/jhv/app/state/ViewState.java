@@ -300,7 +300,7 @@ public final class ViewState {
             return;
 
         Display.multiview = newMultiview;
-        ImageLayers.arrangeMultiView(newMultiview);
+        ImageLayers.arrangeMultiView();
         notifyModeListeners();
     }
 

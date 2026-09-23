@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -148,9 +147,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-        if (Display.multiview) {
-            ImageLayers.arrangeMultiView(true);
-        }
+        ImageLayers.arrangeMultiView();
     }
 
     void setView(View _view) {
@@ -174,10 +171,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         DisplayController.zoomMiniToFit();
         Layers.setActiveImageLayer(this);
-
-        if (Display.multiview) {
-            ImageLayers.arrangeMultiView(true);
-        }
         Layers.fireLayerUpdated(this);
     }
 
@@ -196,9 +189,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         removed = true;
         loader.abolish();
         unsetView();
-        if (Display.multiview) {
-            ImageLayers.arrangeMultiView(true);
-        }
         dispose();
         //System.gc(); // reclaim memory asap
     }

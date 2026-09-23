@@ -115,8 +115,8 @@ public final class ImageLayers {
         }
     }
 
-    public static void arrangeMultiView(boolean multiview) {
-        if (multiview) {
+    public static void arrangeMultiView() {
+        if (Display.multiview) {
             int ct = 0;
             for (ImageLayer layer : Layers.getImageLayers()) {
                 if (layer.isEnabled()) {
