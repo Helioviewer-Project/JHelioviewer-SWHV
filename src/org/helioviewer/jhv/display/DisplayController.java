@@ -132,6 +132,7 @@ public final class DisplayController {
     }
 
     public static void zoomToFovAnnotation(double centerX, double centerY, double halfSize) {
+        Display.resetViewportZoom();
         Camera camera = Display.getCamera();
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         camera.setTranslation(-centerX, -centerY);
