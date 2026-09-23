@@ -49,9 +49,10 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     private static JSONObject toPointJson(Vec3 p) {
+        double r = p.length();
         double lon = SphericalCoords.longitude(p);
         double lat = SphericalCoords.latitude(p);
-        return new JSONObject().put("lon", Math.toDegrees(lon < 0 ? lon + 2 * Math.PI : lon)).put("lat", Math.toDegrees(lat));
+        return new JSONObject().put("r", r).put("lon", Math.toDegrees(lon < 0 ? lon + 2 * Math.PI : lon)).put("lat", Math.toDegrees(lat));
     }
 
     private static Vec3 fromPointJson(JSONObject jo, String name) {
@@ -61,8 +62,8 @@ abstract class AbstractAnnotateable implements Annotateable {
         JSONObject obj = jo.optJSONObject(name);
         if (obj == null)
             return null;
-        double lon = Math.toRadians(obj.optDouble("lon", 0)), lat = Math.toRadians(obj.optDouble("lat", 0));
-        return SphericalCoords.unit(lon, lat);
+        double r = obj.optDouble("r", 1), lon = Math.toRadians(obj.optDouble("lon", 0)), lat = Math.toRadians(obj.optDouble("lat", 0));
+        return SphericalCoords.vec3(r, lon, lat);
     }
 
     static Vec3 interpolateSpherical(double t, double longitude1, double latitude1, double longitude2, double latitude2) {
