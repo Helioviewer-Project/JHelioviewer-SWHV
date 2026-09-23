@@ -7,21 +7,13 @@ public final class SectorPanel {
 
     private final FilterDetails directionDetails;
     private final FilterDetails widthDetails;
-    private double direction;
-    private double width;
 
     public SectorPanel(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        direction = settings.getSectorCenter();
-        width = settings.getSectorWidth();
-        directionDetails = SliderFilterPanel.create("Sector", -180, 180, direction, 1, SectorPanel::formatDegree, value -> {
-            direction = value;
-            settings.setSector(direction, width);
-        });
-        widthDetails = SliderFilterPanel.create("Opening", 0, 360, width, 1, SectorPanel::formatDegree, value -> {
-            width = value;
-            settings.setSector(direction, width);
-        });
+        directionDetails = SliderFilterPanel.create("Sector", -180, 180, settings.getSectorCenter(), 1, SectorPanel::formatDegree,
+                value -> settings.setSector(value, settings.getSectorWidth()));
+        widthDetails = SliderFilterPanel.create("Opening", 0, 360, settings.getSectorWidth(), 1, SectorPanel::formatDegree,
+                value -> settings.setSector(settings.getSectorCenter(), value));
     }
 
     public FilterDetails getDirectionDetails() {
