@@ -1,22 +1,12 @@
 package org.helioviewer.jhv.app;
 
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
-
-import org.json.JSONObject;
 
 public final class Commands {
 
@@ -117,87 +107,6 @@ public final class Commands {
 
     public static void recordStop() {
         ExportMovie.shallStop();
-    }
-
-    public static void loadState(URI uri) {
-        Load.state(uri);
-    }
-
-    public static void loadState(@Nullable OperationContext context, URI uri) {
-        Load.state(context, uri);
-    }
-
-    public static void loadState(@Nullable OperationContext context, String json) {
-        Load.state(context, json);
-    }
-
-    public static void loadRequest(URI uri) {
-        Load.request(uri);
-    }
-
-    public static void loadRequest(String json) {
-        Load.request(json);
-    }
-
-    public static void loadSunJSON(URI uri) {
-        Load.sunJSON(uri);
-    }
-
-    public static void loadSunJSON(String json) {
-        Load.sunJSON(json);
-    }
-
-    public static CompletableFuture<ImageLayer> loadImage(URI uri) {
-        return loadImage(List.of(uri));
-    }
-
-    public static CompletableFuture<ImageLayer> loadImage(List<URI> uris) {
-        return loadImage(uris, null);
-    }
-
-    public static CompletableFuture<ImageLayer> loadImage(List<URI> uris, @Nullable JSONObject imageParams) {
-        CompletableFuture<ImageLayer> future = new CompletableFuture<>();
-        if (uris.isEmpty()) {
-            future.complete(null);
-            return future;
-        }
-
-        Task.submitBackground(() -> FileUtils.resolveURIList(uris), resolved -> {
-            if (resolved.isEmpty()) {
-                future.complete(null);
-                return;
-            }
-
-            try {
-                ImageLayer layer = ImageLayer.create(null);
-                layer.applyImageParams(imageParams);
-                layer.load(resolved);
-                future.complete(layer);
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
-        }, future::completeExceptionally);
-        return future;
-    }
-
-    public static void loadCDF(URI uri) {
-        Load.cdf(uri);
-    }
-
-    public static void loadCDF(List<URI> uris) {
-        Load.cdf(uris);
-    }
-
-    public static void loadVOTable(URI uri) {
-        Load.votable(uri);
-    }
-
-    public static void loadHapi(URI uri) {
-        Load.hapi(uri);
-    }
-
-    public static void loadHapi(List<URI> uris) {
-        Load.hapi(uris);
     }
 
     public static void zoomIn() {

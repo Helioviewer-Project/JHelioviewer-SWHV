@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.io.Load;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -16,25 +17,25 @@ import org.astrogrid.samp.client.AbstractMessageHandler;
 final class LoadHandlers {
 
     static void register(SampClient client) {
-        client.addMessageHandler(singleURIHandler("image.load.fits", Commands::loadImage));
+        client.addMessageHandler(singleURIHandler("image.load.fits", Load::image));
         // load VOTable only from SOAR
         client.addMessageHandler(SampHandlers.create("table.load.votable", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender))
-                loadURI(msg, Commands::loadVOTable);
+                loadURI(msg, Load::votable);
         }));
         // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
         client.addMessageHandler(SampHandlers.create("table.load.fits", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
-                loadURI(msg, Commands::loadImage);
+                loadURI(msg, Load::image);
         }));
         // advertise we can load CDF, although we can do only MAG and SWA
-        client.addMessageHandler(singleURIHandler("table.load.cdf", Commands::loadCDF));
+        client.addMessageHandler(singleURIHandler("table.load.cdf", Load::cdf));
         client.addMessageHandler(LoadImageHandler.create());
-        client.addMessageHandler(uriListHandler("jhv.load.cdf", Commands::loadCDF, Commands::loadCDF));
+        client.addMessageHandler(uriListHandler("jhv.load.cdf", Load::cdf, Load::cdf));
         // Add handler for the HAPI csv files
-        client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands::loadHapi, Commands::loadHapi));
-        client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands::loadRequest, Commands::loadRequest));
-        client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Commands::loadSunJSON, Commands::loadSunJSON));
+        client.addMessageHandler(uriListHandler("jhv.load.hapi", Load::hapi, Load::hapi));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.request", Load::request, Load::request));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Load::sunJSON, Load::sunJSON));
         client.addMessageHandler(SampHandlers.create("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
     }
 
@@ -69,12 +70,12 @@ final class LoadHandlers {
             Object input = msg.getParam("url");
             if (input != null) {
                 URI uri = toURI(input.toString());
-                EventQueue.invokeLater(() -> Commands.loadState(context, uri));
+                EventQueue.invokeLater(() -> Load.state(context, uri));
                 return;
             }
             String value = SampHandlers.optionalString(msg, "value");
             if (value != null) {
-                EventQueue.invokeLater(() -> Commands.loadState(context, value));
+                EventQueue.invokeLater(() -> Load.state(context, value));
                 return;
             }
             Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");

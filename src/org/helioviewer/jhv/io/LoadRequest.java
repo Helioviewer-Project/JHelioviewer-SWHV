@@ -28,6 +28,8 @@ class LoadRequest {
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
+        if (uriList.isEmpty())
+            return;
         Task.submitBackground("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
         Timelines.dc.setStatus("Loading...");
     }

@@ -23,6 +23,8 @@ public class LoadSunJSON {
     }
 
     public static void submit(@Nonnull List<URI> uriList) {
+        if (uriList.isEmpty())
+            return;
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
             Task.submitBackground("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);

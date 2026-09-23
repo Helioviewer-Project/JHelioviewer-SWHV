@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
@@ -25,8 +26,8 @@ final class LoadImageHandler {
             try {
                 JSONObject imageParams = imageParams(msg);
                 if (!LoadHandlers.loadURIList(msg,
-                        uri -> waitImageLoad(context, Commands.loadImage(List.of(uri), imageParams)),
-                        uris -> waitImageLoad(context, Commands.loadImage(uris, imageParams)))) {
+                        uri -> waitImageLoad(context, Load.image(List.of(uri), imageParams)),
+                        uris -> waitImageLoad(context, Load.image(uris, imageParams)))) {
                     context.complete(false, "Missing jhv.load.image url.", null);
                 }
             } catch (Exception e) {

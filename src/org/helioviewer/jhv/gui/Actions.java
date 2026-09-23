@@ -27,12 +27,11 @@ import org.helioviewer.jhv.gui.dialog.SoarDialog;
 import org.helioviewer.jhv.gui.dialog.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.ModelLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -83,7 +82,7 @@ public final class Actions {
         public void actionPerformed(ActionEvent e) {
             File state = LoadStateDialog.get();
             if (state != null)
-                Commands.loadState(state.toURI());
+                Load.state(state.toURI());
         }
     }
 
@@ -165,7 +164,7 @@ public final class Actions {
                     if (f.isFile() && f.canRead()) // cannot select directories anyway
                         uris.add(f.toURI());
                 }
-                Commands.loadImage(uris);
+                Load.image(uris);
             }
         }
     }
@@ -193,7 +192,7 @@ public final class Actions {
                 return;
 
             URI uri = file.toURI();
-            Task.submitBackground(uri.toString(), () -> new ModelLayer(uri), Layers::add, "Error loading model");
+            Load.model(uri);
         }
     }
 

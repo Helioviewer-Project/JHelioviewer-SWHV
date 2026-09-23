@@ -28,10 +28,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.thread.Task;
 
 import org.json.JSONArray;
@@ -84,7 +84,7 @@ public class AspiicsDialog extends StandardDialog {
     public ButtonPanel createButtonPanel() {
         addButton.addActionListener(e -> {
             List<String> selected = listPane.getSelectedValuesList();
-            Commands.loadImage(selected.stream().map(AspiicsDialog::uri).toList());
+            Load.image(selected.stream().map(AspiicsDialog::uri).toList());
             setVisible(false);
         });
 

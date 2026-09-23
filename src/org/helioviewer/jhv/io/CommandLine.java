@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Settings;
 
@@ -47,7 +46,7 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("-load")) {
-            Commands.loadImage(uri);
+            Load.image(uri);
         }
     }
 
@@ -55,11 +54,11 @@ public class CommandLine {
     public static void loadRequest() {
         // -request: works only for default server
         for (URI uri : getURIOptionValues("-request")) {
-            Commands.loadRequest(uri);
+            Load.request(uri);
         }
         // -state
         for (URI uri : getURIOptionValues("-state")) {
-            Commands.loadState(uri);
+            Load.state(uri);
             break;
         }
     }

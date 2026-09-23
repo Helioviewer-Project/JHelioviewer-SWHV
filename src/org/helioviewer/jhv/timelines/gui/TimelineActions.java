@@ -8,12 +8,12 @@ import java.io.File;
 
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")
@@ -54,7 +54,7 @@ public class TimelineActions {
                 Settings.setProperty("path.local", directory);
                 for (File fileName : fileNames) {
                     if (fileName.isFile())
-                        Commands.loadRequest(fileName.toURI());
+                        Load.request(fileName.toURI());
                 }
             }
         }

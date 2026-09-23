@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -62,7 +61,7 @@ public final class PunchClient {
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
-        Commands.loadImage(items.stream().map(DataItem::uri).toList());
+        Load.image(items.stream().map(DataItem::uri).toList());
     }
 
     private static String readIndex(String url) throws Exception {
