@@ -28,10 +28,7 @@ public interface UpdateViewpoint {
     class ObserverAt1au implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            ImageLayer layer = Layers.getActiveImageLayer();
-            return layer == null
-                    ? Position.toFixedDistance(Sun.getEarth(time), Sun.MeanEarthDistance)
-                    : Position.toFixedDistance(layer.getView().getMetaData(time).getViewpoint(), Sun.MeanEarthDistance);
+            return Position.toFixedDistance(observer.update(time), Sun.MeanEarthDistance);
         }
     }
 
