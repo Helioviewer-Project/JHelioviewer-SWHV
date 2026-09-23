@@ -36,9 +36,12 @@ class BandCacheMinute implements BandCache {
         int len = values.length;
         boolean max = yAxis.preferMax();
         for (int i = 0; i < len; i++) {
+            float value = yAxis.clip(values[i]);
+            if (value == YAxis.BLANK) // chunks start blank; writing it would erase valid samples at coarser levels
+                continue;
             long key = date2key(dates[i]);
             DataChunk cache = cacheMap.computeIfAbsent(key, DataChunk::new);
-            cache.setValue(max, (int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), yAxis.clip(values[i]));
+            cache.setValue(max, (int) ((dates[i] % MILLIS_PER_CHUNK) / MILLIS_PER_TICK), value);
         }
     }
 
