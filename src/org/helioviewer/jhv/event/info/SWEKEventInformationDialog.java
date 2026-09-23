@@ -36,15 +36,13 @@ public final class SWEKEventInformationDialog extends JDialog {
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
     private SolarEvent event;
-    private final RelatedEvents related;
 
-    public SWEKEventInformationDialog(RelatedEvents _related, SolarEvent _event) {
+    public SWEKEventInformationDialog(RelatedEvents related, SolarEvent _event) {
         super(MainFrame.get(), _event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         event = _event;
-        related = _related;
 
         initAllTablePanel();
         initParameterCollapsiblePanels(true, false);
@@ -63,7 +61,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         eventDescriptionConstraint.anchor = GridBagConstraints.LINE_START;
         eventDescriptionConstraint.fill = GridBagConstraints.BOTH;
 
-        add(new EventDescriptionPanel(_related, event), eventDescriptionConstraint);
+        add(new EventDescriptionPanel(related, event), eventDescriptionConstraint);
 
         GridBagConstraints allTablePanelConstraint = new GridBagConstraints();
         allTablePanelConstraint.gridx = 0;
