@@ -244,7 +244,7 @@ public class J2KView extends BaseView {
         return isDownloading;
     }
 
-    protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
+    private J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
         ResolutionSet.Level res;
         if (ExportMovie.isRecording()) { // all bets are off
             res = source.resolutionSet(frame).getLevel(0);
@@ -272,7 +272,10 @@ public class J2KView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {
-        J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
+        decode(getDecodeParams(targetFrame, pixFactor, factor), viewpoint);
+    }
+
+    protected void decode(J2KParams.Decode decodeParams, Position viewpoint) {
         AtomicBoolean status = source.getFrameStatus(decodeParams.frame, decodeParams.level); // before signalling to reader
         boolean cacheResult = status != null && status.get();
         if (reader != null && !cacheResult) {

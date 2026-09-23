@@ -12,19 +12,11 @@ public class J2KViewCallisto extends J2KView {
         super(_executor, _request, _dataUri, _processingSettings);
     }
 
-    public void setDecodeRegion(int x, int y, int width, int height) {
-        region = new DecodeRegion(x, y, width, height);
-    }
-
-    private record DecodeRegion(int x, int y, int width, int height) {}
-
-    private DecodeRegion region;
-
-    @Override
-    protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
-        ResolutionSet.Level res = getResolutionLevel(frame, 0);
-        J2KParams.SubImage subImage = new J2KParams.SubImage(region.x(), region.y(), region.width(), region.height(), res.width(), res.height());
-        return new J2KParams.Decode(frame, subImage, res.level(), factor);
+    // Radio data is a single-frame JP2: decode the given region of the full-resolution level.
+    public void decodeRegion(int x, int y, int width, int height, float factor) {
+        ResolutionSet.Level res = getResolutionLevel(0, 0);
+        J2KParams.SubImage subImage = new J2KParams.SubImage(x, y, width, height, res.width(), res.height());
+        decode(new J2KParams.Decode(0, subImage, res.level(), factor), null);
     }
 
 }
