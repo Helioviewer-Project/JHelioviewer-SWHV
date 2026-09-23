@@ -175,7 +175,7 @@ public class Player {
     public static void pause() {
         movieTimer.stop();
         notifyStatusChanged();
-        DisplayController.render(1); /* ! force update for on the fly resolution change */
+        DisplayController.render(); /* ! force update for on the fly resolution change */
     }
 
     public static void toggle() {
@@ -247,7 +247,7 @@ public class Player {
         DisplayController.timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
-        DisplayController.render(1);
+        DisplayController.render();
 
         timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));
 

@@ -99,8 +99,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         processingSettings.setFilter(type);
     }
 
-    void decode(Position viewpoint, double pixFactor, float factor) {
-        view.decode(viewpoint, pixFactor, factor, processingSettings.fitsParameters().clipRange(view.getClipSet()));
+    void decode(Position viewpoint, double pixFactor) {
+        view.decode(viewpoint, pixFactor, processingSettings.fitsParameters().clipRange(view.getClipSet()));
     }
 
     public ImageProcessingSettings getProcessingSettings() {
@@ -112,7 +112,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             return;
         view.clearCache();
         imageData = prevImageData = baseImageData = null;
-        DisplayController.render(1);
+        DisplayController.render();
     }
 
     public void load(APIRequest req) {

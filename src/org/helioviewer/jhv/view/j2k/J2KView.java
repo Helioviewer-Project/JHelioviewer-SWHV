@@ -244,18 +244,17 @@ public class J2KView extends BaseView {
         return isDownloading;
     }
 
-    private J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
+    private J2KParams.Decode getDecodeParams(int frame, double pixFactor) {
         ResolutionSet.Level res;
         if (ExportMovie.isRecording()) { // all bets are off
             res = source.resolutionSet(frame).getLevel(0);
-            factor = 1;
         } else {
             MetaData m = metaData[frame];
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
             res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
-        return new J2KParams.Decode(frame, res.subImage(), res.level(), factor);
+        return new J2KParams.Decode(frame, res.subImage(), res.level(), 1);
     }
 
     private int currentLevel = 10000;
@@ -271,8 +270,8 @@ public class J2KView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {
-        decode(getDecodeParams(targetFrame, pixFactor, factor), viewpoint);
+    public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {
+        decode(getDecodeParams(targetFrame, pixFactor), viewpoint);
     }
 
     protected void decode(J2KParams.Decode decodeParams, Position viewpoint) {

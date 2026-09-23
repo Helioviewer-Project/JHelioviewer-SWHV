@@ -65,7 +65,7 @@ public final class URIView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range range) {
+    public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range range) {
         clipRange = hasFITS() ? range : null;
         DecodeKey key = decodeKey();
         DecodedImage image = ImageBufferCache.get(key);

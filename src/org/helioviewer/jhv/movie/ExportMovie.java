@@ -186,7 +186,7 @@ public final class ExportMovie {
                 stopAfterFrame = true;
                 if (mainCanvasVisible) {
                     canvasFramePending = true;
-                    DisplayController.render(1);
+                    DisplayController.render();
                 } else {
                     captureFrame();
                 }

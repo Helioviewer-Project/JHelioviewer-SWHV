@@ -32,9 +32,9 @@ public final class DisplayController {
     private static boolean missingHandlerLogged;
     private static Consumer<Position> renderRequestHandler = _ -> missingRenderRequestHandler();
 
-    public static void render(float decodeFactor) {
+    public static void render() {
         Position viewpoint = viewpointModel.getViewpoint();
-        if (!ImageLayers.decode(decodeFactor, viewpoint)) // just display() if none enabled
+        if (!ImageLayers.decode(viewpoint)) // just display() if none enabled
             display(viewpoint);
     }
 
@@ -97,7 +97,7 @@ public final class DisplayController {
 
     public static void refreshCamera() {
         updateViewpoint(Player.getTime());
-        render(1);
+        render();
     }
 
     private static void updateViewpoint(JHVTime time) {
@@ -106,13 +106,13 @@ public final class DisplayController {
 
     public static void resetCamera() {
         resetCamera(Display.getCamera(), viewpointModel);
-        render(1);
+        render();
     }
 
     static void resetCameras() {
         resetCamera(Display.getMiniCamera(), miniViewpointState);
         resetCamera(Display.getCamera(), viewpointModel);
-        render(1);
+        render();
     }
 
     private static void resetCamera(Camera camera, ViewpointState model) {
@@ -124,7 +124,7 @@ public final class DisplayController {
     public static void zoomFit() {
         Display.resetViewportZoom();
         fitCameraToImageLayers(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
-        render(1);
+        render();
     }
 
     public static void zoomMiniToFit() {
@@ -150,7 +150,7 @@ public final class DisplayController {
 
     public static void zoomIn() {
         zoomViewports(-Camera.ZOOM_MULTIPLIER_BUTTON);
-        render(1);
+        render();
     }
 
     public static void zoomOut() {
@@ -177,7 +177,7 @@ public final class DisplayController {
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }
-        render(1);
+        render();
     }
 
     private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, MapMode mode) {

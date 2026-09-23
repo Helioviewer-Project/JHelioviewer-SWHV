@@ -26,13 +26,13 @@ import org.astrogrid.samp.SampUtils;
 
 public final class ImageLayers {
 
-    public static boolean decode(float factor, Position viewpoint) {
+    public static boolean decode(Position viewpoint) {
         boolean decoded = false;
         for (ImageLayer layer : Layers.getImageLayers()) {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
                 double pixFactor = DisplayController.getImagePixelFactor(Display.getViewport(idx));
-                layer.decode(viewpoint, pixFactor, factor);
+                layer.decode(viewpoint, pixFactor);
                 decoded = true;
             }
         }
@@ -131,7 +131,7 @@ public final class ImageLayers {
             }
         }
         Display.reshapeAll();
-        DisplayController.render(1);
+        DisplayController.render();
     }
 
     @Nullable

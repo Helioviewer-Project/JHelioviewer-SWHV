@@ -61,8 +61,8 @@ public class ManyView implements View {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {
-        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor, clipRange);
+    public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {
+        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, clipRange);
     }
 
     @Nullable

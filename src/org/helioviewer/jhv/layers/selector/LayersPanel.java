@@ -202,7 +202,7 @@ public final class LayersPanel extends JPanel {
                 if (v.col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(v.row, v.col);
-                    DisplayController.render(1);
+                    DisplayController.render();
                 } else if (v.col == NAME_COL && layer instanceof ImageLayer il) {
                     Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved

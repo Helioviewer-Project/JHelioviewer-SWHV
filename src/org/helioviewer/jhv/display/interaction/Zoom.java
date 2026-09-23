@@ -31,7 +31,7 @@ final class Zoom {
                 viewport.zoom *= factor;
         }
         if (velocity < 0)
-            DisplayController.render(1);
+            DisplayController.render();
         else
             DisplayController.display();
     }

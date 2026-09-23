@@ -108,7 +108,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     private void optionStateChanged(CameraMode mode) {
         if (cameraMode == mode) {
             applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
-            DisplayController.render(1);
+            DisplayController.render();
         }
     }
 

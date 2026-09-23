@@ -37,7 +37,7 @@ public interface View {
 
     default void clearCache() {}
 
-    default void decode(Position viewpoint, double pixFactor, float factor, @Nullable ClipSet.Range clipRange) {}
+    default void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {}
 
     @Nullable
     default ClipSet getClipSet() {
