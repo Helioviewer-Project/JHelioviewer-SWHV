@@ -14,7 +14,6 @@ import kdu_jni.KduException;
 // Assumes a persistent HTTP connection
 public final class JPIPSocket extends HTTPSocket {
 
-    private static final String[] cnewParams = {"cid", "transport", "host", "path", "port", "auxport"};
     private static final int mainHeaderKlass = Constants.getKlass(Constants.JPIP.MAIN_HEADER_DATA_BIN_CLASS);
 
     private static final int META_REQUEST_LEN = 2000000;
@@ -44,10 +43,11 @@ public final class JPIPSocket extends HTTPSocket {
                 throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
             Map<String, String> map = new HashMap<>();
-            for (String part : cnew.split(","))
-                for (String cnewParam : cnewParams)
-                    if (part.startsWith(cnewParam + '='))
-                        map.put(cnewParam, part.substring(cnewParam.length() + 1));
+            for (String part : cnew.split(",")) {
+                int eq = part.indexOf('=');
+                if (eq > 0)
+                    map.put(part.substring(0, eq), part.substring(eq + 1));
+            }
 
             String path = map.get("path");
             jpipChannelID = map.get("cid");
@@ -57,7 +57,7 @@ public final class JPIPSocket extends HTTPSocket {
                 throw new IOException("The client only supports HTTP transport");
 
             jpipPath = '/' + path;
-        } catch (KduException | IOException | RuntimeException | Error e) {
+        } catch (Throwable e) { // close the socket on any failure, then rethrow
             try {
                 super.close();
             } catch (IOException ignore) {
@@ -96,13 +96,13 @@ public final class JPIPSocket extends HTTPSocket {
         return buf + "len=" + len;
     }
 
-    private static String createFrameQuery(int frame, String size) {
-        return createQuery(FRAME_RESPONSE_LIMIT, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", size, "roff", "0,0");
+    private String createFrameQuery(int frame, String size) {
+        return createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", size, "roff", "0,0");
     }
 
     public void init(JPIPCache cache) throws KduException, IOException {
         JPIPResponse res;
-        String req = createQuery(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
+        String req = createQuery(META_REQUEST_LEN, "cid", jpipChannelID, "stream", "0", "metareq", "[*]!!");
         do {
             res = requestInitialization(req, cache);
         } while (!res.isResponseComplete());
@@ -131,9 +131,6 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     private void writeRequest(String queryStr) throws IOException {
-        // Add a necessary JPIP request field
-        if (jpipChannelID != null && !queryStr.contains("cid=") && !queryStr.contains("cclose"))
-            queryStr += "&cid=" + jpipChannelID;
         write("GET " + jpipPath + '?' + queryStr + httpHeader);
     }
 
