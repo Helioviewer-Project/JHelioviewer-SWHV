@@ -53,7 +53,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
             }
         };
         grid = new JTable(tableModel);
-        container.setChangeListener(tableModel::fireTableDataChanged);
+        container.setChangeListener(() -> tableModel.fireTableRowsUpdated(0, tableModel.getRowCount() - 1));
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
