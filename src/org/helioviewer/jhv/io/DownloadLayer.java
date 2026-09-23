@@ -48,7 +48,7 @@ public class DownloadLayer {
         public Path call() throws Exception {
             URI uri = new URI(req.toFileRequest());
             try {
-                try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
+                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
                     long contentLength = nc.getContentLength();
                     long bytesRead, totalRead = 0, lastProgress = 0;
                     Buffer sinkBuffer = sink.getBuffer();
