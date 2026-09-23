@@ -65,7 +65,7 @@ public class ImageFilter {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int idx = rowBase; idx < rowEnd; idx++) {
-                    data[idx] = ((array[idx] + 256) & 0xFF) * BDIV;
+                    data[idx] = (array[idx] & 0xFF) * BDIV;
                 }
             }
         });
