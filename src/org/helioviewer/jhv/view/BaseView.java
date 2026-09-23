@@ -93,7 +93,7 @@ public class BaseView implements View {
         dataHandler = _dataHandler;
     }
 
-    protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image, BooleanSupplier isCurrent) {
+    protected final void sendDataToHandler(int frame, @Nullable Position viewpoint, DecodedImage image, BooleanSupplier isCurrent) {
         image.imageBuffer().protectFromExplicitFree();
         MetaData m = metaData[frame];
 

@@ -274,7 +274,7 @@ public class J2KView extends BaseView {
         decode(getDecodeParams(targetFrame, pixFactor), viewpoint);
     }
 
-    protected void decode(J2KParams.Decode decodeParams, Position viewpoint) {
+    protected void decode(J2KParams.Decode decodeParams, @Nullable Position viewpoint) {
         AtomicBoolean status = source.getFrameStatus(decodeParams.frame, decodeParams.level); // before signalling to reader
         boolean cacheResult = status != null && status.get();
         if (reader != null && !cacheResult) {
