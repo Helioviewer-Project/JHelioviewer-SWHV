@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.time;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -82,12 +83,14 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
         return get(key(idx));
     }
 
-    public V lowerValue(JHVTime time) {
-        return get(lowerKey(time));
+    public V floorValue(JHVTime time) {
+        Map.Entry<JHVTime, V> e = floorEntry(time);
+        return (e == null ? firstEntry() : e).getValue();
     }
 
-    public V higherValue(JHVTime time) {
-        return get(higherKey(time));
+    public V ceilingValue(JHVTime time) {
+        Map.Entry<JHVTime, V> e = ceilingEntry(time);
+        return (e == null ? lastEntry() : e).getValue();
     }
 
 }

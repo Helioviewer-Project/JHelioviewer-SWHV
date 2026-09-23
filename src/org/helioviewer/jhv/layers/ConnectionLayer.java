@@ -125,7 +125,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         JHVTime time = mv.viewpoint().time;
         updateTimestamp(time);
 
-        SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
+        SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.floorValue(time), footpointMap.ceilingValue(time));
         Annotations.drawCross(mv, vp, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.uploadAndClear(footpointBuf);
         footpointLine.renderLine(vp, LINEWIDTH);
