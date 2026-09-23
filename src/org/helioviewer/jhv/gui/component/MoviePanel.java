@@ -14,7 +14,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SpinnerNumberModel;
@@ -32,7 +31,6 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -201,7 +199,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
-        syncButton.addActionListener(e -> syncLayersSpan());
+        syncButton.addActionListener(e -> loadLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
         addLayerPanel.add(addLayerButton, BorderLayout.LINE_START);
@@ -237,14 +235,12 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
     public void loadDatasets(List<DataSourcesTree.SourceItem> items) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
-        if (checkSanity()) {
-            long start = getStartTime();
-            long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-            int cadence = getCadence();
-            for (DataSourcesTree.SourceItem item : items) {
-                ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
-                imageLayer.load(new APIRequest(item.server, item.sourceId, start, end, cadence));
-            }
+        long start = getStartTime();
+        long end = samplingPanel.isSingleFrame() ? start : getEndTime();
+        int cadence = getCadence();
+        for (DataSourcesTree.SourceItem item : items) {
+            ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
+            imageLayer.load(new APIRequest(item.server, item.sourceId, start, end, cadence));
         }
     }
 
@@ -261,29 +257,16 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         imageDialog.showDialog(true);
     }
 
-    private boolean checkSanity() {
-        long start = getStartTime();
-        long end = getEndTime();
-        if (start > end) {
-            timeSelectorPanel.setTime(end, end);
-            JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-    }
-
+    // Lock and Difference panel: show the range in the time fields, then reload all image layers.
     public void syncLayersSpan(long start, long end) {
         timeSelectorPanel.setTime(start, end);
-        syncLayersSpan();
+        loadLayersSpan();
     }
 
-    private void syncLayersSpan() {
-        if (checkSanity()) {
-            long start = getStartTime();
-            long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-            DrawController.setSelectedInterval(start, end);
-            ImageLayers.syncLayersSpan(start, end, getCadence());
-        }
+    private void loadLayersSpan() {
+        long start = getStartTime();
+        long end = samplingPanel.isSingleFrame() ? start : getEndTime();
+        ImageLayers.syncLayersSpan(start, end, getCadence());
     }
 
     private static class RecordButton extends JideToggleButton {
