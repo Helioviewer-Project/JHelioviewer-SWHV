@@ -155,12 +155,7 @@ public class BandType {
             if (range == null || range.length() < 2)
                 continue;
             double min = range.optDouble(0, -Double.MAX_VALUE);
-            Object maxObj = range.opt(1);
-            double max;
-            if (maxObj instanceof String s && "infinity".equals(s))
-                max = Double.MAX_VALUE;
-            else
-                max = range.optDouble(1, Double.MAX_VALUE);
+            double max = range.optDouble(1, Double.MAX_VALUE);
             String colorName = jo.optString("color", "black");
             Color color = Colors.parseColor(colorName);
             list.add(new Level(min, max, color));
