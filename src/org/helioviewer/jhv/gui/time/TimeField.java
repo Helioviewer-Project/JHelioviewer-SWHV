@@ -5,8 +5,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.JTextField;
@@ -54,14 +52,7 @@ class TimeField extends JTextField {
                 setTimeFromText();
             }
         });
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    transferFocus();
-                }
-            }
-        });
+        addActionListener(e -> transferFocus()); // Enter commits the text via focus loss
         putClientProperty("JTextField.trailingComponent", calendarButton); // FlatLaf 2 feature
         setToolTipText(tip);
     }
@@ -101,25 +92,21 @@ class TimeField extends JTextField {
         if (calPopup != null) {
             calPopup.hide();
             calPopup = null;
-            setTimeFromCalendar();
+            commitTime(calendarPicker.getTime());
         }
-    }
-
-    private void informListeners() {
-        listeners.forEach(CalendarListener::calendarAction);
     }
 
     private void setTimeFromText() {
         String text = getText();
-        if (text != null) { // satisfy coverity
-            setTime(TimeUtils.optParse(text, getTime()));
-            informListeners();
-        }
+        if (text != null) // satisfy coverity
+            commitTime(TimeUtils.optParse(text, getTime()));
     }
 
-    private void setTimeFromCalendar() {
-        setTime(calendarPicker.getTime());
-        informListeners();
+    private void commitTime(long time) {
+        long old = selectedTime;
+        setTime(time);
+        if (selectedTime != old)
+            listeners.forEach(CalendarListener::calendarAction);
     }
 
     void setTime(long time) {
