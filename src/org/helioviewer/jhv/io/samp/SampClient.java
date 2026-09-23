@@ -89,7 +89,7 @@ public final class SampClient extends HubConnector {
 
     static Commands.OperationContext operationContext(String senderId, Message msg, String mtype, String completionMType) {
         String requestId = SampHandlers.optionalString(msg, "requestId");
-        return new Commands.OperationContext(SampClient.class, senderId, requestId, mtype,
+        return new Commands.OperationContext(senderId, requestId, mtype,
                 (context, success, message, output) -> EventQueue.invokeLater(() ->
                         notifyCompletion(context, completionMType, success, message, output)));
     }

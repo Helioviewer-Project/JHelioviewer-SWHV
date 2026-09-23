@@ -12,7 +12,7 @@ import org.helioviewer.jhv.io.Directories;
 public final class CompletionNotifications {
 
     public static Commands.OperationContext recordingContext() {
-        return new Commands.OperationContext(CompletionNotifications.class, null, null, "record",
+        return new Commands.OperationContext(null, null, "record",
                 (context, success, message, output) -> {
                     if (success)
                         EventQueue.invokeLater(() -> showRecordingFinished(output));

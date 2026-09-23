@@ -24,13 +24,8 @@ public final class Commands {
             @Nullable String speed,
             @Nullable String speedUnit) {}
 
-    public record OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
+    public record OperationContext(@Nullable String clientId, @Nullable String requestId,
                                    @Nullable String mtype, @Nullable Completion completion) {
-        public OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
-                                @Nullable String mtype) {
-            this(owner, clientId, requestId, mtype, null);
-        }
-
         public void complete(boolean success, String message, @Nullable String output) {
             if (completion != null)
                 completion.finished(this, success, message, output);
