@@ -72,9 +72,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     @Override
     public void cacheUpdated() {
         if (!enabled) return;
-        TimeAxis xAxis = DrawController.selectedAxis;
-        visibleEvents = EventCache.getEvents(xAxis.start(), xAxis.end());
-        SWEKDownloader.requestForInterval(xAxis.start(), xAxis.end());
+        fetchData(DrawController.selectedAxis);
         DrawController.drawRequest();
     }
 

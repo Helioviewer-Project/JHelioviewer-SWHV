@@ -422,8 +422,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
 
         if (enabled) {
             EventCache.registerHandler(this);
-            Player.addTimeRangeListener(this);
-            requestEvents(true, Player.getStartTime(), Player.getEndTime());
+            Player.addTimeRangeListener(this); // calls timeRangeChanged, which requests the events
         } else {
             invalidateActiveEvents();
             EventCache.highlight(null);
@@ -449,21 +448,10 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         iconCacheId.clear();
     }
 
-    private long startTime = Player.getStartTime();
-    private long endTime = Player.getEndTime();
-
-    private void requestEvents(boolean force, long start, long end) {
-        if (force || start < startTime || end > endTime) {
-            startTime = start;
-            endTime = end;
-            SWEKDownloader.requestForInterval(start, end);
-        }
-    }
-
     @Override
     public void timeRangeChanged(long start, long end) {
         invalidateActiveEvents();
-        requestEvents(false, start, end);
+        SWEKDownloader.requestForInterval(start, end);
     }
 
     @Override
@@ -471,7 +459,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         if (!enabled)
             return;
         invalidateActiveEvents();
-        requestEvents(true, Player.getStartTime(), Player.getEndTime());
+        SWEKDownloader.requestForInterval(Player.getStartTime(), Player.getEndTime());
         DisplayController.display();
     }
 
