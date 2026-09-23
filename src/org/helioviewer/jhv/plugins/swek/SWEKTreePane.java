@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -90,7 +91,7 @@ final class SWEKTreePane extends JPanel {
 
     private void repaintBusyGroups() {
         boolean anyBusy = false;
-        for (var entry : groupNodes.entrySet()) {
+        for (Map.Entry<SWEKGroup, DefaultMutableTreeNode> entry : groupNodes.entrySet()) {
             if (SWEKDownloader.isGroupBusy(entry.getKey())) {
                 anyBusy = true;
                 repaintGroup(entry.getValue());

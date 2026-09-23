@@ -43,7 +43,7 @@ public class J2KView extends BaseView {
     private final Object cleanerToken = new Object();
 
     private final APIRequest request;
-    protected final int serial;
+    private final int serial;
 
     private final J2KSource source;
     private final int maxFrame;
@@ -52,7 +52,7 @@ public class J2KView extends BaseView {
     private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    protected final J2KReader reader;
+    private final J2KReader reader;
 
     public J2KView(LatestWorker<DecodedImage> _executor, APIRequest _request, DataUri _dataUri, ImageProcessingSettings _processingSettings) throws Exception {
         super(_executor, _dataUri, _processingSettings);
