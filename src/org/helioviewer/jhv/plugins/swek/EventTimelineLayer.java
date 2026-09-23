@@ -180,7 +180,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     private static EventPlotConfiguration createEventPlot(Rectangle graphArea, RelatedEvents event, int x0, int x1, int yPosition, long time) {
         int w = Math.max(x1 - x0, 1);
         if (w < 5) {
-            x0 -= 5 / w;
+            x0 -= (5 - w) / 2; // center the widened marker on the event
             w = 5;
         }
         int y = graphArea.y + 6 * yPosition + DrawConstants.EVENT_OFFSET;
