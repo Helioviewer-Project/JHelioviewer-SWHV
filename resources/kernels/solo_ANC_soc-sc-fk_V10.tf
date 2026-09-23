@@ -12,6 +12,17 @@ Solar Orbiter (SOLO) Frames Kernel
 Version and Date
 ------------------------------------------------------------------------
 
+   Version 1.0 -- June 03, 2026 -- Alfredo Escalante Lopez, ESAC/ESA
+                                   Ricardo Valles Blanco, ESAC/ESA
+                                   Silvia Romero Azpitarte, ESAC/ESA
+
+      Corrected reference frames diagrams and descriptions.
+
+      Updated contact information.
+
+      Corrected SOLO_SA-Y and SOLO_MGA reference frames diagrams and
+      orientation.
+
    Version 0.9 -- February 23, 2023 -- Alfredo Escalante Lopez, ESAC/ESA
                                        Ricardo Valles Blanco, ESAC/ESA
 
@@ -113,9 +124,15 @@ References
       Manual'', SO-EPD-PO-MA-0002, Issue 2, Revision 7,
       9th September 2016.
 
-   10. ``SWA EAS - science frames and rotation matrices'',
-       SO-SWA-MSSL-TN, A. Varsani, Mullard Space Science Laboratory,
-       Issue 1, January 2019.
+  10. ``SWA EAS - science frames and rotation matrices'',
+      SO-SWA-MSSL-TN, A. Varsani, Mullard Space Science Laboratory,
+      Issue 1, January 2019.
+
+  11. ``Solar Orbiter Coordinate System Document EN-14'',
+      SOL.S.ASTR.TN.00099, Issue 6, Airbus Defence and Space,
+      28th June 2018.
+
+  12. SOL.S.ASTR.TN.00090, Issue 13, Airbus Defence and Space.
 
 
 Contact Information
@@ -126,7 +143,7 @@ Contact Information
 
            Alfredo Escalante Lopez
            (+34) 91-8131-429
-           alfredo.escalante@esa.int
+           spice@cosmos.esa.int
 
    or the Solar Orbiter Science Operations Center at ESAC:
 
@@ -169,7 +186,7 @@ Implementation Notes
    This file was created and may be updated with a text editor or word
    processor.
 
-   * SPICEPY is a non-official, community developed Python wrapper for the
+   * SPICEYPY is a non-official, community developed Python wrapper for the
      NAIF SPICE toolkit. Its development is managed on Github.
      It is available at: https://github.com/AndrewAnnex/SpiceyPy
 
@@ -179,7 +196,7 @@ SOLO NAIF ID Codes -- Summary Section
 
    The following names and NAIF ID codes are assigned to the SOLO spacecraft,
    its structures and science instruments (the keywords implementing these
-   definitions are located in the section "SOL NAIF ID Codes -- Definition
+   definitions are located in the section "SOLO NAIF ID Codes -- Definition
    Section" at the end of this file):
 
       SOLO Spacecraft and Spacecraft Structures names/IDs:
@@ -191,9 +208,7 @@ SOLO NAIF ID Codes -- Summary Section
                                                 SOLO_SC)
             SOLO_HGA                  -144013
 
-            SOLO_SA+Y_ZERO            -144014
             SOLO_SA+Y                 -144015
-            SOLO_SA-Y_ZERO            -144016
             SOLO_SA-Y                 -144017
 
             SOLO_LGA_PZ               -144020
@@ -292,9 +307,14 @@ SOLO Frames
       SOLO_FOF                SOLO_SRF              CK              -144001
 
       SOLO_HGA_URF            SOLO_SRF              FIXED           -144010
-      SOLO_HGA_EL             SOLO_HGA_URF          CK              -144011
-      SOLO_HGA_AZ             SOLO_HGA_EL           CK              -144012
-      SOLO_HGA_MRF            SOLO_HGA_AZ           FIXED           -144013
+      SOLO_HGA_AZ             SOLO_HGA_URF          CK              -144011
+      SOLO_HGA_EL             SOLO_HGA_AZ           CK              -144012
+      SOLO_HGA_MRF            SOLO_HGA_EL           FIXED           -144013
+
+      SOLO_SA+Y_ZERO          SOLO_SRF              FIXED           -144014
+      SOLO_SA+Y               SOLO_SA+Y_ZERO        CK              -144015
+      SOLO_SA-Y_ZERO          SOLO_SRF              FIXED           -144016
+      SOLO_SA-Y               SOLO_SA-Y_ZERO        CK              -144017
 
       SOLO_LGA_PZ             SOLO_SRF              FIXED           -144020
       SOLO_LGA_MZ             SOLO_SRF              FIXED           -144021
@@ -423,13 +443,13 @@ Solar Orbiter Frames Hierarchy
          |     |   v               |      .         |<-ck          |<-ck
          |     |  "SOLO_LGA_PZ"    |      .         |              |
          |     |  -------------    |      .         v              v
-         |     |                   |      .   "SOLO_MGA_EL"   "SOLO_HGA_EL"
+         |     |                   |      .   "SOLO_MGA_EL"   "SOLO_HGA_AZ"
          |     |                   |      .   ------------    ------------
          |     |                   |      .         |              |
          |     |                   |      .         |<-fixed       |<-ck
          |     |                   |      .         |              |
          |     |                   |      .         v              v
-         |     |                   |      .   "SOLO_MGA_MRF" "SOLO_HGA_AZ"
+         |     |                   |      .   "SOLO_MGA_MRF" "SOLO_HGA_EL"
          |     |                   |      .   -------------- -------------
          |     |                   |      .                        |
          |     |                   |      .                        |<-fixed
@@ -759,18 +779,14 @@ SOLO High Gain Antenna Frames:
 HGA Moveable Reference Frames:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   DISCLAIMER: The HGA Moveable Referenfe frames although defined are not
-   yet implemented in the Solar Orbiter SPICE Kernel Dataset (CK files
-   are not being generated).
-
    To incorporate rotations in the gimbal the HGA frame chain includes
-   three frames: SOLO_HGA_EL, SOLO_HGA_AZ, and SOLO_HGA_MRF.
+   three frames: SOLO_HGA_AZ, SOLO_HGA_EL, and SOLO_HGA_MRF.
 
    The first two frames are defined as CK-based frames and are
    co-aligned with the SOLO_HGA_MRF frame in the zero gimbal position. In
-   a non-zero position the SOLO_HGA_EL is rotated from the HGA MRF
-   frame by an elevation angle about +Y and the SOLO_HGA_AZ frame is
-   rotated from the SOLO_HGA_EL frame by an azimuth angle about +Z. These
+   a non-zero position the SOLO_HGA_AZ is rotated from the HGA MRF
+   frame by an azimuth angle about +Z and the elevation frame is
+   rotated from the SOLO_HGA_AZ frame by an elevation angle about +Y. These
    rotations are stored in separated segments in CK files.
 
    The canonical upright position of the HGA is defined by azimuth = 0 deg,
@@ -800,18 +816,18 @@ HGA Moveable Reference Frames:
 
    \begindata
 
-      FRAME_SOLO_HGA_EL                = -144011
-      FRAME_-144011_NAME               = 'SOLO_HGA_EL'
+      FRAME_SOLO_HGA_AZ                = -144011
+      FRAME_-144011_NAME               = 'SOLO_HGA_AZ'
       FRAME_-144011_CLASS              =  3
       FRAME_-144011_CLASS_ID           = -144011
       FRAME_-144011_CENTER             = -144
       CK_-144011_SCLK                  = -144
       CK_-144011_SPK                   = -144
 
-      FRAME_SOLO_HGA_AZ                = -144012
-      FRAME_-144012_NAME               = 'SOLO_HGA_AZ'
+      FRAME_SOLO_HGA_EL                = -144012
+      FRAME_-144012_NAME               = 'SOLO_HGA_EL'
       FRAME_-144012_CLASS              =  3
-      FRAME_-144012_CLASS_ID           = -143012
+      FRAME_-144012_CLASS_ID           = -144012
       FRAME_-144012_CENTER             = -144
       CK_-144012_SCLK                  = -144
       CK_-144012_SPK                   = -144
@@ -821,7 +837,7 @@ HGA Moveable Reference Frames:
       FRAME_-144013_CLASS              =  4
       FRAME_-144013_CLASS_ID           = -144013
       FRAME_-144013_CENTER             = -144
-      TKFRAME_-144013_RELATIVE         = 'SOLO_HGA_AZ'
+      TKFRAME_-144013_RELATIVE         = 'SOLO_HGA_EL'
       TKFRAME_-144013_SPEC             = 'ANGLES'
       TKFRAME_-144013_UNITS            = 'DEGREES'
       TKFRAME_-144013_AXES             = (   2,       1,       3     )
@@ -855,7 +871,7 @@ SOLO Low Gain Antenna Frames:
             ( x, y, z ) =  ( 0.85351, -0.64433, 1.18275 )
 
    The SOLO_HGA_URF frame is defined as a fixed offset frame relative to the
-   SOLO_MRF frame. The following rotation matrix from [4] is used to define
+   SOLO_SRF frame. The following rotation matrix from [4] is used to define
    the fixed offset =
 
                          | -0.707107  -0.328179  0.626337 |
@@ -880,7 +896,7 @@ SOLO Low Gain Antenna Frames:
             ( x, y, z ) =  ( 1.94725, 0.5581, -1.46296 )
 
    The SOLO_HGA_URF frame is defined as a fixed offset frame relative to the
-   SOLO_MRF frame. The following rotation matrix from [4] is used to define
+   SOLO_SRF frame. The following rotation matrix from [4] is used to define
    the fixed offset =
 
                          |  0.906308    0.171894  -0.386081 |
@@ -927,18 +943,20 @@ SOLO Medium Gain Antenna Frames:
    of the HGA.
 
    The MGA_URF frame is used to define the position and orientation of the
-   MGA-root relative to the SOLO PRF frame, used to provide a reference for
-   the definition of the MGA inertial properties, and used to define the
-   deformation of the MGA from its nominal geometry.
+   MGA-root relative to the SOLO SRF frame and is co-aligned with the MGA MRF
+   when the MGA is in stowed position (0 degrees elevation), and it's used to
+   provide a reference for the definition of the MGA inertial properties, and
+   used to define the deformation of the MGA from its nominal geometry.
 
    The SOLO High Gain Antenna is attached to the +Z panel of the S/C bus
    in the corner with the -X panel by a gimbal providing one degree of
    freedom and it articulates during flight to track Earth.
 
-   According to [4] the SOLO HGA Unit reference frame -- SOLO_MGA_URF -- is
-   defined as follows:
+   According to [4] and [12] the SOLO MGA Unit reference frame
+   -- SOLO_MGA_URF -- is defined as follows:
 
-      -  +X axis is aligned with the S/C +X axis,
+      -  +X axis is the result of rotating the S/C +X axis -112 degrees around
+         the S/C +Y axis.
 
       -  +Y axis is aligned with the S/C +Y axis, and is also aligned with
          axis of rotation of the MGA hinge.
@@ -952,7 +970,7 @@ SOLO Medium Gain Antenna Frames:
             ( x, y, z ) =  ( 0.5405, -0.3569, 1.3337 )
 
    The SOLO_MGA_URF frame is defined as a fixed offset frame relative to the
-   SOLO_MRF frame.
+   SOLO_SRF frame.
 
    \begindata
 
@@ -965,7 +983,7 @@ SOLO Medium Gain Antenna Frames:
       TKFRAME_-144030_SPEC            = 'ANGLES'
       TKFRAME_-144030_UNITS           = 'DEGREES'
       TKFRAME_-144030_AXES            = (     3,      2,      1 )
-      TKFRAME_-144030_ANGLES          = (   0.0,    0.0,    0.0 )
+      TKFRAME_-144030_ANGLES          = (   0.0, -112.0,    0.0 )
 
    \begintext
 
@@ -973,31 +991,30 @@ SOLO Medium Gain Antenna Frames:
 MGA Moveable Reference Frames:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   DISCLAIMER: The MGA Moveable Referenfe frames although defined are not
-   yet implemented in the Solar Orbiter SPICE Kernel Dataset (CK files
-   are not being generated).
-
    To incorporate rotations in the gimbal the MGA frame chain includes
    three frames: SOLO_MGA_EL and SOLO_MGA_MRF.
 
-   The first frame is defined as CK-based frame and is co-aligned with the
-   SOLO_MGA_MRF frame in the zero gimbal position. In a non-zero position the
-   SOLO_MGA_EL is rotated from the MGA MRF frame by an elevation angle
+   The SOLO_MGA_EL is defined as CK-based frame and is co-aligned with the
+   SOLO_MGA_URF frame in the zero gimbal position. In a non-zero position the
+   SOLO_MGA_EL is rotated from the SOLO_MGA_URF frame by an elevation angle
    about -Y.
 
-    The rotation is defined by the elevation of the MGA. The elevation is the
+   The rotation is defined by the elevation of the MGA. The elevation is the
    angle of positive rotation of the MGA around the -Y axis of the
-   SOLO_MGA_MRF frame hence the elevation angle is the angle in between the
-   +X axis of the SOLO_MGA_MRF frame and the +X axis of the SOLO_SRF frame.
+   SOLO_MGA_URF frame hence the elevation angle is the angle in between the
+   +Z axis of the SOLO_MGA_MRF frame and the +Z axis of the SOLO_MGA_URF frame.
+
+   Note that according to [12] the SOLO_MGA_URF +Z axis is defined as the
+   MGA +X axis.
 
    The range of elevation is 0 to +210 degrees. The value of that provides the
    nominal boresight of the MGA is 22 degrees. Note that the MGA safe position
    corresponds to an elevation of 0.5 degree.
 
-   According to [4] the SOLO optical reference frame -- SOLO_HGA_MRF -- is
+   According to [4] the SOLO optical reference frame -- SOLO_MGA_MRF -- is
    defined as follows:
 
-      -  +X axis is aligned with the boresight of the undeformed HGA.
+      -  +X axis is aligned with the boresight of the undeformed MGA.
 
       -  +Y axis is aligned with the S/C +Y axis,
 
@@ -1007,7 +1024,7 @@ MGA Moveable Reference Frames:
          the boresight axis onto the rotation axis of the elevation mechanism.
 
 
-   This set of keywords defines the HGA frame as a CK frame:
+   This set of keywords defines the MGA Elevation frame as a CK frame:
 
    \begindata
 
@@ -1327,7 +1344,7 @@ Star Trackers Frames:
                                            |  0             |
                                            |  |             |
                                            |  |             |
-               +Zsrf is out of             V  |             |
+               +Zsrf is into               V  |             |
                   the page                +Ysrf             |
                                               H
                                               H
@@ -1384,9 +1401,9 @@ SOLO Solar Arrays Frames:
       -  +Y is parallel to the longest side of the array, positively
          oriented from the yoke to the end of the wing;
 
-      -  +Z is aligned to the spacecraft bus +Z;
+      -  +X is aligned to the spacecraft bus +X;
 
-      -  +X completes the right-handed frame.
+      -  +Z completes the right-handed frame.
 
       -  the origin of the frame is located at the yoke geometric
          center.
@@ -1398,9 +1415,9 @@ SOLO Solar Arrays Frames:
       -  +Y is parallel to the longest side of the array, positively oriented
          from the yoke to the end of the wing;
 
-      -  +Z is normal to the solar array plane, the solar cells facing +Z;
+      -  +X is normal to the solar array plane, the solar cells facing +X;
 
-      -  +X completes the right-handed frame;
+      -  +Z completes the right-handed frame;
 
       -  the origin of the frame is located at the yoke geometric center.
 
@@ -1409,7 +1426,7 @@ SOLO Solar Arrays Frames:
    solar array frames. Please note that in all the diagrams of this file the
    Solar Arrays are rotated 90 degrees.
 
-   This diagram illustrates the JUICE_SA+Y and JUICE_SA-Y frames:
+   This diagram illustrates the SOLO_SA+Y and SOLO_SA-Y frames:
 
 
    +X S/C side (Heat Shield side) view:
@@ -1429,21 +1446,21 @@ SOLO Solar Arrays Frames:
                                        .O.
                              .--------------------.
                              |                    |
-                  +Zsa+y_zero|         . __       |+Zsa-y_zero
-   .__  _________.          ^|    oO    |__|      |^          ,_________  __.
-   |  \ \        |\         ||         ^ +Zsrf    ||         /|        / /  |
-   |  / /        |\\        ||         |          ||        //|        \ \  |
-   |  \ \        | \\_______||         |          ||______//  |        / /  |
-   |  +Ysa+y_zero<----------x|         |          |o---------->+Ysa-y_zero  |
-   |  \ \        |//         |         o--------> |         \\|        / /  |
-   |  / /        |/          |      +Xsrf     +Ysrf          \|        \ \  |
-   '-'  '--------'           |                    |           '---------' '-'
+                             |         . __       |+Zsa+y_zero
+   .__  _________.           |    oO    |__|      |^          ,_________  __.
+   |  \ \        |\          |         ^ +Zsrf    ||         /|        / /  |
+   |  / /        |\\         |         |          ||        //|        \ \  |
+   |  \ \        | \\________|         |          ||______//  |        / /  |
+   |  +Ysa-y_zero<----------o|         |          |o---------->+Ysa+y_zero  |
+   |  \ \        |//        ||         o--------> |         \\|        / /  |
+   |  / /        |/         ||      +Xsrf     +Ysrf          \|        \ \  |
+   '-'  '--------'          ||                    |           '---------' '-'
+                            v|                    |
+                  +Zsa-y_zero|                    |
                              |                    |
-                             |                    |
-                             |                    |
-                             |                    |           +Xsrf is out
-                             .____________________.            of the page.
-                           .'    /____________\    '.
+                             |                    |    +Xsrf, +Xsa-y_zero and
+                             .____________________.    +Xsa+y_zero are out
+                           .'    /____________\    '.   of the page.
                          .'            ||            '.
                        .'              ||              '.
                      .'              .-''-.              '.
@@ -1487,7 +1504,7 @@ SOLO Solar Arrays Frames:
       TKFRAME_-144016_SPEC             = 'ANGLES'
       TKFRAME_-144016_UNITS            = 'DEGREES'
       TKFRAME_-144016_AXES             = (     3,      2,     1   )
-      TKFRAME_-144016_ANGLES           = (   0.0,  180.0,   180.0 )
+      TKFRAME_-144016_ANGLES           = (   0.0,    0.0,   180.0 )
 
       FRAME_SOLO_SA-Y                  = -144017
       FRAME_-144017_NAME               = 'SOLO_SA-Y'
@@ -1644,10 +1661,10 @@ EPD SupraThermal Electron and Proton (STEP) Frame:
                                            |  0             |
                                            |  |             |
                                            |  |             |
-               +Zsrf is out of             V  |             |
-                the page and              +Ysrf             |
-               +Ystep is into                 H
-                the page.                     H
+               +Zsrf and +Ystep are        V  |             |
+                into the page             +Ysrf             |
+                                              H
+                                              H
                                               H
                                             /\/\/
 
@@ -1746,8 +1763,8 @@ EPD Suprathermal Ion Spectrograph (SIS) Frames:
                                          ||                 |
                +Ysrf is into          '. ||                 |
                 the page and         .| |||                 |
-                                   -: | |'/                 H
-                                     '| |                   |
+               +Zsis is out of     -: | |'/                 H
+                the page             '| |                   |
                                       .'                    |
                                                             |
 
@@ -1868,7 +1885,7 @@ EPD High Energy Telescope and Electron Proton Telescope (EPT-HET) Frames:
                                            .' |   '.        |
                                          .'   |     '.      |
                +Zsrf is out of          V     |       ' > +Xmy
-                                    +Zmy      H
+                the page            +Zmy      H
                                               H
                                               H
                                             /\/\/
@@ -2023,9 +2040,9 @@ EUI Sensors Line of Sight Frames:
                                           //      /_________|__\
                                          ||                 |
                                          ||                 |
-           +Ysrf is out of the        '. ||                 |
-           page and +ZYeui is into   .| |||                 |
-           the page.               -: | |'/                 H
+           +Ysrf is into the          '. ||                 |
+           page and +Yeui is         .| |||                 |
+           out of the page.        -: | |'/                 H
                                      '| |                   |
                                       .'                    |
                                                             |
@@ -2369,9 +2386,9 @@ Metis Sensors Line of Sight Frames:
                                           //      /_________|__\
                                          ||                 |
                                          ||                 |
-           +Ysrf is out of the        '. ||                 |
+           +Ysrf is into the          '. ||                 |
            page and +Ymetis is       .| |||                 |
-           into the page.          -: | |'/                 H
+           out of the page.        -: | |'/                 H
                                      '| |                   |
                                       .'                    |
                                                             |
@@ -2655,9 +2672,9 @@ PHI Sensors Line of Sight Frames:
                                           //      /_________|__\
                                          ||                 |
                                          ||                 |
-           +Ysrf is out of the        '. ||                 |
+           +Ysrf is into the          '. ||                 |
            page and +Yphi is         .| |||                 |
-           into the page.          -: | |'/                 H
+           out of the page.        -: | |'/                 H
                                      '| |                   |
                                       .'                    |
                                                             |
@@ -3293,9 +3310,9 @@ SPICE Sensors Line of Sight Frames:
                                           //      /_________|__\
                                          ||                 |
                                          ||                 |
-           +Ysrf is out of the        '. ||                 |
+           +Ysrf is into the          '. ||                 |
            page and +Yspice is       .| |||                 |
-           into the page.          -: | |'/                 H
+           out of the page.        -: | |'/                 H
                                      '| |                   |
                                       .'                    |
                                                             |
@@ -3477,9 +3494,9 @@ STIX Sensor Line of Sight Frame:
                                           //      /_________|__\
                                          ||                 |
                                          ||                 |
-           +Ysrf is out of the        '. ||                 |
-           page and +Ystix is into   .| |||                 |
-           the page.               -: | |'/                 H
+           +Ysrf is into the          '. ||                 |
+           page and +Ystix is        .| |||                 |
+           out of the page.        -: | |'/                 H
                                      '| |                   |
                                       .'                    |
                                                             |
@@ -3714,14 +3731,14 @@ SWA Proton/Alpha Sensor (PAS) Frame:
                                          |  .|                      | | |
                                          | / |                      | | |
                                          .'  |                      | | |
-                                             |                      | |=|
+                                             |                 +Ypas| |=|
                                             >|                    o-----> +Xpas
                                             o:____________________|_: |=|
                                            //      /        | \   |   | |
                                           //      /_________|__\  |
                                          ||                 |     V
                                          ||                 |    +Zpas
-            +Ysrf is into +Yhis       '. ||                 |
+            +Ysrf is into             '. ||                 |
              the page and +Ypas      .| |||                 |
              is out of the page.   -: | |'/                 H
                                      '| |                   |

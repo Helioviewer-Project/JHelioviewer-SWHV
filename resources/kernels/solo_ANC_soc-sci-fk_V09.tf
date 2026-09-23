@@ -21,6 +21,10 @@ Frame (FK) SPICE kernel file for Solar Orbiter-specific science frames
 Version and Date
 ------------------------------------------------------------------------------
 
+   Version 0.9 -- July 9, 2025 -- Ricardo Valles Blanco ESAC/ESA
+
+      Updated contact information.
+
    Version 0.8  -- February 23, 2023 -- Ricardo Valles Blanco, ESAC/ESA
                                         Alfredo Escalante Lopez, ESAC/ESA
                                         Andrew Walsh, ESAC/ESA
@@ -152,7 +156,7 @@ Contact Information
 
            Alfredo Escalante Lopez
            (+34) 91-8131-429
-           alfredo.escalante@esa.int
+           spice@cosmos.esa.int
 
    or the Solar Orbiter Science Operations Center at ESAC:
 
