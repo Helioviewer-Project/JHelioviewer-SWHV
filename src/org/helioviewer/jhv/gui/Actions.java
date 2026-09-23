@@ -265,6 +265,7 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             Display.setSeparateViewportZoom(!Display.separateViewportZoom);
+            DisplayController.render(1);
         }
     }
 
