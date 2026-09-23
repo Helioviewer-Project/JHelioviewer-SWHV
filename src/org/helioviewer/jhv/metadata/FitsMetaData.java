@@ -66,12 +66,12 @@ public final class FitsMetaData extends CommonMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
-            cutOffValue = (float) -region.ulx;
+            cutOffValue = (float) -region.llx;
             double maskRotation = -m.getDouble("CROTA").map(Math::toRadians).orElse(0.); // C2 JP2 already rotated
             cutOffX = (float) (Math.sin(maskRotation) / 0.9625);
             cutOffY = (float) (Math.cos(maskRotation) / 0.9625);
         }/* else if (instrument.equals("SWAP")) {
-            cutOffValue = (float) -region.ulx;
+            cutOffValue = (float) -region.llx;
             double maskRotation = -m.getDouble("SOLAR_EP").map(Math::toRadians).orElse(0.);
             cutOffX = (float) Math.sin(maskRotation);
             cutOffY = (float) Math.cos(maskRotation);

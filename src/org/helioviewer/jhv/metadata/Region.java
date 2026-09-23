@@ -11,8 +11,6 @@ public class Region {
     public final double lly;
     public final double urx;
     public final double ury;
-    public final double ulx;
-    // public final double uly;
     public final float[] glslArray;
 
     public Region(double newLLX, double newLLY, double newWidth, double newHeight) {
@@ -25,8 +23,6 @@ public class Region {
         urx = llx + width;
         ury = lly + height;
 
-        ulx = llx;
-        // uly = lly + height;
         glslArray = new float[]{(float) llx, (float) lly, (float) (1. / width), (float) (1. / height)};
     }
 
