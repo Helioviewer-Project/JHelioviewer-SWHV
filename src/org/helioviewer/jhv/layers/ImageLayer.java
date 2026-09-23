@@ -260,7 +260,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             planeToImage1 = Mat2.multiply(planeToImage1, inverseAdjustment);
         }
 
-        int deltaCRVAL1 = displaySettings.getDeltaCRVAL1();
+        double deltaCRVAL1 = displaySettings.getDeltaCRVAL1();
         if (deltaCRVAL1 == 0) {
             crval0[0] = (float) wcs0.crval.x;
             crval1[0] = (float) wcs1.crval.x;
@@ -269,7 +269,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             crval1[0] = (float) (wcs1.crval.x + deltaCRVAL1 * meta1.getUnitPerArcsec());
         }
 
-        int deltaCRVAL2 = displaySettings.getDeltaCRVAL2();
+        double deltaCRVAL2 = displaySettings.getDeltaCRVAL2();
         if (deltaCRVAL2 == 0) {
             crval0[1] = (float) wcs0.crval.y;
             crval1[1] = (float) wcs1.crval.y;

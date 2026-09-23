@@ -7,18 +7,18 @@ public final class SectorPanel {
 
     private final FilterDetails directionDetails;
     private final FilterDetails widthDetails;
-    private int direction;
-    private int width;
+    private double direction;
+    private double width;
 
     public SectorPanel(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        direction = (int) Math.round(settings.getSectorCenter());
-        width = (int) Math.round(settings.getSectorWidth());
-        directionDetails = SliderFilterPanel.create("Sector", -180, 180, direction, SectorPanel::formatDegree, value -> {
+        direction = settings.getSectorCenter();
+        width = settings.getSectorWidth();
+        directionDetails = SliderFilterPanel.create("Sector", -180, 180, direction, 1, SectorPanel::formatDegree, value -> {
             direction = value;
             settings.setSector(direction, width);
         });
-        widthDetails = SliderFilterPanel.create("Opening", 0, 360, width, SectorPanel::formatDegree, value -> {
+        widthDetails = SliderFilterPanel.create("Opening", 0, 360, width, 1, SectorPanel::formatDegree, value -> {
             width = value;
             settings.setSector(direction, width);
         });
@@ -37,8 +37,8 @@ public final class SectorPanel {
         widthDetails.setVisible(visible);
     }
 
-    private static String formatDegree(int angle) {
-        return angle + "°";
+    private static String formatDegree(double angle) {
+        return String.format("%.0f°", angle);
     }
 
 }

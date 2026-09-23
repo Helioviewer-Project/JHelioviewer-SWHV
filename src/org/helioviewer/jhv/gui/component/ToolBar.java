@@ -308,14 +308,14 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     }
 
     private JPanel createWarpLambdaPanel() {
-        warpLambdaSlider = new JHVSlider(-1000, 1000, (int) Math.round(ViewState.getWarpLambda() * 1000));
+        warpLambdaSlider = new JHVSlider(-1, 1, ViewState.getWarpLambda(), 1000);
         warpLambdaSlider.setToolTipText("Box-Cox lambda for warp projections");
         warpLambdaSlider.setPreferredSize(new Dimension(POPUP_SLIDER_WIDTH, warpLambdaSlider.getPreferredSize().height));
         JLabel label = new JLabel("λ");
         warpLambdaValue = new JLabel(String.format("%.3f", ViewState.getWarpLambda()), JLabel.RIGHT);
         warpLambdaValue.setPreferredSize(new JLabel("-0.000").getPreferredSize());
         warpLambdaSlider.addChangeListener(e -> {
-            ViewState.setWarpLambda(warpLambdaSlider.getValue() / 1000.);
+            ViewState.setWarpLambda(warpLambdaSlider.getDoubleValue());
             warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
         });
         JPanel panel = new JPanel(new BorderLayout());
@@ -420,7 +420,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             activeProjection.setSelected(true);
         if (warpLambdaSlider != null) {
             warpLambdaSlider.setEnabled(ViewState.getProjection().usesWarpLambda());
-            warpLambdaSlider.setValue((int) Math.round(ViewState.getWarpLambda() * 1000));
+            warpLambdaSlider.setDoubleValue(ViewState.getWarpLambda());
         }
         if (warpLambdaValue != null)
             warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));

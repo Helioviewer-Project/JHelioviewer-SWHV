@@ -41,6 +41,8 @@ public final class GridLayer extends AbstractLayer {
     public static final double GRID_LABEL_SIZE_MIN = 8;
     public static final double GRID_LABEL_SIZE_MAX = 48;
     public static final double GRID_LABEL_SIZE_REF = 22;
+    public static final double GRID_LABEL_ANGLE_MIN = 0;
+    public static final double GRID_LABEL_ANGLE_MAX = 360;
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
@@ -116,7 +118,7 @@ public final class GridLayer extends AbstractLayer {
         updateLabelColors();
         gridLineScale = Math.clamp(jo.optDouble("lineScale", gridLineScale), GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
         gridLabelSize = Math.clamp(jo.optDouble("labelSize", gridLabelSize), GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
-        gridLabelAngle = jo.optDouble("labelAngle", gridLabelAngle);
+        gridLabelAngle = Math.clamp(jo.optDouble("labelAngle", gridLabelAngle), GRID_LABEL_ANGLE_MIN, GRID_LABEL_ANGLE_MAX);
 
         String strGridType = jo.optString("type", Display.gridType.toString());
         try {
@@ -403,7 +405,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     public void setGridLabelAngle(double _gridLabelAngle) {
-        gridLabelAngle = _gridLabelAngle;
+        gridLabelAngle = Math.clamp(_gridLabelAngle, GRID_LABEL_ANGLE_MIN, GRID_LABEL_ANGLE_MAX);
         DisplayController.display();
     }
 

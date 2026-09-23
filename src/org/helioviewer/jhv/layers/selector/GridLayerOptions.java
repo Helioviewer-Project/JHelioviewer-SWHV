@@ -143,28 +143,26 @@ final class GridLayerOptions extends JPanel {
     }
 
     private static JHVSlider createOpacitySlider(double initialValue, DoubleConsumer valueSetter) {
-        JHVSlider slider = new JHVSlider(0, 100, (int) Math.round(initialValue * 100));
-        slider.addChangeListener(e -> valueSetter.accept(slider.getValue() / 100.));
+        JHVSlider slider = new JHVSlider(0, 1, initialValue, 100);
+        slider.addChangeListener(e -> valueSetter.accept(slider.getDoubleValue()));
         return slider;
     }
 
     private static JHVSlider createLineWidthSlider(GridLayer layer) {
-        int min = (int) Math.round(GridLayer.GRID_LINE_SCALE_MIN * 10);
-        int max = (int) Math.round(GridLayer.GRID_LINE_SCALE_MAX * 10);
-        JHVSlider slider = new JHVSlider(min, max, (int) Math.round(layer.getGridLineScale() * 10));
-        slider.addChangeListener(e -> layer.setGridLineScale(slider.getValue() / 10.));
+        JHVSlider slider = new JHVSlider(GridLayer.GRID_LINE_SCALE_MIN, GridLayer.GRID_LINE_SCALE_MAX, layer.getGridLineScale(), 10);
+        slider.addChangeListener(e -> layer.setGridLineScale(slider.getDoubleValue()));
         return slider;
     }
 
     private static JHVSlider createLabelSizeSlider(GridLayer layer) {
-        JHVSlider slider = new JHVSlider((int) GridLayer.GRID_LABEL_SIZE_MIN, (int) GridLayer.GRID_LABEL_SIZE_MAX, (int) Math.round(layer.getGridLabelSize()));
-        slider.addChangeListener(e -> layer.setGridLabelSize(slider.getValue()));
+        JHVSlider slider = new JHVSlider(GridLayer.GRID_LABEL_SIZE_MIN, GridLayer.GRID_LABEL_SIZE_MAX, layer.getGridLabelSize(), 1);
+        slider.addChangeListener(e -> layer.setGridLabelSize(slider.getDoubleValue()));
         return slider;
     }
 
     private static JHVSlider createLabelAngleSlider(GridLayer layer) {
-        JHVSlider slider = new JHVSlider(0, 360, (int) Math.round(layer.getGridLabelAngle()));
-        slider.addChangeListener(e -> layer.setGridLabelAngle(slider.getValue()));
+        JHVSlider slider = new JHVSlider(GridLayer.GRID_LABEL_ANGLE_MIN, GridLayer.GRID_LABEL_ANGLE_MAX, layer.getGridLabelAngle(), 1);
+        slider.addChangeListener(e -> layer.setGridLabelAngle(slider.getDoubleValue()));
         return slider;
     }
 

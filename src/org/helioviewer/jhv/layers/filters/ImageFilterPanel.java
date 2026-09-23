@@ -41,11 +41,11 @@ public final class ImageFilterPanel implements FilterDetails {
 
     private static JPanel createEnhancePanel(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        JHVSlider slider = new JHVSlider(0, 30, (int) (settings.getEnhanced() * 10));
-        JLabel label = new JLabel(formatLabel(slider.getValue() / 10.), JLabel.RIGHT);
+        JHVSlider slider = new JHVSlider(0, 3, settings.getEnhanced(), 10);
+        JLabel label = new JLabel(formatLabel(slider.getDoubleValue()), JLabel.RIGHT);
         label.setToolTipText("<html><body>pixel⋅R<sup>v");
         slider.addChangeListener(e -> {
-            double value = slider.getValue() / 10.;
+            double value = slider.getDoubleValue();
             settings.setEnhanced(value);
             label.setText(formatLabel(value));
             DisplayController.display();
@@ -68,18 +68,18 @@ public final class ImageFilterPanel implements FilterDetails {
         enhanceButton.setAlwaysDropdown(true);
         enhanceButton.add(enhancePanel);
 
-        JHVSlider upsilonLowSlider = new JHVSlider(5, 100, (int) (settings.getUpsilonLow() * 100));
-        JLabel upsilonLowLabel = new JLabel(formatUpsilon(upsilonLowSlider.getValue() / 100.), JLabel.RIGHT);
+        JHVSlider upsilonLowSlider = new JHVSlider(0.05, 1, settings.getUpsilonLow(), 100);
+        JLabel upsilonLowLabel = new JLabel(formatUpsilon(upsilonLowSlider.getDoubleValue()), JLabel.RIGHT);
         upsilonLowSlider.addChangeListener(e -> {
-            double value = upsilonLowSlider.getValue() / 100.;
+            double value = upsilonLowSlider.getDoubleValue();
             settings.setUpsilon(value, settings.getUpsilonHigh());
             upsilonLowLabel.setText(formatUpsilon(value));
             DisplayController.display();
         });
-        JHVSlider upsilonHighSlider = new JHVSlider(5, 100, (int) (settings.getUpsilonHigh() * 100));
-        JLabel upsilonHighLabel = new JLabel(formatUpsilon(upsilonHighSlider.getValue() / 100.), JLabel.RIGHT);
+        JHVSlider upsilonHighSlider = new JHVSlider(0.05, 1, settings.getUpsilonHigh(), 100);
+        JLabel upsilonHighLabel = new JLabel(formatUpsilon(upsilonHighSlider.getDoubleValue()), JLabel.RIGHT);
         upsilonHighSlider.addChangeListener(e -> {
-            double value = upsilonHighSlider.getValue() / 100.;
+            double value = upsilonHighSlider.getDoubleValue();
             settings.setUpsilon(settings.getUpsilonLow(), value);
             upsilonHighLabel.setText(formatUpsilon(value));
             DisplayController.display();

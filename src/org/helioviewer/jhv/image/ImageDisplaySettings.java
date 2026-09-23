@@ -21,8 +21,8 @@ public final class ImageDisplaySettings {
     private float blue = 1;
 
     private double deltaCROTA;
-    private int deltaCRVAL1;
-    private int deltaCRVAL2;
+    private double deltaCRVAL1;
+    private double deltaCRVAL2;
 
     private double innerMask;
     private double outerMask = Double.POSITIVE_INFINITY;
@@ -52,11 +52,11 @@ public final class ImageDisplaySettings {
         deltaCROTA = Math.clamp(delta, MIN_DCROTA, MAX_DCROTA);
     }
 
-    public void setDeltaCRVAL1(int delta) {
+    public void setDeltaCRVAL1(double delta) {
         deltaCRVAL1 = Math.clamp(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
-    public void setDeltaCRVAL2(int delta) {
+    public void setDeltaCRVAL2(double delta) {
         deltaCRVAL2 = Math.clamp(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
@@ -84,11 +84,11 @@ public final class ImageDisplaySettings {
         return deltaCROTA;
     }
 
-    public int getDeltaCRVAL1() {
+    public double getDeltaCRVAL1() {
         return deltaCRVAL1;
     }
 
-    public int getDeltaCRVAL2() {
+    public double getDeltaCRVAL2() {
         return deltaCRVAL2;
     }
 
