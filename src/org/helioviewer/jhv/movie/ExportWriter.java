@@ -102,15 +102,12 @@ class ExportWriter {
             "-vf", "scale=in_range=pc:out_range=pc"
     );
 
-    @Nullable
     String close() throws Exception {
         if (failure != null) {
             if (tempFile != null)
                 tempFile.delete();
             throw failure;
         }
-        if (tempFile == null) // unlikely reach here on encode error
-            return null;
 
         try {
             String outPath = prefix + format.extension;

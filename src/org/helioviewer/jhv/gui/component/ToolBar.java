@@ -314,10 +314,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JLabel label = new JLabel("λ");
         warpLambdaValue = new JLabel(String.format("%.3f", ViewState.getWarpLambda()), JLabel.RIGHT);
         warpLambdaValue.setPreferredSize(new JLabel("-0.000").getPreferredSize());
-        warpLambdaSlider.addChangeListener(e -> {
-            ViewState.setWarpLambda(warpLambdaSlider.getDoubleValue());
-            warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
-        });
+        warpLambdaSlider.addChangeListener(e -> ViewState.setWarpLambda(warpLambdaSlider.getDoubleValue()));
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
         panel.add(label, BorderLayout.LINE_START);
@@ -415,18 +412,11 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         coronaButton.setSelected(ViewState.isShowCorona());
         multiviewButton.setSelected(ViewState.isMultiview());
         refreshButton.setSelected(ViewState.isRefresh());
-        JRadioButtonMenuItem activeProjection = projectionItems.get(ViewState.getProjection());
-        if (activeProjection != null)
-            activeProjection.setSelected(true);
-        if (warpLambdaSlider != null) {
-            warpLambdaSlider.setEnabled(ViewState.getProjection().usesWarpLambda());
-            warpLambdaSlider.setDoubleValue(ViewState.getWarpLambda());
-        }
-        if (warpLambdaValue != null)
-            warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
-        JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewState.getAnnotationMode());
-        if (activeAnnotationMode != null)
-            activeAnnotationMode.setSelected(true);
+        projectionItems.get(ViewState.getProjection()).setSelected(true);
+        warpLambdaSlider.setEnabled(ViewState.getProjection().usesWarpLambda());
+        warpLambdaSlider.setDoubleValue(ViewState.getWarpLambda());
+        warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
+        annotationItems.get(ViewState.getAnnotationMode()).setSelected(true);
     }
 
 }
