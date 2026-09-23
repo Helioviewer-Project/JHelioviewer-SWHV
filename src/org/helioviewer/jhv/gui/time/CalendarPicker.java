@@ -263,16 +263,7 @@ class CalendarPicker extends JPanel {
             add(contentPane);
         }
 
-        /**
-         * Displays the passed data in the grid.
-         *
-         * @param data         Data to display in the table. If this parameter is null
-         *                     the method will do nothing.
-         * @param columnNames  Column names which will be displayed in the header, too.
-         *                     If this parameter is null the method will do nothing.
-         * @param selectedCell Defines the cell which has to be selected.
-         * @param showHeader   true if the header should be displayed; false if not.
-         */
+        // Shows data in the grid and selects selectedCell; does nothing if data or columnNames is null.
         void fillGrid(Object[][] data, String[] columnNames, Point selectedCell, boolean showHeader) {
             // check if valid data is available
             if (data == null || columnNames == null)

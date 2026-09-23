@@ -56,32 +56,12 @@ class GimpGradient {
         }
     }
 
-    /**
-     * Creates a gimp gradient segment with the given parameters
-     *
-     * @param leftStop      Position of left stoppoint
-     * @param midStop       Position of middle stoppoint
-     * @param rightStop     Position of right stoppoint
-     * @param rl            R of left stop point
-     * @param gl            G of left stop point
-     * @param bl            B of left stop point
-     * @param al            A of left stop point
-     * @param rr            R of right stop point
-     * @param gr            G of right stop point
-     * @param br            B of right stop point
-     * @param ar            A of right stop point
-     * @param blendingType  Blending function type
-     * @param blendingColor Blending function color
-     */
+    // GIMP gradient segment: left/middle/right stop positions, RGBA at the left
+    // and right stops, and the blending function type and color.
     private record Segment(double leftStop, double midStop, double rightStop, double rl, double gl,
                            double bl, double al, double rr, double gr, double br, double ar,
                            int blendingType, int blendingColor) {
-        /**
-         * Gives back the color for point x within this segment
-         *
-         * @param x Point in segment
-         * @return Color according to gradient
-         */
+        // Color at point x within this segment.
         int getGradientColor(double x) throws Exception {
             // Normalize the segment geometry.
             double f = getF(x);
@@ -142,12 +122,7 @@ class GimpGradient {
             };
         }
 
-        /**
-         * Internal function (approximate double) to set the colors
-         *
-         * @param x value
-         * @return approximated as byte
-         */
+        // Maps x in [0, 1] to a byte value.
         private static int appD(double x) {
             return ((int) (x * 0xff)) & 0xff;
         }

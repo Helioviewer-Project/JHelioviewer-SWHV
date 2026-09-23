@@ -6,12 +6,6 @@ public class MathUtils {
 
     private static final double LN_2 = Math.log(2);
 
-    /**
-     * Takes and returns the maximum value from the given args.
-     *
-     * @param _is the values to compare
-     * @return the maximum of the given values
-     */
     public static int max(int... _is) {
         int max = Integer.MIN_VALUE;
         for (int i : _is)
@@ -20,12 +14,6 @@ public class MathUtils {
         return max;
     }
 
-    /**
-     * Takes and returns the minimum value from the given args.
-     *
-     * @param _is the values to compare
-     * @return the minimum of the given values
-     */
     public static int min(int... _is) {
         int min = Integer.MAX_VALUE;
         for (int i : _is)

@@ -97,12 +97,7 @@ public class CommandLine {
         return null;
     }
 
-    /**
-     * Method that looks for options in the command line.
-     *
-     * @param param name of the option.
-     * @return the values associated to the option.
-     */
+    // Values of all occurrences of the option param.
     private static List<String> getOptionValues(String param) {
         List<String> values = new ArrayList<>();
         if (arguments == null)

@@ -95,14 +95,6 @@ class EventDescriptionPanel extends JPanel {
         add(summaryPanel, shortPanelConstraint);
     }
 
-    /**
-     * Add component to the summary panel.
-     *
-     * @param panel     the panel to add to
-     * @param y         the y position
-     * @param fieldName the name of the field
-     * @param component the component to add
-     */
     private static void addLineToSummaryPanel(JPanel panel, int y, String fieldName, Component component) {
         GridBagConstraints shortPanelLabelConstraint = new GridBagConstraints();
         shortPanelLabelConstraint.weightx = 0;

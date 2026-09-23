@@ -14,11 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 
-/**
- * A helper class to add mouse wheel support to JSpinner. You can call
- * {@link #installMouseWheelSupport(JSpinner)} to add the support
- * and {@link #uninstallMouseWheelSupport(JComponent)} to remove the support.
- */
+// Adds mouse wheel support to JSpinner and JSlider.
 final class WheelSupport {
 
     private static final String CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER = "mouseWheelListener";
