@@ -137,7 +137,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         double principalAngle = Math.toRadians(principalAngleDegree);
         double distSun = SWEKData.cactusDistance(evt, timestamp);
         int lineResolution = 2;
-        int angularResolution = (int) (angularWidthDegree / 4);
+        int angularResolution = (int) (angularWidthDegree / 2);
 
         Quat q = evt.getPositionInformation().getEarth().toQuat();
         double thetaStart = principalAngle - angularWidth / 2.;
@@ -146,8 +146,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(relatedEvents.getColor());
 
-        drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, color, vexBuf);
-        drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, color, vexBuf);
+        drawInterpolated(angularResolution, distSun, distSun, thetaStart, thetaEnd, q, color, vexBuf);
         drawInterpolated(lineResolution, SWEKData.CACTUS_START_RADIUS, distSun + 0.05, thetaStart, thetaStart, q, color, vexBuf);
         drawInterpolated(lineResolution, SWEKData.CACTUS_START_RADIUS, distSun + 0.05, principalAngle, principalAngle, q, color, vexBuf);
         drawInterpolated(lineResolution, SWEKData.CACTUS_START_RADIUS, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
@@ -269,32 +268,28 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
         double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
         double distSun = SWEKData.cactusDistance(evt, timestamp);
-
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
         BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(relatedEvents.getColor());
 
-        float x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
-        float y = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
-        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
+        float yStart = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
+        float yStop = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
+        float yArc = (float) (scale.toUnitY(distSun) - 0.5);
+        for (double theta : new double[]{thetaStart, principalAngleDegree, thetaEnd}) {
+            float x = (float) ((scale.toUnitX(theta) - 0.5) * vp.aspect);
+            putLineScale(vexBuf, x, yStart, x, yStop, color);
+        }
 
-        x = (float) ((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect);
-        y = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
-        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
-
-        x = (float) ((scale.toUnitX(thetaEnd) - 0.5) * vp.aspect);
-        y = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
-        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
-
-        y = (float) (scale.toUnitY(distSun) - 0.5);
-        putLineScale(vexBuf, x, y, (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect), y, color);
+        double arcEnd = thetaStart + Math.min(angularWidthDegree, 360); // unwrapped, may pass 360
+        putLineScale(vexBuf, (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect), yArc, (float) ((scale.toUnitX(Math.min(arcEnd, 360)) - 0.5) * vp.aspect), yArc, color);
+        if (arcEnd > 360) // crosses 0°: continue from the left edge
+            putLineScale(vexBuf, (float) ((scale.toUnitX(0) - 0.5) * vp.aspect), yArc, (float) ((scale.toUnitX(arcEnd - 360) - 0.5) * vp.aspect), yArc, color);
 
         if (icons) {
             double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImageScale((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect,
-                    scale.toUnitY(distSun) - 0.5, sz, sz);
+            drawImageScale((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect, yArc, sz, sz);
         }
     }
 
