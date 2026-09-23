@@ -394,7 +394,7 @@ abstract class J2KSource {
                 if (resolutionSet[i] == null)
                     return false;
                 AtomicBoolean status = resolutionSet[i].getComplete(level);
-                if (status == null || !status.get())
+                if (!status.get())
                     return false;
             }
             if (level == 0)
@@ -425,9 +425,7 @@ abstract class J2KSource {
             setFramePartial(frame);
             if (fullyComplete)
                 return;
-
-            if (resolutionSet[frame] != null)
-                resolutionSet[frame].setComplete(level);
+            resolutionSet[frame].setComplete(level);
         }
 
     }

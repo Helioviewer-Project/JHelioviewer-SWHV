@@ -107,8 +107,6 @@ public final class URIView extends BaseView {
         ImageBuffer imageBuffer = hasFITS()
                 ? FITSImage.decode(file, filter, key.fitsData(), key.clipRange())
                 : GenericImage.decode(file, filter);
-        if (imageBuffer == null) // e.g. FITS
-            throw new Exception("Could not read: " + file);
         return new DecodedImage(imageBuffer, imageRegion);
     }
 
