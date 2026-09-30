@@ -1,12 +1,21 @@
 package org.helioviewer.jhv.view.uri;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.logging.Logger;
 
 import nom.tam.fits.compression.algorithm.api.ICompressOption;
+import nom.tam.fits.compression.algorithm.api.ICompressor;
 import nom.tam.fits.compression.algorithm.api.ICompressorControl;
+import nom.tam.fits.compression.algorithm.quant.QuantizeOption;
+import nom.tam.fits.compression.algorithm.quant.QuantizeProcessor;
 import nom.tam.fits.compression.algorithm.rice.RiceCompressOption;
 import nom.tam.fits.compression.algorithm.rice.RiceCompressor;
 import nom.tam.fits.compression.provider.api.ICompressorProvider;
@@ -18,6 +27,9 @@ public final class FastRiceProvider implements ICompressorProvider {
     private static final int BYTE_MASK = 0xff;
     private static final int FS_BITS_FOR_SHORT = 4;
     private static final int FS_MAX_FOR_SHORT = 14;
+    private static final int FS_BITS_FOR_INT = 5;
+    private static final int FS_MAX_FOR_INT = 25;
+    private static final VarHandle LONG_WORD = MethodHandles.byteArrayViewVarHandle(long[].class, ByteOrder.BIG_ENDIAN);
     private static final Logger LOG = Logger.getLogger(FastRiceProvider.class.getName());
 
     public FastRiceProvider() {}
@@ -29,10 +41,23 @@ public final class FastRiceProvider implements ICompressorProvider {
             return null;
         }
 
-        return quantAlgorithm == null && baseType == short.class ? new Control() : null;
+        if (quantAlgorithm == null && (baseType == short.class || baseType == int.class))
+            return new Control(baseType);
+        if ((baseType == float.class || baseType == double.class) &&
+                (Compression.ZQUANTIZ_NO_DITHER.equalsIgnoreCase(quantAlgorithm) ||
+                        Compression.ZQUANTIZ_SUBTRACTIVE_DITHER_1.equalsIgnoreCase(quantAlgorithm) ||
+                        Compression.ZQUANTIZ_SUBTRACTIVE_DITHER_2.equalsIgnoreCase(quantAlgorithm)))
+            return new Control(baseType);
+        return null;
     }
 
     private static final class Control implements ICompressorControl {
+
+        private final Class<?> baseType;
+
+        private Control(Class<?> _baseType) {
+            baseType = _baseType;
+        }
 
         @Override
         public boolean compress(Buffer in, ByteBuffer out, ICompressOption option) {
@@ -42,16 +67,54 @@ public final class FastRiceProvider implements ICompressorProvider {
         @Override
         public void decompress(ByteBuffer in, Buffer out, ICompressOption option) {
             RiceCompressOption rice = option.unwrap(RiceCompressOption.class);
-            // Encoded width can differ from the short output type.
-            if (rice.getBytePix() == Short.BYTES)
-                decodeShort(in, (ShortBuffer) out, rice);
-            else
-                new RiceCompressor.ShortRiceCompressor(rice).decompress(in, (ShortBuffer) out);
+            if (baseType == short.class) {
+                // Encoded width can differ from the output type.
+                if (rice.getBytePix() == Short.BYTES)
+                    decodeShort(in, (ShortBuffer) out, rice);
+                else
+                    new RiceCompressor.ShortRiceCompressor(rice).decompress(in, (ShortBuffer) out);
+            } else {
+                IntCompressor decoder = new IntCompressor(rice);
+                if (baseType == int.class)
+                    decoder.decompress(in, (IntBuffer) out);
+                else if (baseType == float.class)
+                    new QuantizeProcessor.FloatQuantCompressor(option.unwrap(QuantizeOption.class), decoder).decompress(in, (FloatBuffer) out);
+                else
+                    new QuantizeProcessor.DoubleQuantCompressor(option.unwrap(QuantizeOption.class), decoder).decompress(in, (DoubleBuffer) out);
+            }
         }
 
         @Override
         public ICompressOption option() {
-            return new RiceCompressOption();
+            RiceCompressOption rice = new RiceCompressOption();
+            return baseType == float.class || baseType == double.class ? new QuantizeOption(rice) : rice;
+        }
+    }
+
+    private static final class IntCompressor implements ICompressor<IntBuffer> {
+
+        private final RiceCompressOption option;
+
+        private IntCompressor(RiceCompressOption _option) {
+            option = _option;
+        }
+
+        @Override
+        public boolean compress(IntBuffer in, ByteBuffer out) {
+            return false;
+        }
+
+        @Override
+        public void decompress(ByteBuffer in, IntBuffer out) {
+            if (option.getBytePix() != Integer.BYTES || !in.hasArray() || !out.hasArray()) {
+                new RiceCompressor.IntRiceCompressor(option).decompress(in, out);
+                return;
+            }
+            Decoder decoder = new Decoder(in, option, FS_BITS_FOR_INT, FS_MAX_FOR_INT);
+            int last = decoder.firstInt();
+            decoder.decodeArray(last, out.array(), out.arrayOffset() + out.position(), out.limit());
+            out.position(out.limit());
+            decoder.finish();
         }
     }
 
@@ -62,7 +125,10 @@ public final class FastRiceProvider implements ICompressorProvider {
         if (out.hasArray()) {
             short[] data = out.array();
             int offset = out.arrayOffset() + out.position();
-            decoder.decodeShortArray(last, data, offset, length);
+            if (in.hasArray())
+                decoder.decodeArray(last, data, offset, length);
+            else
+                decodeShort(decoder, last, data, offset, length);
             out.position(length);
         } else {
             decodeShort(decoder, last, out, length);
@@ -153,6 +219,12 @@ public final class FastRiceProvider implements ICompressorProvider {
             return first;
         }
 
+        private int firstInt() {
+            int first = getByte() << 24 | getByte() << 16 | getByte() << 8 | getByte();
+            initBits();
+            return first;
+        }
+
         private void initBits() {
             bits = getByte();
             nbits = BITS_PER_BYTE;
@@ -208,85 +280,96 @@ public final class FastRiceProvider implements ICompressorProvider {
             return diff;
         }
 
-        private void decodeShortArray(int last, short[] out, int offset, int length) {
-            if (inArray == null) {
-                decodeShort(this, last, out, offset, length);
-                return;
-            }
-
+        private void decodeArray(int last, Object out, int offset, int length) {
+            short[] shortOutput = out instanceof short[] ? (short[]) out : null;
+            int[] intOutput = shortOutput == null ? (int[]) out : null;
             byte[] input = inArray;
             int position = inPosition;
             int limit = inArrayOffset + in.limit();
-            long bitBuffer = bits;
+            long bitBuffer = bits << (Long.SIZE - nbits);
             int bitCount = nbits;
 
             for (int i = 0; i < length; ) {
-                bitCount -= fsBits;
-                while (bitCount < 0) {
-                    bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
+                while (bitCount < fsBits) {
+                    bitBuffer |= (long) (input[position++] & BYTE_MASK) << (Long.SIZE - bitCount - BITS_PER_BYTE);
                     bitCount += BITS_PER_BYTE;
                 }
-
-                int fs = (int) ((bitBuffer >>> bitCount) - 1L);
-                bitBuffer &= (1L << bitCount) - 1L;
+                int fs = (int) (bitBuffer >>> (Long.SIZE - fsBits)) - 1;
+                bitBuffer <<= fsBits;
+                bitCount -= fsBits;
 
                 int end = Math.min(i + blockSize, length);
                 if (fs < 0) {
                     for (; i < end; i++) {
-                        out[offset + i] = (short) last;
+                        if (shortOutput != null)
+                            shortOutput[offset + i] = (short) last;
+                        else
+                            intOutput[offset + i] = last;
                     }
                 } else if (fs == fsMax) {
                     for (; i < end; i++) {
                         while (bitCount < bBits) {
-                            bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
+                            bitBuffer |= (long) (input[position++] & BYTE_MASK) << (Long.SIZE - bitCount - BITS_PER_BYTE);
                             bitCount += BITS_PER_BYTE;
                         }
+                        int diff = (int) (bitBuffer >>> (Long.SIZE - bBits));
+                        bitBuffer <<= bBits;
                         bitCount -= bBits;
-                        int diff = (int) (bitBuffer >>> bitCount);
-                        bitBuffer &= (1L << bitCount) - 1L;
-
                         last += map(diff);
-                        out[offset + i] = (short) last;
+                        if (shortOutput != null)
+                            shortOutput[offset + i] = (short) last;
+                        else
+                            intOutput[offset + i] = last;
                     }
                 } else {
+                    int remainderMask = (1 << fs) - 1;
                     for (; i < end; i++) {
-                        // Refill ahead when four bytes remain, without crossing the input limit.
-                        if (bitCount < Short.SIZE && position <= limit - Integer.BYTES) {
-                            int word = (input[position] & BYTE_MASK) << 24 | (input[position + 1] & BYTE_MASK) << 16
-                                    | (input[position + 2] & BYTE_MASK) << 8 | (input[position + 3] & BYTE_MASK);
-                            bitBuffer = bitBuffer << Integer.SIZE | Integer.toUnsignedLong(word);
-                            position += Integer.BYTES;
-                            bitCount += Integer.SIZE;
+                        if (bitCount < bBits && position <= limit - Long.BYTES) {
+                            // Keep at most 63 counted bits so consuming a code never shifts by 64.
+                            int bytes = (Long.SIZE - 1 - bitCount) / BITS_PER_BYTE;
+                            bitBuffer |= (long) LONG_WORD.get(input, position) >>> bitCount;
+                            position += bytes;
+                            bitCount += bytes * BITS_PER_BYTE;
+                        } else {
+                            while (bitCount < bBits && position < limit) {
+                                bitBuffer |= (long) (input[position++] & BYTE_MASK) << (Long.SIZE - bitCount - BITS_PER_BYTE);
+                                bitCount += BITS_PER_BYTE;
+                            }
                         }
-                        while (bitBuffer == 0) {
-                            bitCount += BITS_PER_BYTE;
-                            bitBuffer = input[position++] & BYTE_MASK;
+
+                        int nzero = Long.numberOfLeadingZeros(bitBuffer);
+                        int skipped = 0;
+                        // The word load can look into the next byte without consuming it.
+                        while (nzero >= bitCount) {
+                            skipped += bitCount;
+                            bitBuffer = (long) (input[position++] & BYTE_MASK) << (Long.SIZE - BITS_PER_BYTE);
+                            bitCount = BITS_PER_BYTE;
+                            nzero = Long.numberOfLeadingZeros(bitBuffer);
                         }
-                        int nzero = bitCount - (Long.SIZE - Long.numberOfLeadingZeros(bitBuffer));
+                        bitBuffer <<= nzero + 1;
                         bitCount -= nzero + 1;
-                        bitBuffer ^= 1L << bitCount;
 
-                        bitCount -= fs;
-                        while (bitCount < 0) {
-                            bitBuffer = bitBuffer << BITS_PER_BYTE | (input[position++] & BYTE_MASK);
+                        while (bitCount < fs) {
+                            bitBuffer |= (long) (input[position++] & BYTE_MASK) << (Long.SIZE - bitCount - BITS_PER_BYTE);
                             bitCount += BITS_PER_BYTE;
                         }
-
-                        int diff = (int) (nzero << fs | bitBuffer >>> bitCount);
-                        bitBuffer &= (1L << bitCount) - 1L;
+                        int diff = (skipped + nzero) << fs | ((int) (bitBuffer >>> (Long.SIZE - fs)) & remainderMask);
+                        bitBuffer <<= fs;
+                        bitCount -= fs;
 
                         last += map(diff);
-                        out[offset + i] = (short) last;
+                        if (shortOutput != null)
+                            shortOutput[offset + i] = (short) last;
+                        else
+                            intOutput[offset + i] = last;
                     }
                 }
             }
 
             // Leave prefetched whole bytes unread, matching the byte-at-a-time decoder.
             inPosition = position - bitCount / BITS_PER_BYTE;
-            bitBuffer >>>= bitCount / BITS_PER_BYTE * BITS_PER_BYTE;
-            bitCount %= BITS_PER_BYTE;
-            bits = bitBuffer;
-            nbits = bitCount;
+            nbits = bitCount % BITS_PER_BYTE;
+            bits = nbits == 0 ? 0 : bitBuffer >>> (Long.SIZE - nbits);
         }
 
         private int getByte() {

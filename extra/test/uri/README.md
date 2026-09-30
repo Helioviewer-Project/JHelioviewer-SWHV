@@ -66,18 +66,22 @@ extra/test/uri/run-fast-rice-verifier.sh ~/git/nom-tam-fits
 If no path is given, it defaults to `~/git/nom-tam-fits`.
 
 The verifier checks service-provider selection, the raw Rice fixtures, generated integer and floating-point data,
-all combinations of 1/2/4-byte Rice encoding and byte/short/int output, and heap/direct buffers with sliced input.
-Short-decoder boundary cases cover block transitions, every length from 1 to 256, sliced input, and consumed buffer positions.
+all combinations of 1/2/4-byte Rice encoding and byte/short/int output, with heap and direct input/output tested independently.
+Heap short/int outputs are array-backed so the matrix exercises the fast decoder as well as its fallbacks.
+Short and integer decoder boundary cases cover block transitions, every length from 1 to 256, sliced input and output, and consumed buffer positions.
+For each width, 2,000 constructed tiles cover every block code and long unary zero runs with expected pixels calculated independently of both decoders.
+These cases also check output guards and input/output positions.
 It also compares complete compressed FITS files with their uncompressed reference through JHV's FITS loader.
 Individual failures are reported without skipping subsequent cases. Any failure gives a nonzero exit status.
 
-Small quantized cases have fixed expected values and run through both JHV's provider selection and nom-tam's decoder. They pin
-the existing 1.22 reconstruction behavior: no dithering, both dither modes, nulls and zeros followed by ordinary
-pixels, and double precision. Changes to upstream behavior therefore require review even when both decoders
-agree. In particular, the legacy dither-2 zero marker is a compatibility check, not a claim about the FITS standard.
+Small quantized cases have fixed expected values and run through both JHV's provider selection and nom-tam's decoder.
+They cover no dithering, both dither modes, nulls and zeros followed by ordinary pixels, and double precision.
+The expectations include the quantization corrections and dither-sequence fixes in the bundled nom-tam version.
 
-FastRice handles short output with `BYTEPIX=2`. Other encoded widths use upstream short decoding, and other
-output types use the upstream provider. The width matrix and `m13_rice.fits` check this fallback behavior.
+FastRice handles short output with `BYTEPIX=2` and integer output with `BYTEPIX=4`.
+Quantized float and double output uses the fast integer decoder followed by nom-tam's reconstruction.
+The integer optimization requires heap input and output. Direct buffers and other encoded widths use upstream decoding.
+Byte output also uses the upstream provider. The width matrix and `m13_rice.fits` check these fallback paths.
 
 To check a candidate nom-tam JAR without replacing the bundled library:
 

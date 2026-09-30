@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.Buffer;
@@ -51,6 +52,9 @@ public final class FastRiceVerifier {
         run("double fixture", () -> verifyDoubleFixture(resources));
         run("synthetic integers", FastRiceVerifier::verifySyntheticIntegerCases);
         run("short refill boundaries", FastRiceVerifier::verifyShortRefillBoundaries);
+        run("int refill boundaries", FastRiceVerifier::verifyIntRefillBoundaries);
+        run("constructed short tiles", () -> verifyConstructedRice(Short.BYTES));
+        run("constructed int tiles", () -> verifyConstructedRice(Integer.BYTES));
         verifySyntheticQuantizedCases();
         verifyEncodedWidths();
         verifyKnownQuantizedValues();
@@ -64,18 +68,17 @@ public final class FastRiceVerifier {
     }
 
     private static void verifyServiceLoader() {
-        ICompressorControl control = CompressorProvider.findCompressorControl(null, Compression.ZCMPTYPE_RICE_1, short.class);
-        if (control == null || !control.getClass().getName().contains("FastRiceProvider"))
-            throw new AssertionError("FastRiceProvider is not active through ServiceLoader: " + control);
-        FastRiceProvider provider = new FastRiceProvider();
-        for (Class<?> type : List.of(byte.class, int.class, float.class, double.class)) {
+        for (Class<?> type : List.of(short.class, int.class, float.class, double.class)) {
             String quantization = type == float.class || type == double.class ? Compression.ZQUANTIZ_SUBTRACTIVE_DITHER_1 : null;
-            if (provider.createCompressorControl(quantization, Compression.ZCMPTYPE_RICE_1, type) != null)
-                throw new AssertionError("FastRice must delegate " + type.getName());
-            ICompressorControl fallback = control(type, quantization);
-            if (fallback.getClass().getName().contains("FastRiceProvider"))
-                throw new AssertionError("upstream fallback was not selected for " + type.getName());
+            ICompressorControl control = control(type, quantization);
+            if (!control.getClass().getName().contains("FastRiceProvider"))
+                throw new AssertionError("FastRiceProvider is not active for " + type.getName());
         }
+        FastRiceProvider provider = new FastRiceProvider();
+        if (provider.createCompressorControl(null, Compression.ZCMPTYPE_RICE_1, byte.class) != null)
+            throw new AssertionError("FastRice must delegate byte output");
+        if (provider.createCompressorControl("unknown", Compression.ZCMPTYPE_RICE_1, float.class) != null)
+            throw new AssertionError("FastRice must delegate unknown quantization");
     }
 
     private interface Check { void run() throws Exception; }
@@ -242,6 +245,183 @@ public final class FastRiceVerifier {
                     throw new AssertionError("incorrect buffer position after short refill");
             }
         }
+
+        // Encoded directly so the compressor cannot choose a different block code.
+        for (int zeros : new int[]{0, 1, 7, 8, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 127, 128, 511, 8191, 65535}) {
+            int length = (22 + zeros + 7) / 8;
+            ByteBuffer input = ByteBuffer.allocate(length + 32);
+            input.put(2, (byte) 0x10); // First value 0, fs = 0.
+            for (int bit : new int[]{20 + zeros, 21 + zeros}) {
+                int index = bit / 8;
+                input.put(index, (byte) (input.get(index) | 1 << (7 - bit % 8)));
+            }
+            input.limit(length);
+            ShortBuffer output = ShortBuffer.allocate(2);
+            control(short.class).decompress(input, output, riceOption(Short.BYTES, 32));
+            short value = (short) ((zeros & 1) == 0 ? zeros / 2 : -(zeros + 1) / 2);
+            assertArrayEquals("short unary zeros=" + zeros, new short[]{value, value}, output.array());
+            if (input.position() != input.limit() || output.position() != 2)
+                throw new AssertionError("incorrect buffer position after short unary run");
+        }
+    }
+
+    private static void verifyIntRefillBoundaries() {
+        Random random = new Random(0x71ce);
+        for (int block : new int[]{16, 32}) {
+            for (int length = 1; length <= 256; length++) {
+                int[] expected = new int[length];
+                for (int i = 0; i < length; i++) {
+                    // Alternate constant, Rice-coded, and direct-coded blocks.
+                    expected[i] = switch (i / block % 3) {
+                        case 0 -> 123;
+                        case 1 -> 123 + random.nextInt(16);
+                        default -> (i & 1) == 0 ? 0 : Integer.MAX_VALUE;
+                    };
+                }
+                RiceCompressOption option = riceOption(Integer.BYTES, block);
+                ByteBuffer compressed = ByteBuffer.allocate(length * 8 + 128);
+                requireCompressed(new RiceCompressor.IntRiceCompressor(option).compress(IntBuffer.wrap(expected), compressed));
+                compressed.flip();
+                IntBuffer reference = IntBuffer.allocate(length);
+                new RiceCompressor.IntRiceCompressor(option).decompress(compressed.duplicate(), reference);
+                assertArrayEquals("int refill upstream reference", expected, reference.array());
+
+                // Nonzero array offset and position, with inaccessible padding after the limit.
+                ByteBuffer padded = ByteBuffer.allocate(compressed.remaining() + 32);
+                padded.position(7);
+                ByteBuffer input = padded.slice();
+                input.position(3);
+                input.put(compressed);
+                input.limit(input.position());
+                input.position(3);
+                IntBuffer output = IntBuffer.allocate(length + 5).position(5).slice();
+                control(int.class).decompress(input, output, option);
+                assertArrayEquals("int refill block=" + block + " length=" + length, expected,
+                        Arrays.copyOfRange(output.array(), output.arrayOffset(), output.arrayOffset() + length));
+                if (input.position() != input.limit() || output.position() != length)
+                    throw new AssertionError("incorrect buffer position after int refill");
+            }
+        }
+
+        // Encoded directly so the compressor cannot choose a different block code.
+        for (int zeros : new int[]{0, 1, 7, 8, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 127, 128, 511, 8191, 65535}) {
+            int length = (39 + zeros + 7) / 8;
+            ByteBuffer input = ByteBuffer.allocate(length + 32);
+            input.put(4, (byte) 0x08); // First value 0, fs = 0.
+            for (int bit : new int[]{37 + zeros, 38 + zeros}) {
+                int index = bit / 8;
+                input.put(index, (byte) (input.get(index) | 1 << (7 - bit % 8)));
+            }
+            input.limit(length);
+            IntBuffer output = IntBuffer.allocate(2);
+            control(int.class).decompress(input, output, riceOption(Integer.BYTES, 32));
+            int value = (zeros & 1) == 0 ? zeros / 2 : -(zeros + 1) / 2;
+            assertArrayEquals("int unary zeros=" + zeros, new int[]{value, value}, output.array());
+            if (input.position() != input.limit() || output.position() != 2)
+                throw new AssertionError("incorrect buffer position after int unary run");
+        }
+    }
+
+    private static void verifyConstructedRice(int bytePix) {
+        Random random = new Random(6843);
+        int bits = bytePix * Byte.SIZE;
+        int fsBits = bytePix == Short.BYTES ? 4 : 5;
+        int fsMax = bytePix == Short.BYTES ? 14 : 25;
+        int[] zeroRuns = {0, 1, 7, 8, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 127, 128, 511, 8191, 65535};
+        ICompressorControl fast = control(bytePix == Short.BYTES ? short.class : int.class);
+        for (int test = 0; test < 2000; test++) {
+            int block = (test & 1) == 0 ? 16 : 32;
+            int length = 1 + random.nextInt(700);
+            int[] expected = new int[length];
+            BitWriter writer = new BitWriter();
+            int last = bytePix == Short.BYTES ? (short) random.nextInt() : random.nextInt();
+            writer.write(last, bits);
+            for (int i = 0; i < length; ) {
+                // Visit every code and mix constant, direct, and Rice blocks in the same tile.
+                int fs = (test + i / block) % (fsMax + 2) - 1;
+                writer.write(fs + 1, fsBits);
+                int end = Math.min(i + block, length);
+                for (; i < end; i++) {
+                    int diff = 0;
+                    if (fs == fsMax) {
+                        diff = bytePix == Short.BYTES ? random.nextInt(1 << Short.SIZE) : random.nextInt();
+                        writer.write(diff, bits);
+                    } else if (fs >= 0) {
+                        int zeros = zeroRuns[(test + i) % zeroRuns.length] >>> fs;
+                        int remainder = random.nextInt() & ((1 << fs) - 1);
+                        for (int j = 0; j < zeros; j++)
+                            writer.write(0, 1);
+                        writer.write(1, 1);
+                        writer.write(remainder, fs);
+                        diff = zeros << fs | remainder;
+                    }
+                    // Compute expected signed differences without using either decoder.
+                    last += (diff & 1) == 0 ? diff >>> 1 : ~(diff >>> 1);
+                    expected[i] = bytePix == Short.BYTES ? (short) last : last;
+                }
+            }
+            byte[] compressed = writer.finish();
+            RiceCompressOption option = riceOption(bytePix, block);
+            ByteBuffer referenceInput = ByteBuffer.wrap(compressed);
+            Buffer reference = bytePix == Short.BYTES ? ShortBuffer.allocate(length) : IntBuffer.allocate(length);
+            if (reference instanceof ShortBuffer shorts)
+                new RiceCompressor.ShortRiceCompressor(option).decompress(referenceInput, shorts);
+            else
+                new RiceCompressor.IntRiceCompressor(option).decompress(referenceInput, (IntBuffer) reference);
+
+            ByteBuffer storage = ByteBuffer.allocate(compressed.length + 32);
+            Arrays.fill(storage.array(), (byte) 0xa5);
+            ByteBuffer input = storage.position(7).slice();
+            input.position(3).put(compressed).flip().position(3);
+            Buffer output;
+            if (bytePix == Short.BYTES) {
+                ShortBuffer backing = ShortBuffer.allocate(length + 12);
+                Arrays.fill(backing.array(), (short) 0x5a5a);
+                output = backing.position(5).limit(5 + length).slice();
+            } else {
+                IntBuffer backing = IntBuffer.allocate(length + 12);
+                Arrays.fill(backing.array(), 0x5a5a);
+                output = backing.position(5).limit(5 + length).slice();
+            }
+            fast.decompress(input, output, option);
+            for (int i = 0; i < length; i++) {
+                int upstream = reference instanceof ShortBuffer shorts ? shorts.get(i) : ((IntBuffer) reference).get(i);
+                int actual = output instanceof ShortBuffer shorts ? shorts.get(i) : ((IntBuffer) output).get(i);
+                if (upstream != expected[i] || actual != expected[i])
+                    throw new AssertionError("constructed BYTEPIX=" + bytePix + " tile=" + test + " pixel=" + i);
+            }
+            for (int i = 0; i < length + 12; i++) {
+                int actual = output instanceof ShortBuffer shorts ? shorts.array()[i] : ((IntBuffer) output).array()[i];
+                if ((i < 5 || i >= 5 + length) && actual != 0x5a5a)
+                    throw new AssertionError("overwritten output guard in constructed tile " + test);
+            }
+            if (input.position() - 3 != compressed.length || referenceInput.position() != compressed.length || output.position() != length)
+                throw new AssertionError("incorrect buffer position in constructed tile " + test);
+        }
+        System.out.println("constructed BYTEPIX=" + bytePix + " tiles=2000");
+    }
+
+    private static final class BitWriter {
+
+        private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        private int bits;
+        private int count;
+
+        private void write(int value, int length) {
+            for (int i = length - 1; i >= 0; i--) {
+                bits = bits << 1 | (value >>> i & 1);
+                if (++count == Byte.SIZE) {
+                    bytes.write(bits);
+                    count = 0;
+                }
+            }
+        }
+
+        private byte[] finish() {
+            if (count > 0)
+                bytes.write(bits << (Byte.SIZE - count));
+            return bytes.toByteArray();
+        }
     }
 
     private static void verifyIntSynthetic(int block, int[] input) {
@@ -310,14 +490,16 @@ public final class FastRiceVerifier {
     private static void verifyEncodedWidths() {
         for (int bytePix : new int[]{1, 2, 4}) {
             for (Class<?> type : List.of(byte.class, short.class, int.class)) {
-                for (boolean direct : new boolean[]{false, true})
-                    run("BYTEPIX=" + bytePix + " output=" + type.getName() + " direct=" + direct,
-                            () -> verifyEncodedWidth(bytePix, type, direct));
+                for (boolean directInput : new boolean[]{false, true}) {
+                    for (boolean directOutput : new boolean[]{false, true})
+                        run("BYTEPIX=" + bytePix + " output=" + type.getName() + " directInput=" + directInput + " directOutput=" + directOutput,
+                                () -> verifyEncodedWidth(bytePix, type, directInput, directOutput));
+                }
             }
         }
     }
 
-    private static void verifyEncodedWidth(int bytePix, Class<?> type, boolean direct) {
+    private static void verifyEncodedWidth(int bytePix, Class<?> type, boolean directInput, boolean directOutput) {
         // All values fit every encoding width. Width is a property of the stream, not the output buffer.
         int[] values = new int[65];
         for (int i = 0; i < values.length; i++)
@@ -326,16 +508,24 @@ public final class FastRiceVerifier {
         ByteBuffer encoded = ByteBuffer.allocate(2048);
         requireCompressed(new RiceCompressor.IntRiceCompressor(option).compress(IntBuffer.wrap(values), encoded));
         encoded.flip();
-        ByteBuffer storage = direct ? ByteBuffer.allocateDirect(encoded.remaining() + 7) : ByteBuffer.allocate(encoded.remaining() + 7);
+        ByteBuffer storage = directInput ? ByteBuffer.allocateDirect(encoded.remaining() + 7) : ByteBuffer.allocate(encoded.remaining() + 7);
         storage.position(7);
         storage.put(encoded).flip().position(7);
         ByteBuffer input = storage.slice();
-        ByteBuffer output = direct ? ByteBuffer.allocateDirect(values.length * 4) : ByteBuffer.allocate(values.length * 4);
-        Buffer decoded = type == byte.class ? output.limit(values.length)
-                : type == short.class ? output.asShortBuffer().limit(values.length) : output.asIntBuffer();
+        Buffer decoded;
+        if (directOutput) {
+            ByteBuffer output = ByteBuffer.allocateDirect(values.length * Integer.BYTES);
+            decoded = type == byte.class ? output.limit(values.length)
+                    : type == short.class ? output.asShortBuffer().limit(values.length) : output.asIntBuffer();
+        } else {
+            decoded = type == byte.class ? ByteBuffer.allocate(values.length)
+                    : type == short.class ? ShortBuffer.allocate(values.length) : IntBuffer.allocate(values.length);
+        }
+        if (input.hasArray() == directInput || decoded.hasArray() == directOutput)
+            throw new AssertionError("incorrect heap/direct buffer setup");
         control(type).decompress(input, decoded, option);
-        if (decoded.position() != values.length)
-            throw new AssertionError("incorrect output position: " + decoded.position());
+        if (input.position() != input.limit() || decoded.position() != values.length)
+            throw new AssertionError("incorrect buffer position after width test");
         for (int i = 0; i < values.length; i++) {
             int actual = decoded instanceof ByteBuffer bytes ? bytes.get(i)
                     : decoded instanceof ShortBuffer shorts ? shorts.get(i) : ((IntBuffer) decoded).get(i);
@@ -345,7 +535,7 @@ public final class FastRiceVerifier {
     }
 
     private static void verifyKnownQuantizedValues() {
-        // Pin the existing 1.22 reconstruction contract independently of the upstream floating-point decoder.
+        // Pin the corrected reconstruction independently of the upstream floating-point decoder.
         // Seed 1 starts at the first Park-Miller random value, 16807 / 2147483647.
         double r0 = 16807.0 / 2147483647;
         double r1 = 282475249.0 / 2147483647;
@@ -355,15 +545,15 @@ public final class FastRiceVerifier {
             for (boolean upstream : new boolean[]{false, true}) {
                 String label = (upstream ? "upstream " : "JHV provider ") + type.getName();
                 run(label + " no dither", () -> verifyKnownValues(type, upstream, false, false,
-                        new int[]{0, 1, 2}, new double[]{11, 13, 15}));
+                        new int[]{0, 1, 2}, new double[]{10, 12, 14}));
                 run(label + " fractional precision", () -> verifyKnownValues(type, upstream, true, false,
                         new int[]{0}, new double[]{10 + (0.5 - r0) * 2}));
                 run(label + " dither2 zero marker", () -> verifyKnownValues(type, upstream, true, true,
-                        new int[]{Integer.MIN_VALUE + 2, 0}, new double[]{0, 10 + (0.5 - r1) * 2}));
+                        new int[]{Integer.MIN_VALUE + 1, 0}, new double[]{0, 10 + (0.5 - r1) * 2}));
                 run(label + " dither1 nulls", () -> verifyKnownValues(type, upstream, true, false,
                         new int[]{0, Integer.MIN_VALUE, 1}, new double[]{10 + (0.5 - r0) * 2, Double.NaN, 10 + (1.5 - r2) * 2}));
                 run(label + " dither2 zeros/nulls", () -> verifyKnownValues(type, upstream, true, true,
-                        new int[]{0, Integer.MIN_VALUE, 1, Integer.MIN_VALUE + 2, 2},
+                        new int[]{0, Integer.MIN_VALUE, 1, Integer.MIN_VALUE + 1, 2},
                         new double[]{10 + (0.5 - r0) * 2, Double.NaN, 10 + (1.5 - r2) * 2, 0, 10 + (2.5 - r4) * 2}));
             }
         }
