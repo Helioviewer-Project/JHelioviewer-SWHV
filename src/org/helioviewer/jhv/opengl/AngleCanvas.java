@@ -151,26 +151,26 @@ public final class AngleCanvas extends Canvas {
         if (!hostVisible)
             return;
 
+        refreshPixelScale();
+        attachIfNeeded();
+        if (angleRenderer == null)
+            return;
+
+        syncHostScale();
+        int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
+        int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
+        if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+            GLRenderer.reshape(glWidth, glHeight);
+            lastGlWidth = glWidth;
+            lastGlHeight = glHeight;
+        }
         try {
-            refreshPixelScale();
-            attachIfNeeded();
-            if (angleRenderer == null)
-                return;
-            syncHostScale();
-            int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
-            int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
-            if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
-                GLRenderer.reshape(glWidth, glHeight);
-                lastGlWidth = glWidth;
-                lastGlHeight = glHeight;
-            }
             angleRenderer.render(viewpoint);
             recovering = false;
             fpsCount++;
         } catch (AngleRenderer.ContextLostException e) {
             try {
-                if (angleRenderer != null)
-                    angleRenderer.destroy();
+                angleRenderer.destroy();
             } finally {
                 angleRenderer = null;
                 invalidateGlSize();
