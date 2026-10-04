@@ -4,6 +4,7 @@ bin
 cov-int
 release/install4j/builds
 gradle
+tmp
 JHelioviewer.jar
 *.iml
 

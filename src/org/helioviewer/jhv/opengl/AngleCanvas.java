@@ -15,6 +15,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
@@ -25,7 +26,7 @@ import org.helioviewer.jhv.opengl.angle.X11AngleBridge;
 
 @SuppressWarnings("serial")
 public final class AngleCanvas extends Canvas {
-    private long macHostHandle;
+    private MacAngleBridge.Host macHost;
     private AngleRenderer angleRenderer;
     private boolean displayPending;
     private Position pendingViewpoint;
@@ -40,6 +41,7 @@ public final class AngleCanvas extends Canvas {
     private boolean nativeHostVisible = true;
     private double nativeHostScale = Double.NaN;
     private boolean attachmentFailed;
+    private boolean recovering;
 
     public AngleCanvas() {
         setFocusable(true);
@@ -136,8 +138,8 @@ public final class AngleCanvas extends Canvas {
             return;
 
         hostVisible = visible;
-        if (!visible && macHostHandle != 0L && nativeHostVisible) {
-            MacAngleBridge.setVisible(macHostHandle, false);
+        if (!visible && macHost != null && nativeHostVisible) {
+            MacAngleBridge.setVisible(macHost.handle(), false);
             nativeHostVisible = false;
         } else if (visible) {
             scheduleHostUpdate(true);
@@ -149,21 +151,34 @@ public final class AngleCanvas extends Canvas {
         if (!hostVisible)
             return;
 
-        refreshPixelScale();
-        attachIfNeeded();
-        if (angleRenderer == null)
-            return;
-
-        syncHostScale();
-        int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
-        int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
-        if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
-            GLRenderer.reshape(glWidth, glHeight);
-            lastGlWidth = glWidth;
-            lastGlHeight = glHeight;
+        try {
+            refreshPixelScale();
+            attachIfNeeded();
+            if (angleRenderer == null)
+                return;
+            syncHostScale();
+            int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
+            int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
+            if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+                GLRenderer.reshape(glWidth, glHeight);
+                lastGlWidth = glWidth;
+                lastGlHeight = glHeight;
+            }
+            angleRenderer.render(viewpoint);
+            recovering = false;
+            fpsCount++;
+        } catch (AngleRenderer.ContextLostException e) {
+            try {
+                if (angleRenderer != null)
+                    angleRenderer.destroy();
+            } finally {
+                angleRenderer = null;
+                invalidateGlSize();
+                if (pendingViewpoint == null)
+                    pendingViewpoint = viewpoint == null ? GLRenderer.getDisplayedViewpoint() : viewpoint;
+            }
+            scheduleRecovery(e);
         }
-        angleRenderer.render(viewpoint);
-        fpsCount++;
     }
 
     // Create the platform-native host/window handle and ANGLE renderer on first use.
@@ -174,17 +189,18 @@ public final class AngleCanvas extends Canvas {
         long newNativeWindowHandle = 0L;
         try {
             if (Platform.isMacOS()) {
-                JRootPane rootPane = SwingUtilities.getRootPane(this);
-                Point location = rootPane == null ? getLocation() :
-                        SwingUtilities.convertPoint(this, 0, 0, rootPane.getContentPane());
-                MacAngleBridge.Host host = MacAngleBridge.create(
-                        this, location.x, location.y, getWidth(), getHeight());
-                if (host == null)
-                    return;
-                macHostHandle = host.handle();
-                newNativeWindowHandle = host.layer();
-                if (!hostVisible)
-                    MacAngleBridge.setVisible(macHostHandle, false);
+                if (macHost == null) {
+                    JRootPane rootPane = SwingUtilities.getRootPane(this);
+                    Point location = rootPane == null ? getLocation() :
+                            SwingUtilities.convertPoint(this, 0, 0, rootPane.getContentPane());
+                    macHost = MacAngleBridge.create(
+                            this, location.x, location.y, getWidth(), getHeight());
+                    if (macHost == null)
+                        return;
+                    if (!hostVisible)
+                        MacAngleBridge.setVisible(macHost.handle(), false);
+                }
+                newNativeWindowHandle = macHost.layer();
             } else if (Platform.isWindows()) {
                 newNativeWindowHandle = WinAngleBridge.hwnd(this);
             } else if (Platform.isLinux()) {
@@ -195,14 +211,31 @@ public final class AngleCanvas extends Canvas {
 
             angleRenderer = new AngleRenderer(newNativeWindowHandle);
             nativeHostVisible = hostVisible;
-            if (Platform.isMacOS())
-                nativeHostScale = Display.pixelScale[0];
             invalidateGlSize();
-        } catch (RuntimeException | Error e) {
+        } catch (RuntimeException e) {
+            if (recovering || e instanceof AngleRenderer.ContextLostException) {
+                scheduleRecovery(e);
+                return;
+            }
+            attachmentFailed = true;
+            throw e;
+        } catch (Error e) {
             // Keep the macOS host until removeNotify so its JAWT layer is cleared only during Canvas teardown.
             attachmentFailed = true;
             throw e;
         }
+    }
+
+    private void scheduleRecovery(RuntimeException failure) {
+        // Allow one recreation, including a successful first frame, for each context loss.
+        if (recovering) {
+            attachmentFailed = true;
+            Log.warn("ANGLE context recovery failed; rendering stopped", failure);
+            return;
+        }
+        recovering = true;
+        Log.warn("ANGLE context was lost; recreating renderer", failure);
+        scheduleHostUpdate(true);
     }
 
     // Keep native scale and visibility synchronized, then trigger a redraw if needed.
@@ -221,7 +254,7 @@ public final class AngleCanvas extends Canvas {
         if (Platform.isMacOS()) {
             syncHostScale();
             if (hostVisible != nativeHostVisible) {
-                MacAngleBridge.setVisible(macHostHandle, hostVisible);
+                MacAngleBridge.setVisible(macHost.handle(), hostVisible);
                 nativeHostVisible = hostVisible;
             }
         }
@@ -255,10 +288,12 @@ public final class AngleCanvas extends Canvas {
         } finally {
             angleRenderer = null;
             try {
-                if (Platform.isMacOS() && macHostHandle != 0L)
-                    MacAngleBridge.destroy(macHostHandle);
+                if (macHost != null)
+                    MacAngleBridge.destroy(macHost.handle());
             } finally {
-                macHostHandle = 0L;
+                macHost = null;
+                recovering = false;
+                attachmentFailed = false;
                 nativeHostVisible = true;
                 nativeHostScale = Double.NaN;
                 displayPending = hostUpdatePending = hostRenderPending = false;
@@ -276,7 +311,7 @@ public final class AngleCanvas extends Canvas {
         if (!Platform.isMacOS() || nativeHostScale == Display.pixelScale[0])
             return;
 
-        MacAngleBridge.setScale(macHostHandle, Display.pixelScale[0]);
+        MacAngleBridge.setScale(macHost.handle(), Display.pixelScale[0]);
         nativeHostScale = Display.pixelScale[0];
     }
 

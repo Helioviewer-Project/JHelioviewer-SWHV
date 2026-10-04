@@ -17,6 +17,13 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class AngleRenderer {
+    @SuppressWarnings("serial")
+    public static final class ContextLostException extends RuntimeException {
+        private ContextLostException(String message) {
+            super(message);
+        }
+    }
+
     private enum Backend {
         D3D11(EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE, "D3D11"),
         METAL(EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, "Metal"),
@@ -184,10 +191,11 @@ public final class AngleRenderer {
     public void destroy() {
         if (activeRenderer != this)
             throw new IllegalStateException("AngleRenderer is not active");
-        if (!EGL15.eglMakeCurrent(display, surface, surface, context))
-            throw eglError("eglMakeCurrent");
-
         try {
+            // A failed swap leaves this context current, including after device loss.
+            // Do not try to bind it again: ANGLE rejects binding a lost context.
+            if (EGL15.eglGetCurrentContext() != context && !EGL15.eglMakeCurrent(display, surface, surface, context))
+                throw eglError("eglMakeCurrent");
             GLRenderer.dispose();
         } finally {
             try {
@@ -279,6 +287,8 @@ public final class AngleRenderer {
         int code = EGL15.eglGetError();
         if (code == EGL15.EGL_SUCCESS)
             return new RuntimeException(step + " failed without EGL error; backend=" + backend.label);
+        if (code == EGL15.EGL_CONTEXT_LOST)
+            return new ContextLostException(step + " failed with EGL_CONTEXT_LOST; backend=" + backend.label);
         return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code) + "; backend=" + backend.label);
     }
 
