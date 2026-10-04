@@ -120,8 +120,9 @@ public record LUT(String name, ByteBuffer rgba) {
         return new LUT(name, rgba);
     }
 
+    // Kakadu normalizes palette entries to [-0.5, 0.5), where +0.5 stands for 2^bits
     private static byte channel(float value) {
-        return (byte) ((Math.clamp(value, -0.5f, 0.5f) + 0.5f) * 0xFF);
+        return (byte) Math.clamp((int) ((value + 0.5f) * 256), 0, 255);
     }
 
     private static ByteBuffer packArgbToRgba(int[] argb) {
