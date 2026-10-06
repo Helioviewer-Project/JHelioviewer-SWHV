@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.20)
+project(jhvj2k LANGUAGES CXX)
+
+# Link the core client built by esajpip; OpenJPEG is not used.
+set(ESAJPIP "" CACHE PATH "esajpip source directory")
+set(ESAJPIP_BUILD "" CACHE PATH "esajpip build directory")
+set(KDU_VENDOR "" CACHE PATH "Kakadu source directory")
+set(KDU_LIBRARY "" CACHE FILEPATH "JHV's Kakadu shared library or import library")
+
+add_library(jhvj2k SHARED jhv_j2k.cc jhv_kdu_geometry.cc jhv_kdu_decode.cc)
+target_compile_features(jhvj2k PRIVATE cxx_std_17)
+target_include_directories(jhvj2k PRIVATE "${ESAJPIP}" "${ESAJPIP}/jpeg2000/generated")
+target_include_directories(jhvj2k SYSTEM PRIVATE
+    "${KDU_VENDOR}/coresys/common" "${KDU_VENDOR}/apps/support" "${KDU_VENDOR}/apps/compressed_io")
+find_library(CLIENT_LIBRARY NAMES esajpip_client PATHS "${ESAJPIP_BUILD}/client" NO_DEFAULT_PATH REQUIRED)
+find_library(JPEG2000_LIBRARY NAMES jpeg2000 PATHS "${ESAJPIP_BUILD}/jpeg2000" NO_DEFAULT_PATH REQUIRED)
+target_link_libraries(jhvj2k PRIVATE "${CLIENT_LIBRARY}" "${JPEG2000_LIBRARY}" "${KDU_LIBRARY}")
+if(APPLE)
+    set_target_properties(jhvj2k PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE INSTALL_RPATH "@loader_path")
+elseif(UNIX)
+    set_target_properties(jhvj2k PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE INSTALL_RPATH "$ORIGIN")
+endif()
+if(NOT MSVC)
+    target_compile_options(jhvj2k PRIVATE -Wall -Wextra -Werror)
+endif()
