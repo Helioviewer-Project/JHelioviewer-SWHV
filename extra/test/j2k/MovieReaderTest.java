@@ -51,7 +51,7 @@ public final class MovieReaderTest {
                 reader.setCacheKey(new String[]{"movie0", "movie1", "movie2", "movie3"});
             } else {
                 socket = new JPIPSocket(uri, source.cache());
-                socket.init(source.cache());
+                socket.prime(source.cache());
             }
             source.open();
             if (source.maxFrame() < 3)

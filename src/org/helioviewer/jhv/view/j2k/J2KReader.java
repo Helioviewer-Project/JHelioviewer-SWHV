@@ -30,7 +30,7 @@ class J2KReader implements Runnable {
         JPIPCache cache = source.cache();
         socket = new JPIPSocket(uri, cache);
         try {
-            socket.init(cache);
+            socket.prime(cache);
         } catch (Exception e) {
             initCloseSocket();
             throw new IOException("Error in the server communication: " + e.getMessage(), e);

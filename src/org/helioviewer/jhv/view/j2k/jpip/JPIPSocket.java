@@ -57,6 +57,12 @@ public final class JPIPSocket extends HTTPSocket {
                 throw new IOException("The client only supports HTTP transport");
 
             jpipPath = '/' + path;
+
+            // A new channel sends the metadata again: fetch it here, compressed, not inside frame responses.
+            String req = createQuery(META_REQUEST_LEN, "cid", jpipChannelID, "stream", "0", "metareq", "[*]!!");
+            do {
+                res = requestInitialization(req, cache);
+            } while (!res.isResponseComplete());
         } catch (Throwable e) { // close the socket on any failure, then rethrow
             try {
                 super.close();
@@ -100,15 +106,10 @@ public final class JPIPSocket extends HTTPSocket {
         return createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", size, "roff", "0,0");
     }
 
-    public void init(JPIPCache cache) throws KduException, IOException {
+    // prime first image
+    public void prime(JPIPCache cache) throws KduException, IOException {
         JPIPResponse res;
-        String req = createQuery(META_REQUEST_LEN, "cid", jpipChannelID, "stream", "0", "metareq", "[*]!!");
-        do {
-            res = requestInitialization(req, cache);
-        } while (!res.isResponseComplete());
-
-        // prime first image
-        req = createFrameQuery(0, "64,64");
+        String req = createFrameQuery(0, "64,64");
         do {
             res = requestInitialization(req, cache);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));

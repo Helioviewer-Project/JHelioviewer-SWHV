@@ -53,7 +53,7 @@ public final class ROBTest {
         JPIPSocket socket = null;
         try {
             socket = new JPIPSocket(uri, source.cache());
-            socket.init(source.cache());
+            socket.prime(source.cache());
             if (mode == Mode.CACHED)
                 socket.close(); // Only metadata and the initial 64x64 image come from the server.
             source.open();
