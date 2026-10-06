@@ -36,17 +36,17 @@ public final class CallistoTest {
                 throw new AssertionError("Expected indexed grayscale Callisto data");
             source.close(); // Exercise the same per-decode reopen used by local JP2 views.
             System.out.println("Callisto dimensions=" + size.width() + "x" + size.height());
-            for (float factor : new float[]{1, 0.5f, 0.25f, 0.125f, 0.0625f, 0.03125f}) {
-                DecodedImage full = decode(source, resolution, size.subImage(), factor);
+            for (int level = 0; level <= 5; level++) {
+                ResolutionSet.Level reduced = resolution.getLevel(level);
+                DecodedImage full = decode(source, resolution, reduced.subImage(), reduced.level());
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(((ByteBuffer) full.imageBuffer().buffer).duplicate());
                 for (int x : new int[]{0, size.width() / 3 + 7, size.width() - 103}) {
-                    J2KParams.SubImage region = new J2KParams.SubImage(x, 0, size.width() / 5,
-                            size.height(), size.width(), size.height());
-                    DecodedImage cropped = decode(source, resolution, region, factor);
+                    J2KParams.SubImage region = J2KViewCallisto.levelRegion(x, 0, size.width() / 5, size.height(), size, reduced);
+                    DecodedImage cropped = decode(source, resolution, region, reduced.level());
                     compare(full, cropped);
                 }
-                System.out.println("PASS: Callisto factor=" + factor + " origin, interior and right-edge crops sha256="
+                System.out.println("PASS: Callisto level=" + level + " origin, interior and right-edge crops sha256="
                         + HexFormat.of().formatHex(hash.digest()));
             }
         } finally {
@@ -55,8 +55,8 @@ public final class CallistoTest {
     }
 
     private static DecodedImage decode(J2KSource source, ResolutionSet resolution, J2KParams.SubImage region,
-                                       float factor) throws Exception {
-        return new J2KDecoder(source, new J2KParams.Decode(0, region, 0, factor), resolution.numComps,
+                                       int level) throws Exception {
+        return new J2KDecoder(source, new J2KParams.Decode(0, region, level), resolution.numComps,
                 ImageFilter.Type.None, metadata, 1, 1).call();
     }
 

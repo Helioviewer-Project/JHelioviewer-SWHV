@@ -34,16 +34,12 @@ class J2KParams {
         final int frame;
         final SubImage subImage;
         final int level;
-        final float factor;
-        private final int factorBits;
         private final int hash;
 
-        Decode(int _frame, SubImage _subImage, int _level, float _factor) {
+        Decode(int _frame, SubImage _subImage, int _level) {
             frame = _frame;
             subImage = _subImage;
             level = _level;
-            factor = _factor;
-            factorBits = Float.floatToIntBits(_factor);
 
             int ret = 17;
             ret = 31 * ret + frame;
@@ -52,7 +48,6 @@ class J2KParams {
             ret = 31 * ret + subImage.w;
             ret = 31 * ret + subImage.h;
             ret = 31 * ret + level;
-            ret = 31 * ret + factorBits;
             hash = ret;
         }
 
@@ -64,8 +59,7 @@ class J2KParams {
                     && subImage.y == other.subImage.y
                     && subImage.w == other.subImage.w
                     && subImage.h == other.subImage.h
-                    && level == other.level
-                    && factorBits == other.factorBits;
+                    && level == other.level;
         }
 
         @Override

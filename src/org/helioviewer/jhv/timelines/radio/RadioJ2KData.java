@@ -123,31 +123,32 @@ class RadioJ2KData implements View.DataHandler {
         if (willDraw && !disposed) {
             Rectangle roi = getROI(xAxis);
             if (roi != null) {
-                view.decodeRegion(roi.x, roi.y, roi.width, roi.height, lastState.resolution);
+                view.decodeRegion(roi.x, roi.y, roi.width, roi.height, lastState.level);
             }
         }
     }
 
-    private float computeResolution(TimeAxis xAxis) {
+    // Full resolution up to 1/32 of the day; one level coarser per doubling.
+    private int computeLevel(TimeAxis xAxis) {
         double pct = Math.min((xAxis.end() - xAxis.start()) / (double) (endDate - startDate), 1.0);
-        float res = 1f;
-        while (res > 0.03125f && pct > 0.03125f / res) {
-            res *= 0.5f;
+        int level = 0;
+        while (level < 5 && pct * 32 > 1 << level) {
+            level++;
         }
-        return res;
+        return level;
     }
 
-    private record DecodeState(float resolution, long paddedStart, long paddedEnd) {}
+    private record DecodeState(int level, long paddedStart, long paddedEnd) {}
 
     private DecodeState lastState;
 
     private Rectangle getROI(TimeAxis xAxis) {
         long visibleStart = Math.max(startDate, xAxis.start());
         long visibleEnd = Math.min(endDate, xAxis.end());
-        float resolution = computeResolution(xAxis);
+        int level = computeLevel(xAxis);
 
         if (lastState != null
-                && lastState.resolution == resolution
+                && lastState.level == level
                 && visibleStart >= lastState.paddedStart
                 && visibleEnd <= lastState.paddedEnd) {
             return null;
@@ -169,7 +170,7 @@ class RadioJ2KData implements View.DataHandler {
             return null;
         }
 
-        lastState = new DecodeState(resolution, newVisibleStart, newVisibleEnd);
+        lastState = new DecodeState(level, newVisibleStart, newVisibleEnd);
 
         return new Rectangle(x0, 0, width, j2kHeight);
     }

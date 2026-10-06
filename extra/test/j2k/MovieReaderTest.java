@@ -66,7 +66,7 @@ public final class MovieReaderTest {
                 readFrames.setAccessible(true);
                 ResolutionSet.Level size = source.resolutionSet(0).getLevel(0);
                 J2KParams.Read params = new J2KParams.Read(null, source,
-                        new J2KParams.Decode(0, size.subImage(), 0, 1), null, false);
+                        new J2KParams.Decode(0, size.subImage(), 0), null, false);
                 if (!cached) {
                     // Keep the idle worker waiting on its original queue while invoking the pump directly.
                     Field threadField = J2KReader.class.getDeclaredField("myThread");
@@ -121,7 +121,7 @@ public final class MovieReaderTest {
                 ResolutionSet resolution = source.resolutionSet(frame);
                 ResolutionSet.Level size = resolution.getLevel(0);
                 DecodedImage image = new J2KDecoder(source,
-                        new J2KParams.Decode(frame, size.subImage(), 0, 1), resolution.numComps,
+                        new J2KParams.Decode(frame, size.subImage(), 0), resolution.numComps,
                         ImageFilter.Type.None, metadata, size.factorX(), size.factorY()).call();
                 if (image == null)
                     throw new AssertionError("Missing decoded frame " + frame);

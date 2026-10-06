@@ -254,7 +254,7 @@ public class J2KView extends BaseView {
             res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
-        return new J2KParams.Decode(frame, res.subImage(), res.level(), 1);
+        return new J2KParams.Decode(frame, res.subImage(), res.level());
     }
 
     private int currentLevel = 10000;

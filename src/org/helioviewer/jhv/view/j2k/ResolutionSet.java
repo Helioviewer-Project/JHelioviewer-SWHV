@@ -31,7 +31,7 @@ public class ResolutionSet {
     }
 
     Level getLevel(int idx) {
-        return resolutions[idx];
+        return resolutions[Math.min(idx, numLevels - 1)];
     }
 
     Level getPreviousLevel(int w, int h) {

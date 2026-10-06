@@ -26,8 +26,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
     private static final int[] firstComponent = {0};
-    private static final Kdu_quality_limiter qualityLow = new Kdu_quality_limiter(2f / 256);
-    private static final Kdu_quality_limiter qualityHigh = new Kdu_quality_limiter(1f / 256);
+    private static final Kdu_quality_limiter quality = new Kdu_quality_limiter(1f / 256);
 
     private static final ThreadLocal<DecodeScratch> localScratch = ThreadLocal.withInitial(DecodeScratch::new);
 
@@ -68,7 +67,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
             compositor.Create(src.jpxSource());
             compositor.Set_surface_initialization_mode(false);
-            compositor.Set_quality_limiting(params.factor < 1 ? qualityLow : qualityHigh, -1, -1);
+            compositor.Set_quality_limiting(quality, -1, -1);
             compositor.Set_thread_env(environment, null);
 
             J2KParams.SubImage subImage = params.subImage;
@@ -84,7 +83,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 compositor.Add_ilayer(frame, empty, empty);
             }
 
-            compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
+            compositor.Set_scale(false, false, false, 1f / (1 << params.level));
 
             Kdu_dims requestedRegion = scratch.requestedRegion;
             requestedRegion.From_u32(subImage.x(), subImage.y(), subImage.w(), subImage.h());
@@ -106,8 +105,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            Region imageRegion = metaData.roiToRegion(actualX, actualY, actualWidth, actualHeight,
-                    factorX / params.factor, factorY / params.factor);
+            Region imageRegion = metaData.roiToRegion(actualX, actualY, actualWidth, actualHeight, factorX, factorY);
             ImageFilter filter = ImageFilter.of(filterType, imageRegion, metaData);
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filter);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();

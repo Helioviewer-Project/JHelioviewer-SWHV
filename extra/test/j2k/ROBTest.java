@@ -114,7 +114,7 @@ public final class ROBTest {
                 }
                 source.setFrameComplete(0, level);
                 DecodedImage image = new J2KDecoder(source,
-                        new J2KParams.Decode(0, size.subImage(), level, 1), resolution.numComps,
+                        new J2KParams.Decode(0, size.subImage(), level), resolution.numComps,
                         ImageFilter.Type.None, metadata, size.factorX(), size.factorY()).call();
                 if (image == null || image.imageBuffer().width != size.width()
                         || image.imageBuffer().height != size.height())

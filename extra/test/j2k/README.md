@@ -52,7 +52,7 @@ This does not exercise the outer reader retry loop or GUI priority refresh.
 
 The live suite also downloads a Callisto JP2 through the ROB API and checks horizontal
 crops at the origin, interior, and right edge against a full-image decode. It exercises
-all six Callisto scale factors (1 through 1/32), including nonaligned requested regions,
+all six Callisto resolution levels (0 through 5), including nonaligned requested regions,
 and closes/reopens the local JP2 between decodes as the application does. Full-image hashes
 are printed for comparison when changing the decoder. These checks cover grayscale pixels,
 not RGB composition or timeline drawing.
