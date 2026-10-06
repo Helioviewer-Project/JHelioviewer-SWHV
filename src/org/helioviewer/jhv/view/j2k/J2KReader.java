@@ -28,8 +28,8 @@ class J2KReader implements Runnable {
         uri = _uri;
 
         JPIPCache cache = source.cache();
-        socket = new JPIPSocket(uri, cache);
         try {
+            socket = new JPIPSocket(uri, cache);
             socket.prime(cache);
         } catch (Exception e) {
             initCloseSocket();

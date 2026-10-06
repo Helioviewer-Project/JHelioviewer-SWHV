@@ -69,6 +69,7 @@ public final class JPIPSocketTest {
                             connection.getInputStream(), StandardCharsets.US_ASCII));
                     readRequest(input);
                     reply(connection, "JPIP-cnew: cid=test,transport=http,path=jpip\r\n", 2);
+                    replyMetadata(input, connection);
                     // Require both requests before responding, proving the client sends ahead.
                     readRequest(input);
                     readRequest(input);
@@ -164,14 +165,17 @@ public final class JPIPSocketTest {
             Future<?> server = workers.submit(() -> {
                 try (Socket connection = listener.accept()) {
                     connection.setSoTimeout(5000);
-                    readRequest(new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII)));
+                    BufferedReader input = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII));
+                    readRequest(input);
                     connection.getOutputStream().write(("HTTP/1.1 200 OK\r\n"
                             + "content-type: image/jpp-stream\r\n"
                             + "jpip-cnew: cid=test,transport=http,path=jpip\r\n"
                             + framing).getBytes(StandardCharsets.US_ASCII));
-                    if (valid)
+                    if (valid) {
                         connection.getOutputStream().write(new byte[]{0, 2, 0});
+                        replyMetadata(input, connection);
+                    }
                 }
                 return null;
             });
@@ -205,6 +209,7 @@ public final class JPIPSocketTest {
                             + "JPIP-cnew: cid=test,transport=http,path=jpip\r\n"
                             + "Content-Length: 3\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
                     connection.getOutputStream().write(new byte[]{0, 2, 0});
+                    replyMetadata(input, connection);
                     if (abort) {
                         readRequest(input);
                         readRequest(input);
@@ -249,11 +254,21 @@ public final class JPIPSocketTest {
         }
     }
 
-    private static void readRequest(BufferedReader input) throws IOException {
-        String line;
-        while ((line = input.readLine()) != null) {
+    // A new channel asks for the metadata before anything else.
+    private static void replyMetadata(BufferedReader input, Socket connection) throws IOException {
+        String request = readRequest(input);
+        if (!request.startsWith("GET /jpip?cid=test&stream=0&metareq="))
+            throw new IOException("Expected the metadata request: " + request);
+        reply(connection, "", 2);
+    }
+
+    private static String readRequest(BufferedReader input) throws IOException {
+        String request = input.readLine();
+        String line = request;
+        while (line != null) {
             if (line.isEmpty())
-                return;
+                return request;
+            line = input.readLine();
         }
         throw new IOException("Connection ended before request headers");
     }
