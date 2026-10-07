@@ -10,8 +10,6 @@ struct jhv_j2k_level {
 
 struct jhv_j2k_geometry {
     int plane_count;
-    int component[3];           // original decoder output indices, in decode order
-    int channel_plane[3];       // color channel to decoded plane
     int channels;               // decoded output: 1 gray or palette indices, 3 color
     int resolutions, layers;
     jhv_j2k_level level[33];    // exact decoder coordinates, full resolution first
@@ -24,21 +22,11 @@ struct jhv_j2k_geometry {
 // Read all first tile-part headers before reporting reductions and quality.
 // KDU's minimum DWT count is conservative across all tile-components.
 // No resampling: selected planes must share their origin/extent and have unit
-// base sampling and zero registration. Success leaves selected output planes
-// at full resolution, with persistence enabled. Layer display coordinates start
+// base sampling and zero registration. Layer display coordinates start
 // at zero; retain level.x/y for translation to the decoder's coordinates.
 // Returns NULL, or a rendering limitation with out unchanged. KDU errors propagate;
-// the caller owns and destroys the codestream, including after failure.
+// the caller owns and destroys the codestream, which is left restricted.
 const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
                                   const hv_render &render, jhv_j2k_geometry &out);
-
-// Select a nonempty rectangle wholly inside the layer's reduced display grid.
-// region.x/y are relative to that grid's top-left pixel. Translate through the
-// selected output component to KDU's full-resolution canvas. layers=0 means all.
-// Use geometry from this persistent codestream, with no decoder tiles open.
-// Invalid reduction, quality or bounds leave restrictions unchanged.
-const char *jhv_kdu_set_region(kdu_core::kdu_codestream &stream,
-                              const jhv_j2k_geometry &geometry, int reduce, int layers,
-                              const jhv_j2k_level &region);
 
 #endif

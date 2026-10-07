@@ -22,8 +22,6 @@ typedef struct {
     int32_t levels, ready;         /* resolution levels; how many, from the coarsest, are ready */
     int32_t width[33], height[33]; /* per level, finest first */
 } jhv_j2k_frame_info;
-/* Once, before any other call: installs the process-wide Kakadu message handlers. */
-JHV_J2K_API int jhv_j2k_init(char *error);
 /* A local JP2/JPX file (UTF-8 path), or an empty JPIP source for NULL. */
 JHV_J2K_API jhv_j2k *jhv_j2k_open(const char *path, char *error);
 JHV_J2K_API void jhv_j2k_close(jhv_j2k *source);

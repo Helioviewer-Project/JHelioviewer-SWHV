@@ -298,7 +298,6 @@ public final class J2KNativeTest {
                 System.load(libraries.resolve("kdu_v7AR.dll").toString());
             System.load(libraries.resolve(System.mapLibraryName("kdu_jni")).toString());
             System.load(libraries.resolve(System.mapLibraryName("jhvj2k")).toString());
-            J2KNative.init();
             for (int i = 2; i < args.length; i++)
                 local(Path.of(args[i]));
             failures(Path.of(args[2]));
@@ -306,7 +305,6 @@ public final class J2KNativeTest {
         }
         System.load(args[0]);
         System.load(args[1]);
-        J2KNative.init();
         Path folder = Path.of(args[2]), image = Path.of(args[4]);
         for (int i = 4; i < args.length; i++)
             local(Path.of(args[i]));

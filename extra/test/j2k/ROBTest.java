@@ -23,7 +23,6 @@ public final class ROBTest {
     public static void main(String[] arguments) throws Exception {
         System.load(arguments[0]);
         System.load(arguments[1]);
-        J2KNative.init();
         URI uri = URI.create(arguments[2]);
         // Reopen the production cache without exposing its shutdown method to application callers.
         Method close = JPIPCacheManager.class.getDeclaredMethod("close");

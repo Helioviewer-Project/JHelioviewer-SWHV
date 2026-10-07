@@ -50,8 +50,8 @@ template<class T, class F> static T guarded(char *error, T failed, F call) noexc
     return failed;
 }
 
-int jhv_j2k_init(char *error) {
-    return guarded(error, -1, [] {
+jhv_j2k *jhv_j2k_open(const char *path, char *error) {
+    return guarded(error, static_cast<jhv_j2k *>(nullptr), [&] {
         static std::once_flag once;
         std::call_once(once, [] {
             errors().configure(32, false, true);
@@ -59,11 +59,6 @@ int jhv_j2k_init(char *error) {
             kdu_customize_errors(&errors());
             kdu_customize_warnings(&warnings());
         });
-        return 0;
-    });
-}
-jhv_j2k *jhv_j2k_open(const char *path, char *error) {
-    return guarded(error, static_cast<jhv_j2k *>(nullptr), [&] {
         std::unique_ptr<jhv_j2k> handle(new jhv_j2k);
         handle->source = path ? std::make_shared<jhv_j2k_source>(path) : std::make_shared<jhv_j2k_source>();
         return handle.release();
@@ -139,7 +134,7 @@ int64_t jhv_j2k_decode(jhv_j2k_job *job, int x, int y, int width, int height,
         const jhv_j2k_source::description &description = job->description;
         const char *reason = job->input.with_stream([&](kdu_codestream &stream) {
             return jhv_kdu_decode(stream, description.render, description.geometry,
-                                  job->level, 0, region, out, capacity);
+                                  job->level, region, out, capacity);
         });
         if (reason) throw std::runtime_error(reason);
         return int64_t(width) * height * (description.geometry.channels == 1 ? 1 : 4);

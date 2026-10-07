@@ -44,7 +44,6 @@ public final class J2KViewTest {
         AppInit.loadSpice();
         System.load(arguments[0]);
         System.load(arguments[1]);
-        J2KNative.init();
         URI uri = URI.create(arguments[2]);
 
         Field timerField = Player.class.getDeclaredField("movieTimer");

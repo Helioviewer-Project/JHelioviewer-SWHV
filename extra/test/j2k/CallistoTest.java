@@ -24,7 +24,6 @@ public final class CallistoTest {
     public static void main(String[] arguments) throws Exception {
         System.load(arguments[0]);
         System.load(arguments[1]);
-        J2KNative.init();
         J2KSource source = new J2KSource(Path.of(arguments[2]));
         try {
             String xml = source.xml(0);

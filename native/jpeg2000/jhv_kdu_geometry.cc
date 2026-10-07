@@ -1,19 +1,19 @@
 #include "jhv_kdu_geometry.h"
 #include <cstdint>
-#include <climits>
 
 const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
                                   const hv_render &render, jhv_j2k_geometry &out) {
     using namespace kdu_core;
     jhv_j2k_geometry value = jhv_j2k_geometry();
+    // Original decoder output indices, in decode order.
+    int components[3] = {};
     for (size_t c = 0; c < render.channel_count; c++) {
         int component = static_cast<int>(render.channel[c].component);
         int plane = 0;
-        while (plane < value.plane_count && value.component[plane] != component)
+        while (plane < value.plane_count && components[plane] != component)
             plane++;
         if (plane == value.plane_count)
-            value.component[value.plane_count++] = component;
-        value.channel_plane[c] = plane;
+            components[value.plane_count++] = component;
     }
     // The host applies a palette: its channels share one decoded index plane.
     bool indexed = render.channel[0].palette_column >= 0;
@@ -25,7 +25,7 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
     value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
     stream.set_persistent();
-    stream.apply_input_restrictions(value.plane_count, value.component, 0, 0,
+    stream.apply_input_restrictions(value.plane_count, components, 0, 0,
                                     NULL, KDU_WANT_OUTPUT_COMPONENTS);
     kdu_dims tiles;
     stream.get_valid_tiles(tiles);
@@ -39,7 +39,7 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
         return "unsupported decoder sampling range";
 
     for (int r = 0; r < value.resolutions; r++) {
-        stream.apply_input_restrictions(value.plane_count, value.component, r, 0,
+        stream.apply_input_restrictions(value.plane_count, components, r, 0,
                                         NULL, KDU_WANT_OUTPUT_COMPONENTS);
         kdu_dims first;
         for (int plane = 0; plane < value.plane_count; plane++) {
@@ -58,39 +58,6 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
         }
         value.level[r] = {first.pos.x, first.pos.y, first.size.x, first.size.y};
     }
-    stream.apply_input_restrictions(value.plane_count, value.component, 0, 0,
-                                    NULL, KDU_WANT_OUTPUT_COMPONENTS);
     out = value;
-    return NULL;
-}
-
-const char *jhv_kdu_set_region(kdu_core::kdu_codestream &stream,
-                              const jhv_j2k_geometry &geometry, int reduce, int layers,
-                              const jhv_j2k_level &region) {
-    using namespace kdu_core;
-    if (reduce < 0 || reduce >= geometry.resolutions)
-        return "JPEG 2000 reduction out of range";
-    if (layers < 0 || layers > geometry.layers)
-        return "JPEG 2000 quality limit out of range";
-    const jhv_j2k_level &level = geometry.level[reduce];
-    if (region.x < 0 || region.y < 0 || region.width <= 0 || region.height <= 0 ||
-        static_cast<int64_t>(region.x) + region.width > level.width ||
-        static_cast<int64_t>(region.y) + region.height > level.height)
-        return "JPEG 2000 region out of range";
-    int64_t x = static_cast<int64_t>(level.x) + region.x;
-    int64_t y = static_cast<int64_t>(level.y) + region.y;
-    if (x < INT_MIN || y < INT_MIN || x + region.width > INT_MAX ||
-        y + region.height > INT_MAX)
-        return "JPEG 2000 region exceeds decoder coordinate range";
-    int components[3];
-    for (int p = 0; p < geometry.plane_count; p++) components[p] = geometry.component[p];
-    stream.apply_input_restrictions(geometry.plane_count, components, reduce,
-                                    layers, NULL, KDU_WANT_OUTPUT_COMPONENTS);
-    kdu_dims component_region, canvas_region;
-    component_region.pos = kdu_coords(static_cast<int>(x), static_cast<int>(y));
-    component_region.size = kdu_coords(region.width, region.height);
-    stream.map_region(0, component_region, canvas_region, true);
-    stream.apply_input_restrictions(geometry.plane_count, components, reduce,
-                                    layers, &canvas_region, KDU_WANT_OUTPUT_COMPONENTS);
     return NULL;
 }

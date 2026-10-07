@@ -1,20 +1,29 @@
 #include "jhv_kdu_decode.h"
 #include "kdu_region_decompressor.h"
 #include <algorithm>
+#include <climits>
 #include <new>
 
 const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &render,
-                          const jhv_j2k_geometry &geometry, int reduce, int layers,
+                          const jhv_j2k_geometry &geometry, int reduce,
                           const jhv_j2k_level &region, uint8_t *output, size_t capacity) {
     using namespace kdu_core;
     using namespace kdu_supp;
+    if (reduce < 0 || reduce >= geometry.resolutions)
+        return "JPEG 2000 reduction out of range";
+    const jhv_j2k_level &level = geometry.level[reduce];
+    if (region.x < 0 || region.y < 0 || region.width <= 0 || region.height <= 0 ||
+        static_cast<int64_t>(region.x) + region.width > level.width ||
+        static_cast<int64_t>(region.y) + region.height > level.height)
+        return "JPEG 2000 region out of range";
+    int64_t x = static_cast<int64_t>(level.x) + region.x;
+    int64_t y = static_cast<int64_t>(level.y) + region.y;
+    if (x < INT_MIN || y < INT_MIN || x + region.width > INT_MAX ||
+        y + region.height > INT_MAX)
+        return "JPEG 2000 region exceeds decoder coordinate range";
     size_t bytes = geometry.channels == 1 ? 1 : 4;
-    if (region.width <= 0 || region.height <= 0) return "JPEG 2000 region out of range";
     uint64_t required = static_cast<uint64_t>(region.width) * region.height * bytes;
     if (!output || required > capacity) return "JPEG 2000 output buffer too small";
-    const char *reason = jhv_kdu_set_region(stream, geometry, reduce, layers, region);
-    if (reason) return reason;
-    stream.apply_input_restrictions(0, 0, 0, 0, NULL, KDU_WANT_OUTPUT_COMPONENTS);
     kdu_channel_mapping mapping;
     // A palette's channels all name its index component: decode that plane once.
     mapping.set_num_channels(geometry.channels);
@@ -30,7 +39,7 @@ const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &re
         mapping.channel_interp[c].init(bits, is_signed, 0.0f);
     }
     kdu_dims requested;
-    requested.pos = kdu_coords(geometry.level[reduce].x + region.x, geometry.level[reduce].y + region.y);
+    requested.pos = kdu_coords(static_cast<int>(x), static_cast<int>(y));
     requested.size = kdu_coords(region.width, region.height);
     // Per-decode ownership keeps KDU thread affinity and failure cleanup local.
     kdu_thread_env environment;
@@ -44,7 +53,7 @@ const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &re
         environment.create();
         int threads = std::min(8, kdu_get_num_processors());
         for (int t = 1; t < threads; t++) environment.add_thread();
-        bool started = decoder.start(stream, &mapping, -1, reduce, layers ? layers : geometry.layers,
+        bool started = decoder.start(stream, &mapping, -1, reduce, geometry.layers,
                                      requested, kdu_coords(1, 1), kdu_coords(1, 1), false,
                                      KDU_WANT_OUTPUT_COMPONENTS, true, &environment);
         kdu_dims incomplete = requested, updated;

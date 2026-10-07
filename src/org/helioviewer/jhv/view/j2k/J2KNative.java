@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 
 // FFM binding of native/jpeg2000/jhv_j2k.h; the library must be loaded first.
 // The monitor serializes calls on the source. A decode runs outside it.
-public final class J2KNative implements AutoCloseable {
+final class J2KNative implements AutoCloseable {
 
     // The client refused a response: the source must not be fed any further.
     @SuppressWarnings("serial")
@@ -39,7 +39,6 @@ public final class J2KNative implements AutoCloseable {
     private static final MemoryLayout P = ValueLayout.ADDRESS;
     private static final int MAX_LEVELS = 33;
     private static final long FRAME_SIZE = 288, FRAME_WIDTH = 20, FRAME_HEIGHT = 152;
-    private static final MethodHandle INIT = bind("init", I, P);
     private static final MethodHandle OPEN = bind("open", P, P, P);
     private static final MethodHandle CLOSE = bind("close", null, P);
     private static final MethodHandle RESPONSE = bind("response", I, P, P, L, P);
@@ -54,14 +53,6 @@ public final class J2KNative implements AutoCloseable {
     private static final MethodHandle END = bind("end_decode", null, P);
 
     private MemorySegment handle;
-
-    // Once at start-up: installs the process-wide Kakadu message handlers.
-    public static void init() throws IOException {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment error = arena.allocate(256);
-            checked(call(INIT, error), error);
-        }
-    }
 
     // A local JP2/JPX file, or an empty JPIP source for null.
     J2KNative(@Nullable Path path) throws IOException {
