@@ -1,35 +1,42 @@
 package org.helioviewer.jhv.timelines.radio;
 
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
-import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
-import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageBuffer;
-import org.helioviewer.jhv.image.ImageProcessingSettings;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
+import org.helioviewer.jhv.view.j2k.J2KSource;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
-class RadioJ2KData implements View.DataHandler {
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
-    private final LatestWorker<DecodedImage> executor = new LatestWorker<>("Radio-Decoder");
+class RadioJ2KData {
+
+    private static final int QUANTA = 32;
+
+    // Columns of a level, over its whole height.
+    record Crop(int level, int x, int width, int height) {}
+
+    private final Cache<Crop, byte[]> decoded = Caffeine.newBuilder().softValues().build();
     private final RadioData owner;
-    private final J2KViewCallisto view;
+    private final J2KSource source;
+    private final LatestWorker<byte[]> executor;
     private boolean disposed;
 
     private final long startDate;
@@ -45,16 +52,17 @@ class RadioJ2KData implements View.DataHandler {
 
     RadioJ2KData(RadioData _owner, APIRequest req, DataUri dataUri) throws Exception {
         owner = _owner;
-        J2KViewCallisto v = null;
+        source = new J2KSource(dataUri.file().toPath());
+        executor = new LatestWorker<>("Radio-Decoder");
         try {
-            ImageProcessingSettings processingSettings = new ImageProcessingSettings(() -> {});
-            v = new J2KViewCallisto(executor, req, dataUri, processingSettings);
-
-            ResolutionSet.Level resLevel = v.getResolutionLevel(0, 0);
+            ResolutionSet.Level resLevel = source.level(0, 0);
             j2kWidth = resLevel.width();
             j2kHeight = resLevel.height();
 
-            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(v.getXMLMetaData());
+            String xml = source.xml(0);
+            if (xml == null)
+                throw new Exception("Missing XML metadata");
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(xml);
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
@@ -63,15 +71,10 @@ class RadioJ2KData implements View.DataHandler {
                 throw new IllegalArgumentException("Invalid radio metadata range");
             }
 
-            v.setDataHandler(this);
             willDraw = startDate == req.startTime(); // didn't get closest
-            view = v;
         } catch (Exception e) {
             executor.dispose();
-            if (v != null) {
-                v.setDataHandler(null);
-                v.abolish();
-            }
+            source.close();
             throw e;
         }
     }
@@ -82,42 +85,61 @@ class RadioJ2KData implements View.DataHandler {
         }
         disposed = true;
         executor.dispose();
-        view.setDataHandler(null);
-        view.abolish();
+        AppThread.create(source::close, "Radio-Close").start(); // not on the EDT
         bufferedImage = null;
     }
 
-    @Override
-    public void handleData(View.ImageData imageData) {
-        ImageBuffer imageBuffer = imageData.imageBuffer();
-        try {
-            region = imageData.region();
-            boolean hadData = bufferedImage != null;
-            bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, imageBuffer.width, imageBuffer.height, owner.getColorModel());
-            if (!hadData)
-                owner.dataUpdated();
-            DrawController.drawRequest();
-        } finally {
-            imageBuffer.allowExplicitFree();
-        }
+    // A pixel of a level covers 2^level source pixels, also where the rows do not halve evenly.
+    private void show(Crop crop, byte[] pixels) {
+        int shift = crop.level;
+        region = new Region(crop.x << shift, 0, crop.width << shift, crop.height << shift);
+        boolean hadData = bufferedImage != null;
+        DataBufferByte dataBuffer = new DataBufferByte(pixels, pixels.length);
+        bufferedImage = new BufferedImage(owner.getColorModel(),
+                Raster.createInterleavedRaster(dataBuffer, crop.width, crop.height, crop.width, 1, new int[]{0}, null), false, null);
+        if (!hadData)
+            owner.dataUpdated();
+        DrawController.drawRequest();
     }
 
-    private static BufferedImage createIndexedImage(ByteBuffer byteBuffer, int width, int height, IndexColorModel colorModel) {
-        byte[] pixels = new byte[byteBuffer.remaining()];
-        byteBuffer.get(byteBuffer.position(), pixels);
-
-        DataBufferByte dataBuffer = new DataBufferByte(pixels, pixels.length);
-        return new BufferedImage(colorModel,
-                Raster.createInterleavedRaster(dataBuffer, width, height, width, 1, new int[]{0}, null), false, null);
+    // The columns of a level which cover a full-resolution range, rounded to 32 pixels at full resolution.
+    static Crop levelCrop(int x, int width, int fullWidth, ResolutionSet.Level res) {
+        x = Math.min(MathUtils.roundDownTo(x, QUANTA), fullWidth - 1);
+        width = Math.min(MathUtils.roundUpTo(width + QUANTA, QUANTA), fullWidth - x);
+        int shift = res.level(), round = (1 << shift) - 1;
+        int x0 = x >> shift;
+        int x1 = Math.min((x + width + round) >> shift, res.width());
+        return new Crop(shift, x0, x1 - x0, res.height());
     }
 
     void requestData(TimeAxis xAxis) {
-        if (willDraw && !disposed) {
-            Rectangle roi = getROI(xAxis);
-            if (roi != null) {
-                view.decodeRegion(roi.x, roi.y, roi.width, roi.height, lastState.level);
-            }
+        if (!willDraw || disposed)
+            return;
+        Crop crop = getCrop(xAxis);
+        if (crop == null)
+            return;
+
+        byte[] pixels = decoded.getIfPresent(crop);
+        if (pixels != null) {
+            executor.invalidate(); // a running decode is stale
+            show(crop, pixels);
+            return;
         }
+        executor.submit(() -> source.decode(0, crop.level, crop.x, 0, crop.width, crop.height), new LatestWorker.Callback<>() {
+            @Override
+            public void onSuccess(byte[] result, boolean fresh) {
+                decoded.put(crop, result);
+                if (fresh)
+                    show(crop, result);
+            }
+
+            @Override
+            public void onFailure(@Nonnull Throwable t, boolean fresh) {
+                LatestWorker.Callback.super.onFailure(t, fresh);
+                if (fresh) // still the last request: ask again
+                    lastState = null;
+            }
+        });
     }
 
     // Full resolution up to 1/32 of the day; one level coarser per doubling.
@@ -134,7 +156,9 @@ class RadioJ2KData implements View.DataHandler {
 
     private DecodeState lastState;
 
-    private Rectangle getROI(TimeAxis xAxis) {
+    // Null while the last request covers the view.
+    @Nullable
+    private Crop getCrop(TimeAxis xAxis) {
         long visibleStart = Math.max(startDate, xAxis.start());
         long visibleEnd = Math.min(endDate, xAxis.end());
         int level = computeLevel(xAxis);
@@ -164,7 +188,7 @@ class RadioJ2KData implements View.DataHandler {
 
         lastState = new DecodeState(level, newVisibleStart, newVisibleEnd);
 
-        return new Rectangle(x0, 0, width, j2kHeight);
+        return levelCrop(x0, width, j2kWidth, source.level(0, level));
     }
 
     void draw(Graphics2D g, TimeAxis.Mapper xMapper, YAxis.Mapper yMapper) {

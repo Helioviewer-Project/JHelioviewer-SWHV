@@ -74,5 +74,5 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         print("Retrieving " + callisto, flush=True)
         with urlopen(callisto, timeout=60) as response:
             (work / "callisto.jp2").write_bytes(response.read())
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.CallistoTest",
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.timelines.radio.CallistoTest",
                         *libraries, str(work / "callisto.jp2")], check=True, timeout=180)

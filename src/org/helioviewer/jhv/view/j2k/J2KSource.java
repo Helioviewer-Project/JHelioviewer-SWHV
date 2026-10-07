@@ -19,14 +19,14 @@ import org.helioviewer.jhv.metadata.Region;
 import org.lwjgl.system.MemoryUtil;
 
 // The native client of a local file or JPIP source, and its frames as the reader publishes them to the EDT.
-final class J2KSource {
+public final class J2KSource {
 
     private final J2KNative client;
     // An entry exists once the frame's header is known.
     private AtomicReferenceArray<ResolutionSet> sets;
 
     // A local file, or an empty JPIP source for null.
-    J2KSource(@Nullable Path path) throws IOException {
+    public J2KSource(@Nullable Path path) throws IOException {
         client = new J2KNative(path);
         if (path == null)
             return;
@@ -40,7 +40,7 @@ final class J2KSource {
         }
     }
 
-    void close() {
+    public void close() {
         client.close();
     }
 
@@ -80,7 +80,7 @@ final class J2KSource {
     }
 
     @Nullable
-    String xml(int frame) throws IOException {
+    public String xml(int frame) throws IOException {
         String xml = client.xml(frame);
         return xml == null ? null : xml.trim().replace("&", "&amp;");
     }
@@ -124,6 +124,11 @@ final class J2KSource {
         return set;
     }
 
+    // The level, or the coarsest one the frame has.
+    public ResolutionSet.Level level(int frame, int level) {
+        return resolutionSet(frame).getLevel(level);
+    }
+
     // Null: not displayable; false: displayable, incomplete at the level; true: complete at the level.
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level) {
@@ -158,21 +163,37 @@ final class J2KSource {
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(roi.w(), roi.h(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
             ByteBuffer pixels = outBuffer.byteBuffer();
 
-            String warning;
-            if (pixels.isDirect()) {
-                warning = job.run(roi.x(), roi.y(), roi.w(), roi.h(), pixels.duplicate());
-            } else { // a filtered gray image is built on the heap
-                ByteBuffer direct = MemoryUtil.memAlloc(pixels.capacity());
-                try {
-                    warning = job.run(roi.x(), roi.y(), roi.w(), roi.h(), direct);
-                    pixels.put(0, direct, 0, pixels.capacity());
-                } finally {
-                    MemoryUtil.memFree(direct);
-                }
-            }
+            // A filtered gray image is built on the heap.
+            String warning = pixels.isDirect()
+                    ? job.run(roi.x(), roi.y(), roi.w(), roi.h(), pixels.duplicate())
+                    : runToHeap(job, roi.x(), roi.y(), roi.w(), roi.h(), pixels);
             if (warning != null)
                 Log.warn(warning);
             return new DecodedImage(outBuffer.finish(), imageRegion);
+        }
+    }
+
+    // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
+    public byte[] decode(int frame, int level, int x, int y, int width, int height) throws IOException {
+        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
+            byte[] pixels = new byte[width * height * resolutionSet(frame).numComps];
+            String warning = runToHeap(job, x, y, width, height, ByteBuffer.wrap(pixels));
+            if (warning != null)
+                Log.warn(warning);
+            return pixels;
+        }
+    }
+
+    // The bridge fills native memory only.
+    @Nullable
+    private static String runToHeap(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer heap) throws IOException {
+        ByteBuffer direct = MemoryUtil.memAlloc(heap.capacity());
+        try {
+            String warning = job.run(x, y, width, height, direct);
+            heap.put(0, direct, 0, heap.capacity());
+            return warning;
+        } finally {
+            MemoryUtil.memFree(direct);
         }
     }
 

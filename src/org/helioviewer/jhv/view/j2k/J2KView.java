@@ -30,7 +30,7 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.ClipSet;
 
-public class J2KView extends BaseView {
+public final class J2KView extends BaseView {
 
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
@@ -260,22 +260,19 @@ public class J2KView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {
-        decode(getDecodeParams(targetFrame, pixFactor), viewpoint);
-    }
-
-    // The request itself, or the whole finest complete level while a JPIP frame lacks the wanted one.
-    private J2KParams.Decode available(J2KParams.Decode wanted) {
-        ResolutionSet.Level res = source.resolutionSet(wanted.frame).getCompleteLevel(wanted.level);
-        return res.level() == wanted.level ? wanted : new J2KParams.Decode(wanted.frame, res.subImage(), res.level());
-    }
-
-    protected void decode(J2KParams.Decode wanted, @Nullable Position viewpoint) {
+        J2KParams.Decode wanted = getDecodeParams(targetFrame, pixFactor);
         J2KParams.Decode decodeParams = available(wanted); // before signalling to reader
         // The first signal starts the movie download.
         if (reader != null && (decodeParams != wanted || currentLevel == NO_LEVEL)) {
             signalReader(wanted, viewpoint);
         }
         show(decodeParams, viewpoint);
+    }
+
+    // The request itself, or the whole finest complete level while a JPIP frame lacks the wanted one.
+    private J2KParams.Decode available(J2KParams.Decode wanted) {
+        ResolutionSet.Level res = source.resolutionSet(wanted.frame).getCompleteLevel(wanted.level);
+        return res.level() == wanted.level ? wanted : new J2KParams.Decode(wanted.frame, res.subImage(), res.level());
     }
 
     void refreshDecodeFromReader(J2KParams.Decode wanted, Position viewpoint) {
@@ -286,7 +283,7 @@ public class J2KView extends BaseView {
         });
     }
 
-    private void show(J2KParams.Decode decodeParams, @Nullable Position viewpoint) {
+    private void show(J2KParams.Decode decodeParams, Position viewpoint) {
         J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, processingSettings.getFilter());
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
@@ -351,7 +348,7 @@ public class J2KView extends BaseView {
         return xmlMetaData[targetFrame];
     }
 
-    public ResolutionSet.Level getResolutionLevel(int frame, int level) {
+    ResolutionSet.Level getResolutionLevel(int frame, int level) {
         return source.resolutionSet(frame).getLevel(level);
     }
 

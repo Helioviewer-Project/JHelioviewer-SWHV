@@ -328,7 +328,7 @@ public final class BandReaderHapi {
     }
 
     private static List<BandData> readRemoteData(Dataset dataset, RequestSchema schema,
-                                                long startTime, long endTime) throws Exception {
+                                                 long startTime, long endTime) throws Exception {
         startTime = Math.max(startTime, dataset.start);
         endTime = Math.min(endTime, dataset.stop);
         if (endTime <= startTime)

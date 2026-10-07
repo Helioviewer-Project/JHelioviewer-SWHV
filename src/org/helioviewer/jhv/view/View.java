@@ -19,7 +19,7 @@ public interface View {
             @Nonnull ImageBuffer imageBuffer,
             @Nonnull MetaData metaData,
             @Nonnull Region region,
-            @Nullable Position viewpoint) {} // null for the radio view, which has no viewpoint
+            @Nonnull Position viewpoint) {}
 
     interface DataHandler {
         void handleData(ImageData imageData);

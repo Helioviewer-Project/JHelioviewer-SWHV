@@ -66,7 +66,7 @@ public class ResolutionSet {
 
     public record Level(int level, int width, int height, double factorX, double factorY, J2KParams.SubImage subImage) {
         Level(int _level, int _width, int _height, double _factorX, double _factorY) {
-            this(_level, _width, _height, _factorX, _factorY, new J2KParams.SubImage(0, 0, _width, _height, _width, _height));
+            this(_level, _width, _height, _factorX, _factorY, new J2KParams.SubImage(0, 0, _width, _height));
         }
     }
 

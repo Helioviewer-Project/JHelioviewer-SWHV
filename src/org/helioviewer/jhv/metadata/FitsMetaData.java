@@ -263,44 +263,40 @@ public final class FitsMetaData extends CommonMetaData {
             pixelH = (int) m.getRequiredLong("NAXIS2");
         }
 
-        if (instrument.equals("CALLISTO")) { // pixel based
-            region = new Region(0, 0, pixelW, pixelH);
+        WcsInterpreter.Result wcs = WcsInterpreter.read(m);
+        WcsHeader.Projection projection = wcs.projection();
+        boolean isSurfaceMap = projection.isSurfaceMap();
+        double planeScale;
+
+        if (isSurfaceMap) {
+            unitPerArcsec = Math.PI / (180. * 3600.);
+            planeScale = 1;
         } else {
-            WcsInterpreter.Result wcs = WcsInterpreter.read(m);
-            WcsHeader.Projection projection = wcs.projection();
-            boolean isSurfaceMap = projection.isSurfaceMap();
-            double planeScale;
+            double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
+            unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+            planeScale = unitPerArcsec;
+        }
+        unitPerPixelX = wcs.unitPerPixelX() * planeScale;
+        unitPerPixelY = wcs.unitPerPixelY() * planeScale;
 
-            if (isSurfaceMap) {
-                unitPerArcsec = Math.PI / (180. * 3600.);
-                planeScale = 1;
-            } else {
-                double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-                unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-                planeScale = unitPerArcsec;
-            }
-            unitPerPixelX = wcs.unitPerPixelX() * planeScale;
-            unitPerPixelY = wcs.unitPerPixelY() * planeScale;
+        // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
+        double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
+        double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
+        referenceX = unitPerPixelX * crpix1;
+        referenceY = unitPerPixelY * (pixelH - crpix2);
 
-            // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
-            double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
-            double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
-            referenceX = unitPerPixelX * crpix1;
-            referenceY = unitPerPixelY * (pixelH - crpix2);
+        region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
+        Vec2 crval = new Vec2(wcs.crval().x * planeScale, wcs.crval().y * planeScale);
+        Mat2 imageToPlane = CROTABlockSet.contains(instrument) ? Mat2.IDENTITY : wcs.imageToPlane();
+        wcsHeader = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval, imageToPlane);
 
-            Vec2 crval = new Vec2(wcs.crval().x * planeScale, wcs.crval().y * planeScale);
-            Mat2 imageToPlane = CROTABlockSet.contains(instrument) ? Mat2.IDENTITY : wcs.imageToPlane();
-            wcsHeader = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval, imageToPlane);
-
-            // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
-            if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
-                Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
-                if (sun != null) {
-                    sunShiftX = sun.x;
-                    sunShiftY = -sun.y;
-                }
+        // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
+        if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
+            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
+            if (sun != null) {
+                sunShiftX = sun.x;
+                sunShiftY = -sun.y;
             }
         }
     }
