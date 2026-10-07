@@ -61,14 +61,26 @@ all six Callisto resolution levels (0 through 5), including nonaligned requested
 Full-image hashes are printed for comparison when changing the decoder. These checks cover
 grayscale pixels, not RGB composition or timeline drawing.
 
-`run_native_test.sh` builds the bridge and checks it, through `J2KNative`, against Kakadu's
+`run_native_test.sh` requires `KDU_VENDOR` to name a supplied Kakadu SDK.
+It builds the bridge and checks it, through `J2KNative`, against Kakadu's
 compositor as an independent decoder: geometry and pixels of every frame and level of the
 given files, JPIP responses written by esajpip's server code, cache entries, refusals and
 failures. The compositor's Java binding, `lib/kdu_jni.jar` here, is used by tests only.
 
+For prebuilt KDU and bridge libraries, use the same native test without building
+the server or generating JPIP responses:
+
+```sh
+python3 extra/test/j2k/check_native_build.py /path/to/platform-libraries --esajpip ../esajpip-SWHV
+```
+
+This checks committed RGB, grayscale and JPX fixtures and supports macOS, Linux
+and Windows. On Windows it loads the core DLL before JNI/support and the bridge;
+the file-descriptor count check applies only on Unix.
+
 Test classes, extracted native libraries, and cache data use temporary directories, cleaned
 up on normal exit. The live runner supports macOS and Linux x86-64.
-Only macOS arm64 has been exercised. No application settings or user cache are used.
+The live suite has been exercised only on macOS arm64. No application settings or user cache are used.
 
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
 or cache eviction. Live decoding supplies only the coordinate conversion needed by the

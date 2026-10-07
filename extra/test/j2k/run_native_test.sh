@@ -15,8 +15,8 @@ mkdir -p "$test/responses" "$test/classes"
 
 # JPIP responses from esajpip's own server code, for its RGB fixture.
 image=$ESAJPIP/tests/transcode/fixtures/kakadu/synthetic_rgb_129x129_CPRL_SOP_EPH.jp2
-cmake --build "$BUILD/client" --target test_client_source --parallel > "$test/server.log"
-"$BUILD/client/tests/client/test_client_source" --write-responses "$test/responses"
+cmake --build "$BUILD/bridge" --target test_client_source --parallel > "$test/server.log"
+"$BUILD/bridge/client/tests/client/test_client_source" --write-responses "$test/responses"
 
 # That fixture declared as sYCC, and a container around an invalid codestream.
 python3 - "$image" "$test" <<'EOF'

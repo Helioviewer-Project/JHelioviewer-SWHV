@@ -4,7 +4,7 @@ set -eu
 cd "$(dirname "$0")/../.."
 root=$PWD
 : "${ESAJPIP:=$root/../esajpip-SWHV}"
-: "${KDU_VENDOR:=$root/../kdu/v7_A_3-00781N}"
+: "${KDU_VENDOR:?Set KDU_VENDOR to the Kakadu SDK directory}"
 : "${BUILD:=$root/tmp/j2k-native}"
 case "$(uname -s)-$(uname -m)" in
     Darwin-arm64) target=macos-arm64; resource=macos-arm64; suffix=dylib ;;
@@ -16,13 +16,9 @@ mkdir -p "$BUILD"
 unzip -p "lib/jhv/jhv-natives-$target.jar" "jhv/$resource/libkdu_jni.$suffix" > "$BUILD/libkdu_jni.$suffix"
 options=()
 if [ "$suffix" = dylib ]; then options+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0); fi
-cmake -S "$ESAJPIP" -B "$BUILD/client" -DCMAKE_BUILD_TYPE=Release \
-    -DESAJPIP_CLIENT_ONLY="${ESAJPIP_CLIENT_ONLY:-ON}" \
-    -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${options[@]}"
-cmake --build "$BUILD/client" --target esajpip_client --parallel
 cmake -S native/jpeg2000 -B "$BUILD/bridge" -DCMAKE_BUILD_TYPE=Release \
-    -DESAJPIP="$ESAJPIP" -DESAJPIP_BUILD="$BUILD/client" \
+    -DESAJPIP="$ESAJPIP" -DESAJPIP_CLIENT_ONLY="${ESAJPIP_CLIENT_ONLY:-ON}" \
     -DKDU_VENDOR="$KDU_VENDOR" -DKDU_LIBRARY="$BUILD/libkdu_jni.$suffix" "${options[@]}"
-cmake --build "$BUILD/bridge" --parallel
+cmake --build "$BUILD/bridge" --target jhvj2k --parallel
 cp "$BUILD/bridge/libjhvj2k.$suffix" "$BUILD/"
 echo "$BUILD/libjhvj2k.$suffix"

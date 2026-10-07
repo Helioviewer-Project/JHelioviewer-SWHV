@@ -65,7 +65,7 @@ private:
 
     // What JHV shows of a file whose color description is not supported.
     static void first_component(hv_render &render) {
-        render = {};
+        render = hv_render();
         render.colour_space = 17;
         render.channel_count = 1;
         render.channel[0].palette_column = -1;
@@ -80,7 +80,7 @@ private:
             owner.descriptions.resize(count);
             // The coarsest level suffices: every header is kept at any reduction.
             decoder_input input(source, frame, INT_MAX);
-            description result = {};
+            description result = description();
             const char *reason = input.with_stream([&](kdu_codestream &stream) {
                 if (hvc_render_read(source, frame, stream.get_num_components(true), &result.render))
                     first_component(result.render);

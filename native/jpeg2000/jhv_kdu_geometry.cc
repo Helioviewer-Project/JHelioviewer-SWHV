@@ -5,7 +5,7 @@
 const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
                                   const hv_render &render, jhv_j2k_geometry &out) {
     using namespace kdu_core;
-    jhv_j2k_geometry value = {};
+    jhv_j2k_geometry value = jhv_j2k_geometry();
     for (size_t c = 0; c < render.channel_count; c++) {
         int component = static_cast<int>(render.channel[c].component);
         int plane = 0;

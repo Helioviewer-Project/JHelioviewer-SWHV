@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -182,14 +183,17 @@ public final class J2KNativeTest {
                 check(!output.hasRemaining(), "job retry after failures");
             }
         }
-        UnixOperatingSystemMXBean bean = (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        long before = bean.getOpenFileDescriptorCount();
+        OperatingSystemMXBean operatingSystem = ManagementFactory.getOperatingSystemMXBean();
+        UnixOperatingSystemMXBean bean = operatingSystem instanceof UnixOperatingSystemMXBean
+                ? (UnixOperatingSystemMXBean) operatingSystem : null;
+        long before = bean == null ? 0 : bean.getOpenFileDescriptorCount();
         for (int i = 0; i < 200; i++) {
             try (J2KNative source = new J2KNative(image)) {
                 pixels(source, 0, source.frame(0).width().length - 1);
             }
         }
-        check(bean.getOpenFileDescriptorCount() == before, "file descriptor leak");
+        if (bean != null)
+            check(bean.getOpenFileDescriptorCount() == before, "file descriptor leak");
         System.out.println("failures, retry and 200 open/decode/close cycles");
     }
 
@@ -287,6 +291,19 @@ public final class J2KNativeTest {
 
     // Arguments: Kakadu library, bridge library, folder made by run_native_test.sh, its image, then JP2/JPX files.
     public static void main(String[] args) throws Exception {
+        // Check a prebuilt set without building the server or generating responses.
+        if (args[0].equals("--local")) {
+            Path libraries = Path.of(args[1]);
+            if (System.getProperty("os.name").startsWith("Windows"))
+                System.load(libraries.resolve("kdu_v7AR.dll").toString());
+            System.load(libraries.resolve(System.mapLibraryName("kdu_jni")).toString());
+            System.load(libraries.resolve(System.mapLibraryName("jhvj2k")).toString());
+            J2KNative.init();
+            for (int i = 2; i < args.length; i++)
+                local(Path.of(args[i]));
+            failures(Path.of(args[2]));
+            return;
+        }
         System.load(args[0]);
         System.load(args[1]);
         J2KNative.init();

@@ -81,7 +81,7 @@ int jhv_j2k_frames(jhv_j2k *source, char *error) {
 int jhv_j2k_frame(jhv_j2k *source, int frame, jhv_j2k_frame_info *info, char *error) {
     return guarded(error, -1, [&] {
         hvc_view view = source->source->status(frame, 0);
-        *info = {};
+        *info = jhv_j2k_frame_info();
         info->stream = view.codestream;
         if (!view.source.resolutions) return 0;
         const jhv_j2k_geometry &geometry = source->source->described(frame).geometry;
