@@ -23,6 +23,7 @@ class J2KReader implements Runnable {
     private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
     private final URI uri;
     private final J2KSource source;
+    private final J2KNative client;
     private final Thread myThread;
     private final long[] stream;
     // Per frame: the coarsest level the server ended without completing, FAILED for a frame given up, else -1.
@@ -35,13 +36,14 @@ class J2KReader implements Runnable {
     J2KReader(URI _uri, J2KSource _source) throws IOException {
         uri = _uri;
         source = _source;
+        client = _source.client();
 
         try {
             connect();
             source.loadFrames();
             stream = new long[source.frames()];
             for (int i = 0; i < stream.length; i++)
-                stream[i] = source.client().frame(i).stream();
+                stream[i] = client.frame(i).stream();
             prime();
         } catch (Exception e) {
             closeSocket();
@@ -114,7 +116,6 @@ class J2KReader implements Runnable {
     private void connect() throws IOException {
         JPIPSocket opened = new JPIPSocket(uri);
         socket = opened;
-        J2KNative client = source.client();
         client.response(opened.receive());
         do {
             opened.sendMetadata();
@@ -124,7 +125,7 @@ class J2KReader implements Runnable {
     private void fetchFirst(String size, String region) throws IOException {
         do {
             socket.sendFrame(stream[0], size, region);
-        } while (!isComplete(source.client().response(socket.receive())));
+        } while (!isComplete(client.response(socket.receive())));
         source.update(0);
     }
 
@@ -178,7 +179,7 @@ class J2KReader implements Runnable {
         if (entry == null)
             return false;
         try {
-            source.client().importFrame(frame, entry.block());
+            client.importFrame(frame, entry.block());
         } catch (IOException e) { // refused: the source is unchanged
             JPIPCacheManager.remove(key);
             return false;
@@ -212,7 +213,7 @@ class J2KReader implements Runnable {
     // Feeds the next response to the source. False when its frame needs another request in this pass.
     private boolean receive(Sent sent, ResolutionSet.Level wanted) throws IOException {
         int frame = sent.frame;
-        boolean complete = isComplete(source.client().response(socket.receive()));
+        boolean complete = isComplete(client.response(socket.receive()));
         update(frame);
 
         ResolutionSet set = source.geometry(frame);
@@ -226,7 +227,7 @@ class J2KReader implements Runnable {
         if (set.getComplete(level).get()) {
             String key = cacheKey[frame];
             if (key != null)
-                JPIPCacheManager.store(key, level, () -> source.client().exportFrame(frame));
+                JPIPCacheManager.store(key, level, () -> client.exportFrame(frame));
             return true;
         }
         if (!complete || !sent.own) // cut by the response limit, or sized by another frame

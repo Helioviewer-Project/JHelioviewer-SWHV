@@ -128,7 +128,7 @@ final class J2KSource {
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level) {
         ResolutionSet set = sets.get(frame);
-        return set == null || !set.isDisplayable() ? null : set.getComplete(level);
+        return set != null && set.isDisplayable() ? set.getComplete(level) : null;
     }
 
     // The last frame of the displayable prefix.
