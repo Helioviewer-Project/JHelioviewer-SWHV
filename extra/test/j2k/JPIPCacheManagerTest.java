@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -12,6 +14,7 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.ehcache.PersistentCacheManager;
+import org.ehcache.Status;
 import org.ehcache.config.builders.CacheManagerBuilder;
 
 public final class JPIPCacheManagerTest {
@@ -22,7 +25,7 @@ public final class JPIPCacheManagerTest {
         Platform.init();
         Directories.createCacheDirs();
 
-        Path cacheDirectory = Path.of(Directories.CACHE.getPath(), "JPIPStream-7");
+        Path cacheDirectory = Path.of(Directories.CACHE.getPath(), "JPIPStream-8");
         PersistentCacheManager lockHolder = CacheManagerBuilder.newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence(cacheDirectory.toString()))
                 .build(true);
@@ -46,11 +49,31 @@ public final class JPIPCacheManagerTest {
             JPIPCacheManager.clear();
             check(logCounter.records == startupRecords, "disabled cache produced additional log records");
             System.out.println("PASS: failed cache initialization stays disabled without repeated logging");
+
+            lockHolder.close();
+            JPIPCacheManager.init();
+            byte[] coarse = {1, 2, 3}, fine = {4, 5, 6, 7};
+            JPIPCacheManager.store("frame", 2, () -> coarse);
+            check(Arrays.equals(JPIPCacheManager.get("frame", 2).block(), coarse) && JPIPCacheManager.get("frame", 3).level() == 2, "stored entry");
+            check(JPIPCacheManager.get("frame", 1) == null, "coarse entry served a finer level");
+            JPIPCacheManager.store("frame", 3, () -> {
+                throw new AssertionError("exported a coarser level than the stored one");
+            });
+            JPIPCacheManager.store("frame", 0, () -> fine);
+            check(Arrays.equals(JPIPCacheManager.get("frame", 2).block(), fine), "finer entry did not replace the coarser one");
+            JPIPCacheManager.remove("frame");
+            check(JPIPCacheManager.get("frame", 5) == null, "removed entry");
+            check(logCounter.records == startupRecords, "cache use produced log records");
+            System.out.println("PASS: entries by level, replacement by a finer level, removal");
         } finally {
             rootLogger.removeHandler(logCounter);
             for (Handler handler : existingHandlers)
                 rootLogger.addHandler(handler);
-            lockHolder.close();
+            if (lockHolder.getStatus() == Status.AVAILABLE)
+                lockHolder.close();
+            Method close = JPIPCacheManager.class.getDeclaredMethod("close");
+            close.setAccessible(true);
+            close.invoke(null);
             FileUtils.deleteDir(testHome);
         }
     }

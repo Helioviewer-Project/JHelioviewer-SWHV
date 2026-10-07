@@ -31,10 +31,9 @@ large copy on the EDT/render thread, and JHV had no explicit object representing
 the lifetime of the native upload storage.
 
 JHV 5 made the upload buffer explicit. Views publish `ImageBuffer` instances, and
-`GLImage` uploads from those buffers. For the common unfiltered J2K path, the
-Kakadu compositor output is gathered directly into the final native
-`ImageBuffer`, avoiding both the old hidden EDT upload copy and an intermediate
-heap-to-native copy in the decoder.
+`GLImage` uploads from those buffers. For the common unfiltered J2K path,
+Kakadu decodes directly into the final native `ImageBuffer`, avoiding both the
+old hidden EDT upload copy and an intermediate heap-to-native copy in the decoder.
 
 The cache was centralized at the same time. Decoded image caches that had been
 local to `J2KView` and `URIView` now share `ImageBufferCache`, making the memory
@@ -47,13 +46,13 @@ Not every decoder can produce an `ImageBuffer` in the same way. The policy is to
 write native buffers directly where that removes a hot-path copy, and to keep
 heap arrays where Java-side decoding or filtering needs array access.
 
-Unfiltered J2K data is the critical playback path. `J2KDecoder` writes Kakadu
-compositor output directly into the final native `ImageBuffer`, so the decoded
+Unfiltered J2K data is the critical playback path. `J2KSource.decode` lets Kakadu
+write directly into the final native `ImageBuffer`, so the decoded
 data is already in the form needed by GL upload.
 
-Filtered J2K data goes through a heap array. `ImageFilter` operates on Java
-arrays, so the decoder builds the array first and constructs the final
-`ImageBuffer` after filtering.
+Filtered gray J2K data goes through a heap array. `ImageFilter` operates on Java
+arrays, so the pixels are decoded into a native buffer of that decode, copied to
+the array, and the final `ImageBuffer` is constructed after filtering.
 
 FITS decoding starts from Java-accessible FITS pixel storage. The reader does
 scaling, clipping, and blank-pixel handling in Java, then writes display pixels

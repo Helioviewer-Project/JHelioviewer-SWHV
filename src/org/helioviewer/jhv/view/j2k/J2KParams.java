@@ -68,6 +68,6 @@ class J2KParams {
         }
     }
 
-    record Read(J2KView view, J2KSource.Remote source, Decode decodeParams, Position viewpoint, boolean priority) {}
+    record Read(J2KView view, Decode decodeParams, Position viewpoint, boolean priority) {}
 
 }

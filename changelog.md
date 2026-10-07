@@ -23,6 +23,7 @@
 ### Technical
 - Document the heliocentric 3D data interface and add a COCONUT conversion example
 - Improve JPIP movie download throughput, cache memory handling, cancellation, and JPEG 2000 resource cleanup
+- Read JPEG 2000 files and JPIP streams with the esajpip client library; Kakadu only decodes
 - Accelerate Rice-compressed 16-bit FITS decoding
 - Expand rendering, WCS, JPIP retrieval and cache restoration, and Callisto decoding regression coverage
 - Update bundled libraries

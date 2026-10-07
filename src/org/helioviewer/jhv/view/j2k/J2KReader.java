@@ -3,38 +3,52 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
-import kdu_jni.KduException;
-
 class J2KReader implements Runnable {
+
+    private static final int FAILED = Integer.MAX_VALUE;
+
+    // A request in flight; own tells whether it was sized by the frame's own header.
+    private record Sent(int frame, boolean own) {}
 
     private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
     private final URI uri;
+    private final J2KSource source;
     private final Thread myThread;
+    private final long[] stream;
+    // Per frame: the coarsest level the server ended without completing, FAILED for a frame given up, else -1.
+    private final int[] stuck;
 
     private volatile boolean isAbolished;
     private volatile JPIPSocket socket;
     private String[] cacheKey;
 
-    J2KReader(URI _uri, J2KSource.Remote source) throws KduException, IOException {
+    J2KReader(URI _uri, J2KSource _source) throws IOException {
         uri = _uri;
+        source = _source;
 
-        JPIPCache cache = source.cache();
         try {
-            socket = new JPIPSocket(uri, cache);
-            socket.prime(cache);
+            connect();
+            source.loadFrames();
+            stream = new long[source.frames()];
+            for (int i = 0; i < stream.length; i++)
+                stream[i] = source.client().frame(i).stream();
+            prime();
         } catch (Exception e) {
-            initCloseSocket();
+            closeSocket();
             throw new IOException("Error in the server communication: " + e.getMessage(), e);
         }
+        stuck = new int[stream.length];
+        Arrays.fill(stuck, -1);
 
         // Virtual-thread interruption also closes a socket still inside its constructor.
         myThread = Thread.ofVirtual().name("Reader " + uri).unstarted(this);
@@ -55,9 +69,7 @@ class J2KReader implements Runnable {
 
         while (myThread.isAlive()) {
             try {
-                JPIPSocket currentSocket = socket;
-                if (currentSocket != null)
-                    currentSocket.abort();
+                closeSocket();
                 myThread.interrupt();
                 myThread.join(100);
             } catch (Exception e) { // avoid exit from loop
@@ -78,69 +90,159 @@ class J2KReader implements Runnable {
             signalQueue.offer(params); // newer pending work takes precedence
     }
 
-    private void initCloseSocket() {
-        if (socket != null) {
+    // Interrupts pending I/O without writing another request.
+    private void closeSocket() {
+        JPIPSocket current = socket;
+        if (current != null) {
             try {
-                socket.abort();
+                current.abort();
             } catch (IOException e) {
-                Log.error(e);
+                Log.error("Error closing JPIPSocket", e);
             }
-            socket = null;
         }
     }
 
-    @SuppressWarnings("try")
-    private boolean restoreFrame(J2KSource.Remote source, int frame, int level) throws KduException {
-        try (J2KSource.Use ignored = source.use()) {
-            AtomicBoolean status = source.getFrameStatus(frame, level);
-            if (status != null && status.get())
-                return true;
+    private static boolean isComplete(int reason) throws IOException {
+        return switch (reason) {
+            case 1, 2 -> true; // image done, window done
+            case 4, 7 -> false; // byte limit, response limit
+            default -> throw new IOException("Unexpected JPIP end of response: " + reason);
+        };
+    }
 
-            String key = cacheKey[frame];
-            JPIPCacheManager.Entry entry = key == null ? null : JPIPCacheManager.get(key, level);
-            if (entry == null)
-                return false;
-            source.cache().put(frame, entry.stream());
-            level = entry.level();
+    // A new channel and its metadata.
+    private void connect() throws IOException {
+        JPIPSocket opened = new JPIPSocket(uri);
+        socket = opened;
+        J2KNative client = source.client();
+        client.response(opened.receive());
+        do {
+            opened.sendMetadata();
+        } while (!isComplete(client.response(opened.receive())));
+    }
+
+    private void fetchFirst(String size, String region) throws IOException {
+        do {
+            socket.sendFrame(stream[0], size, region);
+        } while (!isComplete(source.client().response(socket.receive())));
+        source.update(0);
+    }
+
+    // First open: a coarse level of the first frame.
+    private void prime() throws IOException {
+        fetchFirst("64,64", "64,64");
+        ResolutionSet set = source.geometry(0);
+        if (set != null && !set.isDisplayable()) { // the window did not cover a level
+            ResolutionSet.Level res = set.getClosestLevel(64, 64);
+            fetchFirst(res.width() + "," + res.height(), (res.width() + 1) + "," + (res.height() + 1));
         }
-        source.setFrameComplete(frame, level);
+        if (set == null || !set.isDisplayable())
+            throw new IOException("The server did not send a complete level of the first frame");
+    }
+
+    // No request can make the frame more complete at the level this size needs.
+    private boolean isSettled(int frame, int width, int height) {
+        ResolutionSet set = source.geometry(frame);
+        if (set == null)
+            return stuck[frame] == FAILED;
+        int level = set.getNextLevel(width, height).level();
+        return stuck[frame] >= level || set.getComplete(level).get();
+    }
+
+    private boolean isSettled(int width, int height) {
+        for (int i = 0; i < stuck.length; i++) {
+            if (!isSettled(i, width, height))
+                return false;
+        }
         return true;
     }
 
-    @SuppressWarnings("try")
-    private JPIPSocket.FrameResponse receiveFrame(J2KSource.Remote source, int level) throws KduException, IOException {
-        JPIPSocket.FrameResponse response;
-        try (J2KSource.Use ignored = source.use()) {
-            JPIPCache cache = source.cache();
-            response = socket.receiveFrame(cache);
-            String key = cacheKey[response.frame()];
-            if (response.complete() && key != null)
-                JPIPCacheManager.store(key, level, cache, response.frame());
+    private void update(int frame) {
+        try {
+            source.update(frame);
+        } catch (IOException e) {
+            fail(frame, e.getMessage());
         }
-        if (response.complete())
-            source.setFrameComplete(response.frame(), level);
-        else
-            source.setFramePartial(response.frame());
-        return response;
+    }
+
+    private void fail(int frame, String reason) {
+        if (stuck[frame] != FAILED)
+            Log.error(uri + ": frame " + frame + " abandoned: " + reason);
+        stuck[frame] = FAILED;
+    }
+
+    // Imports the frame's disk entry if it is complete at the level or finer.
+    private boolean restore(int frame, int level) {
+        String key = cacheKey[frame];
+        JPIPCacheManager.Entry entry = key == null ? null : JPIPCacheManager.get(key, level);
+        if (entry == null)
+            return false;
+        try {
+            source.client().importFrame(frame, entry.block());
+        } catch (IOException e) { // refused: the source is unchanged
+            JPIPCacheManager.remove(key);
+            return false;
+        }
+        update(frame);
+        return true;
+    }
+
+    // Sends the request a frame needs in this pass; null when it needs none.
+    @Nullable
+    private Sent request(int frame, ResolutionSet.Level wanted) throws IOException {
+        int width = wanted.width(), height = wanted.height();
+        if (isSettled(frame, width, height))
+            return null;
+
+        // Any entry will do while the frame's own levels are unknown.
+        ResolutionSet set = source.geometry(frame);
+        if (restore(frame, set == null ? Integer.MAX_VALUE : set.getNextLevel(width, height).level())) {
+            if (isSettled(frame, width, height))
+                return null;
+            set = source.geometry(frame);
+        }
+
+        // The signalled frame's size while the header is unknown; else the frame's own, the region padded.
+        ResolutionSet.Level res = set == null ? wanted : set.getNextLevel(width, height);
+        int pad = set == null ? 0 : 1;
+        socket.sendFrame(stream[frame], res.width() + "," + res.height(), (res.width() + pad) + "," + (res.height() + pad));
+        return new Sent(frame, set != null);
+    }
+
+    // Feeds the next response to the source. False when its frame needs another request in this pass.
+    private boolean receive(Sent sent, ResolutionSet.Level wanted) throws IOException {
+        int frame = sent.frame;
+        boolean complete = isComplete(source.client().response(socket.receive()));
+        update(frame);
+
+        ResolutionSet set = source.geometry(frame);
+        if (set == null) {
+            if (complete)
+                fail(frame, "no header in a complete response");
+            return stuck[frame] == FAILED;
+        }
+
+        int level = set.getNextLevel(wanted.width(), wanted.height()).level();
+        if (set.getComplete(level).get()) {
+            String key = cacheKey[frame];
+            if (key != null)
+                JPIPCacheManager.store(key, level, () -> source.client().exportFrame(frame));
+            return true;
+        }
+        if (!complete || !sent.own) // cut by the response limit, or sized by another frame
+            return false;
+
+        Log.warn(uri + ": frame " + frame + " is incomplete at level " + level + " after a complete response");
+        stuck[frame] = Math.max(stuck[frame], level);
+        return true;
     }
 
     private boolean readingInterrupted() {
         return isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
     }
 
-    // True once the frame is known to have this size at this level.
-    private static boolean hasSize(J2KSource.Remote source, int frame, ResolutionSet.Level size) {
-        if (source.getFrameStatus(frame, 0) == null)
-            return false;
-        ResolutionSet.Level own = source.resolutionSet(frame).getLevel(size.level());
-        return own.width() == size.width() && own.height() == size.height();
-    }
-
-    private boolean readFrames(J2KParams.Read params, ResolutionSet.Level resLevel, boolean singleFrame) throws KduException, IOException {
-        J2KSource.Remote source = params.source();
+    private boolean readFrames(J2KParams.Read params, ResolutionSet.Level wanted, boolean singleFrame) throws IOException {
         J2KParams.Decode decode = params.decodeParams();
-        String size = resLevel.width() + "," + resLevel.height();
-        String padded = (resLevel.width() + 1) + "," + (resLevel.height() + 1);
         ArrayDeque<Integer> remaining = new ArrayDeque<>();
         if (singleFrame) {
             remaining.add(decode.frame);
@@ -151,40 +253,36 @@ class J2KReader implements Runnable {
                 remaining.add((first + i) % cacheKey.length);
         }
 
-        // The source and resolution stay fixed until all sent responses have been consumed.
+        // The size stays fixed until all sent responses have been consumed.
+        ArrayDeque<Sent> sent = new ArrayDeque<>();
         int limit = singleFrame ? 1 : 2;
         boolean draining = false;
         while (true) {
             // On newer work, drain sent responses without issuing any more requests.
             draining |= readingInterrupted();
-            int frame;
-            boolean complete;
-            if (!draining && socket.pendingCount() < limit && !remaining.isEmpty()) {
-                frame = remaining.removeFirst();
-                if (!restoreFrame(source, frame, decode.level)) {
-                    // An exact size lets the region be padded to reach the edge precincts.
-                    socket.sendFrame(frame, size, hasSize(source, frame, resLevel) ? padded : size);
+            if (!draining && sent.size() < limit && !remaining.isEmpty()) {
+                Sent request = request(remaining.removeFirst(), wanted);
+                if (request != null) {
+                    sent.addLast(request);
                     continue;
                 }
-                complete = true;
-            } else if (socket.pendingCount() > 0) {
-                JPIPSocket.FrameResponse response = receiveFrame(source, decode.level);
-                frame = response.frame();
-                complete = response.complete();
+            } else if (!sent.isEmpty()) {
+                Sent first = sent.removeFirst();
+                if (!receive(first, wanted)) {
+                    remaining.addFirst(first.frame); // finish this frame first
+                    continue;
+                }
             } else {
                 return !draining;
             }
 
-            if (!complete)
-                remaining.addLast(frame); // Revisit partial frames after the rest of the movie.
-            else if (singleFrame)
+            if (singleFrame)
                 params.view().refreshDecodeFromReader(decode, params.viewpoint());
             UITimer.completionChanged();
         }
     }
 
     @Override
-    @SuppressWarnings("try")
     public void run() {
         int retries = 0;
         while (!isAbolished) {
@@ -197,25 +295,17 @@ class J2KReader implements Runnable {
             }
 
             J2KView view = params.view();
-            J2KSource.Remote source = params.source();
-            J2KParams.Decode decodeParams = params.decodeParams();
-
-            int frame = decodeParams.frame;
-            int level = decodeParams.level;
-            ResolutionSet.Level resLevel = source.resolutionSet(frame).getLevel(level);
+            J2KParams.Decode decode = params.decodeParams();
+            ResolutionSet.Level wanted = source.resolutionSet(decode.frame).getLevel(decode.level);
 
             view.setDownloading(true);
 
             try {
-                if (socket.isClosed()) {
-                    // System.out.println(">>> reconnect");
-                    try (J2KSource.Use ignored = source.use()) {
-                        socket = new JPIPSocket(uri, source.cache());
-                    }
-                }
+                if (socket.isClosed())
+                    connect();
 
                 boolean singleFrame = cacheKey.length <= 1 || params.priority();
-                boolean finished = readFrames(params, resLevel, singleFrame);
+                boolean finished = readFrames(params, wanted, singleFrame);
 
                 // suicide if fully done
                 if (source.isComplete(0)) {
@@ -225,17 +315,22 @@ class J2KReader implements Runnable {
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && finished && !source.isComplete(level)) {
-                    queueIfEmpty(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
+                if (singleFrame && finished && !isSettled(wanted.width(), wanted.height())) {
+                    queueIfEmpty(new J2KParams.Read(view, decode, params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
-            } catch (Exception e) {
-                try {
-                    socket.abort();
-                } catch (IOException ioe) {
-                    Log.error("Error closing JPIPSocket", ioe);
+            } catch (J2KNative.Refused e) {
+                // The source takes no more data; what is complete stays viewable.
+                Log.error(uri + ": " + e.getMessage());
+                closeSocket();
+                for (String key : cacheKey) {
+                    if (key != null)
+                        JPIPCacheManager.remove(key);
                 }
+                return;
+            } catch (Exception e) {
+                closeSocket();
 
                 if (retries++ < 13)
                     queueIfEmpty(params); // retry unless newer work is pending

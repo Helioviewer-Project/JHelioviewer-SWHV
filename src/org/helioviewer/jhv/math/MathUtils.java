@@ -6,14 +6,6 @@ public class MathUtils {
 
     private static final double LN_2 = Math.log(2);
 
-    public static int max(int... _is) {
-        int max = Integer.MIN_VALUE;
-        for (int i : _is)
-            if (max < i)
-                max = i;
-        return max;
-    }
-
     public static int min(int... _is) {
         int min = Integer.MAX_VALUE;
         for (int i : _is)

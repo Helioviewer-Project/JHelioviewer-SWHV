@@ -4,6 +4,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
@@ -30,17 +31,15 @@ public class JPIPCacheManager {
         Log.setLoggerLevel("org.ehcache", Level.WARNING); // shut-up Ehcache info logs
     }
 
-    public record Entry(int level, JPIPStream stream) {}
+    // A frame's data as exported by the client, and the level it was complete at.
+    public record Entry(int level, byte[] block) {}
 
     static final class EntrySerializer implements Serializer<Entry> {
         @Override
         public ByteBuffer serialize(Entry entry) {
-            long size = Integer.BYTES + entry.stream().encodedSize();
-            if (size > Integer.MAX_VALUE)
-                throw new SerializerException("JPIP cache entry is too large");
-            ByteBuffer buffer = ByteBuffer.allocate((int) size);
+            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES + entry.block().length);
             buffer.putInt(entry.level());
-            entry.stream().write(buffer);
+            buffer.put(entry.block());
             return buffer.flip();
         }
 
@@ -49,8 +48,10 @@ public class JPIPCacheManager {
             ByteBuffer buffer = binary.slice();
             try {
                 int level = buffer.getInt();
-                return new Entry(level, JPIPStream.read(buffer));
-            } catch (BufferUnderflowException | IllegalArgumentException e) {
+                byte[] block = new byte[buffer.remaining()];
+                buffer.get(block);
+                return new Entry(level, block);
+            } catch (BufferUnderflowException e) {
                 throw new SerializerException("Invalid JPIP cache entry", e);
             }
         }
@@ -61,14 +62,14 @@ public class JPIPCacheManager {
         }
     }
 
-    private static final Path cacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-7");
+    private static final Path cacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-8");
 
     private static PersistentCacheManager cacheManager;
     private static Cache<String, Entry> cache;
     private static Thread hook;
 
     public static void init() {
-        deleteDirs("JPIPLevel-4", "JPIPStream-4", "JPIPLevel-5", "JPIPStream-5", "JPIPLevel-6", "JPIPStream-6");
+        deleteDirs("JPIPLevel-4", "JPIPStream-4", "JPIPLevel-5", "JPIPStream-5", "JPIPLevel-6", "JPIPStream-6", "JPIPStream-7");
 
         ExpiryPolicy<Object, Object> expiryPolicy = ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(7));
 
@@ -111,7 +112,8 @@ public class JPIPCacheManager {
         return null;
     }
 
-    public static void store(@Nonnull String key, int level, @Nonnull JPIPCache source, int frame) {
+    // Stores the block unless an entry at this level or finer exists.
+    public static void store(@Nonnull String key, int level, @Nonnull Callable<byte[]> block) {
         Cache<String, Entry> currentCache = cache;
         if (currentCache == null)
             return;
@@ -119,7 +121,19 @@ public class JPIPCacheManager {
         try {
             Entry entry = currentCache.get(key);
             if (entry == null || entry.level() > level)
-                currentCache.put(key, new Entry(level, source.scan(frame)));
+                currentCache.put(key, new Entry(level, block.call()));
+        } catch (Exception e) {
+            Log.error(e);
+        }
+    }
+
+    public static void remove(@Nonnull String key) {
+        Cache<String, Entry> currentCache = cache;
+        if (currentCache == null)
+            return;
+
+        try {
+            currentCache.remove(key);
         } catch (Exception e) {
             Log.error(e);
         }

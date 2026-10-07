@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compile and run JPIP regressions after ant compile (JDK 25).
 
-Offline by default. --live also retrieves and decodes fixed ROB AIA images and a Callisto spectrogram.
+Offline by default. --live also retrieves and decodes a fixed ROB AIA image, a movie and a Callisto spectrogram.
 """
 
 import argparse
@@ -16,21 +16,22 @@ from urllib.request import urlopen
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--live", action="store_true", help="also test live ROB retrieval (requires network and bundled KDU)")
+parser.add_argument("--live", action="store_true", help="also test live ROB retrieval (requires network and the native libraries)")
+parser.add_argument("--bridge", help="libjhvj2k built by native/jpeg2000/build.sh, when the natives jar has none")
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[3]
 classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"),
                              *(str(p) for p in sorted((root / "lib").rglob("*.jar")))])
 with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
-    sources = ["JPIPSerializerTest.java", "JPIPResponseTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
+    sources = ["JPIPSerializerTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
     if args.live:
-        sources.extend(["ROBTest.java", "MovieReaderTest.java", "CallistoTest.java"])
+        sources.extend(["ROBTest.java", "MovieReaderTest.java", "J2KViewTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
-    for name in ["JPIPSerializerTest", "JPIPResponseTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
+    for name in ["JPIPSerializerTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],
                        check=True, timeout=60)
@@ -39,17 +40,23 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         machine = platform.machine().lower()
         if system == "Darwin":
             target = "macos-arm64" if machine == "arm64" else "macos"
-            library = "libkdu_jni.dylib"
+            suffix = ".dylib"
         elif system == "Linux" and machine in ("x86_64", "amd64"):
-            target, library = "linux", "libkdu_jni.so"
+            target, suffix = "linux", ".so"
         else:
             parser.error("Live test currently supports macOS and Linux x86-64")
+        # The bridge finds Kakadu next to itself.
+        libraries = [str(work / ("libkdu_jni" + suffix)), str(work / ("libjhvj2k" + suffix))]
         with zipfile.ZipFile(root / "lib/jhv" / ("jhv-natives-" + target + ".jar")) as jar:
-            native_directory = target if target == "macos-arm64" else target + "-amd64"
-            (work / library).write_bytes(jar.read("jhv/" + native_directory + "/" + library))
+            native_directory = "jhv/" + (target if target == "macos-arm64" else target + "-amd64") + "/"
+            Path(libraries[0]).write_bytes(jar.read(native_directory + "libkdu_jni" + suffix))
+            if args.bridge:
+                Path(libraries[1]).write_bytes(Path(args.bridge).read_bytes())
+            else:
+                Path(libraries[1]).write_bytes(jar.read(native_directory + "libjhvj2k" + suffix))
         uri = "jpip://jpip.swhv.oma.be/aia_171/2026/09/09/2026_09_09__12_00_33_349__SDO_AIA_AIA_171.jp2"
         print("Retrieving " + uri, flush=True)
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.ROBTest", str(work / library), uri],
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.ROBTest", *libraries, uri],
                        check=True, timeout=180)
 
         movie_request = ("https://api.swhv.oma.be/hv_docpage/v2/getJPX/?sourceId=10"
@@ -58,12 +65,14 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         print("Preparing movie through " + movie_request, flush=True)
         with urlopen(movie_request, timeout=180) as response:
             movie = json.load(response)["uri"]
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", str(work / library), movie],
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", *libraries, movie],
                        check=True, timeout=180)
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.J2KViewTest", *libraries, movie],
+                       check=True, timeout=300)
 
         callisto = "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?sourceId=5000&date=2026-09-09T00:00:00Z"
         print("Retrieving " + callisto, flush=True)
         with urlopen(callisto, timeout=60) as response:
             (work / "callisto.jp2").write_bytes(response.read())
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.CallistoTest",
-                        str(work / library), str(work / "callisto.jp2")], check=True, timeout=180)
+                        *libraries, str(work / "callisto.jp2")], check=True, timeout=180)

@@ -22,7 +22,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.metadata.DetectorMask;
-import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
+import org.helioviewer.jhv.view.j2k.J2KNative;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import nom.tam.fits.FitsFactory;
@@ -34,7 +34,7 @@ public final class AppInit {
         ExitHooks.attach();
 
         loadLibs(Platform.getResourceDir());
-        KakaduMessageSystem.startKduMessageSystem();
+        J2KNative.init();
 
         try {
             JPIPCacheManager.init();
@@ -67,6 +67,7 @@ public final class AppInit {
             loadLib("kdu_v7AR", resourceDir);
         }
         loadLib("kdu_jni", resourceDir);
+        loadLib("jhvj2k", resourceDir);
 
         Path ffmpegPath = Path.of(Directories.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {

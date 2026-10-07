@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 
 // FFM binding of native/jpeg2000/jhv_j2k.h; the library must be loaded first.
 // The monitor serializes calls on the source. A decode runs outside it.
-final class J2KNative implements AutoCloseable {
+public final class J2KNative implements AutoCloseable {
 
     // The client refused a response: the source must not be fed any further.
     static final class Refused extends IOException {
@@ -29,11 +29,7 @@ final class J2KNative implements AutoCloseable {
 
     // Levels are finest first. Without the frame's header only stream is set.
     // The ready levels are the coarsest ones.
-    record Frame(long stream, int channels, int ready, int[] width, int[] height) {
-        boolean isReady(int level) {
-            return level < width.length && level >= width.length - ready;
-        }
-    }
+    record Frame(long stream, int channels, int ready, int[] width, int[] height) {}
 
     record Palette(int entries, int channels, byte[] values) {}
 
@@ -59,7 +55,7 @@ final class J2KNative implements AutoCloseable {
     private MemorySegment handle;
 
     // Once at start-up: installs the process-wide Kakadu message handlers.
-    static void init() throws IOException {
+    public static void init() throws IOException {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment error = arena.allocate(256);
             checked(call(INIT, error), error);
@@ -148,24 +144,24 @@ final class J2KNative implements AutoCloseable {
         }
     }
 
-    // Disk cache entry of a JPIP frame, in a direct buffer.
-    synchronized ByteBuffer exportFrame(int frame) throws IOException {
+    // Disk cache entry of a JPIP frame.
+    synchronized byte[] exportFrame(int frame) throws IOException {
         requireOpen();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment error = arena.allocate(256);
             long size = checked(call(EXPORT, handle, frame, MemorySegment.NULL, 0L, error), error);
-            ByteBuffer entry = ByteBuffer.allocateDirect(Math.toIntExact(size));
-            checked(call(EXPORT, handle, frame, MemorySegment.ofBuffer(entry), size, error), error);
-            return entry;
+            MemorySegment entry = arena.allocate(size);
+            checked(call(EXPORT, handle, frame, entry, size, error), error);
+            return entry.toArray(ValueLayout.JAVA_BYTE);
         }
     }
 
     // A refused entry leaves the source unchanged.
-    synchronized void importFrame(int frame, ByteBuffer entry) throws IOException {
+    synchronized void importFrame(int frame, byte[] entry) throws IOException {
         requireOpen();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment error = arena.allocate(256);
-            checked(call(IMPORT, handle, frame, MemorySegment.ofBuffer(entry), (long) entry.remaining(), error), error);
+            checked(call(IMPORT, handle, frame, arena.allocateFrom(ValueLayout.JAVA_BYTE, entry), (long) entry.length, error), error);
         }
     }
 
@@ -227,6 +223,7 @@ final class J2KNative implements AutoCloseable {
             throw new CancellationException("JPEG 2000 source is closed");
     }
 
+    @SuppressWarnings("restricted")
     private static MethodHandle bind(String name, @Nullable MemoryLayout result, MemoryLayout... arguments) {
         FunctionDescriptor descriptor = result == null ? FunctionDescriptor.ofVoid(arguments) : FunctionDescriptor.of(result, arguments);
         return Linker.nativeLinker().downcallHandle(SymbolLookup.loaderLookup().find("jhv_j2k_" + name)

@@ -8,7 +8,7 @@ set(KDU_VENDOR "" CACHE PATH "Kakadu source directory")
 set(KDU_LIBRARY "" CACHE FILEPATH "JHV's Kakadu shared library or import library")
 
 add_library(jhvj2k SHARED jhv_j2k.cc jhv_kdu_geometry.cc jhv_kdu_decode.cc)
-target_compile_features(jhvj2k PRIVATE cxx_std_17)
+target_compile_features(jhvj2k PRIVATE cxx_std_11)
 target_include_directories(jhvj2k PRIVATE "${ESAJPIP}" "${ESAJPIP}/jpeg2000/generated")
 target_include_directories(jhvj2k SYSTEM PRIVATE
     "${KDU_VENDOR}/coresys/common" "${KDU_VENDOR}/apps/support" "${KDU_VENDOR}/apps/compressed_io")

@@ -110,21 +110,6 @@ public record LUT(String name, ByteBuffer rgba) {
         return new LUT(name, rgba);
     }
 
-    public static LUT fromOpaqueRgb(String name, float[] red, float[] green, float[] blue) {
-        int len = red.length;
-        ByteBuffer rgba = BufferUtils.newByteBuffer(len * 4);
-        for (int i = 0; i < len; i++) {
-            rgba.put(channel(red[i])).put(channel(green[i])).put(channel(blue[i])).put((byte) 0xFF);
-        }
-        rgba.flip();
-        return new LUT(name, rgba);
-    }
-
-    // Kakadu normalizes palette entries to [-0.5, 0.5), where +0.5 stands for 2^bits
-    private static byte channel(float value) {
-        return (byte) Math.clamp((int) ((value + 0.5f) * 256), 0, 255);
-    }
-
     private static ByteBuffer packArgbToRgba(int[] argb) {
         ByteBuffer rgba = BufferUtils.newByteBuffer(argb.length * 4);
         for (int pixel : argb) {

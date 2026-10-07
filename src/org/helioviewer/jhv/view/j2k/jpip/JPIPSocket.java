@@ -3,71 +3,37 @@ package org.helioviewer.jhv.view.j2k.jpip;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayDeque;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
-import kdu_jni.KduException;
-
-// Assumes a persistent HTTP connection
+// One JPIP channel over a persistent HTTP connection. Responses arrive in request order.
 public final class JPIPSocket extends HTTPSocket {
-
-    private static final int mainHeaderKlass = Constants.getKlass(Constants.JPIP.MAIN_HEADER_DATA_BIN_CLASS);
 
     private static final int META_REQUEST_LEN = 2000000;
     private static final int FRAME_RESPONSE_LIMIT = 2 * 1024 * 1024;
 
-    public record FrameResponse(int frame, boolean complete) {}
-
-    // Owned by the reader thread. Abort only closes the socket; it does not touch this queue.
-    private final ArrayDeque<Integer> pendingFrames = new ArrayDeque<>();
+    private final byte[] chunk = new byte[65536];
+    private ByteBuffer body = ByteBuffer.allocateDirect(chunk.length);
 
     // The jpip channel ID for the connection (persistent)
-    private final String jpipChannelID;
+    private String jpipChannelID;
 
     // The path supplied on the uri line of the HTTP message. Generally for the
     // first request it is the image path in relative terms, but the response
     // could change it. The Kakadu server seems to change it to /jpip.
     private String jpipPath;
 
-    public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
+    // Asks for a channel; the first response received opens it.
+    public JPIPSocket(URI uri) throws IOException {
         super(uri);
+        jpipPath = uri.getPath();
         try {
-            jpipPath = uri.getPath();
-
-            JPIPResponse res = requestInitialization(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache); // deliberately short
-            String cnew = res.getCNew();
-            if (cnew == null)
-                throw new IOException("The header 'JPIP-cnew' was not sent by the server");
-
-            Map<String, String> map = new HashMap<>();
-            for (String part : cnew.split(",")) {
-                int eq = part.indexOf('=');
-                if (eq > 0)
-                    map.put(part.substring(0, eq), part.substring(eq + 1));
-            }
-
-            String path = map.get("path");
-            jpipChannelID = map.get("cid");
-            if (jpipChannelID == null || path == null)
-                throw new IOException("The server did not send a channel id and path in JPIP-cnew");
-            if (!"http".equals(map.get("transport")))
-                throw new IOException("The client only supports HTTP transport");
-
-            jpipPath = '/' + path;
-
-            // A new channel sends the metadata again: fetch it here, compressed, not inside frame responses.
-            String req = createQuery(META_REQUEST_LEN, "cid", jpipChannelID, "stream", "0", "metareq", "[*]!!");
-            do {
-                res = requestInitialization(req, cache);
-            } while (!res.isResponseComplete());
-        } catch (Throwable e) { // close the socket on any failure, then rethrow
-            try {
-                super.close();
-            } catch (IOException ignore) {
-            }
+            writeRequest(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
+        } catch (IOException e) {
+            super.close();
             throw e;
         }
     }
@@ -84,7 +50,8 @@ public final class JPIPSocket extends HTTPSocket {
             return;
 
         try {
-            writeRequest(createQuery(0, "cclose", jpipChannelID));
+            if (jpipChannelID != null)
+                writeRequest(createQuery(0, "cclose", jpipChannelID));
         } catch (IOException ignore) { // no problem, server may have closed the socket
         } finally {
             super.close();
@@ -102,58 +69,64 @@ public final class JPIPSocket extends HTTPSocket {
         return buf + "len=" + len;
     }
 
-    private String createFrameQuery(int frame, String size, String region) {
-        return createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", region, "roff", "0,0");
-    }
-
-    // prime first image
-    public void prime(JPIPCache cache) throws KduException, IOException {
-        JPIPResponse res;
-        String req = createFrameQuery(0, "64,64", "64,64");
-        do {
-            res = requestInitialization(req, cache);
-        } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
-    }
-
-    public void sendFrame(int frame, String size, String region) throws IOException {
-        writeRequest(createFrameQuery(frame, size, region));
-        pendingFrames.addLast(frame);
-    }
-
-    public FrameResponse receiveFrame(JPIPCache cache) throws KduException, IOException {
-        int frame = pendingFrames.getFirst();
-        JPIPResponse response = receive(cache, frame);
-        pendingFrames.removeFirst();
-        return new FrameResponse(frame, response.isResponseComplete());
-    }
-
-    public int pendingCount() {
-        return pendingFrames.size();
-    }
-
     private void writeRequest(String queryStr) throws IOException {
         write("GET " + jpipPath + '?' + queryStr + httpHeader);
     }
 
-    private JPIPResponse requestInitialization(String queryStr, JPIPCache cache) throws KduException, IOException {
-        writeRequest(queryStr);
-        return receive(cache, 0);
+    public void sendMetadata() throws IOException {
+        writeRequest(createQuery(META_REQUEST_LEN, "cid", jpipChannelID, "stream", "0", "metareq", "[*]!!"));
     }
 
-    private JPIPResponse receive(JPIPCache cache, int frame) throws KduException, IOException {
+    public void sendFrame(long stream, String size, String region) throws IOException {
+        writeRequest(createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", Long.toString(stream), "fsiz", size + ",closest", "rsiz", region, "roff", "0,0"));
+    }
+
+    // The whole body of the next response, valid until the next call.
+    public ByteBuffer receive() throws IOException {
         Map<String, String> header = readHeader();
         if (!"image/jpp-stream".equals(header.get("Content-Type")))
             throw new IOException("Expected image/jpp-stream content");
 
-        JPIPResponse jpipRes = new JPIPResponse(header.get("JPIP-cnew"));
+        body.clear();
         try (InputStream in = getInputStream(header)) {
-            jpipRes.readSegments(in, cache, frame);
+            int count;
+            while ((count = in.read(chunk)) >= 0) {
+                if (count > body.remaining()) {
+                    ByteBuffer larger = ByteBuffer.allocateDirect(Math.max(2 * body.capacity(), body.position() + count));
+                    body = larger.put(body.flip());
+                }
+                body.put(chunk, 0, count);
+            }
         }
 
+        if (jpipChannelID == null)
+            openChannel(header.get("JPIP-cnew"));
         if ("close".equals(header.get("Connection"))) {
             super.close();
         }
-        return jpipRes;
+        return body.flip();
+    }
+
+    private void openChannel(String cnew) throws IOException {
+        if (cnew == null)
+            throw new IOException("The header 'JPIP-cnew' was not sent by the server");
+
+        Map<String, String> map = new HashMap<>();
+        for (String part : cnew.split(",")) {
+            int eq = part.indexOf('=');
+            if (eq > 0)
+                map.put(part.substring(0, eq), part.substring(eq + 1));
+        }
+
+        String path = map.get("path");
+        String cid = map.get("cid");
+        if (cid == null || path == null)
+            throw new IOException("The server did not send a channel id and path in JPIP-cnew");
+        if (!"http".equals(map.get("transport")))
+            throw new IOException("The client only supports HTTP transport");
+
+        jpipChannelID = cid;
+        jpipPath = '/' + path;
     }
 
 }

@@ -7,7 +7,8 @@ root=$PWD
 : "${ESAJPIP:=$root/../esajpip-SWHV}"
 : "${BUILD:=$root/tmp/j2k-native}"
 export ESAJPIP BUILD
-library=$(bash native/jpeg2000/build.sh | tail -1)
+# The response generator below needs the full esajpip configuration.
+library=$(ESAJPIP_CLIENT_ONLY=OFF bash native/jpeg2000/build.sh | tail -1)
 kdu=$BUILD/libkdu_jni.${library##*.}
 test=$BUILD/test
 mkdir -p "$test/responses" "$test/classes"
@@ -39,7 +40,7 @@ open(folder + '/sycc.jp2', 'wb').write(rebuilt(sycc))
 open(folder + '/malformed.jp2', 'wb').write(rebuilt(lambda kind, payload: b'\xffO\xffQ\x00\x02' if kind == b'jp2c' else payload))
 EOF
 
-classpath=$(find lib -name '*.jar' | tr '\n' ':')
+classpath=$(find lib extra/test/j2k/lib -name '*.jar' | tr '\n' ':')
 javac -nowarn -cp "$classpath" -d "$test/classes" \
     src/org/helioviewer/jhv/view/j2k/J2KNative.java extra/test/j2k/J2KNativeTest.java
 java --enable-native-access=ALL-UNNAMED -cp "$classpath$test/classes" \

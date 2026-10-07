@@ -30,7 +30,7 @@ silently skipping it. Some failure-path tests deliberately log exceptions.
 | --- | --- | --- |
 | `maintenance` (`extra/licenses/`, `extra/ffmpeg/`) | License synchronization and FFmpeg update scripts, using mocked downloads and temporary files | Yes |
 | `model` | Model URI recognition, Assimp metadata, generated glTF loading, geometry, materials, and layer metadata | Yes |
-| `j2k` | Protocol parsing, serialization, cache initialization failures, HTTP response boundaries, socket cleanup and queued responses | Yes |
+| `j2k` | Disk cache entries and initialization failures, HTTP response boundaries, JPIP channel requests, response bodies in request order and socket cleanup | Yes |
 | `timelines` | HAPI server configuration and catalog loading, partial failures and cancellation, timeline data, request coverage, cache, export, and Java2D drawing | Yes |
 | `event` | HEK fixture parsing, event database persistence, filtering, cache/download coordination, and SWEK configuration | Yes |
 | `shaders` (`opengl/`) | GLSL syntax and program linking using `glslangValidator` | No |

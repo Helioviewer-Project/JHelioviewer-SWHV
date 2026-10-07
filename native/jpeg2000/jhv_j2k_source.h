@@ -36,12 +36,12 @@ public:
     }
     kdu_long get_pos() override { return static_cast<kdu_long>(position); }
     // Run use on a fresh codestream over this input, destroying it on every path.
-    template<class F> auto with_stream(F use) {
+    template<class F> const char *with_stream(F use) {
         kdu_codestream stream;
         try {
             seek(0);
             stream.create(this);
-            auto result = use(stream);
+            const char *result = use(stream);
             stream.destroy();
             return result;
         } catch (...) {

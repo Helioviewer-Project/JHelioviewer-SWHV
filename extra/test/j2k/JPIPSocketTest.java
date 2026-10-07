@@ -3,10 +3,12 @@ package org.helioviewer.jhv.view.j2k.jpip;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -17,121 +19,161 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public final class JPIPSocketTest {
 
+    private static final String CHANNEL = "JPIP-cnew: cid=test,transport=http,path=jpip\r\n";
+
     public static void main(String[] arguments) throws Exception {
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
         for (String cnew : new String[]{"cid=test,transport=http", "transport=http,path=jpip",
                 "cid=test,path=jpip", "cid=test,transport=http-tcp,path=jpip"})
-            testInvalidChannel(cnew);
+            testInvalidChannel("JPIP-cnew: " + cnew + "\r\n");
+        testInvalidChannel("");
         testPipeline();
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
-        System.out.println("PASS: graceful close, response abort and interrupted constructor handshake");
+        System.out.println("PASS: channel opening, bodies in request order, buffer growth, graceful close, abort and interrupted handshake");
     }
 
-    private static void testInvalidChannel(String cnew) throws Exception {
+    private interface Server {
+        Object serve(Socket connection, BufferedReader input) throws Exception;
+    }
+
+    private interface Client {
+        void run(URI uri, ExecutorService workers, Future<Object> served) throws Exception;
+    }
+
+    // Runs the client code against one connection of a local server; returns what the server returned.
+    private static Object exchange(Server server, Client client) throws Exception {
         try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
                 ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
             listener.setSoTimeout(5000);
-            Future<Integer> server = workers.submit(() -> {
+            Future<Object> served = workers.submit(() -> {
                 try (Socket connection = listener.accept()) {
                     connection.setSoTimeout(5000);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII));
-                    readRequest(input);
-                    reply(connection, "JPIP-cnew: " + cnew + "\r\n", 2);
-                    return input.read();
+                    return server.serve(connection, new BufferedReader(new InputStreamReader(
+                            connection.getInputStream(), StandardCharsets.US_ASCII)));
                 }
             });
-            try {
-                JPIPSocket client = new JPIPSocket(
-                        URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
-                client.abort();
-                throw new AssertionError("Accepted unsupported channel: " + cnew);
-            } catch (IOException expected) {
-                // Constructor failure must close TCP without sending a follow-up request.
-            }
-            if (server.get(5, TimeUnit.SECONDS) != -1)
-                throw new AssertionError("Invalid channel caused another request: " + cnew);
+            client.run(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), workers, served);
+            return served.get(5, TimeUnit.SECONDS);
         }
     }
 
-    private static void testPipeline() throws Exception {
-        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
-                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
-            listener.setSoTimeout(5000);
-            Future<?> server = workers.submit(() -> {
-                try (Socket connection = listener.accept()) {
-                    connection.setSoTimeout(5000);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII));
-                    readRequest(input);
-                    reply(connection, "JPIP-cnew: cid=test,transport=http,path=jpip\r\n", 2);
-                    replyMetadata(input, connection);
-                    // Require both requests before responding, proving the client sends ahead.
-                    readRequest(input);
-                    readRequest(input);
-                    reply(connection, "", 3); // Partial response, followed by a complete one.
-                    reply(connection, "", 2);
-                    readRequest(input);
-                    reply(connection, "Connection: close\r\n", 2);
-                }
-                return null;
-            });
-            JPIPSocket client = new JPIPSocket(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+    private static void testResponse(String framing, boolean valid) throws Exception {
+        exchange((connection, input) -> {
+            String request = readRequest(input);
+            if (!request.startsWith("GET /test?cnew=http&type=jpp-stream&tid=0&len=512 "))
+                throw new IOException("Expected the channel request: " + request);
+            connection.getOutputStream().write(("HTTP/1.1 200 OK\r\ncontent-type: image/jpp-stream\r\n"
+                    + "jpip-cnew: cid=test,transport=http,path=jpip\r\n" + framing).getBytes(StandardCharsets.US_ASCII));
+            if (valid)
+                connection.getOutputStream().write(new byte[]{0, 2, 0});
+            return null;
+        }, (uri, workers, served) -> {
+            JPIPSocket client = new JPIPSocket(uri);
             try {
-                client.sendFrame(0, "64,64", "64,64");
-                client.sendFrame(1, "64,64", "64,64");
-                if (client.pendingCount() != 2)
-                    throw new AssertionError("Missing pending requests");
-                JPIPSocket.FrameResponse first = client.receiveFrame(null);
-                if (first.frame() != 0 || first.complete() || client.pendingCount() != 1)
-                    throw new AssertionError("First response should belong to frame 0 and be partial");
-                JPIPSocket.FrameResponse second = client.receiveFrame(null);
-                if (second.frame() != 1 || !second.complete() || client.pendingCount() != 0)
-                    throw new AssertionError("Second response should belong to frame 1 and be complete");
-                client.sendFrame(0, "64,64", "64,64");
-                if (!client.receiveFrame(null).complete())
+                ByteBuffer body = client.receive();
+                if (!valid)
+                    throw new AssertionError("Accepted invalid response framing: " + framing);
+                if (!body.isDirect() || body.remaining() != 3 || body.get(1) != 2)
+                    throw new AssertionError("Wrong body of the channel response");
+            } catch (IOException e) {
+                if (valid)
+                    throw e;
+            } finally {
+                client.abort();
+            }
+        });
+    }
+
+    private static void testInvalidChannel(String header) throws Exception {
+        Object next = exchange((connection, input) -> {
+            readRequest(input);
+            reply(connection, header, new byte[]{0, 2, 0});
+            return input.read();
+        }, (uri, workers, served) -> {
+            JPIPSocket client = new JPIPSocket(uri);
+            try {
+                client.receive();
+                throw new AssertionError("Accepted unsupported channel: " + header);
+            } catch (IOException expected) {
+                // A refused channel is left without a follow-up request.
+            } finally {
+                client.abort();
+            }
+        });
+        if ((Integer) next != -1)
+            throw new AssertionError("Invalid channel caused another request: " + header);
+    }
+
+    private static void testPipeline() throws Exception {
+        byte[] large = new byte[300000];
+        for (int i = 0; i < large.length; i++)
+            large[i] = (byte) (i * 31);
+        exchange((connection, input) -> {
+            readRequest(input);
+            reply(connection, CHANNEL, new byte[]{0, 2, 0});
+            String metadata = readRequest(input);
+            if (!metadata.startsWith("GET /jpip?cid=test&stream=0&metareq=[*]!!&len=2000000 "))
+                throw new IOException("Expected the metadata request: " + metadata);
+            reply(connection, "", new byte[]{0, 4, 0});
+            // Require both requests before responding, proving the client sends ahead.
+            String first = readRequest(input), second = readRequest(input);
+            if (!first.startsWith("GET /jpip?cid=test&stream=7&fsiz=64,65,closest&rsiz=65,66&roff=0,0&len=2097152 ")
+                    || !second.startsWith("GET /jpip?cid=test&stream=8&"))
+                throw new IOException("Unexpected frame requests: " + first + " | " + second);
+            // A chunked body larger than the client's initial buffer.
+            OutputStream out = connection.getOutputStream();
+            out.write("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\nTransfer-Encoding: chunked\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            for (int at = 0; at < large.length; at += 100000) {
+                out.write((Integer.toHexString(100000) + "\r\n").getBytes(StandardCharsets.US_ASCII));
+                out.write(large, at, 100000);
+                out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
+            }
+            out.write("0\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            reply(connection, "", new byte[]{0, 1, 0});
+            readRequest(input);
+            reply(connection, "Connection: close\r\n", new byte[]{5, 6, 7, 8});
+            return null;
+        }, (uri, workers, served) -> {
+            JPIPSocket client = new JPIPSocket(uri);
+            try {
+                client.receive();
+                client.sendMetadata();
+                if (client.receive().get(1) != 4)
+                    throw new AssertionError("Wrong metadata response");
+                client.sendFrame(7, "64,65", "65,66");
+                client.sendFrame(8, "64,64", "64,64");
+                if (!client.receive().equals(ByteBuffer.wrap(large)))
+                    throw new AssertionError("First response is not the large body");
+                ByteBuffer second = client.receive();
+                if (second.remaining() != 3 || second.get(1) != 1)
+                    throw new AssertionError("Second response is not the short body");
+                client.sendFrame(7, "64,64", "64,64");
+                if (!client.receive().equals(ByteBuffer.wrap(new byte[]{5, 6, 7, 8})))
                     throw new AssertionError("Sequential request after draining failed");
                 if (!client.isClosed())
                     throw new AssertionError("Server close was ignored");
             } finally {
                 client.abort();
             }
-            server.get(5, TimeUnit.SECONDS);
-        }
-    }
-
-    private static void reply(Socket connection, String headers, int reason) throws IOException {
-        connection.getOutputStream().write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\n"
-                + headers + "Content-Length: 3\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
-        connection.getOutputStream().write(new byte[]{0, (byte) reason, 0});
+        });
     }
 
     private static void testInterruptedHandshake() throws Exception {
-        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
-                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
-            listener.setSoTimeout(5000);
-            CountDownLatch requestReceived = new CountDownLatch(1);
-            Future<Integer> server = workers.submit(() -> {
-                try (Socket connection = listener.accept()) {
-                    connection.setSoTimeout(5000);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII));
-                    readRequest(input);
-                    requestReceived.countDown();
-                    // Do not reply to cnew: the client has no constructed JPIPSocket to abort.
-                    return input.read();
-                }
-            });
+        CountDownLatch requestReceived = new CountDownLatch(1);
+        Object next = exchange((connection, input) -> {
+            readRequest(input);
+            requestReceived.countDown();
+            // Do not reply to cnew: only the interrupt can release the client.
+            return input.read();
+        }, (uri, workers, served) -> {
             AtomicReference<Throwable> failure = new AtomicReference<>();
             Thread reader = Thread.ofVirtual().start(() -> {
                 try {
-                    JPIPSocket client = new JPIPSocket(
-                            URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
-                    client.abort();
+                    new JPIPSocket(uri).receive();
                     failure.set(new AssertionError("Stalled handshake completed"));
                 } catch (IOException e) {
                     if (!Thread.currentThread().isInterrupted())
@@ -149,84 +191,37 @@ public final class JPIPSocketTest {
                     throw new AssertionError("Interrupt did not release the handshake");
                 if (failure.get() != null)
                     throw new AssertionError("Handshake cancellation failed", failure.get());
-                if (server.get(5, TimeUnit.SECONDS) != -1)
-                    throw new AssertionError("Handshake cancellation did not close TCP");
             } finally {
                 reader.interrupt();
                 reader.join(2000);
             }
-        }
-    }
-
-    private static void testResponse(String framing, boolean valid) throws Exception {
-        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
-                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
-            listener.setSoTimeout(5000);
-            Future<?> server = workers.submit(() -> {
-                try (Socket connection = listener.accept()) {
-                    connection.setSoTimeout(5000);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII));
-                    readRequest(input);
-                    connection.getOutputStream().write(("HTTP/1.1 200 OK\r\n"
-                            + "content-type: image/jpp-stream\r\n"
-                            + "jpip-cnew: cid=test,transport=http,path=jpip\r\n"
-                            + framing).getBytes(StandardCharsets.US_ASCII));
-                    if (valid) {
-                        connection.getOutputStream().write(new byte[]{0, 2, 0});
-                        replyMetadata(input, connection);
-                    }
-                }
-                return null;
-            });
-            try {
-                JPIPSocket client = new JPIPSocket(
-                        URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
-                client.abort();
-                if (!valid)
-                    throw new AssertionError("Accepted invalid response framing: " + framing);
-            } catch (IOException e) {
-                if (valid)
-                    throw e;
-            }
-            server.get(5, TimeUnit.SECONDS);
-        }
+        });
+        if ((Integer) next != -1)
+            throw new AssertionError("Handshake cancellation did not close TCP");
     }
 
     private static void testClose(boolean abort) throws Exception {
-        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
-                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
-            listener.setSoTimeout(5000);
-            CountDownLatch requestReceived = new CountDownLatch(1);
-            Future<String> received = workers.submit(() -> {
-                try (Socket connection = listener.accept()) {
-                    connection.setSoTimeout(5000);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(
-                            connection.getInputStream(), StandardCharsets.US_ASCII));
-                    readRequest(input);
-                    connection.getOutputStream().write(("HTTP/1.1 200 OK\r\n"
-                            + "Content-Type: image/jpp-stream\r\n"
-                            + "JPIP-cnew: cid=test,transport=http,path=jpip\r\n"
-                            + "Content-Length: 3\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
-                    connection.getOutputStream().write(new byte[]{0, 2, 0});
-                    replyMetadata(input, connection);
-                    if (abort) {
-                        readRequest(input);
-                        readRequest(input);
-                        requestReceived.countDown();
-                        // Leave the response pending until the client aborts the connection.
-                    }
-                    return input.readLine();
-                }
-            });
-            JPIPSocket client = new JPIPSocket(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
+        CountDownLatch requestReceived = new CountDownLatch(1);
+        exchange((connection, input) -> {
+            readRequest(input);
+            reply(connection, CHANNEL, new byte[]{0, 2, 0});
+            if (abort) {
+                readRequest(input);
+                readRequest(input);
+                requestReceived.countDown();
+                // Leave the response pending until the client aborts the connection.
+            }
+            return input.readLine();
+        }, (uri, workers, served) -> {
+            JPIPSocket client = new JPIPSocket(uri);
             try {
+                client.receive();
                 if (abort) {
                     Future<?> pending = workers.submit(() -> {
                         try {
                             client.sendFrame(0, "64,64", "64,64");
                             client.sendFrame(1, "64,64", "64,64");
-                            client.receiveFrame(null);
+                            client.receive();
                             throw new AssertionError("Stalled response completed successfully");
                         } catch (IOException expected) {
                             // Closing TCP must release the blocked read.
@@ -237,11 +232,11 @@ public final class JPIPSocketTest {
                         throw new AssertionError("Request did not reach server");
                     client.abort();
                     pending.get(5, TimeUnit.SECONDS);
-                    if (received.get(5, TimeUnit.SECONDS) != null)
+                    if (served.get(5, TimeUnit.SECONDS) != null)
                         throw new AssertionError("Abort wrote another request");
                 } else {
                     client.close();
-                    String request = received.get(5, TimeUnit.SECONDS);
+                    String request = (String) served.get(5, TimeUnit.SECONDS);
                     if (request == null || !request.startsWith("GET /jpip?cclose=test&"))
                         throw new AssertionError("Missing graceful channel close: " + request);
                 }
@@ -251,15 +246,13 @@ public final class JPIPSocketTest {
             } finally {
                 client.abort();
             }
-        }
+        });
     }
 
-    // A new channel asks for the metadata before anything else.
-    private static void replyMetadata(BufferedReader input, Socket connection) throws IOException {
-        String request = readRequest(input);
-        if (!request.startsWith("GET /jpip?cid=test&stream=0&metareq="))
-            throw new IOException("Expected the metadata request: " + request);
-        reply(connection, "", 2);
+    private static void reply(Socket connection, String headers, byte[] body) throws IOException {
+        connection.getOutputStream().write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\n"
+                + headers + "Content-Length: " + body.length + "\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+        connection.getOutputStream().write(body);
     }
 
     private static String readRequest(BufferedReader input) throws IOException {

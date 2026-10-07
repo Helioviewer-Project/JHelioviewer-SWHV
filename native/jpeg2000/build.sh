@@ -17,6 +17,7 @@ unzip -p "lib/jhv/jhv-natives-$target.jar" "jhv/$resource/libkdu_jni.$suffix" > 
 options=()
 if [ "$suffix" = dylib ]; then options+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0); fi
 cmake -S "$ESAJPIP" -B "$BUILD/client" -DCMAKE_BUILD_TYPE=Release \
+    -DESAJPIP_CLIENT_ONLY="${ESAJPIP_CLIENT_ONLY:-ON}" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON "${options[@]}"
 cmake --build "$BUILD/client" --target esajpip_client --parallel
 cmake -S native/jpeg2000 -B "$BUILD/bridge" -DCMAKE_BUILD_TYPE=Release \

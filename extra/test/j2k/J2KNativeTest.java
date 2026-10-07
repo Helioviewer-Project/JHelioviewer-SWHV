@@ -24,7 +24,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 
 // Checks the native bridge through J2KNative. Kakadu's Java classes serve only
-// as the pixel reference: the compositor, driven as J2KDecoder drives it.
+// as the pixel reference: the compositor, driven as JHV's former decoder drove it.
 public final class J2KNativeTest {
 
     private static void check(boolean ok, String message) {
@@ -123,9 +123,9 @@ public final class J2KNativeTest {
                 Reference expected = reference(path, frame, info, level, access);
                 String where = path + " frame " + frame + " level " + level;
                 check(info.width()[level] == expected.width() && info.height()[level] == expected.height(),
-                        "geometry differs from the present decoder: " + where);
+                        "geometry differs from Kakadu's compositor: " + where);
                 check(Arrays.equals(pixels(source, frame, level), expected.pixels()),
-                        "pixels differ from the present decoder: " + where);
+                        "pixels differ from Kakadu's compositor: " + where);
             }
         }
     }
@@ -158,7 +158,7 @@ public final class J2KNativeTest {
             try { source.frames(); throw new AssertionError("closed source accepted"); }
             catch (CancellationException expectedFailure) { /* Expected. */ }
         }
-        System.out.println("geometry and pixels at every level against the present decoder, jobs after close: " + path);
+        System.out.println("geometry and pixels at every level against Kakadu's compositor, jobs after close: " + path);
     }
 
     private static void failures(Path image) throws Exception {
@@ -225,7 +225,7 @@ public final class J2KNativeTest {
         }
         check(levels > 1, "the image needs several levels");
 
-        ByteBuffer entry;
+        byte[] entry;
         try (J2KNative source = new J2KNative(null)) {
             check(source.response(body(responses.resolve("reduced-header.jpp"))) == 2, "header response");
             check(source.frames() == 1, "frame count");
@@ -236,11 +236,11 @@ public final class J2KNativeTest {
 
             check(source.response(body(responses.resolve("reduced.jpp"))) == 2, "coarsest window");
             info = source.frame(0);
-            check(info.isReady(levels - 1) && !info.isReady(0), "coarsest level ready alone");
+            check(info.ready() >= 1 && info.ready() < levels, "coarsest level ready alone");
             check(Arrays.equals(pixels(source, 0, levels - 1), expected[levels - 1]), "coarsest pixels");
 
             check(source.response(body(responses.resolve("limited.jpp"))) == 4, "byte-limited window");
-            check(!source.frame(0).isReady(0), "byte-limited window made the frame ready");
+            check(source.frame(0).ready() < levels, "byte-limited window made the frame ready");
             check(source.response(body(responses.resolve("continuation.jpp"))) == 2, "continued window");
             check(source.frame(0).ready() == levels, "all levels ready");
             for (int level = 0; level < levels; level++)
@@ -250,10 +250,10 @@ public final class J2KNativeTest {
 
         try (J2KNative source = new J2KNative(null)) {
             source.response(body(responses.resolve("whole-header.jpp")));
-            try { source.importFrame(0, entry.slice(0, entry.limit() - 1)); throw new AssertionError("truncated cache entry imported"); }
+            try { source.importFrame(0, Arrays.copyOf(entry, entry.length - 1)); throw new AssertionError("truncated cache entry imported"); }
             catch (IOException expectedFailure) { check(source.frame(0).ready() == 0, "refused cache entry changed the source"); }
             source.importFrame(0, entry);
-            check(source.frame(0).ready() == levels && source.exportFrame(0).equals(entry), "imported cache entry");
+            check(source.frame(0).ready() == levels && Arrays.equals(source.exportFrame(0), entry), "imported cache entry");
             check(Arrays.equals(pixels(source, 0, 0), expected[0]), "imported pixels");
             // The server knows nothing of an imported frame and sends it again.
             check(source.response(body(responses.resolve("whole.jpp"))) == 2, "replay after import");

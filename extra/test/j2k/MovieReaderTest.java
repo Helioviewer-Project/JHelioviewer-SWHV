@@ -18,56 +18,84 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
 // Exercise the production prefetch pump directly, without constructing a GUI view.
+// Arguments: Kakadu library, bridge library, JPIP URI of a movie with at least four frames.
 public final class MovieReaderTest {
+
+    private enum Mode { SEQUENTIAL, PUMP, CACHED, DAMAGED }
+
     public static void main(String[] arguments) throws Exception {
         System.load(arguments[0]);
-        KakaduMessageSystem.startKduMessageSystem();
-        URI uri = URI.create(arguments[1]);
+        System.load(arguments[1]);
+        J2KNative.init();
+        URI uri = URI.create(arguments[2]);
         Method close = JPIPCacheManager.class.getDeclaredMethod("close");
         close.setAccessible(true);
         JPIPCacheManager.init();
         try {
-            String[] reference = retrieve(uri, false, false);
-            String[] pipelined = retrieve(uri, true, false);
-            if (!Arrays.equals(reference, pipelined))
+            String[] reference = retrieve(uri, Mode.SEQUENTIAL);
+            if (!Arrays.equals(reference, retrieve(uri, Mode.PUMP)))
                 throw new AssertionError("Movie pixels differ with overlapping requests");
             close.invoke(null);
             JPIPCacheManager.init();
-            if (!Arrays.equals(reference, retrieve(uri, true, true)))
+            if (!Arrays.equals(reference, retrieve(uri, Mode.CACHED)))
                 throw new AssertionError("Movie pixels differ after cached restoration");
-            System.out.println("PASS: four movie frames have identical pixels with sequential requests, reader prefetch and reopened cache");
+            if (!Arrays.equals(reference, retrieve(uri, Mode.DAMAGED)))
+                throw new AssertionError("Movie pixels differ after a damaged cache entry");
+            System.out.println("PASS: four movie frames have identical pixels with sequential requests, reader prefetch, reopened cache and a damaged cache entry");
         } finally {
             close.invoke(null);
         }
     }
 
-    private static String[] retrieve(URI uri, boolean pump, boolean cached) throws Exception {
-        J2KSource.Remote source = new J2KSource.Remote();
+    private static boolean isComplete(int reason) {
+        if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
+            throw new AssertionError("Unexpected end of response: " + reason);
+        return reason < 4;
+    }
+
+    private static String[] retrieve(URI uri, Mode mode) throws Exception {
+        J2KSource source = new J2KSource(null);
         J2KReader reader = null;
         JPIPSocket socket = null;
         try {
-            if (pump) {
+            if (mode == Mode.SEQUENTIAL) { // the requests of the reader, one at a time, without it
+                J2KNative client = source.client();
+                socket = new JPIPSocket(uri);
+                client.response(socket.receive());
+                do {
+                    socket.sendMetadata();
+                } while (!isComplete(client.response(socket.receive())));
+                source.loadFrames();
+                for (int frame = 0; frame < 4; frame++) {
+                    do {
+                        socket.sendFrame(client.frame(frame).stream(), "4096,4096", "4097,4097");
+                    } while (!isComplete(client.response(socket.receive())));
+                    source.update(frame);
+                }
+            } else {
                 reader = new J2KReader(uri, source);
                 reader.setCacheKey(new String[]{"movie0", "movie1", "movie2", "movie3"});
-            } else {
-                socket = new JPIPSocket(uri, source.cache());
-                socket.prime(source.cache());
             }
-            source.open();
-            if (source.maxFrame() < 3)
+            if (source.frames() < 4)
                 throw new AssertionError("Expected a movie with at least four frames");
-            if (pump) {
-                if (cached) {
+            ResolutionSet.Level size = source.resolutionSet(0).getLevel(0);
+            if (size.width() != 4096 || size.height() != 4096)
+                throw new AssertionError("Expected 4096x4096 frames");
+
+            if (reader != null) {
+                if (mode == Mode.CACHED) {
                     Field socketField = J2KReader.class.getDeclaredField("socket");
                     socketField.setAccessible(true);
                     ((JPIPSocket) socketField.get(reader)).abort(); // The pump must satisfy every frame from cache.
                 }
+                if (mode == Mode.DAMAGED) { // a block the client refuses: the frame is fetched and stored again
+                    JPIPCacheManager.remove("movie2");
+                    JPIPCacheManager.store("movie2", 0, () -> new byte[]{1, 2, 3});
+                }
                 Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
                 readFrames.setAccessible(true);
-                ResolutionSet.Level size = source.resolutionSet(0).getLevel(0);
-                J2KParams.Read params = new J2KParams.Read(null, source,
-                        new J2KParams.Decode(0, size.subImage(), 0), null, false);
-                if (!cached) {
+                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, size.subImage(), 0), null, false);
+                if (mode == Mode.PUMP) {
                     // Keep the idle worker waiting on its original queue while invoking the pump directly.
                     Field threadField = J2KReader.class.getDeclaredField("myThread");
                     threadField.setAccessible(true);
@@ -93,21 +121,17 @@ public final class MovieReaderTest {
                     queueField.set(reader, signals);
                     if ((boolean) readFrames.invoke(reader, params, size, false))
                         throw new AssertionError("Pump ignored newer work");
-                    if (source.getFrameStatus(0, 0) == null || source.getFrameStatus(1, 0) == null
-                            || source.getFrameStatus(2, 0) != null)
+                    if (source.geometry(0) == null || source.geometry(1) == null || source.geometry(2) != null)
                         throw new AssertionError("Pump did not stop after draining the two sent responses");
                     signals.clear();
                 }
                 if (!(boolean) readFrames.invoke(reader, params, size, false))
                     throw new AssertionError("Prefetch interrupted unexpectedly");
-            } else {
-                for (int frame = 0; frame < 4; frame++) {
-                    do {
-                        socket.sendFrame(frame, "4096,4096", "4096,4096");
-                    } while (!socket.receiveFrame(source.cache()).complete());
-                    source.setFrameComplete(frame, 0);
-                }
+                JPIPCacheManager.Entry entry = JPIPCacheManager.get("movie2", 0);
+                if (entry == null || entry.block().length < 1000)
+                    throw new AssertionError("Missing or damaged cache entry after the pump");
             }
+
             MetaData metadata = (MetaData) Proxy.newProxyInstance(MovieReaderTest.class.getClassLoader(),
                     new Class<?>[]{MetaData.class}, (proxy, method, values) -> {
                         if (method.getName().equals("roiToRegion"))
@@ -118,13 +142,8 @@ public final class MovieReaderTest {
             for (int frame = 0; frame < hashes.length; frame++) {
                 if (!source.getFrameStatus(frame, 0).get())
                     throw new AssertionError("Incomplete frame " + frame);
-                ResolutionSet resolution = source.resolutionSet(frame);
-                ResolutionSet.Level size = resolution.getLevel(0);
-                DecodedImage image = new J2KDecoder(source,
-                        new J2KParams.Decode(frame, size.subImage(), 0), resolution.numComps,
-                        ImageFilter.Type.None, metadata, size.factorX(), size.factorY()).call();
-                if (image == null)
-                    throw new AssertionError("Missing decoded frame " + frame);
+                DecodedImage image = source.decode(new J2KParams.Decode(frame, size.subImage(), 0),
+                        ImageFilter.Type.None, metadata, size.factorX(), size.factorY());
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
                 hashes[frame] = HexFormat.of().formatHex(hash.digest());
@@ -137,7 +156,7 @@ public final class MovieReaderTest {
                 if (socket != null)
                     socket.abort();
             } finally {
-                source.destroy();
+                source.close();
             }
         }
     }

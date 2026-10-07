@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 
@@ -22,42 +23,38 @@ public final class CallistoTest {
 
     public static void main(String[] arguments) throws Exception {
         System.load(arguments[0]);
-        KakaduMessageSystem.startKduMessageSystem();
-        J2KSource.Local source = new J2KSource.Local(arguments[1], true);
+        System.load(arguments[1]);
+        J2KNative.init();
+        J2KSource source = new J2KSource(Path.of(arguments[2]));
         try {
-            source.open();
-            String[] xml = new String[source.maxFrame() + 1];
-            source.extractMetaData(xml);
-            if (xml.length != 1 || !xml[0].contains("STARTFRQ"))
+            String xml = source.xml(0);
+            if (source.frames() != 1 || xml == null || !xml.contains("STARTFRQ"))
                 throw new AssertionError("Expected a single-frame Callisto fixture");
             ResolutionSet resolution = source.resolutionSet(0);
             ResolutionSet.Level size = resolution.getLevel(0);
             if (resolution.numComps != 1)
                 throw new AssertionError("Expected indexed grayscale Callisto data");
-            source.close(); // Exercise the same per-decode reopen used by local JP2 views.
             System.out.println("Callisto dimensions=" + size.width() + "x" + size.height());
             for (int level = 0; level <= 5; level++) {
                 ResolutionSet.Level reduced = resolution.getLevel(level);
-                DecodedImage full = decode(source, resolution, reduced.subImage(), reduced.level());
+                DecodedImage full = decode(source, reduced.subImage(), reduced.level());
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(((ByteBuffer) full.imageBuffer().buffer).duplicate());
                 for (int x : new int[]{0, size.width() / 3 + 7, size.width() - 103}) {
                     J2KParams.SubImage region = J2KViewCallisto.levelRegion(x, 0, size.width() / 5, size.height(), size, reduced);
-                    DecodedImage cropped = decode(source, resolution, region, reduced.level());
+                    DecodedImage cropped = decode(source, region, reduced.level());
                     compare(full, cropped);
                 }
                 System.out.println("PASS: Callisto level=" + level + " origin, interior and right-edge crops sha256="
                         + HexFormat.of().formatHex(hash.digest()));
             }
         } finally {
-            source.destroy();
+            source.close();
         }
     }
 
-    private static DecodedImage decode(J2KSource source, ResolutionSet resolution, J2KParams.SubImage region,
-                                       int level) throws Exception {
-        return new J2KDecoder(source, new J2KParams.Decode(0, region, level), resolution.numComps,
-                ImageFilter.Type.None, metadata, 1, 1).call();
+    private static DecodedImage decode(J2KSource source, J2KParams.SubImage region, int level) throws Exception {
+        return source.decode(new J2KParams.Decode(0, region, level), ImageFilter.Type.None, metadata, 1, 1);
     }
 
     private static void compare(DecodedImage full, DecodedImage cropped) {
