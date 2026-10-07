@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -10,10 +9,6 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
@@ -131,20 +126,17 @@ public final class MovieReaderTest {
                     throw new AssertionError("Missing or damaged cache entry after the pump");
             }
 
-            MetaData metadata = (MetaData) Proxy.newProxyInstance(MovieReaderTest.class.getClassLoader(),
-                    new Class<?>[]{MetaData.class}, (proxy, method, values) -> {
-                        if (method.getName().equals("roiToRegion"))
-                            return Region.DEFAULT;
-                        throw new AssertionError("Unexpected metadata call: " + method.getName());
-                    });
             String[] hashes = new String[4];
             for (int frame = 0; frame < hashes.length; frame++) {
                 if (!source.getFrameStatus(frame, 0).get())
                     throw new AssertionError("Incomplete frame " + frame);
-                DecodedImage image = source.decode(new J2KParams.Decode(frame, size.subImage(), 0),
-                        ImageFilter.Type.None, metadata, size.factorX(), size.factorY());
+                ByteBuffer pixels;
+                try (J2KNative.Decode job = source.beginDecode(frame, 0)) {
+                    pixels = ByteBuffer.allocateDirect(size.width() * size.height());
+                    J2KSource.decode(job, 0, 0, size.width(), size.height(), pixels);
+                }
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
-                hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
+                hash.update(pixels);
                 hashes[frame] = HexFormat.of().formatHex(hash.digest());
             }
             return hashes;

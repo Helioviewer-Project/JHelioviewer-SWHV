@@ -2,17 +2,12 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HexFormat;
 
-import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
@@ -60,13 +55,6 @@ public final class ROBTest {
             if (xml == null || xml.isBlank())
                 throw new AssertionError("Missing image metadata");
 
-            // Decode needs only this coordinate conversion when no image filter is applied.
-            MetaData metadata = (MetaData) Proxy.newProxyInstance(ROBTest.class.getClassLoader(),
-                    new Class<?>[]{MetaData.class}, (proxy, method, values) -> {
-                        if (method.getName().equals("roiToRegion"))
-                            return Region.DEFAULT;
-                        throw new AssertionError("Unexpected metadata call: " + method.getName());
-                    });
             Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
             readFrames.setAccessible(true);
             String[] result = {xml, null, null};
@@ -85,11 +73,13 @@ public final class ROBTest {
                 if (entry == null || entry.level() != (cached ? 0 : level))
                     throw new AssertionError("Missing persisted level " + level);
 
-                DecodedImage image = source.decode(decode, ImageFilter.Type.None, metadata, size.factorX(), size.factorY());
-                if (image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
-                    throw new AssertionError("Wrong decoded size at level " + level);
+                ByteBuffer pixels;
+                try (J2KNative.Decode job = source.beginDecode(0, level)) {
+                    pixels = ByteBuffer.allocateDirect(size.width() * size.height());
+                    J2KSource.decode(job, 0, 0, size.width(), size.height(), pixels);
+                }
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
-                hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
+                hash.update(pixels);
                 result[index++] = HexFormat.of().formatHex(hash.digest());
             }
             return result;

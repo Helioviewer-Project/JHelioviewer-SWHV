@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
+import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,7 +13,9 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
+import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
@@ -20,6 +23,7 @@ import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
@@ -297,10 +301,23 @@ public final class J2KView extends BaseView {
         ResolutionSet.Level resolution = getResolutionLevel(decodeParams.frame, decodeParams.level);
         try {
             executor.submit(
-                    () -> source.decode(decodeParams, key.filter(), m, resolution.factorX(), resolution.factorY()),
+                    () -> decodeImage(decodeParams, key.filter(), m, resolution),
                     new J2KCallback(key, viewpoint));
         } catch (RejectedExecutionException ignore) {
             // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
+        }
+    }
+
+    // Runs on the decode worker; the view owns solar geometry and image filtering.
+    private DecodedImage decodeImage(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metadata, ResolutionSet.Level resolution) throws IOException {
+        try (J2KNative.Decode job = source.beginDecode(params.frame, params.level)) {
+            J2KParams.SubImage roi = params.subImage;
+            Region imageRegion = metadata.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
+            ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
+            boolean gray = source.resolutionSet(params.frame).numComps == 1;
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(roi.w(), roi.h(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
+            J2KSource.decode(job, roi.x(), roi.y(), roi.w(), roi.h(), outBuffer.byteBuffer());
+            return new DecodedImage(outBuffer.finish(), imageRegion);
         }
     }
 

@@ -32,8 +32,8 @@ The native libraries come from the natives jar of the host; `--bridge PATH` supp
 `libjhvj2k` built by `native/jpeg2000/build.sh` while the jar has none.
 
 The live test uses a fixed single-frame AIA 171 image from September 9, 2026. It retrieves
-levels 2 and 0 through the reader, checks completion, the persisted level after each and the
-decoded dimensions. A second session restores from the disk cache after closing and reopening
+levels 2 and 0 through the reader and checks completion and the persisted level after each.
+A second session restores from the disk cache after closing and reopening
 its manager. Its socket is aborted after the metadata and the first coarse level, so the
 tested resolutions cannot be downloaded again. Metadata and decoded pixel hashes are compared
 between the sessions, not pinned across KDU versions. Allow up to three minutes and several
@@ -83,5 +83,5 @@ up on normal exit. The live runner supports macOS and Linux x86-64.
 The live suite has been exercised only on macOS arm64. No application settings or user cache are used.
 
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
-or cache eviction. Live decoding supplies only the coordinate conversion needed by the
-unfiltered decoder, so it does not validate metadata geometry.
+or cache eviction. The ROB and movie reader checks decode raw pixels; the view check
+uses the image metadata, but does not independently validate its geometry.

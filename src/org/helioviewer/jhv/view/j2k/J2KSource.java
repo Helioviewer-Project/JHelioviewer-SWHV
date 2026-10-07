@@ -9,12 +9,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageBuffer;
-import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -153,33 +148,26 @@ public final class J2KSource {
         return true;
     }
 
-    // A region of a complete level; runs on a decode worker.
-    DecodedImage decode(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metaData, double factorX, double factorY) throws IOException {
-        J2KParams.SubImage roi = params.subImage;
-        boolean gray = resolutionSet(params.frame).numComps == 1;
-        try (J2KNative.Decode job = client.beginDecode(params.frame, params.level)) {
-            Region imageRegion = metaData.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), factorX, factorY);
-            ImageFilter filter = ImageFilter.of(filterType, imageRegion, metaData);
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(roi.w(), roi.h(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
-            ByteBuffer pixels = outBuffer.byteBuffer();
+    // Acquire the input before allocating pixels. The job outlives close().
+    J2KNative.Decode beginDecode(int frame, int level) throws IOException {
+        return client.beginDecode(frame, level);
+    }
 
-            // A filtered gray image is built on the heap.
-            String warning = pixels.isDirect()
-                    ? job.run(roi.x(), roi.y(), roi.w(), roi.h(), pixels.duplicate())
-                    : runToHeap(job, roi.x(), roi.y(), roi.w(), roi.h(), pixels);
-            if (warning != null)
-                Log.warn(warning);
-            return new DecodedImage(outBuffer.finish(), imageRegion);
-        }
+    // Gray8 or RGBA rows of a region of the job's level; runs on a decode worker.
+    // Leaves the output buffer's position unchanged.
+    static void decode(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer pixels) throws IOException {
+        String warning = pixels.isDirect()
+                ? job.run(x, y, width, height, pixels.duplicate())
+                : runToHeap(job, x, y, width, height, pixels);
+        if (warning != null)
+            Log.warn(warning);
     }
 
     // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
     public byte[] decode(int frame, int level, int x, int y, int width, int height) throws IOException {
-        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
+        try (J2KNative.Decode job = beginDecode(frame, level)) {
             byte[] pixels = new byte[width * height * resolutionSet(frame).numComps];
-            String warning = runToHeap(job, x, y, width, height, ByteBuffer.wrap(pixels));
-            if (warning != null)
-                Log.warn(warning);
+            decode(job, x, y, width, height, ByteBuffer.wrap(pixels));
             return pixels;
         }
     }
