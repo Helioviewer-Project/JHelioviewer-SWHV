@@ -47,16 +47,6 @@ public class ResolutionSet {
         return resolutions[Math.min(idx, numLevels - 1)];
     }
 
-    Level getPreviousLevel(int w, int h) {
-        int idx = 0;
-        for (int i = 0; i < numLevels; i++) {
-            idx = i;
-            if (resolutions[i].width <= w && resolutions[i].height <= h)
-                break;
-        }
-        return resolutions[idx];
-    }
-
     Level getClosestLevel(int w, int h) {
         Level closest = resolutions[0];
         for (Level res : resolutions) {

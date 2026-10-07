@@ -115,14 +115,10 @@ public class J2KView extends BaseView {
 
             abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source));
         } catch (Exception e) {
-            try {
-                if (acquiredReader != null)
-                    acquiredReader.stop();
-                if (acquiredSource != null)
-                    acquiredSource.close();
-            } catch (Exception cleanupFailure) {
-                e.addSuppressed(cleanupFailure);
-            }
+            if (acquiredReader != null)
+                acquiredReader.stop();
+            if (acquiredSource != null)
+                acquiredSource.close();
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
     }
