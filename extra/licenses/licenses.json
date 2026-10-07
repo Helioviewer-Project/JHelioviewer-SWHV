@@ -34,10 +34,10 @@
       "native_members": []
     },
     {
-      "path": "lib/caffeine-3.2.4.jar",
-      "sha256": "9d9d2cfd681fd9272ded3d27c9930db12f89f732345975aa113ebc223bbf1224",
+      "path": "lib/caffeine-3.3.0.jar",
+      "sha256": "5d015adc655191c8f9a152c4cc871170a04d28040ed281d0e74ade87d6ae8aff",
       "embedded_notices": [
-        "lib/caffeine-3.2.4.jar!META-INF/LICENSE"
+        "lib/caffeine-3.3.0.jar!META-INF/LICENSE"
       ],
       "declarations": [],
       "supplemental_notices": [],
@@ -214,12 +214,12 @@
       "native_members": []
     },
     {
-      "path": "lib/formats/json-20260719.jar",
-      "sha256": "c243f45f9590c12694a4142ed3f07fc70dfb71e4daebd05ae234bf92a2da92a6",
+      "path": "lib/formats/json-20260814.jar",
+      "sha256": "7dd2de1533e766e2b6c07d8194da85145ad313a167a4760050f5c9b6839604fe",
       "embedded_notices": [],
       "declarations": [
         {
-          "source": "lib/formats/json-20260719.jar!META-INF/maven/org.json/json/pom.xml",
+          "source": "lib/formats/json-20260814.jar!META-INF/maven/org.json/json/pom.xml",
           "name": "Public Domain",
           "url": "https://github.com/stleary/JSON-java/blob/master/LICENSE"
         }
@@ -231,25 +231,14 @@
       "native_members": []
     },
     {
-      "path": "lib/formats/kdu_jni.jar",
-      "sha256": "4551012a086eb34dd7ab7aeab982429cd968de403db3ecd4291317358680d4b3",
-      "embedded_notices": [],
-      "declarations": [],
-      "supplemental_notices": [],
-      "external_notices": [
-        "resources/licenses/Kakadu.txt"
-      ],
-      "native_members": []
-    },
-    {
-      "path": "lib/formats/nom-tam-fits-1.22.0.jar",
-      "sha256": "d87b502a067b4d3d0dbe6870c82d402cdd250fa3b804bda9b299159a06fad0ea",
+      "path": "lib/formats/nom-tam-fits-master-bbebf33.jar",
+      "sha256": "86e88460b6fef9b2c281b12f86e96dace814b8b97fc159338a300bc9fb1c53e5",
       "embedded_notices": [
-        "lib/formats/nom-tam-fits-1.22.0.jar!LICENSE.txt"
+        "lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt"
       ],
       "declarations": [
         {
-          "source": "lib/formats/nom-tam-fits-1.22.0.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
+          "source": "lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
           "name": "Public Domain",
           "url": "file://${project.basedir}/src/license/publicdomain/license.txt"
         }
@@ -375,10 +364,10 @@
       "native_members": []
     },
     {
-      "path": "lib/guava-33.6.0-jre.jar",
-      "sha256": "dc573e1fca4fd5454f4a5fd3d7da2df03002876a4175bafc14a95980dd7713b3",
+      "path": "lib/guava-33.7.1-jre.jar",
+      "sha256": "796d8e28ac64e83a47c4c5935a8fecc4682650a04bbdead738ef0f5a3a0e6c46",
       "embedded_notices": [
-        "lib/guava-33.6.0-jre.jar!META-INF/LICENSE"
+        "lib/guava-33.7.1-jre.jar!META-INF/LICENSE"
       ],
       "declarations": [],
       "supplemental_notices": [],
@@ -387,12 +376,13 @@
     },
     {
       "path": "lib/jhv/jhv-natives-linux.jar",
-      "sha256": "1801173bc54bfcf4f4413655dcda13a1d59c347c4b1f11b473b9a42285745271",
+      "sha256": "a8b53390473868a4bcc4ecc607cb5614d027225f900f2e73959e8c89c2647631",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
         "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt"
+        "extra/licenses/SPICE.txt",
+        "extra/licenses/esajpip.txt"
       ],
       "external_notices": [
         "resources/licenses/FFmpeg-Notices.txt",
@@ -403,17 +393,19 @@
         "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libEGL.so",
         "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libGLESv2.so",
         "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libJNISpice.so",
+        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libjhvj2k.so",
         "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libkdu_jni.so"
       ]
     },
     {
       "path": "lib/jhv/jhv-natives-macos-arm64.jar",
-      "sha256": "ed063bd75813b3902396d991c48834003dbf4a9503e8dc80548371f9ee2241d2",
+      "sha256": "923ad8c112efa612625feaefaec46e500ca40357de8f5297ad3dce3a926d0d74",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
         "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt"
+        "extra/licenses/SPICE.txt",
+        "extra/licenses/esajpip.txt"
       ],
       "external_notices": [
         "resources/licenses/FFmpeg-Notices.txt",
@@ -424,17 +416,19 @@
         "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libEGL.dylib",
         "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libGLESv2.dylib",
         "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libJNISpice.dylib",
+        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libjhvj2k.dylib",
         "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libkdu_jni.dylib"
       ]
     },
     {
       "path": "lib/jhv/jhv-natives-macos.jar",
-      "sha256": "805699a54a20fd46c3e71b14d0289b875c802338542d837af39b1cbdd7d48bd8",
+      "sha256": "cdd2c1adae545928202c639892f9743dcaab76f76a0222aced7efd6498138b43",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
         "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt"
+        "extra/licenses/SPICE.txt",
+        "extra/licenses/esajpip.txt"
       ],
       "external_notices": [
         "resources/licenses/FFmpeg-Notices.txt",
@@ -445,17 +439,19 @@
         "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libEGL.dylib",
         "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libGLESv2.dylib",
         "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libJNISpice.dylib",
+        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libjhvj2k.dylib",
         "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libkdu_jni.dylib"
       ]
     },
     {
       "path": "lib/jhv/jhv-natives-windows.jar",
-      "sha256": "e7afd668a4df382fce1a960d113b596e8994228d6617cd4ed6f966b605959556",
+      "sha256": "de493ccddb91d7450eeb5c265bef3fd6502ba895f3d003ec514b1ca1eea7529f",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
         "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt"
+        "extra/licenses/SPICE.txt",
+        "extra/licenses/esajpip.txt"
       ],
       "external_notices": [
         "resources/licenses/FFmpeg-Notices.txt",
@@ -464,6 +460,7 @@
       "native_members": [
         "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/JNISpice.dll",
         "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/ffmpeg",
+        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/jhvj2k.dll",
         "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/kdu_jni.dll",
         "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/kdu_v7AR.dll",
         "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/libEGL.dll",
@@ -917,8 +914,8 @@
       "native_members": []
     },
     {
-      "path": "lib/square/kotlin-stdlib-2.4.10.jar",
-      "sha256": "4ec0293bc3751423b203f1d8493251c57c42e73eb6377a6b8560d0974ff0a6df",
+      "path": "lib/square/kotlin-stdlib-2.4.20.jar",
+      "sha256": "2226de463d309d4a5500a481320b3dea515a6981dcae1def531fbc158884e25f",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -928,8 +925,8 @@
       "native_members": []
     },
     {
-      "path": "lib/square/logging-interceptor-5.4.0.jar",
-      "sha256": "44abfdb49fb13ac012ae4a36bfb734eba9ad5479cb09361b84f053b6b809ee47",
+      "path": "lib/square/logging-interceptor-5.5.0.jar",
+      "sha256": "ef9c93cea95f764a44c140a9f252ecf4f45358ec929f31c911d94f209ac54fab",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -939,8 +936,8 @@
       "native_members": []
     },
     {
-      "path": "lib/square/okhttp-jvm-5.4.0.jar",
-      "sha256": "b15e605ca0a4b12c62ea7f657dad413c236c947e875854767349cdbe20df473c",
+      "path": "lib/square/okhttp-jvm-5.5.0.jar",
+      "sha256": "234194a04aac54858df0a750d243af7b2e39df5e4eb86e9912043ad33a9f9a52",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -950,8 +947,8 @@
       "native_members": []
     },
     {
-      "path": "lib/square/okio-jvm-3.18.1.jar",
-      "sha256": "b97b640557a650d15411f2be29aef558c4e422a83653cb18ba494311dbed18be",
+      "path": "lib/square/okio-jvm-3.18.2.jar",
+      "sha256": "681fed549d1d2c63710f42c9eab433d642c71af778babd67035c50f8c425aaff",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [

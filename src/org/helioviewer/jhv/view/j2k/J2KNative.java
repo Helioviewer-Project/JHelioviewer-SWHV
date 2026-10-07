@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 public final class J2KNative implements AutoCloseable {
 
     // The client refused a response: the source must not be fed any further.
+    @SuppressWarnings("serial")
     static final class Refused extends IOException {
         Refused(String message) {
             super(message);

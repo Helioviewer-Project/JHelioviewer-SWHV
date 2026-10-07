@@ -66,6 +66,7 @@ ADDITIONAL_NOTICES = {
 # Native libraries are detected from actual archive members, not JAR names.
 # Keys omit the platform's "lib" prefix and shared-library extension.
 NATIVE_NOTICES = {
+    "jhvj2k": ("esajpip.txt",),
     "EGL": ("ANGLE.txt",),
     "GLESv2": ("ANGLE.txt",),
     "JNISpice": ("SPICE.txt",),

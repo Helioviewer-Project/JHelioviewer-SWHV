@@ -14,10 +14,10 @@ License terms are included in Apache-2.0.txt.
 
 Supplemental notices: Annotations.txt.
 
-lib/caffeine-3.2.4.jar
+lib/caffeine-3.3.0.jar
 ----------------------
 
-Source: lib/caffeine-3.2.4.jar!META-INF/LICENSE
+Source: lib/caffeine-3.3.0.jar!META-INF/LICENSE
 
 License terms are included in Apache-2.0.txt.
 
@@ -160,24 +160,19 @@ The Apache Software License, Version 2.0
 http://www.apache.org/licenses/LICENSE-2.0.txt
 License terms are included in Apache-2.0.txt.
 
-lib/formats/json-20260719.jar
+lib/formats/json-20260814.jar
 -----------------------------
 
-Declared in lib/formats/json-20260719.jar!META-INF/maven/org.json/json/pom.xml:
+Declared in lib/formats/json-20260814.jar!META-INF/maven/org.json/json/pom.xml:
 Public Domain
 https://github.com/stleary/JSON-java/blob/master/LICENSE
 
 Supplemental notices: JSON.txt.
 
-lib/formats/kdu_jni.jar
------------------------
+lib/formats/nom-tam-fits-master-bbebf33.jar
+-------------------------------------------
 
-Separately maintained notices: Kakadu.txt.
-
-lib/formats/nom-tam-fits-1.22.0.jar
------------------------------------
-
-Source: lib/formats/nom-tam-fits-1.22.0.jar!LICENSE.txt
+Source: lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt
 
 The Unlicense
 
@@ -206,7 +201,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 
-Declared in lib/formats/nom-tam-fits-1.22.0.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
+Declared in lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
 Public Domain
 file://${project.basedir}/src/license/publicdomain/license.txt
 
@@ -372,38 +367,38 @@ Copyright 2007-2026 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-lib/guava-33.6.0-jre.jar
+lib/guava-33.7.1-jre.jar
 ------------------------
 
-Source: lib/guava-33.6.0-jre.jar!META-INF/LICENSE
+Source: lib/guava-33.7.1-jre.jar!META-INF/LICENSE
 
 License terms are included in Apache-2.0.txt.
 
 lib/jhv/jhv-natives-linux.jar
 -----------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt.
+Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
 
 Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
 
 lib/jhv/jhv-natives-macos-arm64.jar
 -----------------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt.
+Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
 
 Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
 
 lib/jhv/jhv-natives-macos.jar
 -----------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt.
+Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
 
 Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
 
 lib/jhv/jhv-natives-windows.jar
 -------------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt.
+Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
 
 Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
 
@@ -622,22 +617,22 @@ The Apache Software License, Version 2.0
 https://www.apache.org/licenses/LICENSE-2.0.txt
 License terms are included in Apache-2.0.txt.
 
-lib/square/kotlin-stdlib-2.4.10.jar
+lib/square/kotlin-stdlib-2.4.20.jar
 -----------------------------------
 
 Supplemental notices: Kotlin.txt.
 
-lib/square/logging-interceptor-5.4.0.jar
+lib/square/logging-interceptor-5.5.0.jar
 ----------------------------------------
 
 Supplemental notices: OkHttp.txt.
 
-lib/square/okhttp-jvm-5.4.0.jar
+lib/square/okhttp-jvm-5.5.0.jar
 -------------------------------
 
 Supplemental notices: OkHttp.txt.
 
-lib/square/okio-jvm-3.18.1.jar
+lib/square/okio-jvm-3.18.2.jar
 ------------------------------
 
 Supplemental notices: Okio.txt.
