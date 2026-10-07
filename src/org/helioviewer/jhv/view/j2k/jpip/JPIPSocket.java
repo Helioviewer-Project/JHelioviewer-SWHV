@@ -102,21 +102,21 @@ public final class JPIPSocket extends HTTPSocket {
         return buf + "len=" + len;
     }
 
-    private String createFrameQuery(int frame, String size) {
-        return createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", size, "roff", "0,0");
+    private String createFrameQuery(int frame, String size, String region) {
+        return createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", String.valueOf(frame), "fsiz", size + ",closest", "rsiz", region, "roff", "0,0");
     }
 
     // prime first image
     public void prime(JPIPCache cache) throws KduException, IOException {
         JPIPResponse res;
-        String req = createFrameQuery(0, "64,64");
+        String req = createFrameQuery(0, "64,64", "64,64");
         do {
             res = requestInitialization(req, cache);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
     }
 
-    public void sendFrame(int frame, String size) throws IOException {
-        writeRequest(createFrameQuery(frame, size));
+    public void sendFrame(int frame, String size, String region) throws IOException {
+        writeRequest(createFrameQuery(frame, size, region));
         pendingFrames.addLast(frame);
     }
 

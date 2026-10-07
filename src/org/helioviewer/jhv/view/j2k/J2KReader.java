@@ -128,9 +128,19 @@ class J2KReader implements Runnable {
         return isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
     }
 
-    private boolean readFrames(J2KParams.Read params, String size, boolean singleFrame) throws KduException, IOException {
+    // True once the frame is known to have this size at this level.
+    private static boolean hasSize(J2KSource.Remote source, int frame, ResolutionSet.Level size) {
+        if (source.getFrameStatus(frame, 0) == null)
+            return false;
+        ResolutionSet.Level own = source.resolutionSet(frame).getLevel(size.level());
+        return own.width() == size.width() && own.height() == size.height();
+    }
+
+    private boolean readFrames(J2KParams.Read params, ResolutionSet.Level resLevel, boolean singleFrame) throws KduException, IOException {
         J2KSource.Remote source = params.source();
         J2KParams.Decode decode = params.decodeParams();
+        String size = resLevel.width() + "," + resLevel.height();
+        String padded = (resLevel.width() + 1) + "," + (resLevel.height() + 1);
         ArrayDeque<Integer> remaining = new ArrayDeque<>();
         if (singleFrame) {
             remaining.add(decode.frame);
@@ -152,7 +162,8 @@ class J2KReader implements Runnable {
             if (!draining && socket.pendingCount() < limit && !remaining.isEmpty()) {
                 frame = remaining.removeFirst();
                 if (!restoreFrame(source, frame, decode.level)) {
-                    socket.sendFrame(frame, size);
+                    // An exact size lets the region be padded to reach the edge precincts.
+                    socket.sendFrame(frame, size, hasSize(source, frame, resLevel) ? padded : size);
                     continue;
                 }
                 complete = true;
@@ -192,8 +203,6 @@ class J2KReader implements Runnable {
             int frame = decodeParams.frame;
             int level = decodeParams.level;
             ResolutionSet.Level resLevel = source.resolutionSet(frame).getLevel(level);
-            int width = resLevel.width();
-            int height = resLevel.height();
 
             view.setDownloading(true);
 
@@ -206,8 +215,7 @@ class J2KReader implements Runnable {
                 }
 
                 boolean singleFrame = cacheKey.length <= 1 || params.priority();
-                String size = width + "," + height;
-                boolean finished = readFrames(params, size, singleFrame);
+                boolean finished = readFrames(params, resLevel, singleFrame);
 
                 // suicide if fully done
                 if (source.isComplete(0)) {

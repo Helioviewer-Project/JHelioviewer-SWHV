@@ -62,7 +62,7 @@ public final class MovieReaderTest {
                     socketField.setAccessible(true);
                     ((JPIPSocket) socketField.get(reader)).abort(); // The pump must satisfy every frame from cache.
                 }
-                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, String.class, boolean.class);
+                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
                 readFrames.setAccessible(true);
                 ResolutionSet.Level size = source.resolutionSet(0).getLevel(0);
                 J2KParams.Read params = new J2KParams.Read(null, source,
@@ -91,19 +91,19 @@ public final class MovieReaderTest {
                     Field queueField = J2KReader.class.getDeclaredField("signalQueue");
                     queueField.setAccessible(true);
                     queueField.set(reader, signals);
-                    if ((boolean) readFrames.invoke(reader, params, "4096,4096", false))
+                    if ((boolean) readFrames.invoke(reader, params, size, false))
                         throw new AssertionError("Pump ignored newer work");
                     if (source.getFrameStatus(0, 0) == null || source.getFrameStatus(1, 0) == null
                             || source.getFrameStatus(2, 0) != null)
                         throw new AssertionError("Pump did not stop after draining the two sent responses");
                     signals.clear();
                 }
-                if (!(boolean) readFrames.invoke(reader, params, "4096,4096", false))
+                if (!(boolean) readFrames.invoke(reader, params, size, false))
                     throw new AssertionError("Prefetch interrupted unexpectedly");
             } else {
                 for (int frame = 0; frame < 4; frame++) {
                     do {
-                        socket.sendFrame(frame, "4096,4096");
+                        socket.sendFrame(frame, "4096,4096", "4096,4096");
                     } while (!socket.receiveFrame(source.cache()).complete());
                     source.setFrameComplete(frame, 0);
                 }

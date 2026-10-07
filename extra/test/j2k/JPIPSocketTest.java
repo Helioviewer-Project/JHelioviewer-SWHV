@@ -82,8 +82,8 @@ public final class JPIPSocketTest {
             });
             JPIPSocket client = new JPIPSocket(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), null);
             try {
-                client.sendFrame(0, "64,64");
-                client.sendFrame(1, "64,64");
+                client.sendFrame(0, "64,64", "64,64");
+                client.sendFrame(1, "64,64", "64,64");
                 if (client.pendingCount() != 2)
                     throw new AssertionError("Missing pending requests");
                 JPIPSocket.FrameResponse first = client.receiveFrame(null);
@@ -92,7 +92,7 @@ public final class JPIPSocketTest {
                 JPIPSocket.FrameResponse second = client.receiveFrame(null);
                 if (second.frame() != 1 || !second.complete() || client.pendingCount() != 0)
                     throw new AssertionError("Second response should belong to frame 1 and be complete");
-                client.sendFrame(0, "64,64");
+                client.sendFrame(0, "64,64", "64,64");
                 if (!client.receiveFrame(null).complete())
                     throw new AssertionError("Sequential request after draining failed");
                 if (!client.isClosed())
@@ -224,8 +224,8 @@ public final class JPIPSocketTest {
                 if (abort) {
                     Future<?> pending = workers.submit(() -> {
                         try {
-                            client.sendFrame(0, "64,64");
-                            client.sendFrame(1, "64,64");
+                            client.sendFrame(0, "64,64", "64,64");
+                            client.sendFrame(1, "64,64", "64,64");
                             client.receiveFrame(null);
                             throw new AssertionError("Stalled response completed successfully");
                         } catch (IOException expected) {

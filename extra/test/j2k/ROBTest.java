@@ -95,7 +95,7 @@ public final class ROBTest {
                             String query = "stream=0&fsiz=" + dimensions + ",closest&rsiz=" + dimensions + "&roff=0,0&len=16384";
                             complete = ((JPIPResponse) request.invoke(socket, query, source.cache())).isResponseComplete();
                         } else {
-                            socket.sendFrame(0, dimensions);
+                            socket.sendFrame(0, dimensions, dimensions);
                             complete = socket.receiveFrame(source.cache()).complete();
                         }
                     } while (!complete);
