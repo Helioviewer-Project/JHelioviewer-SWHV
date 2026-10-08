@@ -34,15 +34,12 @@ public class ManyView implements View {
         hasFITS = _views.stream().anyMatch(View::hasFITS);
         _views.forEach(this::putDates);
         frameMap.buildIndex();
-        Set<View> unique = new LinkedHashSet<>();
+        views = List.copyOf(new LinkedHashSet<>(_views));
         List<ClipSet> clipSets = new ArrayList<>();
         for (FrameInfo frameInfo : frameMap.values()) {
-            unique.add(frameInfo.view);
             clipSets.add(frameInfo.view.getClipSet());
         }
-        views = List.copyOf(unique);
         clipSet = ClipSet.median(clipSets);
-        // unused J2KViews should be abolished by their reaper
     }
 
     private void putDates(View v) {

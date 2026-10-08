@@ -175,7 +175,8 @@ public final class ImageBufferCacheTest {
         AtomicInteger visits = new AtomicInteger(), handlers = new AtomicInteger();
         List<View> views = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            long date = i * 3L;
+            // The second half repeats the first half's timestamps, shadowing an entire input collection.
+            long date = (i % (count / 2)) * 3L;
             Object id = new Object();
             views.add(new View() {
                 @Override public int getMaximumFrameNumber() { return 2; }
@@ -219,7 +220,7 @@ public final class ImageBufferCacheTest {
         } finally {
             ImageBufferCache.invalidateIf(key -> key instanceof OwnedKey);
         }
-        System.out.println("PASS: 2,000 views and 6,000 frames use one cache pass and one background source closer");
+        System.out.println("PASS: 2,000 views, including shadowed timestamps, use one cache pass and one background source closer");
     }
 
     private static DecodedImage image() {

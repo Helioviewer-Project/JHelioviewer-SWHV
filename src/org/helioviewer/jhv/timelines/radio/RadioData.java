@@ -11,7 +11,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -61,7 +61,6 @@ public final class RadioData extends TimelineLayer {
             .weigher((DecodeKey key, byte[] pixels) -> pixels.length)
             .build();
     private final HashMap<Long, RadioJP2Download> downloads = new HashMap<>();
-    private final HashSet<Long> failedDays = new HashSet<>();
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
     private IndexColorModel colorModel;
@@ -127,8 +126,8 @@ public final class RadioData extends TimelineLayer {
     private void clearCache() {
         cache.values().forEach(RadioJ2KData::removeData);
         cache.clear();
+        downloads.values().forEach(download -> download.thread.interrupt());
         downloads.clear();
-        failedDays.clear();
         DrawController.drawRequest();
     }
 
@@ -141,15 +140,23 @@ public final class RadioData extends TimelineLayer {
                 entry.getValue().removeData();
             return remove;
         });
-        changed |= downloads.keySet().removeIf(date -> date < first || date > end);
-        failedDays.removeIf(date -> date < first || date > end);
+        Iterator<RadioJP2Download> pending = downloads.values().iterator();
+        while (pending.hasNext()) {
+            RadioJP2Download download = pending.next();
+            if (download.date < first || download.date > end) {
+                download.thread.interrupt();
+                pending.remove();
+                changed = true;
+            }
+        }
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
-            if (!downloads.containsKey(date) && !cache.containsKey(date) && !failedDays.contains(date)) {
+            if (!downloads.containsKey(date) && !cache.containsKey(date)) {
                 RadioJP2Download download = new RadioJP2Download(date);
                 downloads.put(date, download);
                 changed = true;
-                Task.submitBackground(download, result -> onSuccessRadioJP2(download, result),
+                Task.submit(task -> download.thread = Thread.ofVirtual().name("Radio-Download").start(task),
+                        download, result -> onSuccessRadioJP2(download, result),
                         t -> onFailureRadioJP2(download, t));
             }
         }
@@ -159,6 +166,8 @@ public final class RadioData extends TimelineLayer {
 
     private final class RadioJP2Download implements Callable<RadioJ2KData> {
         private final long date;
+        // Owned by the EDT. Interrupt I/O but keep the result callback to close obsolete days.
+        private Thread thread;
 
         RadioJP2Download(long _date) {
             date = _date;
@@ -189,10 +198,8 @@ public final class RadioData extends TimelineLayer {
         if (finishDownload(download)) {
             if (AppThread.isInterrupted(t))
                 Log.warn(t);
-            else {
-                failedDays.add(download.date);
+            else
                 Log.errorStack(t);
-            }
         }
     }
 

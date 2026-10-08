@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
@@ -17,7 +17,7 @@ import org.helioviewer.jhv.app.Message;
 public final class Task {
 
     // Work runs on the supplied executor; success and failure callbacks run on the EDT.
-    public static <T> Future<T> submit(@Nonnull ExecutorService executor, @Nonnull Callable<T> task,
+    public static <T> Future<T> submit(@Nonnull Executor executor, @Nonnull Callable<T> task,
                                        @Nonnull Consumer<T> onSuccess, @Nonnull Consumer<Throwable> onFailure) {
         FutureTask<T> futureTask = new FutureTask<>(task) {
             @Override

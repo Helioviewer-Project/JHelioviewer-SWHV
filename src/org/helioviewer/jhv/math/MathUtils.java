@@ -6,14 +6,6 @@ public class MathUtils {
 
     private static final double LN_2 = Math.log(2);
 
-    public static int min(int... _is) {
-        int min = Integer.MAX_VALUE;
-        for (int i : _is)
-            if (min > i)
-                min = i;
-        return min;
-    }
-
     public static double mapTo0To360(double x) {
         x %= 360.;
         if (x < 0)

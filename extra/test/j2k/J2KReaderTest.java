@@ -116,6 +116,11 @@ public final class J2KReaderTest {
                     if (retries.getInt(reader) != 0)
                         throw new AssertionError("Completed or restored frames did not reset consecutive failures");
                 }
+                if (source.getPartialUntil() < frames - 1)
+                    throw new AssertionError("Displayable prefix did not advance through retrieved frames");
+                if (frames == 1 && (!source.isComplete(level)
+                        || (mode == Mode.PREFETCH && level > 0 && source.isComplete(level - 1))))
+                    throw new AssertionError("Source completion does not match the retrieved level");
                 for (int frame = 0; frame < frames; frame++) {
                     if (!source.resolutionSet(frame).getLevel(level).equals(size))
                         throw new AssertionError("Fixture frames have different resolution grids");

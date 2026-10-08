@@ -19,6 +19,9 @@ public final class J2KSource {
     private final J2KNative client;
     // An entry exists once the frame's header is known.
     private AtomicReferenceArray<ResolutionSet> sets;
+    // Prefix lengths advanced only by update(), published to the EDT and reader.
+    private volatile int displayableFrames;
+    private volatile int completeFrames;
 
     // A local file, or an empty JPIP source for null.
     public J2KSource(@Nullable Path path) throws IOException {
@@ -68,9 +71,26 @@ public final class J2KSource {
                 resolutions[i] = new ResolutionSet.Level(i, width, height);
             }
             set = new ResolutionSet(resolutions, info.channels());
+            set.setCompleteLevels(info.ready());
             sets.set(frame, set);
+        } else {
+            set.setCompleteLevels(info.ready());
         }
-        set.setCompleteLevels(info.ready());
+
+        // A complete coarsest level makes the frame displayable.
+        displayableFrames = completeUntil(displayableFrames, Integer.MAX_VALUE);
+        completeFrames = completeUntil(completeFrames, 0);
+    }
+
+    // The first frame at or after from without a complete level.
+    private int completeUntil(int from, int level) {
+        while (from < sets.length()) {
+            ResolutionSet set = sets.get(from);
+            if (set == null || !set.getComplete(level))
+                break;
+            from++;
+        }
+        return from;
     }
 
     @Nullable
@@ -121,25 +141,19 @@ public final class J2KSource {
     // Null: not displayable; false: displayable, incomplete at the level; true: complete at the level.
     @Nullable
     Boolean getFrameStatus(int frame, int level) {
+        if (completeFrames == sets.length())
+            return true;
         ResolutionSet set = sets.get(frame);
         return set != null && set.isDisplayable() ? set.getComplete(level) : null;
     }
 
     // The last frame of the displayable prefix.
     int getPartialUntil() {
-        int i = 0;
-        while (i < sets.length() && getFrameStatus(i, 0) != null)
-            i++;
-        return Math.max(0, i - 1);
+        return Math.max(0, displayableFrames - 1);
     }
 
     boolean isComplete(int level) {
-        for (int i = 0; i < sets.length(); i++) {
-            ResolutionSet set = sets.get(i);
-            if (set == null || !set.getComplete(level))
-                return false;
-        }
-        return true;
+        return completeUntil(completeFrames, level) == frames();
     }
 
     // Acquire the input before allocating pixels. The job outlives close().
