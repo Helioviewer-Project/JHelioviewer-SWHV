@@ -96,7 +96,7 @@ public class BaseView implements View {
     }
 
     protected final LatestWorker.Callback<DecodedImage> decodeCallback(
-            Object key, int frame, Position viewpoint,
+            ImageBufferCache.Key key, int frame, Position viewpoint,
             BooleanSupplier isCurrent, Consumer<Throwable> failureHandler) {
         return new LatestWorker.Callback<>() {
             @Override

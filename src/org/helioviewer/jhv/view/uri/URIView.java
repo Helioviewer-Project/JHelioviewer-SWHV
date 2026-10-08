@@ -74,15 +74,11 @@ public final class URIView extends BaseView {
             sendDataToHandler(0, viewpoint, image, () -> key.equals(decodeKey()));
             return;
         }
-        ImageFilter filter = createFilter(key.filter());
+        ImageFilter filter = ImageFilter.of(key.filter(), imageRegion, metaData[0]);
         executor.submit(
                 () -> decodeImage(key, filter),
                 decodeCallback(key, 0, viewpoint,
                         () -> key.equals(decodeKey()), Log::errorStack));
-    }
-
-    private ImageFilter createFilter(ImageFilter.Type type) {
-        return ImageFilter.of(type, imageRegion, metaData[0]);
     }
 
     @Nullable

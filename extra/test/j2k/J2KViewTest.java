@@ -98,7 +98,7 @@ public final class J2KViewTest {
             show(view, 0, Integer.MAX_VALUE);
             await(view, frames - 1);
             // A finer level of the shown frame is fetched and delivered without another request to decode.
-            ResolutionSet.Level finer = view.getResolutionLevel(0, 3);
+            ResolutionSet.Level finer = source(view).level(0, 3);
             show(view, 0, 3);
             View.ImageData image;
             do {
@@ -131,15 +131,15 @@ public final class J2KViewTest {
         System.exit(0);
     }
 
-    private record Abandoned(WeakReference<J2KView> view, J2KNative client, Object key, DecodedImage image) {}
+    private record Abandoned(WeakReference<J2KView> view, J2KNative client, ImageBufferCache.Key key, DecodedImage image) {}
 
     private static Abandoned abandon(URI uri) throws Exception {
         J2KView view = open(uri);
-        J2KNative client = ((J2KSource) field(J2KView.class, view, "source")).client();
+        J2KNative client = source(view).client();
         Constructor<?> constructor = Class.forName(J2KView.class.getName() + "$DecodeKey")
                 .getDeclaredConstructor(int.class, J2KParams.Decode.class, ImageFilter.Type.class);
         constructor.setAccessible(true);
-        Object key = constructor.newInstance(field(J2KView.class, view, "serial"), new J2KParams.Decode(0, 0), ImageFilter.Type.None);
+        ImageBufferCache.Key key = (ImageBufferCache.Key) constructor.newInstance(field(J2KView.class, view, "serial"), new J2KParams.Decode(0, 0), ImageFilter.Type.None);
         DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null);
         ImageBufferCache.put(key, image);
         return new Abandoned(new WeakReference<>(view), client, key, image);
@@ -174,7 +174,7 @@ public final class J2KViewTest {
     @SuppressWarnings("unchecked")
     private static void checkResolutionSelection(J2KView view) throws Exception {
         // Before signalling the reader, exercise the selector with square, tall, wide and unequal-scale geometry.
-        J2KSource source = (J2KSource) field(J2KView.class, view, "source");
+        J2KSource source = source(view);
         AtomicReferenceArray<ResolutionSet> sets = (AtomicReferenceArray<ResolutionSet>) field(J2KSource.class, source, "sets");
         MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
         ResolutionSet originalSet = sets.get(0);
@@ -206,7 +206,7 @@ public final class J2KViewTest {
     }
 
     private static void checkRefresh(J2KView view) throws Exception {
-        ResolutionSet.Level size = view.getResolutionLevel(0, Integer.MAX_VALUE);
+        ResolutionSet.Level size = source(view).level(0, Integer.MAX_VALUE);
         MetaData metadata = view.getMetaData(view.getFrameTime(0));
         Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
         double scale = size.height() / metadata.getPhysicalRegion().height;
@@ -276,7 +276,7 @@ public final class J2KViewTest {
 
             String[] hashes = new String[frames];
             for (int frame = 0; frame < frames; frame++) {
-                ResolutionSet.Level size = view.getResolutionLevel(frame, 4);
+                ResolutionSet.Level size = source(view).level(frame, 4);
                 show(view, frame, 4);
                 View.ImageData image = images.poll(60, TimeUnit.SECONDS);
                 if (image == null || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
@@ -290,6 +290,10 @@ public final class J2KViewTest {
         } finally {
             close(view);
         }
+    }
+
+    private static J2KSource source(J2KView view) throws Exception {
+        return (J2KSource) field(J2KView.class, view, "source");
     }
 
     private static J2KView open(URI uri) throws Exception {
@@ -328,7 +332,7 @@ public final class J2KViewTest {
     // Asks for a frame at the level a display of that level's height would want.
     private static void show(J2KView view, int frame, int level) throws Exception {
         MetaData metadata = view.getMetaData(view.getFrameTime(frame));
-        double scale = view.getResolutionLevel(frame, level).height() / metadata.getPhysicalRegion().height;
+        double scale = source(view).level(frame, level).height() / metadata.getPhysicalRegion().height;
         AtomicBoolean selected = new AtomicBoolean();
         clearImages();
         EventQueue.invokeAndWait(() -> {
@@ -579,7 +583,7 @@ public final class J2KViewTest {
             J2KView view = open(uri, new APIRequest("ROB", 10, 0, 0, APIRequest.CADENCE_ALL));
             J2KReader reader = (J2KReader) field(J2KView.class, view, "reader");
             try {
-                J2KSource source = (J2KSource) field(J2KView.class, view, "source");
+                J2KSource source = source(view);
                 MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
                 String[] keys = (String[]) field(J2KReader.class, reader, "cacheKey");
                 for (int i = 0; i < keys.length; i++) {

@@ -1,124 +1,80 @@
 # Image Buffer Cache
 
-`ImageBufferCache` stores decoded image data so that JHV can reuse it instead of
-decoding the same frame, region, resolution level, and filter combination again.
-This matters for playback, scrubbing, and synchronized layer updates: the viewer
-often returns to data that was decoded only moments earlier, and re-decoding that
-data is much more expensive than keeping it in a bounded cache.
+`ImageBufferCache` shares decoded solar images between `J2KView` and `URIView`.
+It stores `DecodedImage` instances, each containing an `ImageBuffer` with native
+pixels and a `Region` describing their physical extent. Reusing these images
+avoids decoding and filtering again during playback and scrubbing.
 
-The cache stores `ImageBuffer` instances. An `ImageBuffer` owns image pixels in
-native memory, because GL upload can consume native buffers directly. The cache
-therefore has two responsibilities: it avoids unnecessary decoding, and it keeps
-the native memory used by decoded images within a predictable budget.
+## Keys and eviction
 
-Each `ImageBuffer` also registers a fallback cleanup action with Java's
-`Cleaner` API. That cleanup action runs after the JVM proves that the registered
-object is no longer reachable, and it releases the native memory if normal cache
-cleanup did not get there first. This is only the last safety net, not a cache
-eviction strategy. Playback tests with working sets larger than the cache showed
-that native allocations can outrun GC discovery of unreachable buffers,
-eventually exhausting OS virtual memory. The fallback cleanup is therefore
-deliberately conservative: it is registered on the direct `ByteBuffer` or
-`ShortBuffer` owned by the `ImageBuffer`, and it frees the recorded native
-address only after that buffer object is unreachable.
+Each key implements `ImageBufferCache.Key` and identifies its owning source:
 
-## Background
+- J2K keys contain the view's serial number, frame, resolution level, and filter.
+- URI keys contain the data URI, filter, FITS processing parameters, and clip range.
 
-Before JHV 5, image upload went through JOGL APIs that accepted Java heap
-buffers. If GL needed native memory, the heap-to-native copy was hidden inside
-the JOGL upload path. That made the application code simpler, but it also hid a
-large copy on the EDT/render thread, and JHV had no explicit object representing
-the lifetime of the native upload storage.
+The Guava cache has an 8 GiB byte budget, weighted by the native pixel storage.
+It uses least-recently-used eviction with one shared budget. Newly decoded images
+are admitted without a frequency-based admission rule. Images larger than the
+budget cannot remain cached.
 
-JHV 5 made the upload buffer explicit. Views publish `ImageBuffer` instances, and
-`GLImage` uploads from those buffers. For the common unfiltered J2K path,
-Kakadu decodes directly into the final native `ImageBuffer`, avoiding both the
-old hidden EDT upload copy and an intermediate heap-to-native copy in the decoder.
+Clearing a view removes its keys. `ManyView` collects the owners of its children
+and removes their entries in one pass, including when a layer contains thousands
+of local files. Closing native sources is separate from removing decoded images.
 
-The cache was centralized at the same time. Decoded image caches that had been
-local to `J2KView` and `URIView` now share `ImageBufferCache`, making the memory
-budget global and measurable. The tradeoff is that eviction has to respect image
-data that is still retained by layer state or already uploaded/rendering state.
+The budget covers cached pixels. Images retained by a layer or a pending delivery
+can remain allocated after eviction, and in-flight decodes also allocate outside
+of the cache budget.
 
-## Decode Paths
+## Ownership and cleanup
 
-Not every decoder can produce an `ImageBuffer` in the same way. The policy is to
-write native buffers directly where that removes a hot-path copy, and to keep
-heap arrays where Java-side decoding or filtering needs array access.
+`DecodedImage` has explicit reference ownership. The decoder creates it with one
+reference. Once published, references are retained and released on the EDT.
 
-Unfiltered J2K data is the critical playback path. `J2KSource.decode` lets Kakadu
-write directly into the final native `ImageBuffer`, so the decoded
-data is already in the form needed by GL upload.
+1. `LatestWorker` runs decoding off the EDT and posts the result callback to the EDT.
+2. `BaseView.decodeCallback` closes a result if the view is detached or its
+   processing settings have changed. Otherwise it transfers the decoder's
+   reference to the cache. A valid superseded result can be cached without being
+   delivered.
+3. `ImageBufferCache.get` returns a borrowed image for the current EDT turn.
+   Keeping it beyond that turn requires `retain()`.
+4. `BaseView.sendDataToHandler` retains a reference for its queued delivery and
+   releases it in `finally`, even if the view has detached before delivery.
+5. `ImageLayer` retains a reference for each occupied current, previous, or base
+   image slot. Replacing a slot releases its previous image. Detaching the view
+   clears all three slots immediately.
+6. Cache replacement, eviction, and explicit invalidation post `close()` to the
+   EDT. This preserves images borrowed earlier in that EDT turn.
+7. The last `close()` frees the native pixels. Retaining or releasing an already
+   released image throws `IllegalStateException`, including with assertions disabled.
 
-Filtered gray J2K data goes through a heap array. `ImageFilter` operates on Java
-arrays, so the pixels are decoded into a native buffer of that decode, copied to
-the array, and the final `ImageBuffer` is constructed after filtering.
+CPU pixel cleanup does not require repainting. An invalidation's queued cache
+release runs on the EDT; retained layer and delivery references keep an image
+alive only until their own release. GL resource disposal still requires a render
+context and is separate from CPU pixel ownership. `GLSLImage` keeps buffer
+identity to avoid redundant uploads; the layer slots own the pixels it uploads.
 
-FITS decoding starts from Java-accessible FITS pixel storage. The reader does
-scaling, clipping, and blank-pixel handling in Java, then writes display pixels
-through `ImageBuffer.WriteBuffer`. With `ImageFilter.None`, that write buffer is
-already the final native `ImageBuffer`. Filtered FITS data uses a heap array
-first, because `ImageFilter` operates on arrays.
+`ImageBuffer` also registers a `Cleaner` action on its direct buffer as a fallback
+for unreachable allocations. Explicit release invokes that action directly.
+Normal cache and layer cleanup uses reference ownership rather than waiting for GC.
 
-Generic image loading goes through `ImageIO` and `BufferedImage`. Gray images can
-reuse raster arrays. Other image formats are converted through
-`NativeImageFactory.createRGBAPremultipliedImage()`, because Java does not
-provide a standard byte-RGBA-premultiplied `BufferedImage` type. That RGBA path
-currently copies native image data back to a heap array before creating an
-`ImageBuffer`. This could be improved, but it is not the critical AIA playback
-path.
+## Decode paths
 
-## Cleanup Policy
+- Unfiltered J2K decoding writes directly into the final native buffer. The view
+  acquires the native decode job before allocating output pixels.
+- Gray J2K filtering reads that buffer into Java arrays and creates a half-float
+  output buffer. `ImageBuffer.WriteBuffer.finish(filter)` frees the input even if
+  filtering fails. RGBA data bypasses gray-image filtering.
+- FITS decoding writes display pixels through `ImageBuffer.WriteBuffer`, applying
+  the same filtering and ownership transfer when the buffer is finished.
+- Generic gray and indexed images use raster arrays. Other images are converted
+  to premultiplied RGBA native storage, copied into the final write buffer, and
+  the conversion storage is freed in `finally`.
 
-Cache eviction does not close an `ImageBuffer` immediately. It retires the
-buffer. Retired buffers are then reaped later, after rendering code reports which
-buffers are still retained.
+An unfinished `WriteBuffer` frees its pixels on `close()`. After `finish()`, the
+returned image owns those pixels and closing the writer does not free them.
 
-The important distinction is between a buffer that merely exists transiently and
-a buffer that has entered the live image/render path. Only the latter is part of
-the deterministic cleanup contract. Buffers that are decoded but never accepted
-by an `ImageLayer` are left to normal reachability plus the `Cleaner` fallback.
-
-This keeps the cache cleanup path deliberately narrow. `ImageBufferCache` owns
-cache membership and retired-buffer cleanup; it does not try to model every short
-temporary reference held by decode or callback code.
-
-## Ownership Contract
-
-- `ImageBufferCache.get()` and `ImageBufferCache.put()` are plain cache
-  operations. Cache access does not imply UI ownership.
-- Cache eviction retires an `ImageBuffer`; it does not immediately free the
-  native memory.
-- `J2KView` and `URIView` deliver decoded buffers to
-  `View.DataHandler.handleData()` directly from the decode callback. The
-  callback itself is already scheduled on the EDT by `EDTCallbackExecutor`.
-- `ImageLayer.handleData()` accepts the `ImageData` into layer state and then
-  requests display/time updates.
-- Non-layer handlers that copy the image data and do not retain the
-  `ImageBuffer`, such as `RadioJ2KData`, do not participate in retained-buffer
-  tracking.
-- `Layers` collects buffers currently retained by `ImageLayer` and by uploaded
-  `GLImage` state.
-- `ImageBufferCache.reap()` may explicitly free retired buffers only when they
-  are not in that retained set.
-- Retired buffers are tracked weakly, so retired-cache bookkeeping does not keep
-  buffers alive by itself.
-
-## Fragile Points
-
-The following changes look local, but alter ownership semantics:
-
-- Treating `get()` or `put()` as UI ownership would conflate cache access with
-  publishing a buffer to a layer.
-- Freeing directly from the Caffeine removal listener would be too early,
-  because the buffer may still be retained by `ImageLayer` state or uploaded in
-  `GLImage`.
-- Grace periods are deliberately avoided. A fixed number of render passes is a
-  guess, not an ownership rule.
-- Decode callback handoffs are not tracked as a separate ownership state. A
-  buffer becomes part of deterministic cleanup once a retaining owner reports it.
-
-Changes to this contract should be reviewed across the whole decode-to-render
-path, not just in the class being edited. In particular, check `J2KView`,
-`URIView`, `ImageLayer`, `Layers`, `GLImage`, and any non-layer
-`View.DataHandler` implementation that receives `ImageBuffer`.
+Radio spectrograms use a separate path: `J2KSource.decode` returns scalar heap
+bytes, freeing its temporary native buffer in `finally`. `RadioData` caches those
+crops with soft values and a byte budget, while the displayed `BufferedImage`
+holds its current crop. Colormap changes reuse the scalar pixels. Radio does not
+participate in `DecodedImage` reference ownership or `ImageBufferCache`.

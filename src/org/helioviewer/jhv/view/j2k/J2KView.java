@@ -368,8 +368,4 @@ public final class J2KView extends BaseView {
         return xmlMetaData[targetFrame];
     }
 
-    ResolutionSet.Level getResolutionLevel(int frame, int level) {
-        return source.resolutionSet(frame).getLevel(level);
-    }
-
 }

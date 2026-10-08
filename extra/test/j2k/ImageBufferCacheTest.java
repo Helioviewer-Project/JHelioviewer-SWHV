@@ -38,6 +38,8 @@ public final class ImageBufferCacheTest {
         System.out.println("PASS: release checks without assertions, weighted LRU, resolution changes, removal, held and queued images and replacement without repainting");
     }
 
+    private record TestKey(Object owner, int frame) implements ImageBufferCache.Key {}
+
     private record OwnedKey(Object id, int frame, AtomicInteger visits) implements ImageBufferCache.Key {
         @Override
         public Object owner() {
@@ -203,12 +205,12 @@ public final class ImageBufferCacheTest {
         for (DecodedImage image : images) {
             if (!allocated(image))
                 throw new AssertionError("Native allocator tracking is not enabled");
-            ImageBufferCache.put(image, image);
+            ImageBufferCache.put(new TestKey(image, 0), image);
         }
-        EventQueue.invokeAndWait(() -> ImageBufferCache.invalidateIf(key -> key instanceof DecodedImage));
+        EventQueue.invokeAndWait(() -> ImageBufferCache.invalidateIf(key -> key instanceof TestKey));
         for (DecodedImage image : images) {
             await(() -> !allocated(image), "Removed image required repainting or garbage collection");
-            if (ImageBufferCache.get(image) != null)
+            if (ImageBufferCache.get(new TestKey(image, 0)) != null)
                 throw new AssertionError("Removed image remains cached");
         }
     }
@@ -221,9 +223,9 @@ public final class ImageBufferCacheTest {
                 shared.retain();
             queued.retain();
             queued.retain();
-            ImageBufferCache.put(shared, shared);
-            ImageBufferCache.put(queued, queued);
-            ImageBufferCache.invalidateIf(key -> key instanceof DecodedImage);
+            ImageBufferCache.put(new TestKey(shared, 0), shared);
+            ImageBufferCache.put(new TestKey(queued, 0), queued);
+            ImageBufferCache.invalidateIf(key -> key instanceof TestKey);
         });
         EventQueue.invokeAndWait(() -> {});
         if (!allocated(shared) || !allocated(queued))
@@ -243,7 +245,7 @@ public final class ImageBufferCacheTest {
     }
 
     private static void replacementAndEviction() throws Exception {
-        Object key = new Object();
+        TestKey key = new TestKey(new Object(), 0);
         DecodedImage first = image(), second = image();
         ImageBufferCache.put(key, first);
         ImageBufferCache.put(key, second);
@@ -252,7 +254,7 @@ public final class ImageBufferCacheTest {
             throw new AssertionError("Replacement image was freed");
         ImageBufferCache.invalidateIf(candidate -> candidate == key);
         await(() -> !allocated(second), "Replacement image was not freed on removal");
-        Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(1);
+        Cache<ImageBufferCache.Key, DecodedImage> cache = ImageBufferCache.createCache(1);
         DecodedImage third = image();
         cache.put(key, third);
         await(() -> !allocated(third), "Oversized image was not freed");
@@ -263,20 +265,20 @@ public final class ImageBufferCacheTest {
     private static void weightedLRU() throws Exception {
         DecodedImage first = image(), second = image(), third = image();
         DecodedImage large = new DecodedImage(ImageBuffer.fromBytes(512, 256, ImageBuffer.Format.Gray8, new byte[512 * 256]), null);
-        Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(3L * first.imageBuffer().byteSize());
+        Cache<ImageBufferCache.Key, DecodedImage> cache = ImageBufferCache.createCache(3L * first.imageBuffer().byteSize());
         EventQueue.invokeAndWait(() -> {
-            cache.put(0, first);
-            cache.put(1, second);
-            cache.put(2, third);
+            cache.put(new TestKey("level", 0), first);
+            cache.put(new TestKey("level", 1), second);
+            cache.put(new TestKey("level", 2), third);
             // A frequently used image is still evicted once it is the least recently used.
             for (int repeat = 0; repeat < 100; repeat++)
-                cache.getIfPresent(0);
-            cache.getIfPresent(1);
-            cache.getIfPresent(2);
+                cache.getIfPresent(new TestKey("level", 0));
+            cache.getIfPresent(new TestKey("level", 1));
+            cache.getIfPresent(new TestKey("level", 2));
             first.retain(); // A layer may continue displaying an evicted image.
-            cache.put(3, large);
-            if (cache.getIfPresent(0) != null || cache.getIfPresent(1) != null
-                    || cache.getIfPresent(2) != third || cache.getIfPresent(3) != large)
+            cache.put(new TestKey("level", 3), large);
+            if (cache.getIfPresent(new TestKey("level", 0)) != null || cache.getIfPresent(new TestKey("level", 1)) != null
+                    || cache.getIfPresent(new TestKey("level", 2)) != third || cache.getIfPresent(new TestKey("level", 3)) != large)
                 throw new AssertionError("Eviction did not follow recency and byte weight");
         });
         await(() -> !allocated(second), "LRU eviction did not free the unheld image");
@@ -291,22 +293,22 @@ public final class ImageBufferCacheTest {
     private static void resolutionChange() throws Exception {
         // Scale the images and budget equally: 512 old frames fill the cache, as at 8 GiB with 4K grayscale.
         for (int side : new int[]{256, 128}) {
-            Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(512L * 256 * 256);
+            Cache<ImageBufferCache.Key, DecodedImage> cache = ImageBufferCache.createCache(512L * 256 * 256);
             ArrayList<DecodedImage> images = new ArrayList<>();
             EventQueue.invokeAndWait(() -> {
                 for (int frame = 0; frame < 512; frame++) {
                     DecodedImage image = image();
                     images.add(image);
-                    cache.put("old-" + frame, image);
+                    cache.put(new TestKey("old", frame), image);
                 }
                 for (int loop = 0; loop < 20; loop++) {
                     for (int frame = 0; frame < 512; frame++)
-                        cache.getIfPresent("old-" + frame);
+                        cache.getIfPresent(new TestKey("old", frame));
                 }
                 for (int loop = 0; loop < 3; loop++) {
                     int misses = 0;
                     for (int frame = 0; frame < 512; frame++) {
-                        String key = "new-" + frame;
+                        TestKey key = new TestKey("new", frame);
                         if (cache.getIfPresent(key) == null) {
                             misses++;
                             DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(side, side, ImageBuffer.Format.Gray8, new byte[side * side]), null);

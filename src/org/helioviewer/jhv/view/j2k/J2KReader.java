@@ -107,7 +107,7 @@ class J2KReader implements Runnable {
         }
     }
 
-    private static boolean isComplete(int reason) throws IOException {
+    private static boolean isWindowComplete(int reason) throws IOException {
         return switch (reason) {
             case 1, 2 -> true; // image done, window done
             case 4, 7 -> false; // byte limit, response limit
@@ -117,18 +117,17 @@ class J2KReader implements Runnable {
 
     // A new channel and its metadata.
     private void connect() throws IOException {
-        JPIPSocket opened = new JPIPSocket(uri);
-        socket = opened;
-        client.response(opened.receive());
+        socket = new JPIPSocket(uri);
+        client.response(socket.receive());
         do {
-            opened.sendMetadata();
-        } while (!isComplete(client.response(opened.receive())));
+            socket.sendMetadata();
+        } while (!isWindowComplete(client.response(socket.receive())));
     }
 
     private void fetchFirst(int width, int height, int pad) throws IOException {
         do {
             socket.sendFrame(stream[0], width, height, pad);
-        } while (!isComplete(client.response(socket.receive())));
+        } while (!isWindowComplete(client.response(socket.receive())));
         source.update(0);
     }
 
@@ -226,7 +225,7 @@ class J2KReader implements Runnable {
     // Feeds the next response to the source. False when its frame needs another request in this pass.
     private boolean receive(Sent sent, ResolutionSet.Level wanted) throws IOException {
         int frame = sent.frame;
-        boolean complete = isComplete(client.response(socket.receive()));
+        boolean complete = isWindowComplete(client.response(socket.receive()));
         update(frame);
 
         ResolutionSet set = source.geometry(frame);

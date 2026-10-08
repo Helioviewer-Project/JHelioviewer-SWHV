@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import javax.annotation.Nullable;
@@ -107,14 +108,9 @@ public final class J2KSource {
         return sets.get(frame);
     }
 
-    // For displayable frames.
+    // Requires a known frame header. Use geometry() when it may not have arrived.
     ResolutionSet resolutionSet(int frame) {
-        ResolutionSet set = sets.get(frame);
-        if (set == null) {
-            Log.error("resolutionSet[" + frame + "] is null"); // never happened?
-            return sets.get(0);
-        }
-        return set;
+        return Objects.requireNonNull(sets.get(frame));
     }
 
     // The level, or the coarsest one the frame has.
