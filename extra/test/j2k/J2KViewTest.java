@@ -106,7 +106,7 @@ public final class J2KViewTest {
                 if (image == null)
                     throw new AssertionError("Finer level was not delivered");
                 boolean ready = image.imageBuffer().width == finer.width() && image.imageBuffer().height == finer.height();
-                EventQueue.invokeAndWait(image.image()::close);
+                EventQueue.invokeAndWait(image.image()::release);
                 if (ready)
                     break;
             } while (true);
@@ -215,7 +215,7 @@ public final class J2KViewTest {
         View.ImageData image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Latest request viewpoint was not delivered");
-        EventQueue.invokeAndWait(image.image()::close);
+        EventQueue.invokeAndWait(image.image()::release);
 
         clearImages();
         // An older fine window finishes after the view has zoomed out.
@@ -225,7 +225,7 @@ public final class J2KViewTest {
             throw new AssertionError("Reader refresh used an obsolete viewpoint");
         int width = image.imageBuffer().width;
         int height = image.imageBuffer().height;
-        EventQueue.invokeAndWait(image.image()::close);
+        EventQueue.invokeAndWait(image.image()::release);
         if (width != size.width() || height != size.height())
             throw new AssertionError("Reader refresh used an obsolete resolution: " + width + "x" + height
                     + ", wanted " + size.width() + "x" + size.height());
@@ -284,7 +284,7 @@ public final class J2KViewTest {
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
                 hashes[frame] = HexFormat.of().formatHex(hash.digest());
-                EventQueue.invokeAndWait(image.image()::close);
+                EventQueue.invokeAndWait(image.image()::release);
             }
             return hashes;
         } finally {
@@ -325,7 +325,7 @@ public final class J2KViewTest {
         EventQueue.invokeAndWait(() -> {
             View.ImageData image;
             while ((image = images.poll()) != null)
-                image.image().close();
+                image.image().release();
         });
     }
 

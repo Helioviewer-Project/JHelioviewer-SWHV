@@ -24,7 +24,7 @@ public final class ImageBufferCache {
                 .concurrencyLevel(1) // One shared byte budget and LRU order, without frequency-based admission.
                 .maximumWeight(maximumBytes)
                 .weigher((Key key, DecodedImage value) -> value.imageBuffer().byteSize())
-                .removalListener(notification -> EventQueue.invokeLater(notification.getValue()::close))
+                .removalListener(notification -> EventQueue.invokeLater(notification.getValue()::release))
                 .build();
     }
 

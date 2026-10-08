@@ -102,7 +102,7 @@ public class BaseView implements View {
             @Override
             public void onSuccess(DecodedImage result, boolean fresh) {
                 if (dataHandler == null || !isCurrent.getAsBoolean()) {
-                    result.close();
+                    result.release();
                     return;
                 }
 
@@ -128,7 +128,7 @@ public class BaseView implements View {
                 if (dataHandler != null && isCurrent.getAsBoolean())
                     dataHandler.handleData(data);
             } finally {
-                image.close();
+                image.release();
             }
         });
     }

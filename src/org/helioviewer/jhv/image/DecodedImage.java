@@ -2,7 +2,7 @@ package org.helioviewer.jhv.image;
 
 import org.helioviewer.jhv.metadata.Region;
 
-public final class DecodedImage implements AutoCloseable {
+public final class DecodedImage {
 
     private final ImageBuffer imageBuffer;
     private final Region region;
@@ -30,8 +30,7 @@ public final class DecodedImage implements AutoCloseable {
         references++;
     }
 
-    @Override
-    public void close() {
+    public void release() {
         if (references <= 0)
             throw new IllegalStateException("Decoded image has been released");
         if (--references == 0)

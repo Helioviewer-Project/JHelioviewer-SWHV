@@ -29,7 +29,6 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;

@@ -42,9 +42,9 @@ reference. Once published, references are retained and released on the EDT.
 5. `ImageLayer` retains a reference for each occupied current, previous, or base
    image slot. Replacing a slot releases its previous image. Detaching the view
    clears all three slots immediately.
-6. Cache replacement, eviction, and explicit invalidation post `close()` to the
+6. Cache replacement, eviction, and explicit invalidation post `release()` to the
    EDT. This preserves images borrowed earlier in that EDT turn.
-7. The last `close()` frees the native pixels. Retaining or releasing an already
+7. The last `release()` frees the native pixels. Retaining or releasing an already
    released image throws `IllegalStateException`, including with assertions disabled.
 
 CPU pixel cleanup does not require repainting. An invalidation's queued cache

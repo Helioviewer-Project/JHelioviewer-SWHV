@@ -318,7 +318,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (next != null)
             next.image().retain();
         if (previous != null)
-            previous.image().close();
+            previous.image().release();
         return next;
     }
 

@@ -133,7 +133,7 @@ public final class ImageBufferCacheTest {
                     if (((ByteBuffer) result.imageBuffer().buffer).get(i) != 0)
                         throw new AssertionError("Writer did not clear all pixels");
             }
-            result.close();
+            result.release();
             if (allocated(result))
                 throw new AssertionError("Transferred writer pixels were not released");
         }
@@ -164,14 +164,14 @@ public final class ImageBufferCacheTest {
     private static void releasedImage() throws Exception {
         DecodedImage image = image();
         EventQueue.invokeAndWait(() -> {
-            image.close();
+            image.release();
             try {
                 image.retain();
                 throw new AssertionError("Retained a released image");
             } catch (IllegalStateException expected) {
             }
             try {
-                image.close();
+                image.release();
                 throw new AssertionError("Released an image twice");
             } catch (IllegalStateException expected) {
             }
@@ -231,15 +231,15 @@ public final class ImageBufferCacheTest {
         if (!allocated(shared) || !allocated(queued))
             throw new AssertionError("A held or queued image was freed");
         EventQueue.invokeAndWait(() -> {
-            shared.close();
-            shared.close();
-            queued.close();
+            shared.release();
+            shared.release();
+            queued.release();
         });
         if (!allocated(shared) || !allocated(queued))
             throw new AssertionError("An image with a remaining owner was freed");
         EventQueue.invokeAndWait(() -> {
-            shared.close();
-            queued.close();
+            shared.release();
+            queued.release();
         });
         await(() -> !allocated(shared) && !allocated(queued), "Last release did not free the images");
     }
@@ -284,7 +284,7 @@ public final class ImageBufferCacheTest {
         await(() -> !allocated(second), "LRU eviction did not free the unheld image");
         if (!allocated(first))
             throw new AssertionError("LRU eviction freed a layer-owned image");
-        EventQueue.invokeAndWait(first::close);
+        EventQueue.invokeAndWait(first::release);
         await(() -> !allocated(first), "Last layer release did not free the evicted image");
         cache.invalidateAll();
         await(() -> !allocated(third) && !allocated(large), "LRU cache removal did not free images");

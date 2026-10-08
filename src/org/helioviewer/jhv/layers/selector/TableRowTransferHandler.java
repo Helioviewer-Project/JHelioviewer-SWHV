@@ -19,6 +19,7 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 
 // Handles DnD row reordering
@@ -96,7 +97,7 @@ class TableRowTransferHandler extends TransferHandler {
                 Object obj = info.getTransferable().getTransferData(DataFlavor.stringFlavor);
                 int rowFrom = Integer.parseInt((String) obj);
                 if (rowFrom != -1 && rowFrom != index) {
-                    Object moved = grid.getModel().getValueAt(rowFrom, 0);
+                    Layer moved = (Layer) grid.getModel().getValueAt(rowFrom, 0);
                     ((Reorderable) grid.getModel()).reorder(rowFrom, index);
                     int row = Layers.getLayers().indexOf(moved);
                     grid.setRowSelectionInterval(row, row); // the model change cleared the selection
