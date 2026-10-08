@@ -47,7 +47,7 @@ requests without the reader, the actual reader prefetch pump, reopened disk-cach
 with the socket aborted, and a session in which one cache entry is replaced by a block the
 client refuses (the frame is fetched and stored again). A controlled signal after two sends
 checks that two sent responses are drained before switching work. The pump is invoked directly
-without a GUI view, while its worker remains idle. Received or restored frames must reset
+without a GUI view, while its worker remains idle. Completed or restored frames must reset
 the reader's consecutive failure count within the pass.
 
 The same movie is then opened by the real view, headless, with its reader thread. Paused and

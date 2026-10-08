@@ -228,7 +228,6 @@ class J2KReader implements Runnable {
         int frame = sent.frame;
         boolean complete = isComplete(client.response(socket.receive()));
         update(frame);
-        retries = 0;
 
         ResolutionSet set = source.geometry(frame);
         if (set == null) {
@@ -239,6 +238,7 @@ class J2KReader implements Runnable {
 
         int level = set.getNextLevel(wanted.width(), wanted.height()).level();
         if (set.getComplete(level)) {
+            retries = 0;
             String key = cacheKey[frame];
             if (key != null)
                 JPIPCacheManager.store(key, level, () -> client.exportFrame(frame));
@@ -311,7 +311,7 @@ class J2KReader implements Runnable {
             view.setDownloading(true);
 
             try {
-                if (retries > 0)
+                if (retries > 1)
                     Thread.sleep(1000);
                 if (socket.isClosed())
                     connect();
@@ -319,8 +319,8 @@ class J2KReader implements Runnable {
                 boolean singleFrame = cacheKey.length <= 1 || params.priority();
                 boolean finished = readFrames(params, wanted, singleFrame);
 
-                // suicide if fully done
-                if (source.isComplete(0)) {
+                // Do not discard a queued display request when the download finishes.
+                if (signalQueue.isEmpty() && source.isComplete(0)) {
                     try {
                         socket.close();
                     } catch (IOException ignore) {}

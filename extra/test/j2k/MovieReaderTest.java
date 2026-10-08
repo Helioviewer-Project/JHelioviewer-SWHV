@@ -125,7 +125,7 @@ public final class MovieReaderTest {
                 if (!(boolean) readFrames.invoke(reader, params, size, false))
                     throw new AssertionError("Prefetch interrupted unexpectedly");
                 if (retries.getInt(reader) != 0)
-                    throw new AssertionError("Received or restored frames did not reset consecutive failures");
+                    throw new AssertionError("Completed or restored frames did not reset consecutive failures");
                 JPIPCacheManager.Entry entry = JPIPCacheManager.get("movie2", 0);
                 if (entry == null || entry.block().length < 1000)
                     throw new AssertionError("Missing or damaged cache entry after the pump");
