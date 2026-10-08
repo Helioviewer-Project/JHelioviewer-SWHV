@@ -2,14 +2,18 @@ package org.helioviewer.jhv.view;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 
@@ -18,21 +22,25 @@ public class ManyView implements View {
     private record FrameInfo(View view, JHVTime timeView, int idxView) {}
 
     private final TimeMap<FrameInfo> frameMap = new TimeMap<>();
+    private final List<View> views;
     private final boolean hasFITS;
     private final @Nullable ClipSet clipSet;
     private int targetFrame;
 
-    public ManyView(List<View> views) throws IOException {
-        if (views.isEmpty())
+    public ManyView(List<View> _views) throws IOException {
+        if (_views.isEmpty())
             throw new IOException("Empty list of views");
 
-        hasFITS = views.stream().anyMatch(View::hasFITS);
-        views.forEach(this::putDates);
+        hasFITS = _views.stream().anyMatch(View::hasFITS);
+        _views.forEach(this::putDates);
         frameMap.buildIndex();
+        Set<View> unique = new LinkedHashSet<>();
         List<ClipSet> clipSets = new ArrayList<>();
         for (FrameInfo frameInfo : frameMap.values()) {
+            unique.add(frameInfo.view);
             clipSets.add(frameInfo.view.getClipSet());
         }
+        views = List.copyOf(unique);
         clipSet = ClipSet.median(clipSets);
         // unused J2KViews should be abolished by their reaper
     }
@@ -51,12 +59,25 @@ public class ManyView implements View {
 
     @Override
     public void abolish() {
-        frameMap.values().forEach(frameInfo -> frameInfo.view.abolish());
+        clearCache();
+        AppThread.create(this::closeSources, "JHV-CollectionCloser").start();
     }
 
     @Override
-    public void clearCache() {
-        frameMap.values().forEach(frameInfo -> frameInfo.view.clearCache());
+    public void collectCacheOwners(Set<Object> owners) {
+        for (View view : views)
+            view.collectCacheOwners(owners);
+    }
+
+    @Override
+    public void closeSources() {
+        for (View view : views) {
+            try {
+                view.closeSources();
+            } catch (Exception e) {
+                Log.error(e);
+            }
+        }
     }
 
     @Override
@@ -98,7 +119,7 @@ public class ManyView implements View {
 
     @Override
     public void setDataHandler(View.DataHandler dataHandler) {
-        frameMap.values().forEach(frameInfo -> frameInfo.view.setDataHandler(dataHandler));
+        views.forEach(view -> view.setDataHandler(dataHandler));
     }
 
     @Nullable

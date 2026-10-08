@@ -3,6 +3,9 @@ package org.helioviewer.jhv.view.j2k;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
@@ -113,7 +116,7 @@ public final class J2KView extends BaseView {
                 reader.start(cacheKey);
             }
 
-            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, new WeakReference<>(this), reader, source));
         } catch (Exception e) {
             if (acquiredReader != null)
                 acquiredReader.stop();
@@ -123,22 +126,31 @@ public final class J2KView extends BaseView {
         }
     }
 
-    private record DecodeKey(int serial, J2KParams.Decode params, ImageFilter.Type filter) {}
+    private record DecodeKey(int serial, J2KParams.Decode params, ImageFilter.Type filter) implements ImageBufferCache.Key {
+        @Override
+        public Object owner() {
+            return serial;
+        }
+    }
 
     private static void clearCache(int aSerial) {
         ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.serial == aSerial);
     }
 
-    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
+    private record J2KAbolisher(int aSerial, WeakReference<J2KView> aView, J2KReader aReader, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
+            // Explicit owners have already cleared the cache, possibly in one collection-wide pass.
+            if (aView.get() == null)
+                clearCache(aSerial);
+            if (aReader == null) {
+                aSource.close();
+                return;
+            }
             // reader abolish may take too long in stressed conditions
             AppThread.create(() -> {
                 try {
-                    clearCache(aSerial);
-                    if (aReader != null) {
-                        aReader.stop();
-                    }
+                    aReader.stop();
                 } finally {
                     aSource.close();
                 }
@@ -154,12 +166,26 @@ public final class J2KView extends BaseView {
 
     @Override
     public void abolish() {
-        abolishable.clean();
+        clearCache();
+        if (reader == null)
+            AppThread.create(this::closeSources, "JHV-J2KAbolisher").start();
+        else
+            closeSources();
     }
 
     @Override
-    public void clearCache() {
-        clearCache(serial);
+    public void collectCacheOwners(Set<Object> owners) {
+        owners.add(serial);
+    }
+
+    @Override
+    public void closeSources() {
+        try {
+            abolishable.clean();
+        } finally {
+            // Keep the Cleaner action on its explicit-close path until clean() returns.
+            Reference.reachabilityFence(this);
+        }
     }
 
     @Override

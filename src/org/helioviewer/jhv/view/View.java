@@ -1,11 +1,15 @@
 package org.helioviewer.jhv.view;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -43,7 +47,16 @@ public interface View {
 
     default void abolish() {}
 
-    default void clearCache() {}
+    default void collectCacheOwners(Set<Object> owners) {}
+
+    default void clearCache() {
+        Set<Object> owners = new HashSet<>();
+        collectCacheOwners(owners);
+        ImageBufferCache.invalidateOwners(owners);
+    }
+
+    // Use a cleanup worker for local sources; remote readers schedule their own shutdown.
+    default void closeSources() {}
 
     default void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {}
 

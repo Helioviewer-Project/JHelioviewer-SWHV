@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -40,6 +42,9 @@ import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
+import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageBufferCache;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
@@ -74,6 +79,7 @@ public final class J2KViewTest {
         System.load(arguments[0]);
         System.load(arguments[1]);
         URI uri = URI.create(arguments[2]);
+        checkReaper(uri);
         checkRetriesAndKeys(capture(uri));
 
         Field timerField = Player.class.getDeclaredField("movieTimer");
@@ -121,6 +127,46 @@ public final class J2KViewTest {
         }
         System.out.println("PASS: download start, latest refresh viewpoint, detached refresh, priority refresh, playing download and connection recovery");
         System.exit(0);
+    }
+
+    private record Abandoned(WeakReference<J2KView> view, J2KNative client, Object key, DecodedImage image) {}
+
+    private static Abandoned abandon(URI uri) throws Exception {
+        J2KView view = open(uri);
+        J2KNative client = ((J2KSource) field(J2KView.class, view, "source")).client();
+        Constructor<?> constructor = Class.forName(J2KView.class.getName() + "$DecodeKey")
+                .getDeclaredConstructor(int.class, J2KParams.Decode.class, ImageFilter.Type.class);
+        constructor.setAccessible(true);
+        Object key = constructor.newInstance(field(J2KView.class, view, "serial"), new J2KParams.Decode(0, 0), ImageFilter.Type.None);
+        DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null);
+        ImageBufferCache.put(key, image);
+        return new Abandoned(new WeakReference<>(view), client, key, image);
+    }
+
+    private static void checkReaper(URI uri) throws Exception {
+        Abandoned abandoned = abandon(uri);
+        EventQueue.invokeAndWait(() -> {}); // Release the last invocation event's reference to the view.
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20);
+        for (;;) {
+            System.gc();
+            Thread.sleep(20);
+            EventQueue.invokeAndWait(() -> {});
+            if (abandoned.view.get() == null && ImageBufferCache.get(abandoned.key) == null) {
+                try {
+                    abandoned.client.frames();
+                } catch (CancellationException closed) {
+                    try {
+                        abandoned.image.retain();
+                        throw new AssertionError("Cleaner left the cached image allocated");
+                    } catch (IllegalStateException released) {
+                    }
+                    break;
+                }
+            }
+            if (System.nanoTime() > deadline)
+                throw new AssertionError("Cleaner did not retire the abandoned view's cache and native source");
+        }
+        System.out.println("PASS: abandoned view's Cleaner retires cached pixels and closes its native source");
     }
 
     @SuppressWarnings("unchecked")

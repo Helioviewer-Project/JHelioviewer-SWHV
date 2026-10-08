@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -95,7 +96,12 @@ public final class URIView extends BaseView {
     }
 
     private record DecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable ImageProcessingSettings.FITSParameters fitsData,
-                             @Nullable ClipSet.Range clipRange) {}
+                             @Nullable ClipSet.Range clipRange) implements ImageBufferCache.Key {
+        @Override
+        public Object owner() {
+            return uri;
+        }
+    }
 
     private DecodeKey decodeKey() {
         ImageProcessingSettings.FITSParameters data = hasFITS() ? processingSettings.fitsParameters() : null;
@@ -148,12 +154,12 @@ public final class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey k && k.uri() == dataUri);
+        clearCache();
     }
 
     @Override
-    public void clearCache() {
-        abolish();
+    public void collectCacheOwners(Set<Object> owners) {
+        owners.add(dataUri);
     }
 
 }

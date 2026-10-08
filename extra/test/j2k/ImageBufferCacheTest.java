@@ -3,10 +3,19 @@ package org.helioviewer.jhv.image;
 import java.awt.EventQueue;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
+
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.view.ManyView;
+import org.helioviewer.jhv.view.View;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -17,6 +26,7 @@ public final class ImageBufferCacheTest {
 
     public static void main(String[] arguments) throws Exception {
         releasedImage();
+        manyFiles();
         explicitRemoval();
         heldAndQueuedImages();
         replacementAndEviction();
@@ -24,6 +34,68 @@ public final class ImageBufferCacheTest {
         resolutionChange();
         concurrentReplacement();
         System.out.println("PASS: release checks without assertions, weighted LRU, resolution changes, removal, held and queued images, replacement and concurrent invalidation without repainting");
+    }
+
+    private record OwnedKey(Object id, int frame, AtomicInteger visits) implements ImageBufferCache.Key {
+        @Override
+        public Object owner() {
+            visits.incrementAndGet();
+            return id;
+        }
+    }
+
+    private static void manyFiles() throws Exception {
+        int count = 2000;
+        CountDownLatch closed = new CountDownLatch(count);
+        Set<Thread> closerThreads = ConcurrentHashMap.newKeySet();
+        AtomicInteger visits = new AtomicInteger(), handlers = new AtomicInteger();
+        List<View> views = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            long date = i * 3L;
+            Object id = new Object();
+            views.add(new View() {
+                @Override public int getMaximumFrameNumber() { return 2; }
+                @Override public JHVTime getFrameTime(int frame) { return new JHVTime(date + frame); }
+                @Override public JHVTime getFirstTime() { return getFrameTime(0); }
+                @Override public JHVTime getLastTime() { return getFrameTime(2); }
+                @Override public boolean setNearestFrame(JHVTime time) { return true; }
+                @Override public JHVTime getNearestTime(JHVTime time) { return time; }
+                @Override public JHVTime getLowerTime(JHVTime time) { return time; }
+                @Override public JHVTime getHigherTime(JHVTime time) { return time; }
+                @Override public MetaData getMetaData(JHVTime time) { throw new UnsupportedOperationException(); }
+                @Override public void collectCacheOwners(Set<Object> owners) { owners.add(id); }
+                @Override public void setDataHandler(View.DataHandler handler) { handlers.incrementAndGet(); }
+                @Override public void closeSources() {
+                    if (EventQueue.isDispatchThread())
+                        throw new AssertionError("Sources closed on the EDT");
+                    closerThreads.add(Thread.currentThread());
+                    closed.countDown();
+                }
+            });
+            for (int frame = 0; frame < 3; frame++)
+                ImageBufferCache.put(new OwnedKey(id, frame, visits),
+                        new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null));
+        }
+        OwnedKey other = new OwnedKey(new Object(), 0, visits);
+        DecodedImage retained = image();
+        ImageBufferCache.put(other, retained);
+        ManyView collection = new ManyView(List.of(new ManyView(views.subList(0, count / 2)),
+                new ManyView(views.subList(count / 2, count))));
+        try {
+            EventQueue.invokeAndWait(() -> {
+                collection.setDataHandler(null);
+                collection.clearCache();
+            });
+            if (visits.get() != count * 3 + 1 || handlers.get() != count || ImageBufferCache.get(other) != retained)
+                throw new AssertionError("Collection did not visit each cache entry and child once, or purged another layer");
+            visits.set(0);
+            EventQueue.invokeAndWait(collection::abolish);
+            if (!closed.await(10, TimeUnit.SECONDS) || closerThreads.size() != 1 || visits.get() != 1)
+                throw new AssertionError("Collection repeated cache scans or used multiple source-close threads");
+        } finally {
+            ImageBufferCache.invalidateIf(key -> key instanceof OwnedKey);
+        }
+        System.out.println("PASS: 2,000 views and 6,000 frames use one cache pass and one background source closer");
     }
 
     private static DecodedImage image() {

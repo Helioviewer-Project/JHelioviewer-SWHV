@@ -2,6 +2,7 @@ package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -10,6 +11,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 public final class ImageBufferCache {
+
+    public interface Key {
+        Object owner();
+    }
 
     private static final long MAX_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
 
@@ -40,6 +45,11 @@ public final class ImageBufferCache {
             if (predicate.test(entry.getKey()))
                 cache.asMap().remove(entry.getKey(), entry.getValue());
         }
+    }
+
+    public static void invalidateOwners(Set<Object> owners) {
+        if (!owners.isEmpty())
+            invalidateIf(key -> key instanceof Key k && owners.contains(k.owner()));
     }
 
     private ImageBufferCache() {}
