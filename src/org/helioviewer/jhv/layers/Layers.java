@@ -274,9 +274,9 @@ public final class Layers {
     public static void restore(List<Layer> restoredLayers) {
         ArrayList<Layer> normalizedLayers = normalizeRestoreList(restoredLayers);
 
+        imageLayersCount = 0;
         layers.forEach(Layers::detach);
         layers.clear();
-        imageLayersCount = 0;
 
         newLayers.addAll(normalizedLayers);
 
