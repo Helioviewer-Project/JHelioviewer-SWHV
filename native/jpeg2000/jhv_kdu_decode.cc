@@ -25,6 +25,7 @@ const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &re
     uint64_t required = static_cast<uint64_t>(region.width) * region.height * bytes;
     if (!output || required > capacity) return "JPEG 2000 output buffer too small";
     kdu_channel_mapping mapping;
+    bool indexed = render.channel[0].palette_column >= 0;
     // A palette's channels all name its index component: decode that plane once.
     mapping.set_num_channels(geometry.channels);
     mapping.num_colour_channels = mapping.num_channels;
@@ -46,7 +47,7 @@ const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &re
     kdu_region_decompressor decoder;
     kdu_quality_limiter limiter(1.0f / 256);
     decoder.set_quality_limiting(&limiter, -1, -1);
-    decoder.set_white_stretch(8);
+    decoder.set_white_stretch(indexed ? 0 : 8);
     bool complete = false, finished = false;
     kdu_exception failure = 0;
     try {
@@ -61,17 +62,15 @@ const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &re
         if (started) {
             while (!incomplete.is_empty())
                 if (!decoder.process(output, offsets, static_cast<int>(bytes), requested.pos,
-                                     region.width, 256 * 1024, 0, incomplete, updated, 8, true,
+                                     region.width, 256 * 1024, 0, incomplete, updated, indexed ? 0 : 8, true,
                                      0, bytes == 4 ? 1 : 0, geometry.channels)) break;
         }
         complete = started && incomplete.is_empty();
         finished = decoder.finish(&failure);
-        decoder.reset();
         environment.destroy();
     } catch (...) {
         if (environment.exists()) environment.handle_exception(KDU_ERROR_EXCEPTION);
         decoder.finish();
-        decoder.reset();
         environment.destroy();
         throw;
     }

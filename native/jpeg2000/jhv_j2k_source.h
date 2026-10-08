@@ -2,7 +2,7 @@
 #define JHV_J2K_SOURCE_H
 #include <climits>
 #include <cstdio>
-#include <exception>
+#include <new>
 #include <stdexcept>
 #include <vector>
 #include "jhv_kdu_decode.h"
@@ -61,7 +61,6 @@ public:
 private:
     hvc *client = nullptr;
     std::vector<description> descriptions;
-    std::exception_ptr inspection_failure;
 
     // What JHV shows of a file whose color description is not supported.
     static void first_component(hv_render &render) {
@@ -72,52 +71,9 @@ private:
     }
 
     static int inspect(hvc *source, size_t frame, void *context,
-                       hvc_info *info, char *error, size_t error_size) noexcept {
-        jhv_j2k_source &owner = *static_cast<jhv_j2k_source *>(context);
-        try {
-            size_t count = hvc_frames(source);
-            if (count > INT_MAX) throw std::runtime_error("too many JPEG 2000 frames");
-            owner.descriptions.resize(count);
-            // The coarsest level suffices: every header is kept at any reduction.
-            decoder_input input(source, frame, INT_MAX);
-            description result = description();
-            const char *reason = input.with_stream([&](kdu_codestream &stream) {
-                if (hvc_render_read(source, frame, stream.get_num_components(true), &result.render))
-                    first_component(result.render);
-                return jhv_kdu_read_geometry(stream, result.render, result.geometry);
-            });
-            if (reason && result.render.channel_count > 1) {
-                first_component(result.render);
-                reason = input.with_stream([&](kdu_codestream &stream) {
-                    return jhv_kdu_read_geometry(stream, result.render, result.geometry);
-                });
-            }
-            if (reason) throw std::runtime_error(reason);
-            info->components = result.geometry.plane_count;
-            info->resolutions = result.geometry.resolutions;
-            info->layers = result.geometry.layers;
-            for (int r = 0; r < info->resolutions; r++) {
-                info->width[r] = result.geometry.level[r].width;
-                info->height[r] = result.geometry.level[r].height;
-            }
-            owner.descriptions[frame] = result;
-            return 0;
-        } catch (...) {
-            // Keep the typed failure; nothing may unwind through the C client.
-            owner.inspection_failure = std::current_exception();
-            std::snprintf(error, error_size, "decoder inspection failed");
-            return -1;
-        }
-    }
+                       hvc_info *info, char *error, size_t error_size) noexcept;
 
-    [[noreturn]] void fail() {
-        if (inspection_failure) {
-            std::exception_ptr failure = inspection_failure;
-            inspection_failure = nullptr;
-            std::rethrow_exception(failure);
-        }
-        throw std::runtime_error(hvc_error(client));
-    }
+    [[noreturn]] void fail() { throw std::runtime_error(hvc_error(client)); }
 
 public:
     explicit jhv_j2k_source(const char *path) {
@@ -151,7 +107,7 @@ public:
         if (hvc_status(client, static_cast<uint64_t>(frame), &options, &view)) fail();
         return view;
     }
-    // Valid once status has reported the frame's geometry.
+    // Immutable and stable once the client has inspected the frame's geometry.
     const description &described(int frame) const { return descriptions.at(frame); }
 };
 

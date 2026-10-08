@@ -66,6 +66,9 @@ python3 extra/test/j2k/check_native_build.py /path/to/builds/macos-arm64 --esajp
 ```
 
 This uses the existing native test and committed RGB, grayscale and JPX fixtures.
+Small generated palette fixtures also check raw indices, channel ordering,
+signed sample conversion, short buffers and final colors against the compositor.
+The Java binding consumes a 256-entry RGBA8 table and raw unsigned index bytes.
 It checks every frame and resolution against Kakadu's compositor, jobs that
 outlive their source, failure recovery, and repeated open/decode/close cycles.
 File-descriptor counts are checked on Unix. The full JPIP test still uses

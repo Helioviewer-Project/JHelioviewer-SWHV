@@ -101,25 +101,13 @@ public final class J2KSource {
 
     @Nullable
     LUT lut() {
-        J2KNative.Palette palette;
         try {
-            palette = client.palette(0);
+            ByteBuffer palette = client.palette(0);
+            return palette == null ? null : new LUT("built-in", palette);
         } catch (IOException e) {
             Log.warn("Unusable JPEG 2000 palette", e);
             return null;
         }
-        if (palette == null)
-            return null;
-
-        int entries = palette.entries(), channels = palette.channels();
-        byte[] values = palette.values();
-        byte[] red = new byte[entries], green = new byte[entries], blue = new byte[entries];
-        for (int i = 0; i < entries; i++) {
-            red[i] = values[i * channels];
-            green[i] = values[i * channels + (channels < 3 ? 0 : 1)];
-            blue[i] = values[i * channels + (channels < 3 ? 0 : 2)];
-        }
-        return LUT.fromOpaqueRgb("built-in", red, green, blue);
     }
 
     // Null while the frame's header is unknown.
@@ -156,11 +144,6 @@ public final class J2KSource {
         return completeUntil(completeFrames, level) == frames();
     }
 
-    // Acquire the input before allocating pixels. The job outlives close().
-    J2KNative.Decode beginDecode(int frame, int level) throws IOException {
-        return client.beginDecode(frame, level);
-    }
-
     // Gray8 or RGBA rows into a direct buffer; runs on a decode worker.
     // Leaves the output buffer's position unchanged.
     static void decode(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer pixels) throws IOException {
@@ -171,7 +154,7 @@ public final class J2KSource {
 
     // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
     public byte[] decode(int frame, int level, int x, int y, int width, int height) throws IOException {
-        try (J2KNative.Decode job = beginDecode(frame, level)) {
+        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
             ByteBuffer direct = MemoryUtil.memAlloc(width * height * resolutionSet(frame).numComps);
             try {
                 decode(job, x, y, width, height, direct);

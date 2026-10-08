@@ -51,20 +51,20 @@ final class ImageLayerLoader {
     void load(APIRequest req) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Task.submitBackground("request", () -> {
+        loadFuture = Task.submit(task -> Thread.ofVirtual().name("Image-Load").start(task), () -> {
                     URI uri = requestAPI(req.toJpipRequest());
                     return uri == null ? null : createView(req, uri);
                 },
                 result -> onSuccess(result, gen),
-                (logContext, t) -> onFailure(t, gen));
+                t -> onFailure(t, gen));
     }
 
     void load(List<URI> uriList) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Task.submitBackground(uriList.toString(), () -> loadUri(uriList),
+        loadFuture = Task.submit(task -> Thread.ofVirtual().name("Image-Load").start(task), () -> loadUri(uriList),
                 result -> onSuccess(result, gen),
-                (logContext, t) -> onFailure(t, gen));
+                t -> onFailure(t, gen));
     }
 
     boolean isLoading() {
@@ -133,7 +133,9 @@ final class ImageLayerLoader {
         if (uriList.size() == 1) {
             return createView(null, uriList.getFirst());
         } else {
-            List<View> views = uriList.parallelStream().map(uri -> {
+            // Keep JPIP initialization on the interruptible loader thread.
+            boolean jpip = uriList.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
+            List<View> views = (jpip ? uriList.stream() : uriList.parallelStream()).map(uri -> {
                 try {
                     return createView(null, uri);
                 } catch (Exception e) {

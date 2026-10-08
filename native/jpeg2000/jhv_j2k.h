@@ -25,17 +25,22 @@ typedef struct {
 /* A local JP2/JPX file (UTF-8 path), or an empty JPIP source for NULL. */
 JHV_J2K_API jhv_j2k *jhv_j2k_open(const char *path, char *error);
 JHV_J2K_API void jhv_j2k_close(jhv_j2k *source);
-/* One whole JPIP response body. Returns its end-of-response reason; a failure
- * is a refusal, after which the source must not receive further responses. */
-JHV_J2K_API int jhv_j2k_response(jhv_j2k *source, const uint8_t *body, uint64_t size, char *error);
+/* Begin delivery on a replacement channel without discarding cached data. */
+JHV_J2K_API void jhv_j2k_new_channel(jhv_j2k *source);
+/* One whole JPIP response body. Returns its end-of-response reason and reports
+ * delivery of new data-bin ranges or final flags in progress. Complete windows
+ * clear only their own delivery history. window is the requested frame, or -1
+ * for metadata. A failure is a refusal: accept no further responses. */
+JHV_J2K_API int jhv_j2k_response(jhv_j2k *source, const uint8_t *body, uint64_t size, int window,
+                               int *progress, char *error);
 JHV_J2K_API int jhv_j2k_frames(jhv_j2k *source, char *error);
 /* Without the frame's header only stream is set. Fails if the frame cannot be decoded. */
 JHV_J2K_API int jhv_j2k_frame(jhv_j2k *source, int frame, jhv_j2k_frame_info *info, char *error);
-/* Size query with NULL output, then a copy. Palette returns its entry count and
- * channels its columns; a frame with a palette decodes to its index plane. */
+/* Size query with NULL output, then a copy. Palette is a 256-entry RGBA8
+ * display table in color order, or absent. Indexed frames decode to raw bytes;
+ * indices beyond the palette's entries select its last entry. */
 JHV_J2K_API int64_t jhv_j2k_xml(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
-JHV_J2K_API int jhv_j2k_palette(jhv_j2k *source, int frame, int32_t *channels,
-                              uint8_t *out, uint64_t capacity, char *error);
+JHV_J2K_API int jhv_j2k_palette_rgba(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
 /* Disk cache entry of a JPIP frame. A refused import leaves the source unchanged. */
 JHV_J2K_API int64_t jhv_j2k_export(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
 JHV_J2K_API int jhv_j2k_import(jhv_j2k *source, int frame, const uint8_t *entry, uint64_t size, char *error);

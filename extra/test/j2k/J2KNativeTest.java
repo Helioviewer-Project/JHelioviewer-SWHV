@@ -1,8 +1,16 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
@@ -116,16 +124,25 @@ public final class J2KNativeTest {
         int frames = source.frames();
         for (int frame = 0; frame < frames; frame++) {
             source.xml(frame);
-            source.palette(frame);
+            ByteBuffer palette = source.palette(frame);
             J2KNative.Frame info = source.frame(frame);
             int levels = info.width().length;
             check(levels > 0 && info.ready() == levels, "local frame not ready");
             for (int level = 0; level < levels; level++) {
-                Reference expected = reference(path, frame, info, level, access);
+                J2KNative.Frame rendered = palette == null ? info
+                        : new J2KNative.Frame(info.stream(), 4, info.ready(), info.width(), info.height());
+                Reference expected = reference(path, frame, rendered, level, access);
                 String where = path + " frame " + frame + " level " + level;
                 check(info.width()[level] == expected.width() && info.height()[level] == expected.height(),
                         "geometry differs from Kakadu's compositor: " + where);
-                check(Arrays.equals(pixels(source, frame, level), expected.pixels()),
+                byte[] actual = pixels(source, frame, level);
+                if (palette != null) {
+                    byte[] colors = new byte[actual.length * 4];
+                    for (int i = 0; i < actual.length; i++)
+                        palette.get(4 * (actual[i] & 255), colors, 4 * i, 4);
+                    actual = colors;
+                }
+                check(Arrays.equals(actual, expected.pixels()),
                         "pixels differ from Kakadu's compositor: " + where);
             }
         }
@@ -133,14 +150,16 @@ public final class J2KNativeTest {
 
     private static void local(Path path) throws Exception {
         try (J2KNative source = new J2KNative(path)) {
-            compare(path, source, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
             // Jobs outlive their source.
             J2KNative.Frame info = source.frame(0);
             int level = info.width().length - 1, width = info.width()[level], height = info.height()[level];
             byte[] expected = pixels(source, 0, level);
-            J2KNative.Decode first = source.beginDecode(0, level), second = source.beginDecode(0, level);
-            source.close();
-            try (ExecutorService pool = Executors.newFixedThreadPool(2)) {
+            try (J2KNative.Decode first = source.beginDecode(0, level);
+                 J2KNative.Decode second = source.beginDecode(0, level);
+                 ExecutorService pool = Executors.newFixedThreadPool(2)) {
+                // Inspect later frames while the jobs retain their first frame's description.
+                compare(path, source, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
+                source.close();
                 List<Future<byte[]>> results = new ArrayList<>();
                 for (J2KNative.Decode job : List.of(first, second)) {
                     results.add(pool.submit(() -> {
@@ -197,6 +216,75 @@ public final class J2KNativeTest {
         System.out.println("failures, retry and 200 open/decode/close cycles");
     }
 
+    private static void responseProgress() throws Exception {
+        // One byte of metadata bin 0, followed by a byte-limit EOR.
+        byte[] message = {0x60, 8, 0, 0, 1, 42, 0, 4, 0};
+        ByteBuffer reply = ByteBuffer.allocateDirect(message.length);
+        reply.put(message).flip();
+        try (J2KNative source = new J2KNative(null)) {
+            check(source.response(reply, 0).progressed(), "first delivery made no progress");
+            check(!source.response(reply, 0).progressed(), "identical replay made progress");
+            source.newChannel();
+            check(source.response(reply, 0).progressed(), "replacement-channel replay was refused");
+            check(!source.response(reply, 0).progressed(), "replacement-channel replay advanced twice");
+            reply.put(0, (byte) 0x70); // Same bytes, now final: this is progress too.
+            check(source.response(reply, 0).progressed(), "final flag made no progress");
+            check(!source.response(reply, 0).progressed(), "repeated final flag made progress");
+            ByteBuffer complete = ByteBuffer.allocateDirect(3);
+            complete.put(new byte[]{0, 2, 0}).flip();
+            check(source.response(complete, 0).reason() == 2, "empty completed window was refused");
+            check(source.response(reply, 0).progressed(), "new window retained old delivery history");
+            check(source.response(complete, 1).reason() == 2, "second window completion");
+            check(!source.response(reply, 0).progressed(), "another window erased unfinished delivery history");
+        }
+        try (J2KNative source = new J2KNative(null)) {
+            ByteBuffer cached = ByteBuffer.allocateDirect(13);
+            cached.put(new byte[]{0x60, 8, 0, 0, 5, 42, 42, 42, 42, 42, 0, 4, 0}).flip();
+            source.response(cached, 0);
+            source.newChannel();
+            reply.put(0, (byte) 0x60);
+            // A replacement channel may replay already cached ranges out of order.
+            for (int offset : new int[]{4, 0, 2, 1, 3}) {
+                reply.put(3, (byte) offset);
+                check(source.response(reply, 0).progressed(), "unseen range made no progress");
+                check(!source.response(reply, 0).progressed(), "repeated range made progress");
+            }
+            check(!source.response(cached, 0).progressed(), "coalesced ranges were counted again");
+        }
+        System.out.println("limited-response progress, duplicate and reordered ranges, final flags and replacement-channel replay");
+    }
+
+    private static void palettes(Path folder) throws Exception {
+        for (String name : List.of("small", "index2", "clamped", "gray", "swap", "mapped", "unsigned3", "signed4", "unsigned10", "signed10"))
+            local(folder.resolve(name + ".jp2"));
+        for (String name : List.of("index9", "signed-index")) {
+            try (J2KNative source = new J2KNative(folder.resolve(name + ".jp2"))) {
+                try { source.frame(0); throw new AssertionError("unrepresentable palette index accepted"); }
+                catch (IOException expected) { check(expected.getMessage().contains("palette indices"), expected.toString()); }
+            }
+        }
+        MethodHandle palette = Linker.nativeLinker().downcallHandle(SymbolLookup.loaderLookup().find("jhv_j2k_palette_rgba").orElseThrow(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
+        try (J2KNative source = new J2KNative(folder.resolve("small.jp2")); Arena arena = Arena.ofConfined()) {
+            Field field = J2KNative.class.getDeclaredField("handle");
+            field.setAccessible(true);
+            MemorySegment handle = (MemorySegment) field.get(source);
+            MemorySegment output = arena.allocate(1024), error = arena.allocate(256);
+            output.fill((byte) 42);
+            try {
+                int result = (int) palette.invokeExact(handle, 0, output, 1023L, error);
+                check(result < 0 && error.getString(0).contains("buffer too small"), "short palette buffer accepted");
+                for (byte value : output.toArray(ValueLayout.JAVA_BYTE))
+                    check(value == 42, "failed palette call wrote output");
+            } catch (Throwable t) {
+                if (t instanceof Exception e) throw e;
+                if (t instanceof Error e) throw e;
+                throw new AssertionError(t);
+            }
+        }
+    }
+
     // A color description the client does not support, and a codestream Kakadu refuses.
     private static void unsupported(Path folder) throws Exception {
         Path sycc = folder.resolve("sycc.jp2");
@@ -231,21 +319,21 @@ public final class J2KNativeTest {
 
         byte[] entry;
         try (J2KNative source = new J2KNative(null)) {
-            check(source.response(body(responses.resolve("reduced-header.jpp"))) == 2, "header response");
+            check(source.response(body(responses.resolve("reduced-header.jpp")), 0).reason() == 2, "header response");
             check(source.frames() == 1, "frame count");
             J2KNative.Frame info = source.frame(0);
             check(info.stream() == 0 && info.width().length == levels && info.ready() == 0, "frame with its header only");
             try { source.beginDecode(0, levels - 1).close(); throw new AssertionError("unready level decoded"); }
             catch (IOException expectedFailure) { check(expectedFailure.getMessage().contains("not ready"), expectedFailure.toString()); }
 
-            check(source.response(body(responses.resolve("reduced.jpp"))) == 2, "coarsest window");
+            check(source.response(body(responses.resolve("reduced.jpp")), 0).reason() == 2, "coarsest window");
             info = source.frame(0);
             check(info.ready() >= 1 && info.ready() < levels, "coarsest level ready alone");
             check(Arrays.equals(pixels(source, 0, levels - 1), expected[levels - 1]), "coarsest pixels");
 
-            check(source.response(body(responses.resolve("limited.jpp"))) == 4, "byte-limited window");
+            check(source.response(body(responses.resolve("limited.jpp")), 0).reason() == 4, "byte-limited window");
             check(source.frame(0).ready() < levels, "byte-limited window made the frame ready");
-            check(source.response(body(responses.resolve("continuation.jpp"))) == 2, "continued window");
+            check(source.response(body(responses.resolve("continuation.jpp")), 0).reason() == 2, "continued window");
             check(source.frame(0).ready() == levels, "all levels ready");
             for (int level = 0; level < levels; level++)
                 check(Arrays.equals(pixels(source, 0, level), expected[level]), "remote pixels at level " + level);
@@ -253,18 +341,18 @@ public final class J2KNativeTest {
         }
 
         try (J2KNative source = new J2KNative(null)) {
-            source.response(body(responses.resolve("whole-header.jpp")));
+            source.response(body(responses.resolve("whole-header.jpp")), 0);
             try { source.importFrame(0, Arrays.copyOf(entry, entry.length - 1)); throw new AssertionError("truncated cache entry imported"); }
             catch (IOException expectedFailure) { check(source.frame(0).ready() == 0, "refused cache entry changed the source"); }
             source.importFrame(0, entry);
             check(source.frame(0).ready() == levels && Arrays.equals(source.exportFrame(0), entry), "imported cache entry");
             check(Arrays.equals(pixels(source, 0, 0), expected[0]), "imported pixels");
             // The server knows nothing of an imported frame and sends it again.
-            check(source.response(body(responses.resolve("whole.jpp"))) == 2, "replay after import");
+            check(source.response(body(responses.resolve("whole.jpp")), 0).reason() == 2, "replay after import");
             ByteBuffer changed = body(responses.resolve("whole.jpp"));
             int at = changed.limit() - 4;
             changed.put(at, (byte) (changed.get(at) ^ 1));
-            try { source.response(changed); throw new AssertionError("conflicting response accepted"); }
+            try { source.response(changed, 0); throw new AssertionError("conflicting response accepted"); }
             catch (J2KNative.Refused refused) { check(refused.getMessage().contains("conflicts"), refused.toString()); }
         }
         System.out.println("JPIP responses: readiness, continuation, pixels at every level, cache entry, refusal");
@@ -298,13 +386,16 @@ public final class J2KNativeTest {
                 System.load(libraries.resolve("kdu_v7AR.dll").toString());
             System.load(libraries.resolve(System.mapLibraryName("kdu_jni")).toString());
             System.load(libraries.resolve(System.mapLibraryName("jhvj2k")).toString());
-            for (int i = 2; i < args.length; i++)
+            responseProgress();
+            palettes(Path.of(args[2]));
+            for (int i = 3; i < args.length; i++)
                 local(Path.of(args[i]));
-            failures(Path.of(args[2]));
+            failures(Path.of(args[3]));
             return;
         }
         System.load(args[0]);
         System.load(args[1]);
+        responseProgress();
         Path folder = Path.of(args[2]), image = Path.of(args[4]);
         for (int i = 4; i < args.length; i++)
             local(Path.of(args[i]));

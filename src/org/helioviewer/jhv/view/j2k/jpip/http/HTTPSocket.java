@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
@@ -109,6 +110,7 @@ public class HTTPSocket {
         return switch (contentEncoding) {
             case "identity" -> transferStream;
             case "gzip" -> new GZIPInputStream(transferStream);
+            case "deflate" -> new InflaterInputStream(transferStream);
             default -> throw new IOException("Unknown content encoding: " + contentEncoding);
         };
     }

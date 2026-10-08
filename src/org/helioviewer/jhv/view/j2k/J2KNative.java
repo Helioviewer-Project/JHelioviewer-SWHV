@@ -32,7 +32,7 @@ final class J2KNative implements AutoCloseable {
     // The ready levels are the coarsest ones.
     record Frame(long stream, int channels, int ready, int[] width, int[] height) {}
 
-    record Palette(int entries, int channels, byte[] values) {}
+    record Response(int reason, boolean progressed) {}
 
     private static final ValueLayout.OfInt I = ValueLayout.JAVA_INT;
     private static final ValueLayout.OfLong L = ValueLayout.JAVA_LONG;
@@ -41,11 +41,12 @@ final class J2KNative implements AutoCloseable {
     private static final long FRAME_SIZE = 288, FRAME_WIDTH = 20, FRAME_HEIGHT = 152;
     private static final MethodHandle OPEN = bind("open", P, P, P);
     private static final MethodHandle CLOSE = bind("close", null, P);
-    private static final MethodHandle RESPONSE = bind("response", I, P, P, L, P);
+    private static final MethodHandle NEW_CHANNEL = bind("new_channel", null, P);
+    private static final MethodHandle RESPONSE = bind("response", I, P, P, L, I, P, P);
     private static final MethodHandle FRAMES = bind("frames", I, P, P);
     private static final MethodHandle FRAME = bind("frame", I, P, I, P, P);
     private static final MethodHandle XML = bind("xml", L, P, I, P, L, P);
-    private static final MethodHandle PALETTE = bind("palette", I, P, I, P, P, L, P);
+    private static final MethodHandle PALETTE = bind("palette_rgba", I, P, I, P, L, P);
     private static final MethodHandle EXPORT = bind("export", L, P, I, P, L, P);
     private static final MethodHandle IMPORT = bind("import", I, P, I, P, L, P);
     private static final MethodHandle BEGIN = bind("begin_decode", P, P, I, I, P);
@@ -67,15 +68,21 @@ final class J2KNative implements AutoCloseable {
         }
     }
 
-    // One whole response body in a direct buffer. Returns the end-of-response reason.
-    synchronized int response(ByteBuffer body) throws Refused {
+    synchronized void newChannel() {
+        requireOpen();
+        call(NEW_CHANNEL, handle);
+    }
+
+    // One response for a frame, or metadata (-1). Each window tracks its own continuation.
+    synchronized Response response(ByteBuffer body, int window) throws Refused {
         requireOpen();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment error = arena.allocate(256);
-            int reason = (int) call(RESPONSE, handle, MemorySegment.ofBuffer(body), (long) body.remaining(), error);
+            MemorySegment progress = arena.allocate(I);
+            int reason = (int) call(RESPONSE, handle, MemorySegment.ofBuffer(body), (long) body.remaining(), window, progress, error);
             if (reason < 0)
                 throw new Refused(error.getString(0));
-            return reason;
+            return new Response(reason, progress.get(I, 0) != 0);
         }
     }
 
@@ -121,18 +128,16 @@ final class J2KNative implements AutoCloseable {
     }
 
     @Nullable
-    synchronized Palette palette(int frame) throws IOException {
+    synchronized ByteBuffer palette(int frame) throws IOException {
         requireOpen();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment error = arena.allocate(256);
-            MemorySegment channels = arena.allocate(I);
-            int entries = (int) checked(call(PALETTE, handle, frame, channels, MemorySegment.NULL, 0L, error), error);
-            if (entries == 0)
+            int size = (int) checked(call(PALETTE, handle, frame, MemorySegment.NULL, 0L, error), error);
+            if (size == 0)
                 return null;
-            long size = Math.multiplyExact((long) entries, channels.get(I, 0));
-            MemorySegment table = arena.allocate(size);
-            checked(call(PALETTE, handle, frame, channels, table, size, error), error);
-            return new Palette(entries, channels.get(I, 0), table.toArray(ValueLayout.JAVA_BYTE));
+            ByteBuffer table = ByteBuffer.allocateDirect(size);
+            checked(call(PALETTE, handle, frame, MemorySegment.ofBuffer(table), (long) size, error), error);
+            return table;
         }
     }
 

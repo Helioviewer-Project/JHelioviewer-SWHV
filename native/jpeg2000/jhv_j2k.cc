@@ -12,7 +12,7 @@ struct jhv_j2k { std::shared_ptr<jhv_j2k_source> source; };
 struct jhv_j2k_job {
     // Destruction closes the input before releasing its source.
     std::shared_ptr<jhv_j2k_source> owner;
-    jhv_j2k_source::description description;
+    const jhv_j2k_source::description &description;
     decoder_input input;
     int level;
     jhv_j2k_job(const std::shared_ptr<jhv_j2k_source> &_source, int _frame, int _level)
@@ -24,30 +24,63 @@ struct jhv_j2k_job {
 // to a call is the latest, not necessarily its own.
 static kdu_message_queue &errors() { static kdu_message_queue queue; return queue; }
 static kdu_message_queue &warnings() { static kdu_message_queue queue; return queue; }
-static void take(kdu_message_queue &queue, char *text) {
+static void take(kdu_message_queue &queue, char *text, size_t capacity = 256) {
     static std::mutex popping;
     std::lock_guard<std::mutex> lock(popping);
     size_t used = std::strlen(text);
     while (const char *message = queue.pop_message()) {
-        if (used < 255) std::snprintf(text + used, 256 - used, "%s%s", used ? " " : "", message);
+        if (used < capacity - 1) std::snprintf(text + used, capacity - used, "%s%s", used ? " " : "", message);
         used = std::strlen(text);
     }
 }
 
-// Every exported fallible call contains all C++ and decoder exceptions.
-template<class T, class F> static T guarded(char *error, T failed, F call) noexcept {
+// Contain C++ and decoder exceptions at the C API and inspector boundaries.
+template<class T, class F> static T guarded(char *error, T failed, F call, size_t capacity = 256) noexcept {
     error[0] = 0;
     try { return call(); }
     catch (kdu_exception code) {
-        take(errors(), error);
-        if (!error[0]) std::snprintf(error, 256, "JPEG 2000 decoder error (%d)", code);
+        take(errors(), error, capacity);
+        if (!error[0]) std::snprintf(error, capacity, "JPEG 2000 decoder error (%d)", code);
         return failed;
     }
-    catch (const std::bad_alloc &) { std::snprintf(error, 256, "JPEG 2000 native allocation failed"); }
-    catch (const std::exception &e) { std::snprintf(error, 256, "%s", e.what()); }
-    catch (...) { std::snprintf(error, 256, "Unexpected JPEG 2000 native failure"); }
-    take(errors(), error);
+    catch (const std::bad_alloc &) { std::snprintf(error, capacity, "JPEG 2000 native allocation failed"); }
+    catch (const std::exception &e) { std::snprintf(error, capacity, "%s", e.what()); }
+    catch (...) { std::snprintf(error, capacity, "Unexpected JPEG 2000 native failure"); }
+    take(errors(), error, capacity);
     return failed;
+}
+
+int jhv_j2k_source::inspect(hvc *source, size_t frame, void *context,
+                            hvc_info *info, char *error, size_t error_size) noexcept {
+    return guarded(error, -1, [&] {
+        jhv_j2k_source &owner = *static_cast<jhv_j2k_source *>(context);
+        // Jobs retain this source and borrow its immutable frame descriptions.
+        if (owner.descriptions.empty()) owner.descriptions.resize(owner.frames());
+        // The coarsest level suffices: every header is kept at any reduction.
+        decoder_input input(source, frame, INT_MAX);
+        description result = description();
+        const char *reason = input.with_stream([&](kdu_codestream &stream) {
+            if (hvc_render_read(source, frame, stream.get_num_components(true), &result.render))
+                first_component(result.render);
+            return jhv_kdu_read_geometry(stream, result.render, result.geometry);
+        });
+        if (reason && result.render.channel_count > 1 && result.render.channel[0].palette_column < 0) {
+            first_component(result.render);
+            reason = input.with_stream([&](kdu_codestream &stream) {
+                return jhv_kdu_read_geometry(stream, result.render, result.geometry);
+            });
+        }
+        if (reason) throw std::runtime_error(reason);
+        info->components = result.geometry.plane_count;
+        info->resolutions = result.geometry.resolutions;
+        info->layers = result.geometry.layers;
+        for (int r = 0; r < info->resolutions; r++) {
+            info->width[r] = result.geometry.level[r].width;
+            info->height[r] = result.geometry.level[r].height;
+        }
+        owner.descriptions[frame] = result;
+        return 0;
+    }, error_size);
 }
 
 jhv_j2k *jhv_j2k_open(const char *path, char *error) {
@@ -65,9 +98,12 @@ jhv_j2k *jhv_j2k_open(const char *path, char *error) {
     });
 }
 void jhv_j2k_close(jhv_j2k *source) { delete source; }
-int jhv_j2k_response(jhv_j2k *source, const uint8_t *body, uint64_t size, char *error) {
+void jhv_j2k_new_channel(jhv_j2k *source) { hvc_new_channel(source->source->raw()); }
+int jhv_j2k_response(jhv_j2k *source, const uint8_t *body, uint64_t size, int window,
+                     int *progress, char *error) {
     return guarded(error, -1, [&] {
-        return source->source->checked(hvc_response(source->source->raw(), body, size));
+        return source->source->checked(hvc_response_progress(source->source->raw(), body, size,
+                                                             static_cast<uint64_t>(window), progress));
     });
 }
 int jhv_j2k_frames(jhv_j2k *source, char *error) {
@@ -99,12 +135,25 @@ int64_t jhv_j2k_xml(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity,
         return static_cast<int64_t>(size);
     });
 }
-int jhv_j2k_palette(jhv_j2k *source, int frame, int32_t *channels, uint8_t *out, uint64_t capacity, char *error) {
+int jhv_j2k_palette_rgba(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error) {
     return guarded(error, -1, [&] {
-        int count = 0;
-        int entries = source->source->checked(hvc_palette(source->source->raw(), frame, &count, out, capacity));
-        *channels = count;
-        return entries;
+        if (!hvc_info_read(source->source->raw(), frame))
+            throw std::runtime_error(hvc_error(source->source->raw()));
+        const hv_render &render = source->source->described(frame).render;
+        if (render.channel[0].palette_column < 0) return 0;
+        const int size = 256 * 4;
+        if (!out) return size;
+        if (capacity < size) throw std::runtime_error("palette output buffer too small");
+        uint8_t colors[256 * 3];
+        const char *reason = hv_render_palette(&render, 256, colors, sizeof colors);
+        if (reason) throw std::runtime_error(reason);
+        for (size_t i = 0; i < 256; i++) {
+            for (size_t c = 0; c < 3; c++) {
+                *out++ = colors[i * render.channel_count + (render.channel_count == 1 ? 0 : c)];
+            }
+            *out++ = 255;
+        }
+        return size;
     });
 }
 int64_t jhv_j2k_export(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error) {

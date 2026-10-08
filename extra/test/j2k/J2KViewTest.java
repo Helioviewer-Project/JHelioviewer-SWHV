@@ -363,18 +363,18 @@ public final class J2KViewTest {
         try {
             JPIPSocket socket = new JPIPSocket(uri);
             try {
-                receive(socket, source, opening);
+                receive(socket, source, opening, -1);
                 int reason;
                 do {
                     socket.sendMetadata();
-                    reason = receive(socket, source, opening);
+                    reason = receive(socket, source, opening, -1);
                 } while (reason == 4 || reason == 7);
                 int metadataEnd = opening.size();
                 source.loadFrames();
                 long stream = source.client().frame(0).stream();
                 do {
                     socket.sendFrame(stream, 64, 64, 0);
-                    reason = receive(socket, source, opening);
+                    reason = receive(socket, source, opening, 0);
                 } while (reason == 4 || reason == 7);
                 source.update(0);
                 ResolutionSet set = source.resolutionSet(0);
@@ -382,7 +382,7 @@ public final class J2KViewTest {
                     ResolutionSet.Level size = set.getClosestLevel(64, 64);
                     do {
                         socket.sendFrame(stream, size.width(), size.height(), 1);
-                        reason = receive(socket, source, opening);
+                        reason = receive(socket, source, opening, 0);
                     } while (reason == 4 || reason == 7);
                     source.update(0);
                 }
@@ -392,7 +392,7 @@ public final class J2KViewTest {
                 ResolutionSet.Level size = set.getLevel(level);
                 do {
                     socket.sendFrame(stream, size.width(), size.height(), 1);
-                    reason = receive(socket, source, finer);
+                    reason = receive(socket, source, finer, 0);
                 } while (reason == 4 || reason == 7);
                 source.update(0);
                 if (!source.getFrameStatus(0, level))
@@ -408,7 +408,7 @@ public final class J2KViewTest {
                 // Small windows let the drain check hold both responses after the two sends.
                 socket.sendFrame(source.client().frame(1).stream(), size.width(), size.height(), 0);
                 List<byte[]> secondFrame = new ArrayList<>();
-                reason = receive(socket, source, secondFrame);
+                reason = receive(socket, source, secondFrame, 1);
                 source.update(1);
                 if ((reason != 1 && reason != 2) || finer.size() != 1 || !Boolean.TRUE.equals(source.getFrameStatus(1, level)))
                     throw new AssertionError("Drain fixture needs two complete, single-response windows");
@@ -421,12 +421,12 @@ public final class J2KViewTest {
         }
     }
 
-    private static int receive(JPIPSocket socket, J2KSource source, List<byte[]> captured) throws Exception {
+    private static int receive(JPIPSocket socket, J2KSource source, List<byte[]> captured, int window) throws Exception {
         ByteBuffer response = socket.receive();
         byte[] bytes = new byte[response.remaining()];
         response.duplicate().get(bytes);
         captured.add(bytes);
-        int reason = source.client().response(response);
+        int reason = source.client().response(response, window).reason();
         if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
             throw new AssertionError("Unexpected captured EOR: " + reason);
         return reason;

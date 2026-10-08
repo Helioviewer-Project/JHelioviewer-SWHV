@@ -22,6 +22,8 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
             return "unsupported mix of palette and direct channels";
     if (indexed && value.plane_count != 1)
         return "unsupported palette on several components";
+    if (indexed && (stream.get_signed(components[0], true) || stream.get_bit_depth(components[0], true) > 8))
+        return "palette indices require one unsigned component of at most 8 bits";
     value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
     stream.set_persistent();

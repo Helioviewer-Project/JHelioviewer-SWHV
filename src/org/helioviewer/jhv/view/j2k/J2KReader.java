@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -72,12 +73,12 @@ class J2KReader implements Runnable {
         }
 
         closeSocket(); // also release the connection if initialization failed before start()
+        myThread.interrupt();
+        // The native source can be closed only after the reader has stopped.
         while (myThread.isAlive()) {
             try {
-                closeSocket();
-                myThread.interrupt();
-                myThread.join(100);
-            } catch (Exception e) { // avoid exit from loop
+                myThread.join();
+            } catch (InterruptedException e) {
                 Log.error(e);
             }
         }
@@ -107,27 +108,45 @@ class J2KReader implements Runnable {
         }
     }
 
-    private static boolean isWindowComplete(int reason) throws IOException {
-        return switch (reason) {
-            case 1, 2 -> true; // image done, window done
-            case 4, 7 -> false; // byte limit, response limit
-            default -> throw new IOException("Unexpected JPIP end of response: " + reason);
+    enum Window { COMPLETE, CONTINUE, STALLED }
+
+    @FunctionalInterface
+    interface Request { void send() throws IOException; }
+
+    @FunctionalInterface
+    interface Response { J2KNative.Response receive() throws IOException; }
+
+    static Window window(J2KNative.Response response) throws IOException {
+        return switch (response.reason()) {
+            case 1, 2 -> Window.COMPLETE;
+            case 4, 7 -> response.progressed() ? Window.CONTINUE : Window.STALLED;
+            default -> throw new IOException("Unexpected JPIP end of response: " + response.reason());
         };
+    }
+
+    // Shared by initialization and first-frame retrieval; testable without a decoder.
+    static void readWindow(Request request, Response response) throws IOException {
+        Window state;
+        do {
+            if (Thread.currentThread().isInterrupted())
+                throw new InterruptedIOException("JPIP request interrupted");
+            request.send();
+            state = window(response.receive());
+            if (state == Window.STALLED)
+                throw new IOException("JPIP byte-limited response made no progress");
+        } while (state == Window.CONTINUE);
     }
 
     // A new channel and its metadata.
     private void connect() throws IOException {
         socket = new JPIPSocket(uri);
-        client.response(socket.receive());
-        do {
-            socket.sendMetadata();
-        } while (!isWindowComplete(client.response(socket.receive())));
+        client.newChannel();
+        client.response(socket.receive(), -1);
+        readWindow(socket::sendMetadata, () -> client.response(socket.receive(), -1));
     }
 
     private void fetchFirst(int width, int height, int pad) throws IOException {
-        do {
-            socket.sendFrame(stream[0], width, height, pad);
-        } while (!isWindowComplete(client.response(socket.receive())));
+        readWindow(() -> socket.sendFrame(stream[0], width, height, pad), () -> client.response(socket.receive(), 0));
         source.update(0);
     }
 
@@ -225,13 +244,13 @@ class J2KReader implements Runnable {
     // Feeds the next response to the source. False when its frame needs another request in this pass.
     private boolean receive(Sent sent, ResolutionSet.Level wanted) throws IOException {
         int frame = sent.frame;
-        boolean complete = isWindowComplete(client.response(socket.receive()));
+        Window state = window(client.response(socket.receive(), frame));
         update(frame);
 
         ResolutionSet set = source.geometry(frame);
         if (set == null) {
-            if (complete)
-                fail(frame, "no header in a complete response");
+            if (state != Window.CONTINUE)
+                fail(frame, state == Window.STALLED ? "JPIP byte-limited response made no progress" : "no header in a complete response");
             return stuck[frame] == FAILED;
         }
 
@@ -243,10 +262,11 @@ class J2KReader implements Runnable {
                 JPIPCacheManager.store(key, level, () -> client.exportFrame(frame));
             return true;
         }
-        if (!complete || !sent.own) // cut by the response limit, or sized by another frame
+        if (state == Window.CONTINUE || (state == Window.COMPLETE && !sent.own)) // limited, or sized by another frame
             return false;
 
-        Log.warn(uri + ": frame " + frame + " is incomplete at level " + level + " after a complete response");
+        Log.warn(uri + ": frame " + frame + " is incomplete at level " + level
+                + (state == Window.STALLED ? ": byte-limited response made no progress" : " after a complete response"));
         stuck[frame] = Math.max(stuck[frame], level);
         return true;
     }

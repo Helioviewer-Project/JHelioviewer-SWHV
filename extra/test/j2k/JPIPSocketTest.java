@@ -15,8 +15,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
 public final class JPIPSocketTest {
@@ -31,12 +33,12 @@ public final class JPIPSocketTest {
                 "cid=test,path=jpip", "cid=test,transport=http-tcp,path=jpip"})
             testInvalidChannel("JPIP-cnew: " + cnew + "\r\n");
         testInvalidChannel("");
-        testPipeline(false);
-        testPipeline(true);
+        for (String encoding : new String[]{"identity", "gzip", "deflate"})
+            testPipeline(encoding);
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
-        System.out.println("PASS: channel opening, plain/gzip chunked bodies in request order, buffer growth, graceful close, abort and interrupted handshake");
+        System.out.println("PASS: channel opening, plain/gzip/deflate chunked bodies in request order, buffer growth, graceful close, abort and cancelled handshake");
     }
 
     private interface Server {
@@ -111,17 +113,18 @@ public final class JPIPSocketTest {
             throw new AssertionError("Invalid channel caused another request: " + header);
     }
 
-    private static void testPipeline(boolean gzip) throws Exception {
+    private static void testPipeline(String encoding) throws Exception {
         byte[] large = new byte[300000];
         for (int i = 0; i < large.length; i++)
             large[i] = (byte) (i * 31);
         ByteArrayOutputStream compressed = new ByteArrayOutputStream();
-        if (gzip) {
-            try (GZIPOutputStream output = new GZIPOutputStream(compressed)) {
+        boolean encoded = !encoding.equals("identity");
+        if (encoded) {
+            try (OutputStream output = encoding.equals("gzip") ? new GZIPOutputStream(compressed) : new DeflaterOutputStream(compressed)) {
                 output.write(large);
             }
         }
-        byte[] payload = gzip ? compressed.toByteArray() : large;
+        byte[] payload = encoded ? compressed.toByteArray() : large;
         exchange((connection, input) -> {
             readRequest(input);
             reply(connection, CHANNEL, new byte[]{0, 2, 0});
@@ -137,8 +140,8 @@ public final class JPIPSocketTest {
             // A chunked body larger than the client's initial buffer.
             OutputStream out = connection.getOutputStream();
             out.write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\nTransfer-Encoding: chunked\r\n"
-                    + (gzip ? "Content-Encoding: gzip\r\n" : "") + "\r\n").getBytes(StandardCharsets.US_ASCII));
-            int chunkSize = gzip ? 7 : 100000; // Split gzip headers and trailer across HTTP chunks too.
+                    + (encoded ? "Content-Encoding: " + encoding + "\r\n" : "") + "\r\n").getBytes(StandardCharsets.US_ASCII));
+            int chunkSize = encoded ? 7 : 100000; // Split compression framing across HTTP chunks too.
             for (int at = 0; at < payload.length; at += chunkSize) {
                 int count = Math.min(chunkSize, payload.length - at);
                 out.write((Integer.toHexString(count) + "\r\n").getBytes(StandardCharsets.US_ASCII));
@@ -184,7 +187,7 @@ public final class JPIPSocketTest {
             return input.read();
         }, (uri, workers, served) -> {
             AtomicReference<Throwable> failure = new AtomicReference<>();
-            Thread reader = Thread.ofVirtual().start(() -> {
+            FutureTask<Void> load = new FutureTask<>(() -> {
                 try {
                     new JPIPSocket(uri).receive();
                     failure.set(new AssertionError("Stalled handshake completed"));
@@ -194,11 +197,13 @@ public final class JPIPSocketTest {
                 } catch (Throwable e) {
                     failure.set(e);
                 }
+                return null;
             });
+            Thread reader = Thread.ofVirtual().start(load);
             try {
                 if (!requestReceived.await(5, TimeUnit.SECONDS))
                     throw new AssertionError("Handshake did not reach server");
-                reader.interrupt();
+                load.cancel(true);
                 reader.join(2000);
                 if (reader.isAlive())
                     throw new AssertionError("Interrupt did not release the handshake");

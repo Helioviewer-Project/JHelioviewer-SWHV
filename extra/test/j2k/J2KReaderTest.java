@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -18,6 +20,11 @@ public final class J2KReaderTest {
     private enum Mode { SEQUENTIAL, PREFETCH, CACHED, DAMAGED }
 
     public static void main(String[] arguments) throws Exception {
+        testContinuation();
+        if (arguments.length == 0) {
+            System.out.println("PASS: reader continuation, stalled windows, EOR validation and interruption without native libraries");
+            return;
+        }
         System.load(arguments[0]);
         System.load(arguments[1]);
         Method close = JPIPCacheManager.class.getDeclaredMethod("close");
@@ -42,15 +49,47 @@ public final class J2KReaderTest {
         }
     }
 
+    private static void testContinuation() throws Exception {
+        int[] calls = {0};
+        J2KReader.readWindow(() -> calls[0]++, () -> new J2KNative.Response(calls[0] < 20 ? 4 : 2, true));
+        if (calls[0] != 20)
+            throw new AssertionError("Legitimate continuation was cut short");
+        for (int reason : new int[]{4, 7}) {
+            calls[0] = 0;
+            try {
+                J2KReader.readWindow(() -> {
+                    if (++calls[0] > 2)
+                        throw new AssertionError("Stalled window kept requesting");
+                }, () -> new J2KNative.Response(reason, calls[0] == 1));
+                throw new AssertionError("Stalled window kept requesting");
+            } catch (IOException expected) {
+                if (calls[0] != 2)
+                    throw new AssertionError("Stalled continuation was retried");
+            }
+            if (J2KReader.window(new J2KNative.Response(reason, false)) != J2KReader.Window.STALLED)
+                throw new AssertionError("Frame response did not report stalled delivery");
+        }
+        J2KReader.readWindow(() -> {}, () -> new J2KNative.Response(2, false));
+        try {
+            J2KReader.window(new J2KNative.Response(3, true));
+            throw new AssertionError("Unexpected EOR was accepted");
+        } catch (IOException expected) {}
+        calls[0] = 0;
+        Thread.currentThread().interrupt();
+        try {
+            J2KReader.readWindow(() -> calls[0]++, () -> new J2KNative.Response(4, true));
+            throw new AssertionError("Interrupted window kept requesting");
+        } catch (InterruptedIOException expected) {
+            if (calls[0] != 0)
+                throw new AssertionError("Interrupted window sent a request");
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
     private static void compare(String[] expected, String[] actual, String scenario) {
         if (!Arrays.equals(expected, actual))
             throw new AssertionError("Metadata or pixels differ after " + scenario);
-    }
-
-    private static boolean isComplete(int reason) {
-        if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
-            throw new AssertionError("Unexpected end of response: " + reason);
-        return reason < 4;
     }
 
     private static String[] retrieve(URI uri, int frames, int[] levels, Mode mode) throws Exception {
@@ -67,10 +106,10 @@ public final class J2KReaderTest {
                 keys[frame] = uri + "[" + frame + "]";
             if (mode == Mode.SEQUENTIAL) {
                 socket = new JPIPSocket(uri);
-                source.client().response(socket.receive());
-                do {
-                    socket.sendMetadata();
-                } while (!isComplete(source.client().response(socket.receive())));
+                source.client().newChannel();
+                source.client().response(socket.receive(), -1);
+                JPIPSocket opened = socket;
+                J2KReader.readWindow(opened::sendMetadata, () -> source.client().response(opened.receive(), -1));
                 source.loadFrames();
             } else {
                 reader = new J2KReader(uri, source);
@@ -104,9 +143,11 @@ public final class J2KReaderTest {
                     throw new AssertionError("Level " + level + " complete or cached before retrieval");
                 if (reader == null) {
                     for (int frame = 0; frame < frames; frame++) {
-                        do {
-                            socket.sendFrame(source.client().frame(frame).stream(), size.width(), size.height(), 1);
-                        } while (!isComplete(source.client().response(socket.receive())));
+                        JPIPSocket opened = socket;
+                        long stream = source.client().frame(frame).stream();
+                        int window = frame;
+                        J2KReader.readWindow(() -> opened.sendFrame(stream, size.width(), size.height(), 1),
+                                () -> source.client().response(opened.receive(), window));
                         source.update(frame);
                     }
                 } else {
@@ -133,7 +174,7 @@ public final class J2KReaderTest {
                     }
                     if (frames == 1 && mode == Mode.PREFETCH && level > 0 && Boolean.TRUE.equals(source.getFrameStatus(frame, level - 1)))
                         throw new AssertionError("Fetching level " + level + " completed a finer level");
-                    try (J2KNative.Decode job = source.beginDecode(frame, level)) {
+                    try (J2KNative.Decode job = source.client().beginDecode(frame, level)) {
                         ByteBuffer pixels = ByteBuffer.allocateDirect(size.width() * size.height());
                         J2KSource.decode(job, 0, 0, size.width(), size.height(), pixels);
                         MessageDigest hash = MessageDigest.getInstance("SHA-256");
