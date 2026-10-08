@@ -34,12 +34,6 @@ class ChunkedInputStream extends InputStream {
         in = _in;
     }
 
-    // This kind of stream does not support marking.
-    @Override
-    public boolean markSupported() {
-        return false;
-    }
-
     // Reads the next byte of the chunked content. It will return -1 if there are
     // no more chunks to decode.
     @Override
@@ -76,35 +70,28 @@ class ChunkedInputStream extends InputStream {
                     return read;
                 }
 
-                if (chunkLength == 0) {
-                    String line = LineRead.readAsciiLine(in);
+                String line = LineRead.readAsciiLine(in);
 
-                    // esajpip doesn't use chunk extension
-                    // int separator = line.indexOf(';');
-                    // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
-                    try {
-                        int length = Integer.parseInt(line, 16);
-                        if (length < 0)
-                            throw new NumberFormatException("Negative length");
-                        chunkLength = length;
-                        if (chunkLength == 0) {
-                            LineRead.readCRLF(in);
-                            eof = true;
-                        }
-                    } catch (NumberFormatException ex) {
-                        throw new ProtocolException("Invalid chunk length format");
+                // esajpip doesn't use chunk extension
+                // int separator = line.indexOf(';');
+                // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
+                try {
+                    int length = Integer.parseInt(line, 16);
+                    if (length < 0)
+                        throw new NumberFormatException("Negative length");
+                    chunkLength = length;
+                    if (chunkLength == 0) {
+                        LineRead.readCRLF(in);
+                        eof = true;
                     }
+                } catch (NumberFormatException ex) {
+                    throw new ProtocolException("Invalid chunk length format");
                 }
             }
         } catch (IOException e) {
             eof = true; // Failed framing or I/O: close must not attempt another drain.
             throw e;
         }
-    }
-
-    @Override
-    public int read(@Nonnull byte[] b) throws IOException {
-        return read(b, 0, b.length);
     }
 
     @Override

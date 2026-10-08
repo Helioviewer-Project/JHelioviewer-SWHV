@@ -334,9 +334,8 @@ public final class FitsMetaData extends CommonMetaData {
 
     @Nonnull
     @Override
-    public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
-        return new Region(roiX * factorX * unitPerPixelX - referenceX, roiY * factorY * unitPerPixelY - referenceY,
-                roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
+    public Region imageToRegion(int width, int height) {
+        return new Region(-referenceX, -referenceY, width * unitPerPixelX, height * unitPerPixelY);
     }
 
     @Nonnull

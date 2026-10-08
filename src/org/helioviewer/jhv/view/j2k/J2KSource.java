@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import javax.annotation.Nullable;
@@ -62,10 +61,9 @@ public final class J2KSource {
         ResolutionSet set = sets.get(frame);
         if (set == null) {
             ResolutionSet.Level[] resolutions = new ResolutionSet.Level[levels];
-            int width0 = info.width()[0], height0 = info.height()[0];
             for (int i = 0; i < levels; i++) {
                 int width = info.width()[i], height = info.height()[i];
-                resolutions[i] = new ResolutionSet.Level(i, width, height, width0 / (double) width, height0 / (double) height);
+                resolutions[i] = new ResolutionSet.Level(i, width, height);
             }
             set = new ResolutionSet(resolutions, info.channels());
             sets.set(frame, set);
@@ -126,7 +124,7 @@ public final class J2KSource {
 
     // Null: not displayable; false: displayable, incomplete at the level; true: complete at the level.
     @Nullable
-    AtomicBoolean getFrameStatus(int frame, int level) {
+    Boolean getFrameStatus(int frame, int level) {
         ResolutionSet set = sets.get(frame);
         return set != null && set.isDisplayable() ? set.getComplete(level) : null;
     }
@@ -142,7 +140,7 @@ public final class J2KSource {
     boolean isComplete(int level) {
         for (int i = 0; i < sets.length(); i++) {
             ResolutionSet set = sets.get(i);
-            if (set == null || !set.getComplete(level).get())
+            if (set == null || !set.getComplete(level))
                 return false;
         }
         return true;
@@ -157,7 +155,7 @@ public final class J2KSource {
     // Leaves the output buffer's position unchanged.
     static void decode(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer pixels) throws IOException {
         String warning = pixels.isDirect()
-                ? job.run(x, y, width, height, pixels.duplicate())
+                ? job.run(x, y, width, height, pixels)
                 : runToHeap(job, x, y, width, height, pixels);
         if (warning != null)
             Log.warn(warning);

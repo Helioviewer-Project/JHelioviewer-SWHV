@@ -7,7 +7,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
@@ -67,20 +66,14 @@ public class HTTPSocket {
 
             InputStream openInputStream = new BufferedInputStream(openSocket.getInputStream());
 
-            HashMap<String, String> hdr = new HashMap<>();
-            hdr.put("User-Agent", AppInfo.userAgent);
-            hdr.put("Connection", "keep-alive");
-            hdr.put("Accept-Encoding", "gzip");
-            hdr.put("Cache-Control", "no-cache");
-            hdr.put("Host", host + ':' + port);
-
-            StringBuilder sb = new StringBuilder();
-            hdr.forEach((key, value) -> sb.append(key).append(": ").append(value).append("\r\n"));
-            String header = " HTTP/1.1\r\n" + sb + "\r\n";
-
             socket = openSocket;
             inputStream = openInputStream;
-            httpHeader = header;
+            httpHeader = " HTTP/1.1\r\n"
+                    + "Host: " + host + ':' + port + "\r\n"
+                    + "User-Agent: " + AppInfo.userAgent + "\r\n"
+                    + "Connection: keep-alive\r\n"
+                    + "Accept-Encoding: gzip\r\n"
+                    + "Cache-Control: no-cache\r\n\r\n";
         } catch (Exception e) { // redirect all to IOException
             if (openSocket != null)
                 try {

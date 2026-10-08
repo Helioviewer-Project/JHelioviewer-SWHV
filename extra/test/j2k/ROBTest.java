@@ -62,12 +62,12 @@ public final class ROBTest {
             for (int level : new int[]{2, 0}) {
                 ResolutionSet.Level size = source.resolutionSet(0).getLevel(level);
                 // The reopened cache holds level 0, which also serves level 2.
-                if (!cached && (source.getFrameStatus(0, level).get() || JPIPCacheManager.get("image", level) != null))
+                if (!cached && (source.getFrameStatus(0, level) || JPIPCacheManager.get("image", level) != null))
                     throw new AssertionError("Level " + level + " complete or cached before it was fetched");
-                J2KParams.Decode decode = new J2KParams.Decode(0, size.subImage(), level);
+                J2KParams.Decode decode = new J2KParams.Decode(0, level);
                 if (!(boolean) readFrames.invoke(reader, new J2KParams.Read(null, decode, false), size, false))
                     throw new AssertionError("Fetch interrupted unexpectedly");
-                if (!source.getFrameStatus(0, level).get() || (level > 0 && !cached && source.getFrameStatus(0, level - 1).get()))
+                if (!source.getFrameStatus(0, level) || (level > 0 && !cached && source.getFrameStatus(0, level - 1)))
                     throw new AssertionError("Wrong completion after fetching level " + level);
                 JPIPCacheManager.Entry entry = JPIPCacheManager.get("image", level);
                 if (entry == null || entry.level() != (cached ? 0 : level))

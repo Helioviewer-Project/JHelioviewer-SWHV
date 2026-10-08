@@ -121,7 +121,7 @@ public final class JPIPSocketTest {
             reply(connection, "", new byte[]{0, 4, 0});
             // Require both requests before responding, proving the client sends ahead.
             String first = readRequest(input), second = readRequest(input);
-            if (!first.startsWith("GET /jpip?cid=test&stream=7&fsiz=64,65,closest&rsiz=65,66&roff=0,0&len=2097152 ")
+            if (!first.startsWith("GET /jpip?cid=test&stream=7&fsiz=64,65,closest&rsiz=65,66&len=2097152 ")
                     || !second.startsWith("GET /jpip?cid=test&stream=8&"))
                 throw new IOException("Unexpected frame requests: " + first + " | " + second);
             // A chunked body larger than the client's initial buffer.

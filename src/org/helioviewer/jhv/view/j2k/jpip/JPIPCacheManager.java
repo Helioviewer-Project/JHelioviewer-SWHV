@@ -29,6 +29,7 @@ public class JPIPCacheManager {
 
     static {
         Log.setLoggerLevel("org.ehcache", Level.WARNING); // shut-up Ehcache info logs
+        Runtime.getRuntime().addShutdownHook(new Thread(JPIPCacheManager::close));
     }
 
     // A frame's data as exported by the client, and the level it was complete at.
@@ -66,7 +67,6 @@ public class JPIPCacheManager {
 
     private static PersistentCacheManager cacheManager;
     private static Cache<String, Entry> cache;
-    private static Thread hook;
 
     public static void init() {
         deleteDirs("JPIPLevel-4", "JPIPStream-4", "JPIPLevel-5", "JPIPStream-5", "JPIPLevel-6", "JPIPStream-6", "JPIPStream-7");
@@ -88,11 +88,6 @@ public class JPIPCacheManager {
         } catch (RuntimeException e) {
             close();
             throw e;
-        }
-
-        if (hook == null) {
-            hook = new Thread(JPIPCacheManager::close);
-            Runtime.getRuntime().addShutdownHook(hook);
         }
     }
 

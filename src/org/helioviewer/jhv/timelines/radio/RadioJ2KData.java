@@ -37,7 +37,6 @@ class RadioJ2KData {
     private final RadioData owner;
     private final J2KSource source;
     private final LatestWorker<byte[]> executor;
-    private boolean disposed;
 
     private final long startDate;
     private final long endDate;
@@ -80,10 +79,6 @@ class RadioJ2KData {
     }
 
     void removeData() {
-        if (disposed) {
-            return;
-        }
-        disposed = true;
         executor.dispose();
         AppThread.create(source::close, "Radio-Close").start(); // not on the EDT
         bufferedImage = null;
@@ -113,7 +108,7 @@ class RadioJ2KData {
     }
 
     void requestData(TimeAxis xAxis) {
-        if (!willDraw || disposed)
+        if (!willDraw)
             return;
         Crop crop = getCrop(xAxis);
         if (crop == null)
@@ -212,7 +207,7 @@ class RadioJ2KData {
     }
 
     boolean isLoading() {
-        return willDraw && !disposed && !hasData();
+        return willDraw && !hasData();
     }
 
     void changeColormap(ColorModel cm) {

@@ -17,7 +17,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JComponent;
 import javax.swing.JSlider;
@@ -398,8 +397,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
                     if (end == begin)
                         end++;
 
-                    AtomicBoolean status = view.getFrameCompletion(i);
-                    g.setColor(status == null ? emptyColor : (status.get() ? completeColor : partialColor));
+                    Boolean status = view.getFrameCompletion(i);
+                    g.setColor(status == null ? emptyColor : (status ? completeColor : partialColor));
                     g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }
             }

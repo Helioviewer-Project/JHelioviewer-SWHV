@@ -136,6 +136,7 @@ class J2KReader implements Runnable {
         ResolutionSet set = source.geometry(0);
         if (set != null && !set.isDisplayable()) { // the window did not cover a level
             ResolutionSet.Level res = set.getClosestLevel(64, 64);
+            // Pad rsiz for the classical esajpip issue documented beside request()'s pad below.
             fetchFirst(res.width() + "," + res.height(), (res.width() + 1) + "," + (res.height() + 1));
         }
         if (set == null || !set.isDisplayable())
@@ -148,7 +149,7 @@ class J2KReader implements Runnable {
         if (set == null)
             return stuck[frame] == FAILED;
         int level = set.getNextLevel(width, height).level();
-        return stuck[frame] >= level || set.getComplete(level).get();
+        return stuck[frame] >= level || set.getComplete(level);
     }
 
     private boolean isSettled(int width, int height) {
@@ -207,6 +208,14 @@ class J2KReader implements Runnable {
 
         // The signalled frame's size while the header is unknown; else the frame's own, the region padded.
         ResolutionSet.Level res = set == null ? wanted : set.getNextLevel(width, height);
+        // Classical esajpip server issue: precinct selection can omit the last precinct
+        // when the last image coordinate is exactly a precinct boundary. Request rsiz=W+1,H+1
+        // while keeping fsiz=W,H. The new server clips rsiz to the image. Pad only exact
+        // frame dimensions: padding an approximate window can break the classical server.
+        // Details are in client/CLASSICAL.md in the esajpip repository.
+        // Classical servers also lack the full-frame default for omitted rsiz.
+        // TODO: Once all supported servers handle omitted rsiz as a full frame, remove
+        // rsiz from JPIPSocket.sendFrame(), this pad and the +1 in prime().
         int pad = set == null ? 0 : 1;
         socket.sendFrame(stream[frame], res.width() + "," + res.height(), (res.width() + pad) + "," + (res.height() + pad));
         return new Sent(frame, set != null);
@@ -227,7 +236,7 @@ class J2KReader implements Runnable {
         }
 
         int level = set.getNextLevel(wanted.width(), wanted.height()).level();
-        if (set.getComplete(level).get()) {
+        if (set.getComplete(level)) {
             String key = cacheKey[frame];
             if (key != null)
                 JPIPCacheManager.store(key, level, () -> client.exportFrame(frame));
@@ -241,18 +250,14 @@ class J2KReader implements Runnable {
         return true;
     }
 
-    private boolean readingInterrupted() {
-        return isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
-    }
-
     private boolean readFrames(J2KParams.Read params, ResolutionSet.Level wanted, boolean singleFrame) throws IOException {
         J2KParams.Decode decode = params.decodeParams();
         ArrayDeque<Integer> remaining = new ArrayDeque<>();
         if (singleFrame) {
-            remaining.add(decode.frame);
+            remaining.add(decode.frame());
         } else {
             int partial = source.getPartialUntil();
-            int first = partial < cacheKey.length - 1 ? partial : decode.frame;
+            int first = partial < cacheKey.length - 1 ? partial : decode.frame();
             for (int i = 0; i < cacheKey.length; i++)
                 remaining.add((first + i) % cacheKey.length);
         }
@@ -263,7 +268,7 @@ class J2KReader implements Runnable {
         boolean draining = false;
         while (true) {
             // On newer work, drain sent responses without issuing any more requests.
-            draining |= readingInterrupted();
+            draining |= isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
             if (!draining && sent.size() < limit && !remaining.isEmpty()) {
                 Sent request = request(remaining.removeFirst(), wanted);
                 if (request != null) {
@@ -299,7 +304,7 @@ class J2KReader implements Runnable {
 
             J2KView view = params.view();
             J2KParams.Decode decode = params.decodeParams();
-            ResolutionSet.Level wanted = source.resolutionSet(decode.frame).getLevel(decode.level);
+            ResolutionSet.Level wanted = source.resolutionSet(decode.frame()).getLevel(decode.level());
 
             view.setDownloading(true);
 

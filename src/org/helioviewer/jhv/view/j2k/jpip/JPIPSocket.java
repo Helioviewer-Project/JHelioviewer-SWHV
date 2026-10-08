@@ -78,7 +78,7 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     public void sendFrame(long stream, String size, String region) throws IOException {
-        writeRequest(createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", Long.toString(stream), "fsiz", size + ",closest", "rsiz", region, "roff", "0,0"));
+        writeRequest(createQuery(FRAME_RESPONSE_LIMIT, "cid", jpipChannelID, "stream", Long.toString(stream), "fsiz", size + ",closest", "rsiz", region));
     }
 
     // The whole body of the next response, valid until the next call.

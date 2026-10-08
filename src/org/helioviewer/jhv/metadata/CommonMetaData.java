@@ -123,9 +123,8 @@ class CommonMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
-        return new Region(roiX * factorX * unitPerPixelX + region.llx, roiY * factorY * unitPerPixelY + region.lly,
-                roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
+    public Region imageToRegion(int width, int height) {
+        return new Region(region.llx, region.lly, width * unitPerPixelX, height * unitPerPixelY);
     }
 
     @Nonnull

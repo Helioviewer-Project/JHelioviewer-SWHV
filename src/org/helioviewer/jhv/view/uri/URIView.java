@@ -53,7 +53,7 @@ public final class URIView extends BaseView {
             }
             xml = readXml;
 
-            imageRegion = m.roiToRegion(0, 0, info.width(), info.height(), 1, 1);
+            imageRegion = m.imageToRegion(info.width(), info.height());
             metaData[0] = m;
 
             LUT lut = info.lut();

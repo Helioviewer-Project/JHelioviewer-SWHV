@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -26,7 +24,6 @@ public interface View {
     }
 
     String EMPTY_METAXML = "<xml/>";
-    AtomicBoolean complete = new AtomicBoolean(true);
 
     @Nullable
     default APIRequest getAPIRequest() {
@@ -80,9 +77,10 @@ public interface View {
         return true;
     }
 
+    // Snapshot: null when unavailable, false when partial, true when complete.
     @Nullable
-    default AtomicBoolean getFrameCompletion(int frame) {
-        return complete;
+    default Boolean getFrameCompletion(int frame) {
+        return true;
     }
 
     JHVTime getFrameTime(int frame);

@@ -48,7 +48,7 @@ public interface MetaData {
     Position getViewpoint();
 
     @Nonnull
-    Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
+    Region imageToRegion(int width, int height);
 
     @Nonnull
     Vec2 getSunShift();

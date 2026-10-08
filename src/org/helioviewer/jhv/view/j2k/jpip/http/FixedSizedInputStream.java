@@ -46,9 +46,4 @@ class FixedSizedInputStream extends InputStream {
         return -1;
     }
 
-    @Override
-    public int read(@Nonnull byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
 }

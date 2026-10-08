@@ -179,14 +179,13 @@ final class J2KNative implements AutoCloseable {
         }
 
         // Fills a direct buffer with Gray8 or RGBA rows of a region of the level
-        // and advances its position. Returns Kakadu's warning, if any.
+        // without changing its position. Returns Kakadu's warning, if any.
         @Nullable
         String run(int x, int y, int width, int height, ByteBuffer output) throws IOException {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment error = arena.allocate(256);
-                long size = checked(call(DECODE, job, x, y, width, height,
+                checked(call(DECODE, job, x, y, width, height,
                         MemorySegment.ofBuffer(output), (long) output.remaining(), error), error);
-                output.position(output.position() + Math.toIntExact(size));
                 String warning = error.getString(0);
                 return warning.isEmpty() ? null : warning;
             }

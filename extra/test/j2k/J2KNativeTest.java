@@ -52,7 +52,7 @@ public final class J2KNativeTest {
             String warning = job.run(0, 0, width, height, output);
             check(warning == null, "decoder warning: " + warning);
         }
-        check(output.position() == 7 + size, "output position");
+        check(output.position() == 7, "output position changed");
         byte[] bytes = new byte[size];
         output.clear().get(7, bytes);
         check(output.get(6) == 0 && output.get(7 + size) == 0, "output bounds");
@@ -180,7 +180,7 @@ public final class J2KNativeTest {
                 try { job.run(-1, 0, width, height, output); throw new AssertionError("invalid region accepted"); }
                 catch (IOException expected) { /* Expected. */ }
                 job.run(0, 0, width, height, output);
-                check(!output.hasRemaining(), "job retry after failures");
+                check(output.equals(ByteBuffer.wrap(pixels(source, 0, level))), "job retry after failures");
             }
         }
         OperatingSystemMXBean operatingSystem = ManagementFactory.getOperatingSystemMXBean();

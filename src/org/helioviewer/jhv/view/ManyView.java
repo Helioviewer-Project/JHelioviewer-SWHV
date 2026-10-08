@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -104,7 +103,7 @@ public class ManyView implements View {
 
     @Nullable
     @Override
-    public AtomicBoolean getFrameCompletion(int frame) {
+    public Boolean getFrameCompletion(int frame) {
         FrameInfo frameInfo = frameMap.indexedValue(frame);
         return frameInfo.view.getFrameCompletion(frameInfo.idxView);
     }

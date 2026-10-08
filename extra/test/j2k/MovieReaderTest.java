@@ -91,7 +91,7 @@ public final class MovieReaderTest {
                 Field retries = J2KReader.class.getDeclaredField("retries");
                 retries.setAccessible(true);
                 retries.setInt(reader, 12);
-                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, size.subImage(), 0), false);
+                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, 0), false);
                 if (mode == Mode.PUMP) {
                     // Keep the idle worker waiting on its original queue while invoking the pump directly.
                     Field threadField = J2KReader.class.getDeclaredField("myThread");
@@ -133,7 +133,7 @@ public final class MovieReaderTest {
 
             String[] hashes = new String[4];
             for (int frame = 0; frame < hashes.length; frame++) {
-                if (!source.getFrameStatus(frame, 0).get())
+                if (!source.getFrameStatus(frame, 0))
                     throw new AssertionError("Incomplete frame " + frame);
                 ByteBuffer pixels;
                 try (J2KNative.Decode job = source.beginDecode(frame, 0)) {

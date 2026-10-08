@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.j2k;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
@@ -39,9 +38,6 @@ public final class J2KView extends BaseView {
 
     private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;
-    @SuppressWarnings("FieldCanBeLocal")
-    // Cleaner tracks reachability of this token; the cleanup action must not capture this J2KView.
-    private final Object cleanerToken = new Object();
 
     private final APIRequest request;
     private final int serial;
@@ -117,7 +113,7 @@ public final class J2KView extends BaseView {
                 reader.setCacheKey(cacheKey);
             }
 
-            abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source));
         } catch (Exception e) {
             if (acquiredReader != null)
                 acquiredReader.stop();
@@ -127,8 +123,10 @@ public final class J2KView extends BaseView {
         }
     }
 
+    private record DecodeKey(int serial, J2KParams.Decode params, ImageFilter.Type filter) {}
+
     private static void clearCache(int aSerial) {
-        ImageBufferCache.invalidateIf(key -> key instanceof J2KDecodeKey dk && dk.serial() == aSerial);
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.serial == aSerial);
     }
 
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
@@ -246,14 +244,14 @@ public final class J2KView extends BaseView {
             res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
-        return new J2KParams.Decode(frame, res.subImage(), res.level());
+        return new J2KParams.Decode(frame, res.level());
     }
 
     private static final int NO_LEVEL = 10000;
     private int currentLevel = NO_LEVEL;
 
     private void signalReader(J2KParams.Decode decodeParams) {
-        int level = decodeParams.level;
+        int level = decodeParams.level();
         boolean priority = !Player.isPlaying();
 
         if (priority || level < currentLevel) {
@@ -276,66 +274,67 @@ public final class J2KView extends BaseView {
 
     // The request itself, or the whole finest complete level while a JPIP frame lacks the wanted one.
     private J2KParams.Decode available(J2KParams.Decode wanted) {
-        ResolutionSet.Level res = source.resolutionSet(wanted.frame).getCompleteLevel(wanted.level);
-        return res.level() == wanted.level ? wanted : new J2KParams.Decode(wanted.frame, res.subImage(), res.level());
+        ResolutionSet.Level res = source.resolutionSet(wanted.frame()).getCompleteLevel(wanted.level());
+        return res.level() == wanted.level() ? wanted : new J2KParams.Decode(wanted.frame(), res.level());
     }
 
     void refreshDecodeFromReader(J2KParams.Decode wanted) {
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null && wanted.frame == targetFrame) {
+            if (dataHandler != null && wanted.frame() == targetFrame) {
                 show(available(wanted), currentViewpoint);
             }
         });
     }
 
     private void show(J2KParams.Decode decodeParams, Position viewpoint) {
-        J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, processingSettings.getFilter());
+        DecodeKey key = new DecodeKey(serial, decodeParams, processingSettings.getFilter());
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.invalidate();
-            sendDataToHandler(decodeParams.frame, viewpoint, image, () -> key.filter() == processingSettings.getFilter());
+            sendDataToHandler(decodeParams.frame(), viewpoint, image, () -> key.filter == processingSettings.getFilter());
             return;
         }
 
-        MetaData m = metaData[decodeParams.frame];
-        ResolutionSet.Level resolution = getResolutionLevel(decodeParams.frame, decodeParams.level);
+        MetaData m = metaData[decodeParams.frame()];
         executor.submit(
-                () -> decodeImage(decodeParams, key.filter(), m, resolution),
+                () -> decodeImage(decodeParams, key.filter, m),
                 new J2KCallback(key, viewpoint));
     }
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.
-    private DecodedImage decodeImage(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metadata, ResolutionSet.Level resolution) throws IOException {
-        try (J2KNative.Decode job = source.beginDecode(params.frame, params.level)) {
-            J2KParams.SubImage roi = params.subImage;
-            Region imageRegion = metadata.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
+    private DecodedImage decodeImage(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metadata) throws IOException {
+        try (J2KNative.Decode job = source.beginDecode(params.frame(), params.level())) {
+            ResolutionSet set = source.resolutionSet(params.frame());
+            ResolutionSet.Level resolution = set.getLevel(params.level());
+            ResolutionSet.Level full = set.getLevel(0);
+            Region imageRegion = metadata.imageToRegion(full.width(), full.height());
             ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
-            boolean gray = source.resolutionSet(params.frame).numComps == 1;
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(roi.w(), roi.h(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
-            J2KSource.decode(job, roi.x(), roi.y(), roi.w(), roi.h(), outBuffer.byteBuffer());
+            boolean gray = set.numComps == 1;
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
+            J2KSource.decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());
             return new DecodedImage(outBuffer.finish(), imageRegion);
         }
     }
 
     private class J2KCallback implements LatestWorker.Callback<DecodedImage> {
 
-        private final J2KDecodeKey key;
+        private final DecodeKey key;
         private final Position viewpoint;
 
-        J2KCallback(J2KDecodeKey _key, Position _viewpoint) {
+        J2KCallback(DecodeKey _key, Position _viewpoint) {
             key = _key;
             viewpoint = _viewpoint;
         }
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (dataHandler == null || key.filter() != processingSettings.getFilter()) return; // detached or filter changed in-flight
+            if (dataHandler == null || key.filter != processingSettings.getFilter()) return; // detached or filter changed in-flight
             ImageBufferCache.put(key, result);
 
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
-            sendDataToHandler(key.params().frame, viewpoint, result, () -> key.filter() == processingSettings.getFilter());
+            sendDataToHandler(key.params.frame(), viewpoint, result, () -> key.filter == processingSettings.getFilter());
         }
 
         @Override
@@ -348,7 +347,7 @@ public final class J2KView extends BaseView {
 
     @Nullable
     @Override
-    public AtomicBoolean getFrameCompletion(int frame) {
+    public Boolean getFrameCompletion(int frame) {
         return source.getFrameStatus(frame, currentLevel);
     }
 

@@ -109,7 +109,7 @@ public final class JHVMetadataDump {
                 ? meta.unitPerPixelY
                 : meta.unitPerPixelY / meta.unitPerArcsec;
         Region hpcBounds = ImageBounds.hpc(meta);
-        Region renderRegion = meta.roiToRegion(0, 0, pixelWidth, pixelHeight, 1, 1);
+        Region renderRegion = meta.imageToRegion(pixelWidth, pixelHeight);
         Vec2 sunShift = meta.getSunShift();
 
         return new JSONObject()

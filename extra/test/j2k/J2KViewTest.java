@@ -103,7 +103,7 @@ public final class J2KViewTest {
             throw new AssertionError("Latest request viewpoint was not delivered");
 
         images.clear();
-        EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(new J2KParams.Decode(0, size.subImage(), size.level())));
+        EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(new J2KParams.Decode(0, size.level())));
         image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Reader refresh used an obsolete viewpoint");
@@ -119,7 +119,7 @@ public final class J2KViewTest {
                     release.await();
                     return null;
                 }, (result, current) -> fresh.complete(current));
-                view.refreshDecodeFromReader(new J2KParams.Decode(0, size.subImage(), size.level()));
+                view.refreshDecodeFromReader(new J2KParams.Decode(0, size.level()));
             });
             EventQueue.invokeAndWait(() -> {}); // the queued refresh has run
             release.countDown();

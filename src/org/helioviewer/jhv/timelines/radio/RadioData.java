@@ -119,8 +119,8 @@ public final class RadioData extends TimelineLayer {
                 RadioJPXDownload download = new RadioJPXDownload(date);
                 downloads.put(date, download);
                 changed = true;
-                Task.submitBackground(Long.toString(date), download, result -> onSuccessRadioJPX(download, result),
-                        (logContext, t) -> onFailureRadioJPX(download, t));
+                Task.submitBackground(download, result -> onSuccessRadioJPX(download, result),
+                        t -> onFailureRadioJPX(download, t));
             }
         }
         if (changed)
@@ -147,7 +147,7 @@ public final class RadioData extends TimelineLayer {
     }
 
     private void onSuccessRadioJPX(RadioJPXDownload download, @Nonnull RadioJ2KData result) {
-        if (finishDownload(download) && enabled) {
+        if (finishDownload(download)) {
             cache.put(download.date, result);
             fetchData(DrawController.selectedAxis);
         } else {
