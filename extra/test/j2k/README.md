@@ -76,8 +76,9 @@ through a local server. Two failed passes must recover with an immediate first r
 before the second. Fourteen consecutive failed passes must exhaust retries and log the cause once,
 even when every pass accepts byte-limited data before failing. A conflicting response must stop
 the reader and purge this source's disk entries while preserving an unrelated entry. Equal-length
-timestamp edits put frames out of order and make one frame use fallback metadata: disk keys must
-use each frame's own timestamp, and the fallback frame must have no key. No capture folders are required.
+timestamp edits create duplicate and out-of-order frames: both movies must be rejected with
+the offending frame indices and timestamps, and their connections must close before background
+downloading starts. Ordered movies retain their per-frame disk keys. No capture folders are required.
 
 The live suite also downloads a Callisto JP2 through the ROB API and checks horizontal
 crops at the origin, interior, and right edge against a full-image decode. It exercises

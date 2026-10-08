@@ -93,19 +93,21 @@ public final class J2KView extends BaseView {
                     metaData[i] = new BasicMetaData(level.width(), level.height(), dataUri.baseName(), dataUri.sourceUri());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
-                if (frameMap.put(metaData[i].getViewpoint().time, i) != null) // log duplicated
-                    Log.warn("Duplicate time stamp: " + metaData[i].getViewpoint().time);
+                JHVTime time = metaData[i].getViewpoint().time;
+                if (i > 0) {
+                    JHVTime previous = metaData[i - 1].getViewpoint().time;
+                    if (time.milli <= previous.milli)
+                        throw new Exception((time.milli == previous.milli ? "Duplicate frame timestamp" : "Out-of-order frame timestamp")
+                                + "\nFrame " + (i - 1) + ": " + previous + "\nFrame " + i + ": " + time);
+                }
+                frameMap.put(time, i);
             }
             frameMap.buildIndex();
-            if (frameMap.maxIndex() != maxFrame)
-                throw new Exception("Duplicated time stamps");
 
             if (reader != null) {
                 String[] cacheKey = new String[maxFrame + 1];
                 if (request != null) {
                     for (int i = 0; i <= maxFrame; i++) {
-                        if (frameMap.key(i).milli != metaData[i].getViewpoint().time.milli)
-                            Log.warn("Badly ordered metadata: " + dataUri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
                         if (metaData[i] instanceof FitsMetaData)
                             cacheKey[i] = request.sourceId() + "+" + metaData[i].getViewpoint().time.milli;
                     }
@@ -212,7 +214,7 @@ public final class J2KView extends BaseView {
 
     @Override
     public boolean setNearestFrame(JHVTime time) {
-        int frame = frameMap.nearestValue(time);
+        int frame = frameMap.nearestIndex(time);
         if (frame != targetFrame) {
             if (frame > source.getPartialUntil())
                 return false;
@@ -243,7 +245,7 @@ public final class J2KView extends BaseView {
 
     @Override
     public MetaData getMetaData(JHVTime time) {
-        return metaData[frameMap.nearestValue(time)];
+        return metaData[frameMap.nearestIndex(time)];
     }
 
     private volatile boolean isDownloading;

@@ -385,13 +385,13 @@ public final class J2KViewTest {
                 source.update(0);
                 if (!source.getFrameStatus(0, level))
                     throw new AssertionError("Captured finer window is incomplete");
-                String[] dates = new String[3];
+                String[] dates = new String[2];
                 for (int i = 0; i < dates.length; i++) {
                     XMLMetaDataContainer xml = new XMLMetaDataContainer(source.xml(i));
                     dates[i] = xml.getString("DATE-AVG").or(() -> xml.getString("DATE_AVG"))
                             .or(() -> xml.getString("DATE_OBS")).orElseGet(() -> xml.getRequiredString("DATE-OBS"));
                 }
-                if (dates[0].length() != dates[2].length() || dates[0].equals(dates[2]))
+                if (dates[0].length() != dates[1].length() || dates[0].equals(dates[1]))
                     throw new AssertionError("Fixture needs distinct timestamps of equal length");
                 return new Responses(opening, metadataEnd, finer, level, dates);
             } finally {
@@ -420,6 +420,8 @@ public final class J2KViewTest {
     }
 
     private static void checkRetriesAndKeys(Responses responses) throws Exception {
+        checkFrameOrder(responses, false);
+        checkFrameOrder(responses, true);
         JPIPCacheManager.init();
         try {
             checkFaults(responses, 2, false);
@@ -430,7 +432,7 @@ public final class J2KViewTest {
             close.setAccessible(true);
             close.invoke(null);
         }
-        System.out.println("PASS: immediate first retry, delayed consecutive retries, limit after partial responses, refusal, and per-frame disk keys with unordered/missing metadata");
+        System.out.println("PASS: immediate first retry, delayed consecutive retries, limit after partial responses, refusal, and per-frame disk keys");
     }
 
     private static void checkFaults(Responses responses, int failures, boolean refuse) throws Exception {
@@ -464,11 +466,11 @@ public final class J2KViewTest {
                         int openingEnd = session == 0 ? responses.opening.size() : responses.metadataEnd;
                         for (int i = 0; i < openingEnd; i++) {
                             readRequest(input);
-                            reply(connection, i == 0, altered(responses.opening.get(i), responses.dates));
+                            reply(connection, i == 0, responses.opening.get(i));
                         }
                         readRequest(input);
                         requests.add(System.nanoTime());
-                        byte[] prior = altered(responses.opening.getLast(), responses.dates);
+                        byte[] prior = responses.opening.getLast().clone();
                         if (refuse) {
                             prior[prior.length - 4] ^= 1; // Conflict with an already held databin byte.
                             reply(connection, false, prior);
@@ -483,7 +485,7 @@ public final class J2KViewTest {
                             for (int i = 0; i < responses.finer.size(); i++) {
                                 if (i > 0)
                                     readRequest(input);
-                                reply(connection, false, altered(responses.finer.get(i), responses.dates));
+                                reply(connection, false, responses.finer.get(i));
                             }
                         }
                         // Settle the remaining movie frames with empty completed windows,
@@ -508,9 +510,6 @@ public final class J2KViewTest {
                 J2KSource source = (J2KSource) field(J2KView.class, view, "source");
                 MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
                 String[] keys = (String[]) field(J2KReader.class, reader, "cacheKey");
-                if (!(metadata[0] instanceof FitsMetaData) || metadata[1] instanceof FitsMetaData
-                        || metadata[0].getViewpoint().time.milli <= metadata[2].getViewpoint().time.milli)
-                    throw new AssertionError("Replay did not produce unordered timestamps and fallback metadata");
                 for (int i = 0; i < keys.length; i++) {
                     String expected = metadata[i] instanceof FitsMetaData ? "10+" + metadata[i].getViewpoint().time.milli : null;
                     if (!Objects.equals(keys[i], expected))
@@ -590,12 +589,46 @@ public final class J2KViewTest {
         }
     }
 
-    // Equal-length substitutions preserve JPIP databin offsets and lengths.
-    private static byte[] altered(byte[] body, String[] dates) {
-        String placeholder = "_".repeat(dates[0].length());
-        return new String(body, StandardCharsets.ISO_8859_1).replace(dates[0], placeholder)
-                .replace(dates[2], dates[0]).replace(placeholder, dates[2])
-                .replace(dates[1], "xxxx" + dates[1].substring(4)).getBytes(StandardCharsets.ISO_8859_1);
+    private static void checkFrameOrder(Responses responses, boolean duplicate) throws Exception {
+        try (ServerSocket listener = new ServerSocket(0, 16, InetAddress.getByName("127.0.0.1"));
+                ExecutorService server = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(10000);
+            Future<?> served = server.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(10000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+                    for (int i = 0; i < responses.opening.size(); i++) {
+                        readRequest(input);
+                        // Equal-length substitutions preserve JPIP databin offsets and lengths.
+                        String body = new String(responses.opening.get(i), StandardCharsets.ISO_8859_1);
+                        if (duplicate) {
+                            body = body.replace(responses.dates[1], responses.dates[0]);
+                        } else {
+                            String placeholder = "_".repeat(responses.dates[0].length());
+                            body = body.replace(responses.dates[0], placeholder)
+                                    .replace(responses.dates[1], responses.dates[0]).replace(placeholder, responses.dates[1]);
+                        }
+                        reply(connection, i == 0, body.getBytes(StandardCharsets.ISO_8859_1));
+                    }
+                    if (input.readLine() != null)
+                        throw new AssertionError("Rejected movie left its connection open or started downloading");
+                }
+                return null;
+            });
+            URI uri = URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test");
+            try {
+                J2KView view = open(uri);
+                close(view);
+                throw new AssertionError("Accepted " + (duplicate ? "duplicate" : "out-of-order") + " timestamps");
+            } catch (Exception e) {
+                String expected = duplicate ? "Duplicate frame timestamp" : "Out-of-order frame timestamp";
+                if (!e.getMessage().contains(expected) || !e.getMessage().contains("Frame 0:")
+                        || !e.getMessage().contains("Frame 1:") || !e.getMessage().contains(uri.toString()))
+                    throw new AssertionError("Incomplete ordering diagnostic", e);
+            }
+            served.get(5, TimeUnit.SECONDS);
+        }
+        System.out.println("PASS: " + (duplicate ? "duplicate" : "out-of-order") + " movie rejected and connection closed");
     }
 
     private static void readRequest(BufferedReader input) throws Exception {
