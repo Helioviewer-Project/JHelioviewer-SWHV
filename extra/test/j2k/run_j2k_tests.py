@@ -24,12 +24,15 @@ classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"),
                              *(str(p) for p in sorted((root / "lib").rglob("*.jar")))])
 with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
+    if platform.system() == "Windows" and not temporary.isascii():
+        parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
     sources = ["JPIPSerializerTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java"]
     if args.live:
         sources.extend(["ROBTest.java", "MovieReaderTest.java", "J2KViewTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
+            "-Djava.io.tmpdir=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
     print("Running ImageBufferCacheTest", flush=True)
     subprocess.run([*java, "-ea", "-Dorg.lwjgl.util.DebugAllocator=true",
@@ -37,6 +40,10 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     for name in ["JPIPSerializerTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],
+                       check=True, timeout=60)
+    if platform.system() != "Windows":
+        print("Running JPIPCacheManagerTest with Windows cache paths", flush=True)
+        subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManagerTest", "--windows-path"],
                        check=True, timeout=60)
     if args.live:
         system = platform.system()

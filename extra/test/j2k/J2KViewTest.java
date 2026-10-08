@@ -1,34 +1,57 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.thread.LatestWorker;
+import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
 // The real view and reader thread on a JPIP movie, headless.
@@ -48,6 +71,7 @@ public final class J2KViewTest {
         System.load(arguments[0]);
         System.load(arguments[1]);
         URI uri = URI.create(arguments[2]);
+        checkRetriesAndKeys(capture(uri));
 
         Field timerField = Player.class.getDeclaredField("movieTimer");
         timerField.setAccessible(true);
@@ -177,9 +201,13 @@ public final class J2KViewTest {
     }
 
     private static J2KView open(URI uri) throws Exception {
+        return open(uri, null);
+    }
+
+    private static J2KView open(URI uri, APIRequest request) throws Exception {
         Constructor<DataUri> constructor = DataUri.class.getDeclaredConstructor(URI.class, URI.class, File.class);
         constructor.setAccessible(true);
-        J2KView view = new J2KView(worker, null, constructor.newInstance(uri, uri, null), new ImageProcessingSettings(() -> {}));
+        J2KView view = new J2KView(worker, request, constructor.newInstance(uri, uri, null), new ImageProcessingSettings(() -> {}));
         EventQueue.invokeAndWait(() -> view.setDataHandler(J2KViewTest::queueImage));
         return view;
     }
@@ -227,6 +255,280 @@ public final class J2KViewTest {
                 throw new AssertionError("Frame " + frame + " did not become displayable");
             Thread.sleep(1);
         }
+    }
+
+    private record Responses(List<byte[]> opening, int metadataEnd, List<byte[]> finer, int level, String[] dates) {}
+
+    // Capture a normal opening and one finer window. Fault tests replay these locally,
+    // so timing and failure counts do not depend on a live service or stored capture folders.
+    private static Responses capture(URI uri) throws Exception {
+        List<byte[]> opening = new ArrayList<>(), finer = new ArrayList<>();
+        J2KSource source = new J2KSource(null);
+        try {
+            JPIPSocket socket = new JPIPSocket(uri);
+            try {
+                receive(socket, source, opening);
+                int reason;
+                do {
+                    socket.sendMetadata();
+                    reason = receive(socket, source, opening);
+                } while (reason == 4 || reason == 7);
+                int metadataEnd = opening.size();
+                source.loadFrames();
+                long stream = source.client().frame(0).stream();
+                do {
+                    socket.sendFrame(stream, 64, 64, 0);
+                    reason = receive(socket, source, opening);
+                } while (reason == 4 || reason == 7);
+                source.update(0);
+                ResolutionSet set = source.resolutionSet(0);
+                if (!set.isDisplayable()) {
+                    ResolutionSet.Level size = set.getClosestLevel(64, 64);
+                    do {
+                        socket.sendFrame(stream, size.width(), size.height(), 1);
+                        reason = receive(socket, source, opening);
+                    } while (reason == 4 || reason == 7);
+                    source.update(0);
+                }
+                int level = source.resolutionSet(0).getCompleteLevel(0).level() - 1;
+                if (level < 0 || source.getFrameStatus(0, level))
+                    throw new AssertionError("Fixture needs an incomplete level finer than its opening");
+                ResolutionSet.Level size = set.getLevel(level);
+                do {
+                    socket.sendFrame(stream, size.width(), size.height(), 1);
+                    reason = receive(socket, source, finer);
+                } while (reason == 4 || reason == 7);
+                source.update(0);
+                if (!source.getFrameStatus(0, level))
+                    throw new AssertionError("Captured finer window is incomplete");
+                String[] dates = new String[3];
+                for (int i = 0; i < dates.length; i++) {
+                    XMLMetaDataContainer xml = new XMLMetaDataContainer(source.xml(i));
+                    dates[i] = xml.getString("DATE-AVG").or(() -> xml.getString("DATE_AVG"))
+                            .or(() -> xml.getString("DATE_OBS")).orElseGet(() -> xml.getRequiredString("DATE-OBS"));
+                }
+                if (dates[0].length() != dates[2].length() || dates[0].equals(dates[2]))
+                    throw new AssertionError("Fixture needs distinct timestamps of equal length");
+                return new Responses(opening, metadataEnd, finer, level, dates);
+            } finally {
+                socket.abort();
+            }
+        } finally {
+            source.close();
+        }
+    }
+
+    private static int receive(JPIPSocket socket, J2KSource source, List<byte[]> captured) throws Exception {
+        ByteBuffer response = socket.receive();
+        byte[] bytes = new byte[response.remaining()];
+        response.duplicate().get(bytes);
+        captured.add(bytes);
+        int reason = source.client().response(response);
+        if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
+            throw new AssertionError("Unexpected captured EOR: " + reason);
+        return reason;
+    }
+
+    private static Object field(Class<?> type, Object instance, String name) throws Exception {
+        Field field = type.getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(instance);
+    }
+
+    private static void checkRetriesAndKeys(Responses responses) throws Exception {
+        JPIPCacheManager.init();
+        try {
+            checkFaults(responses, 2, false);
+            checkFaults(responses, 14, false);
+            checkFaults(responses, 0, true);
+        } finally {
+            Method close = JPIPCacheManager.class.getDeclaredMethod("close");
+            close.setAccessible(true);
+            close.invoke(null);
+        }
+        System.out.println("PASS: immediate first retry, delayed consecutive retries, limit after partial responses, refusal, and per-frame disk keys with unordered/missing metadata");
+    }
+
+    private static void checkFaults(Responses responses, int failures, boolean refuse) throws Exception {
+        CountDownLatch logged = new CountDownLatch(1);
+        List<LogRecord> records = new CopyOnWriteArrayList<>();
+        Logger logger = Logger.getLogger("");
+        Handler[] handlers = logger.getHandlers();
+        Handler capture = new Handler() {
+            @Override public void publish(LogRecord record) {
+                records.add(record);
+                if (record.getMessage().contains("Retry limit reached:") || record.getMessage().contains("conflicts"))
+                    logged.countDown();
+            }
+            @Override public void flush() {}
+            @Override public void close() {}
+        };
+        for (Handler handler : handlers)
+            logger.removeHandler(handler);
+        logger.addHandler(capture);
+        try (ServerSocket listener = new ServerSocket(0, 16, InetAddress.getByName("127.0.0.1"));
+                ExecutorService server = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(10000);
+            Future<List<Long>> served = server.submit(() -> {
+                List<Long> requests = new ArrayList<>();
+                int sessions = failures == 14 ? 14 : failures + 1;
+                for (int session = 0; session < sessions; session++) {
+                    try (Socket connection = listener.accept()) {
+                        connection.setSoTimeout(10000);
+                        connection.setTcpNoDelay(true);
+                        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+                        int openingEnd = session == 0 ? responses.opening.size() : responses.metadataEnd;
+                        for (int i = 0; i < openingEnd; i++) {
+                            readRequest(input);
+                            reply(connection, i == 0, altered(responses.opening.get(i), responses.dates));
+                        }
+                        readRequest(input);
+                        requests.add(System.nanoTime());
+                        byte[] prior = altered(responses.opening.getLast(), responses.dates);
+                        if (refuse) {
+                            prior[prior.length - 4] ^= 1; // Conflict with an already held databin byte.
+                            reply(connection, false, prior);
+                        } else if (session < failures) {
+                            if (!Arrays.equals(Arrays.copyOfRange(prior, prior.length - 3, prior.length), new byte[]{0, 2, 0}))
+                                throw new AssertionError("Expected a window-done EOR at the end of the captured body");
+                            prior[prior.length - 2] = 4; // Accepted byte-limited data, still unready at the requested level.
+                            reply(connection, false, prior);
+                            readRequest(input); // Then break this pass before it can complete a frame.
+                            continue;
+                        } else {
+                            for (int i = 0; i < responses.finer.size(); i++) {
+                                if (i > 0)
+                                    readRequest(input);
+                                reply(connection, false, altered(responses.finer.get(i), responses.dates));
+                            }
+                        }
+                        // Settle the remaining movie frames with empty completed windows,
+                        // so successful recovery reaches idle before the test closes it.
+                        String line;
+                        while ((line = input.readLine()) != null) {
+                            if (!line.startsWith("GET "))
+                                throw new AssertionError("Unexpected request: " + line);
+                            while ((line = input.readLine()) != null && !line.isEmpty()) {}
+                            if (line == null)
+                                throw new AssertionError("Truncated request headers");
+                            reply(connection, false, new byte[]{0, 2, 0});
+                        }
+                    }
+                }
+                return requests;
+            });
+            URI uri = URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test");
+            J2KView view = open(uri, new APIRequest("ROB", 10, 0, 0, APIRequest.CADENCE_ALL));
+            J2KReader reader = (J2KReader) field(J2KView.class, view, "reader");
+            try {
+                J2KSource source = (J2KSource) field(J2KView.class, view, "source");
+                MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
+                String[] keys = (String[]) field(J2KReader.class, reader, "cacheKey");
+                if (!(metadata[0] instanceof FitsMetaData) || metadata[1] instanceof FitsMetaData
+                        || metadata[0].getViewpoint().time.milli <= metadata[2].getViewpoint().time.milli)
+                    throw new AssertionError("Replay did not produce unordered timestamps and fallback metadata");
+                for (int i = 0; i < keys.length; i++) {
+                    String expected = metadata[i] instanceof FitsMetaData ? "10+" + metadata[i].getViewpoint().time.milli : null;
+                    if (!Objects.equals(keys[i], expected))
+                        throw new AssertionError("Disk key uses a sorted position or a fallback time at frame " + i);
+                    if (keys[i] != null)
+                        JPIPCacheManager.remove(keys[i]); // Each fault case must download, not restore the preceding case.
+                }
+                if (refuse) {
+                    for (String key : keys) {
+                        if (key != null)
+                            JPIPCacheManager.store(key, 0, () -> new byte[]{1});
+                    }
+                    JPIPCacheManager.store("unrelated", 0, () -> new byte[]{2});
+                }
+                reader.signal(new J2KParams.Read(view, new J2KParams.Decode(0, responses.level), true));
+                if (refuse || failures == 14) {
+                    if (!logged.await(30, TimeUnit.SECONDS))
+                        throw new AssertionError("Reader never reported its terminal failure: " + records.stream().map(LogRecord::getMessage).toList());
+                    if (refuse) {
+                        Thread thread = (Thread) field(J2KReader.class, reader, "myThread");
+                        thread.join(5000);
+                        if (thread.isAlive() || source.getFrameStatus(0, responses.level))
+                            throw new AssertionError("Refused reader continued or marked the finer level complete");
+                        for (String key : keys) {
+                            if (key != null && JPIPCacheManager.get(key, 0) != null)
+                                throw new AssertionError("Refusal retained a disk entry for this source");
+                        }
+                        if (JPIPCacheManager.get("unrelated", 0) == null)
+                            throw new AssertionError("Refusal removed another source's entry");
+                    } else {
+                        Thread thread = (Thread) field(J2KReader.class, reader, "myThread");
+                        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+                        while (thread.getState() != Thread.State.WAITING || view.isDownloading()) {
+                            if (System.nanoTime() > deadline)
+                                throw new AssertionError("Exhausted reader did not return to idle");
+                            Thread.sleep(5);
+                        }
+                        if (!((JPIPSocket) field(J2KReader.class, reader, "socket")).isClosed())
+                            throw new AssertionError("Exhausted reader opened another connection");
+                    }
+                } else {
+                    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+                    while (!source.getFrameStatus(0, responses.level)) {
+                        if (System.nanoTime() > deadline)
+                            throw new AssertionError("Reader did not recover from two failures");
+                        Thread.sleep(5);
+                    }
+                    Thread thread = (Thread) field(J2KReader.class, reader, "myThread");
+                    while (thread.getState() != Thread.State.WAITING || view.isDownloading()) {
+                        if (System.nanoTime() > deadline)
+                            throw new AssertionError("Recovered reader did not return to idle");
+                        Thread.sleep(5);
+                    }
+                }
+                EventQueue.invokeAndWait(reader::stop); // Keep the headless EDT alive while interrupting queued refreshes.
+                int retries = (int) field(J2KReader.class, reader, "retries");
+                List<Long> requests = served.get(5, TimeUnit.SECONDS);
+                if (!refuse) {
+                    if (retries != (failures == 14 ? 14 : 0))
+                        throw new AssertionError("Wrong consecutive failure count: " + retries);
+                    double firstRetry = (requests.get(1) - requests.get(0)) / 1e6;
+                    double secondRetry = (requests.get(2) - requests.get(1)) / 1e6;
+                    if (firstRetry >= 900 || secondRetry < 900)
+                        throw new AssertionError("Wrong retry pauses: " + firstRetry + ", " + secondRetry + " ms");
+                    if (failures == 14 && (records.stream().filter(r -> r.getMessage().contains("Retry limit reached:")).count() != 1
+                            || records.stream().noneMatch(r -> r.getMessage().contains("Retry limit reached:") && r.getThrown() != null)))
+                        throw new AssertionError("Retry exhaustion did not log its exception once");
+                }
+            } finally {
+                close(view);
+                listener.close();
+            }
+        } finally {
+            logger.removeHandler(capture);
+            for (Handler handler : handlers)
+                logger.addHandler(handler);
+        }
+    }
+
+    // Equal-length substitutions preserve JPIP databin offsets and lengths.
+    private static byte[] altered(byte[] body, String[] dates) {
+        String placeholder = "_".repeat(dates[0].length());
+        return new String(body, StandardCharsets.ISO_8859_1).replace(dates[0], placeholder)
+                .replace(dates[2], dates[0]).replace(placeholder, dates[2])
+                .replace(dates[1], "xxxx" + dates[1].substring(4)).getBytes(StandardCharsets.ISO_8859_1);
+    }
+
+    private static void readRequest(BufferedReader input) throws Exception {
+        String line = input.readLine();
+        if (line == null || !line.startsWith("GET "))
+            throw new AssertionError("Expected a JPIP request, got " + line);
+        while ((line = input.readLine()) != null && !line.isEmpty()) {}
+        if (line == null)
+            throw new AssertionError("Truncated request headers");
+    }
+
+    private static void reply(Socket connection, boolean opening, byte[] body) throws Exception {
+        OutputStream output = connection.getOutputStream();
+        output.write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\n"
+                + (opening ? "JPIP-cnew: cid=test,transport=http,path=jpip\r\n" : "")
+                + "Content-Length: " + body.length + "\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+        output.write(body);
     }
 
     private J2KViewTest() {}

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.zip.GZIPOutputStream;
 
 public final class JPIPSocketTest {
 
@@ -29,11 +31,12 @@ public final class JPIPSocketTest {
                 "cid=test,path=jpip", "cid=test,transport=http-tcp,path=jpip"})
             testInvalidChannel("JPIP-cnew: " + cnew + "\r\n");
         testInvalidChannel("");
-        testPipeline();
+        testPipeline(false);
+        testPipeline(true);
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
-        System.out.println("PASS: channel opening, bodies in request order, buffer growth, graceful close, abort and interrupted handshake");
+        System.out.println("PASS: channel opening, plain/gzip chunked bodies in request order, buffer growth, graceful close, abort and interrupted handshake");
     }
 
     private interface Server {
@@ -108,10 +111,17 @@ public final class JPIPSocketTest {
             throw new AssertionError("Invalid channel caused another request: " + header);
     }
 
-    private static void testPipeline() throws Exception {
+    private static void testPipeline(boolean gzip) throws Exception {
         byte[] large = new byte[300000];
         for (int i = 0; i < large.length; i++)
             large[i] = (byte) (i * 31);
+        ByteArrayOutputStream compressed = new ByteArrayOutputStream();
+        if (gzip) {
+            try (GZIPOutputStream output = new GZIPOutputStream(compressed)) {
+                output.write(large);
+            }
+        }
+        byte[] payload = gzip ? compressed.toByteArray() : large;
         exchange((connection, input) -> {
             readRequest(input);
             reply(connection, CHANNEL, new byte[]{0, 2, 0});
@@ -126,10 +136,13 @@ public final class JPIPSocketTest {
                 throw new IOException("Unexpected frame requests: " + first + " | " + second);
             // A chunked body larger than the client's initial buffer.
             OutputStream out = connection.getOutputStream();
-            out.write("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\nTransfer-Encoding: chunked\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
-            for (int at = 0; at < large.length; at += 100000) {
-                out.write((Integer.toHexString(100000) + "\r\n").getBytes(StandardCharsets.US_ASCII));
-                out.write(large, at, 100000);
+            out.write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpp-stream\r\nTransfer-Encoding: chunked\r\n"
+                    + (gzip ? "Content-Encoding: gzip\r\n" : "") + "\r\n").getBytes(StandardCharsets.US_ASCII));
+            int chunkSize = gzip ? 7 : 100000; // Split gzip headers and trailer across HTTP chunks too.
+            for (int at = 0; at < payload.length; at += chunkSize) {
+                int count = Math.min(chunkSize, payload.length - at);
+                out.write((Integer.toHexString(count) + "\r\n").getBytes(StandardCharsets.US_ASCII));
+                out.write(payload, at, count);
                 out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
             }
             out.write("0\r\n\r\n".getBytes(StandardCharsets.US_ASCII));

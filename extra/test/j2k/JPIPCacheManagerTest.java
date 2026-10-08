@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -22,7 +24,16 @@ public final class JPIPCacheManagerTest {
     public static void main(String[] arguments) throws Exception {
         Path testHome = Files.createTempDirectory("jhv-jpip-cache-test-");
         System.setProperty("user.home", testHome.toString());
+        System.setProperty("java.io.tmpdir", testHome.toString());
         Platform.init();
+        if (arguments.length == 1 && arguments[0].equals("--windows-path")) {
+            Field windows = Platform.class.getDeclaredField("isWindows");
+            windows.setAccessible(true);
+            windows.setBoolean(null, true); // Exercise Windows path selection without changing the host JVM's OS.
+        }
+        if (Platform.isWindows())
+            check(StandardCharsets.US_ASCII.newEncoder().canEncode(testHome.toString()), "Windows cache test requires an ASCII temporary path");
+        check(Directories.CACHE.getFile().toPath().normalize().startsWith(testHome), "cache escaped the isolated test directory");
         Directories.createCacheDirs();
 
         Path cacheDirectory = Path.of(Directories.CACHE.getPath(), "JPIPStream-8");

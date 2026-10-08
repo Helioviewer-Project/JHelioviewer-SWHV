@@ -1,7 +1,11 @@
 #!/bin/bash
 # Build the JPEG 2000 bridge into $BUILD and check it, through J2KNative, against
 # Kakadu's compositor. Arguments: JP2/JPX files; the first is also timed.
-set -eu
+set -euo pipefail
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 JP2_OR_JPX [JP2_OR_JPX ...]" >&2
+    exit 2
+fi
 cd "$(dirname "$0")/../../.."
 root=$PWD
 : "${ESAJPIP:=$root/../esajpip-SWHV}"

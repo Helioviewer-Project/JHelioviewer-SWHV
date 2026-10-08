@@ -19,7 +19,8 @@ The default suite is offline and needs no JPEG 2000 native library:
   read after a timeout in chunk framing or payload.
 - Socket: a local server checks the channel request and its response framing, refused
   channels, the metadata and frame request lines, two requests sent ahead with their bodies
-  returned in order, a chunked body larger than the receive buffer, graceful channel close,
+  returned in order, plain and gzip chunked bodies larger than the receive buffer, gzip headers
+  and trailers split across chunks, graceful channel close,
   aborting a stalled response without sending another request, and a stalled handshake
   interrupted on a virtual thread, which must close TCP.
 - Cache serializer: round trip of an entry, direct/read-only buffers, unchanged input
@@ -27,6 +28,9 @@ The default suite is offline and needs no JPEG 2000 native library:
   client's; the client refuses a damaged one on import.
 - Cache: failure to obtain the persistence lock leaves caching disabled without repeated logging.
   With the lock released: entries by level, replacement only by a finer level, removal.
+  The test verifies that its cache stays beneath its temporary directory. On non-Windows hosts,
+  it also runs with Windows cache-path selection enabled. The runner isolates both `user.home`
+  and `java.io.tmpdir`; Windows requires an ASCII temporary path and fails before testing otherwise.
 
 To also retrieve from ROB using the actual JPIP socket, client, disk cache and decoder:
 
@@ -64,6 +68,14 @@ every frame must be equal.
 Reader refreshes must use the latest viewpoint, and a detached view's refresh must leave
 the shared worker's replacement task current.
 
+The view test captures opening responses and a finer window from that movie, then replays them
+through a local server. Two failed passes must recover with an immediate first retry and a pause
+before the second. Fourteen consecutive failed passes must exhaust retries and log the cause once,
+even when every pass accepts byte-limited data before failing. A conflicting response must stop
+the reader and purge this source's disk entries while preserving an unrelated entry. Equal-length
+timestamp edits put frames out of order and make one frame use fallback metadata: disk keys must
+use each frame's own timestamp, and the fallback frame must have no key. No capture folders are required.
+
 The live suite also downloads a Callisto JP2 through the ROB API and checks horizontal
 crops at the origin, interior, and right edge against a full-image decode. It exercises
 all six Callisto resolution levels (0 through 5), including nonaligned requested regions.
@@ -74,7 +86,7 @@ removing a day purges only its crops, and removed days cannot accept late decode
 Displayed scalar pixels survive eviction and LUT changes. Immutable fixture arrays are reused
 across day entries to exercise cache weights without allocating 438 MiB of pixels.
 
-`run_native_test.sh` requires `KDU_VENDOR` to name a supplied Kakadu SDK.
+`run_native_test.sh` requires at least one JP2/JPX file argument and `KDU_VENDOR` to name a supplied Kakadu SDK.
 It builds the bridge and checks it, through `J2KNative`, against Kakadu's
 compositor as an independent decoder: geometry and pixels of every frame and level of the
 given files, JPIP responses written by esajpip's server code, cache entries, refusals and

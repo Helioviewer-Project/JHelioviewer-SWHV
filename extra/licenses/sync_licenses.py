@@ -77,7 +77,6 @@ NATIVE_NOTICES = {
     "draco": ("Draco.txt",),
     "sqlitejdbc": ("SQLite.txt",),
 }
-EXTERNAL_JARS = {"formats/kdu_jni.jar": "Kakadu.txt"}
 EXTERNAL_BINARIES = {
     "ffmpeg": "FFmpeg-Notices.txt",
     "kdu_jni": "Kakadu.txt",
@@ -228,8 +227,6 @@ def prepare(root):
             if fnmatchcase(relative, pattern)
         }
         external = set()
-        if relative in EXTERNAL_JARS:
-            external.add(EXTERNAL_JARS[relative])
         own_texts = any(source.count("!") == 1 for source, _ in texts)
         own_declarations = [d for d in declarations if d["source"].count("!") == 1]
         resolved = {declared_terms(d["url"]) for d in own_declarations}
