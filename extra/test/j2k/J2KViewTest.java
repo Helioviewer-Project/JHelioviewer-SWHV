@@ -95,7 +95,6 @@ public final class J2KViewTest {
                 throw new AssertionError("Expected a movie with at least four frames");
             show(view, 0, Integer.MAX_VALUE);
             await(view, frames - 1);
-            checkRefresh(view);
             // A finer level of the shown frame is fetched and delivered without another request to decode.
             ResolutionSet.Level finer = view.getResolutionLevel(0, 3);
             show(view, 0, 3);
@@ -109,6 +108,7 @@ public final class J2KViewTest {
                 if (ready)
                     break;
             } while (true);
+            checkRefresh(view);
         } finally {
             close(view);
         }
@@ -125,7 +125,7 @@ public final class J2KViewTest {
         } finally {
             EventQueue.invokeAndWait(playback::stop);
         }
-        System.out.println("PASS: download start, latest refresh viewpoint, detached refresh, priority refresh, playing download and connection recovery");
+        System.out.println("PASS: download start, latest refresh viewpoint and resolution, detached refresh, priority refresh, playing download and connection recovery");
         System.exit(0);
     }
 
@@ -216,11 +216,17 @@ public final class J2KViewTest {
         EventQueue.invokeAndWait(image.image()::close);
 
         clearImages();
-        EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(new J2KParams.Decode(0, size.level())));
+        // An older fine window finishes after the view has zoomed out.
+        EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(0));
         image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Reader refresh used an obsolete viewpoint");
+        int width = image.imageBuffer().width;
+        int height = image.imageBuffer().height;
         EventQueue.invokeAndWait(image.image()::close);
+        if (width != size.width() || height != size.height())
+            throw new AssertionError("Reader refresh used an obsolete resolution: " + width + "x" + height
+                    + ", wanted " + size.width() + "x" + size.height());
 
         // The replacement view uses the same worker. An old view's cached refresh
         // must not invalidate its decode or drop its pending task.
@@ -233,7 +239,7 @@ public final class J2KViewTest {
                     release.await();
                     return null;
                 }, (result, current) -> fresh.complete(current));
-                view.refreshDecodeFromReader(new J2KParams.Decode(0, size.level()));
+                view.refreshDecodeFromReader(0);
             });
             EventQueue.invokeAndWait(() -> {}); // the queued refresh has run
             release.countDown();

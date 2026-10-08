@@ -68,7 +68,8 @@ download; a finer level of the shown frame must be fetched and delivered by the 
 refresh. Playing, the whole movie is downloaded at a coarse level twice, once with the
 connection aborted after a third of the frames; the reader must reconnect and the pixels of
 every frame must be equal.
-Reader refreshes must use the latest viewpoint, and a detached view's refresh must leave
+Reader refreshes must use the latest viewpoint and requested resolution after zooming out,
+even when a finer window finishes late. A detached view's refresh must leave
 the shared worker's replacement task current.
 
 The view test captures opening responses and a finer window from that movie, then replays them

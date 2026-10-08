@@ -48,6 +48,7 @@ public final class J2KView extends BaseView {
     private final int maxFrame;
     private int targetFrame;
     private Position currentViewpoint;
+    private J2KParams.Decode requestedDecode;
 
     private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
@@ -290,6 +291,7 @@ public final class J2KView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {
         currentViewpoint = viewpoint;
         J2KParams.Decode wanted = getDecodeParams(targetFrame, pixFactor);
+        requestedDecode = wanted;
         J2KParams.Decode decodeParams = available(wanted); // before signalling to reader
         // The first signal starts the movie download.
         if (reader != null && (decodeParams != wanted || currentLevel == NO_LEVEL)) {
@@ -304,10 +306,10 @@ public final class J2KView extends BaseView {
         return res.level() == wanted.level() ? wanted : new J2KParams.Decode(wanted.frame(), res.level());
     }
 
-    void refreshDecodeFromReader(J2KParams.Decode wanted) {
+    void refreshDecodeFromReader(int frame) {
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null && wanted.frame() == targetFrame) {
-                show(available(wanted));
+            if (dataHandler != null && requestedDecode != null && frame == targetFrame && frame == requestedDecode.frame()) {
+                show(available(requestedDecode));
             }
         });
     }

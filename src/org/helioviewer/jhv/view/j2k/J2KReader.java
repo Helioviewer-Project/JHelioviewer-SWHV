@@ -288,7 +288,7 @@ class J2KReader implements Runnable {
             }
 
             if (singleFrame)
-                params.view().refreshDecodeFromReader(decode);
+                params.view().refreshDecodeFromReader(decode.frame());
             UITimer.completionChanged();
         }
     }
