@@ -60,41 +60,45 @@ class ChunkedInputStream extends InputStream {
             return 0;
         }
 
-        while (true) {
-            if (eof)
-                return -1;
+        try {
+            while (true) {
+                if (eof)
+                    return -1;
 
-            if (chunkLength > 0) {
-                int read = in.read(b, off, Math.min(chunkLength, len));
-                if (read == -1)
-                    throw new EOFException("Premature EOF: expected " + chunkLength + " more bytes in chunk");
+                if (chunkLength > 0) {
+                    int read = in.read(b, off, Math.min(chunkLength, len));
+                    if (read == -1)
+                        throw new EOFException("Premature EOF: expected " + chunkLength + " more bytes in chunk");
 
-                chunkLength -= read;
-                if (chunkLength == 0)
-                    LineRead.readCRLF(in);
-                return read;
-            }
-
-            if (chunkLength == 0) {
-                String line = LineRead.readAsciiLine(in);
-
-                // esajpip doesn't use chunk extension
-                // int separator = line.indexOf(';');
-                // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
-                try {
-                    int length = Integer.parseInt(line, 16);
-                    if (length < 0)
-                        throw new NumberFormatException("Negative length");
-                    chunkLength = length;
-                    if (chunkLength == 0) {
+                    chunkLength -= read;
+                    if (chunkLength == 0)
                         LineRead.readCRLF(in);
-                        eof = true;
+                    return read;
+                }
+
+                if (chunkLength == 0) {
+                    String line = LineRead.readAsciiLine(in);
+
+                    // esajpip doesn't use chunk extension
+                    // int separator = line.indexOf(';');
+                    // line = (separator > 0) ? line.substring(0, separator).trim() : line.trim();
+                    try {
+                        int length = Integer.parseInt(line, 16);
+                        if (length < 0)
+                            throw new NumberFormatException("Negative length");
+                        chunkLength = length;
+                        if (chunkLength == 0) {
+                            LineRead.readCRLF(in);
+                            eof = true;
+                        }
+                    } catch (NumberFormatException ex) {
+                        throw new ProtocolException("Invalid chunk length format");
                     }
-                } catch (NumberFormatException ex) {
-                    eof = true; // The chunk boundary is unknown; close must not try to drain it.
-                    throw new ProtocolException("Invalid chunk length format");
                 }
             }
+        } catch (IOException e) {
+            eof = true; // Failed framing or I/O: close must not attempt another drain.
+            throw e;
         }
     }
 

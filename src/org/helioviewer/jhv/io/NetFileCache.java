@@ -27,11 +27,20 @@ public class NetFileCache {
                 }
 
                 Path path = Files.createTempFile(Directories.fileCacheDir.toPath(), "jhv", null);
-                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
-                    sink.writeAll(nc.getSource());
+                try {
+                    try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
+                        sink.writeAll(nc.getSource());
+                    }
+                    File file = path.toFile();
+                    return new DataUri(uri, path.toUri(), file);
+                } catch (Exception e) {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (IOException cleanup) {
+                        e.addSuppressed(cleanup);
+                    }
+                    throw e;
                 }
-                File file = path.toFile();
-                return new DataUri(uri, path.toUri(), file);
             });
 
     public static DataUri get(@Nonnull URI uri) throws IOException {

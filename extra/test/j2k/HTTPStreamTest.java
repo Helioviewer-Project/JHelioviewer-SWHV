@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 public final class HTTPStreamTest {
@@ -52,6 +53,32 @@ public final class HTTPStreamTest {
         } catch (IOException expected) {
         }
         check(invalidBody.read() == 'U', "close tried to drain invalid chunk framing");
+
+        // Timeouts in the header, payload, chunk CRLF and final CRLF must not
+        // cause close() to read the failed response again.
+        for (String prefix : new String[]{"", "3\r\na", "1\r\na\r", "0\r\n\r"}) {
+            ByteArrayInputStream body = bytes(prefix);
+            int[] attempts = {0};
+            InputStream failing = new InputStream() {
+                @Override
+                public int read() throws IOException {
+                    attempts[0]++;
+                    int value = body.read();
+                    if (value < 0)
+                        throw new SocketTimeoutException("Stalled response");
+                    return value;
+                }
+            };
+            ChunkedInputStream stalled = new ChunkedInputStream(failing);
+            try {
+                readBody(stalled, true);
+                throw new AssertionError("Expected a read timeout");
+            } catch (SocketTimeoutException expected) {
+            }
+            int reads = attempts[0];
+            stalled.close();
+            check(attempts[0] == reads, "close retried a timed-out read");
+        }
 
         ByteArrayInputStream input = bytes("3\r\nabc\r\n0\r\n\r\nNEXT");
         ChunkedInputStream chunked = new ChunkedInputStream(input);
