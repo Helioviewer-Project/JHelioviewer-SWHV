@@ -118,7 +118,8 @@ class RadioJ2KData {
         executor.submit(() -> source.decode(0, crop.level, crop.x, 0, crop.width, crop.height), new LatestWorker.Callback<>() {
             @Override
             public void onSuccess(byte[] result, boolean fresh) {
-                if (owner.putDecoded(RadioJ2KData.this, crop, result) && fresh)
+                owner.putDecoded(RadioJ2KData.this, crop, result);
+                if (fresh)
                     show(crop, result);
             }
 
@@ -177,7 +178,7 @@ class RadioJ2KData {
     }
 
     void draw(Graphics2D g, TimeAxis.Mapper xMapper, YAxis.Mapper yMapper) {
-        if (!willDraw || !hasData())
+        if (!hasData())
             return;
 
         long timeWidth = endDate - startDate;

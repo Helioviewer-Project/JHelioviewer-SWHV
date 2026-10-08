@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -41,10 +40,7 @@ public final class ImageBufferCache {
     }
 
     public static void invalidateIf(Predicate<Object> predicate) {
-        for (Map.Entry<Object, DecodedImage> entry : cache.asMap().entrySet()) {
-            if (predicate.test(entry.getKey()))
-                cache.asMap().remove(entry.getKey(), entry.getValue());
-        }
+        cache.asMap().keySet().removeIf(predicate);
     }
 
     public static void invalidateOwners(Set<Object> owners) {

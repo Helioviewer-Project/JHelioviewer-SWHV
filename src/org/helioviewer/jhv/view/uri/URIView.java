@@ -57,9 +57,7 @@ public final class URIView extends BaseView {
             imageRegion = m.imageToRegion(info.width(), info.height());
             metaData[0] = m;
 
-            LUT lut = info.lut();
-            if (lut != null)
-                builtinLUT = lut;
+            builtinLUT = info.lut();
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }

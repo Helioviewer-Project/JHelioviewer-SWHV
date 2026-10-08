@@ -132,7 +132,8 @@ public final class CallistoTest {
                 }
                 days.remove(date);
                 data[0].removeData();
-                if (owner.putDecoded(data[0], whole, full) || owner.getDecoded(data[0], whole) != null
+                owner.putDecoded(data[0], whole, full);
+                if (owner.getDecoded(data[0], whole) != null
                         || owner.getDecoded(data[1], whole) != full)
                     throw new AssertionError("Removed day accepted late pixels or purged another day's crops");
             });

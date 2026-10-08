@@ -150,9 +150,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     void setView(View _view) {
-        if (removed) //!
-            return;
-
         replaceView(_view);
         activateView();
     }
@@ -185,8 +182,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     // Release the CPU-side owners now; GL disposal still needs the render context.
     void detachView() {
-        if (removed)
-            return;
         removed = true;
         loader.abolish();
         unsetView();
@@ -194,7 +189,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void remove() {
-        detachView();
         dispose();
     }
 
@@ -361,8 +355,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void handleData(View.ImageData newImageData) {
-        if (removed)
-            return;
         String oldName = getName();
 
         setImageData(newImageData);

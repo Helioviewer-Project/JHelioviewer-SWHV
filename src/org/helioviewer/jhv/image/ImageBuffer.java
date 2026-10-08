@@ -151,10 +151,8 @@ public final class ImageBuffer {
 
         @Override
         public void close() {
-            if (directBuffer != null) {
+            if (directBuffer != null)
                 directBuffer.free();
-                directBuffer = null;
-            }
         }
 
     }

@@ -48,7 +48,7 @@ public final class RadioData extends TimelineLayer {
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
-    // Two full-resolution Callisto images per retained day, with room for alternate crops and levels.
+    // Crop budget equivalent to two full-resolution Callisto images per retained day.
     private static final long MAX_DECODED_BYTES = 2L * DAYS_IN_CACHE * 86400 * 380;
 
     private record DecodeKey(RadioJ2KData day, RadioJ2KData.Crop crop) {}
@@ -113,12 +113,11 @@ public final class RadioData extends TimelineLayer {
         return decoded.getIfPresent(new DecodeKey(day, crop));
     }
 
-    boolean putDecoded(RadioJ2KData day, RadioJ2KData.Crop crop, byte[] pixels) {
+    void putDecoded(RadioJ2KData day, RadioJ2KData.Crop crop, byte[] pixels) {
         // A completed decode may arrive after this day left the window.
         if (!cache.containsValue(day))
-            return false;
+            return;
         decoded.put(new DecodeKey(day, crop), pixels);
-        return true;
     }
 
     void removeDecoded(RadioJ2KData day) {
@@ -126,7 +125,6 @@ public final class RadioData extends TimelineLayer {
     }
 
     private void clearCache() {
-        decoded.invalidateAll();
         cache.values().forEach(RadioJ2KData::removeData);
         cache.clear();
         downloads.clear();

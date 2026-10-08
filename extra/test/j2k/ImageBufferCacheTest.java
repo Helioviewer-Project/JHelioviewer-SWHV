@@ -32,8 +32,7 @@ public final class ImageBufferCacheTest {
         replacementAndEviction();
         weightedLRU();
         resolutionChange();
-        concurrentReplacement();
-        System.out.println("PASS: release checks without assertions, weighted LRU, resolution changes, removal, held and queued images, replacement and concurrent invalidation without repainting");
+        System.out.println("PASS: release checks without assertions, weighted LRU, resolution changes, removal, held and queued images and replacement without repainting");
     }
 
     private record OwnedKey(Object id, int frame, AtomicInteger visits) implements ImageBufferCache.Key {
@@ -264,40 +263,6 @@ public final class ImageBufferCacheTest {
             });
             await(() -> images.stream().noneMatch(ImageBufferCacheTest::allocated), "Resolution-change images were not freed");
         }
-    }
-
-    private static void concurrentReplacement() throws Exception {
-        Object key = new Object();
-        DecodedImage first = image(), second = image();
-        ImageBufferCache.put(key, first);
-        CountDownLatch inspected = new CountDownLatch(1), replace = new CountDownLatch(1);
-        Thread invalidator = new Thread(() -> ImageBufferCache.invalidateIf(candidate -> {
-            if (candidate != key)
-                return false;
-            inspected.countDown();
-            try {
-                replace.await();
-            } catch (InterruptedException e) {
-                throw new AssertionError(e);
-            }
-            return true;
-        }));
-        invalidator.start();
-        try {
-            if (!inspected.await(10, TimeUnit.SECONDS))
-                throw new AssertionError("Invalidation did not inspect the image");
-            ImageBufferCache.put(key, second);
-        } finally {
-            replace.countDown();
-        }
-        invalidator.join(10000);
-        if (invalidator.isAlive())
-            throw new AssertionError("Invalidation did not finish");
-        await(() -> !allocated(first), "Replaced image was not freed during invalidation");
-        if (ImageBufferCache.get(key) != second || !allocated(second))
-            throw new AssertionError("Concurrent replacement was removed or freed");
-        ImageBufferCache.invalidateIf(candidate -> candidate == key);
-        await(() -> !allocated(second), "Final image was not freed");
     }
 
 }

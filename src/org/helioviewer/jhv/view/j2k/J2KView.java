@@ -18,7 +18,6 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -75,9 +74,7 @@ public final class J2KView extends BaseView {
                 default -> throw new Exception("Unknown image type");
             }
 
-            LUT lut = source.lut();
-            if (lut != null)
-                builtinLUT = lut;
+            builtinLUT = source.lut();
 
             maxFrame = source.frames() - 1;
             metaData = new MetaData[maxFrame + 1];
