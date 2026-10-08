@@ -78,7 +78,7 @@ public final class ContextRecoveryTest {
 
     private static void checkFrame(AngleRenderer renderer) {
         GLRenderer.reshape(32, 32);
-        renderer.render(Sun.StartEarth);
+        renderer.render(Sun.StartEarth, false);
         ByteBuffer pixel = BufferUtils.newByteBuffer(4);
         GL.glReadPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
         check((pixel.get(0) & 255) > 200 && pixel.get(1) == 0 && pixel.get(2) == 0, "Retained geometry or shader did not recover");

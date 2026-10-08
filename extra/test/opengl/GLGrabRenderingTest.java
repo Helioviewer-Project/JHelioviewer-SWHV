@@ -41,7 +41,7 @@ public final class GLGrabRenderingTest {
             GLRenderer.reshape(320, 180);
             for (MapMode mode : MapMode.values()) {
                 Display.mode = mode;
-                renderer.render(Sun.StartEarth);
+                renderer.render(Sun.StartEarth, false);
                 MapView screenView = GLRenderer.getMapView();
                 for (int[] size : new int[][]{{256, 256}, {180, 320}, {320, 180}}) {
                     GLGrab grabber = new GLGrab(size[0], size[1]);

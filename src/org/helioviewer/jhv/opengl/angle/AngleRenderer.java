@@ -180,9 +180,14 @@ public final class AngleRenderer {
         surface = newSurface;
     }
 
-    public void render(Position viewpoint) {
+    public void render(Position viewpoint, boolean surfaceResized) {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
+        // Synchronize native window dimensions before drawing; ANGLE otherwise resizes after swap.
+        if (surfaceResized && (backend == Backend.D3D11 || backend == Backend.OPENGL)) {
+            if (!EGL15.eglWaitNative(EGL15.EGL_CORE_NATIVE_ENGINE))
+                throw eglError("eglWaitNative");
+        }
         GLRenderer.display(viewpoint);
         if (swapBuffers && !EGL15.eglSwapBuffers(display, surface))
             throw eglError("eglSwapBuffers");

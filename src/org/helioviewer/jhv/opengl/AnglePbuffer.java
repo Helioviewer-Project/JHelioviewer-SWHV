@@ -33,7 +33,7 @@ public final class AnglePbuffer {
             angleRenderer = AngleRenderer.pbuffer(WIDTH, HEIGHT);
             GLRenderer.reshape(WIDTH, HEIGHT);
         }
-        angleRenderer.render(viewpoint);
+        angleRenderer.render(viewpoint, false);
     }
 
 }

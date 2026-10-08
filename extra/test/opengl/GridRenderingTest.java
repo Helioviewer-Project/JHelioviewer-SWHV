@@ -54,7 +54,7 @@ public final class GridRenderingTest {
                         Display.mode = mode;
                         for (boolean labels : new boolean[]{false, true}) {
                             grid.setShowLabels(labels);
-                            renderer.render(viewpoint);
+                            renderer.render(viewpoint, false);
                             ByteBuffer pixels = BufferUtils.newByteBuffer(width * height * 4);
                             GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
                             GLException.checkErrors("GridRenderingTest " + mode);
