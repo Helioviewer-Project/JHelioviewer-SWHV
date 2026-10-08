@@ -269,7 +269,7 @@ public final class J2KView extends BaseView {
         if (reader != null && (decodeParams != wanted || currentLevel == NO_LEVEL)) {
             signalReader(wanted);
         }
-        show(decodeParams, viewpoint);
+        show(decodeParams);
     }
 
     // The request itself, or the whole finest complete level while a JPIP frame lacks the wanted one.
@@ -281,25 +281,25 @@ public final class J2KView extends BaseView {
     void refreshDecodeFromReader(J2KParams.Decode wanted) {
         EventQueue.invokeLater(() -> {
             if (dataHandler != null && wanted.frame() == targetFrame) {
-                show(available(wanted), currentViewpoint);
+                show(available(wanted));
             }
         });
     }
 
-    private void show(J2KParams.Decode decodeParams, Position viewpoint) {
+    private void show(J2KParams.Decode decodeParams) {
         DecodeKey key = new DecodeKey(serial, decodeParams, processingSettings.getFilter());
         DecodedImage image = ImageBufferCache.get(key);
         if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.invalidate();
-            sendDataToHandler(decodeParams.frame(), viewpoint, image, () -> key.filter == processingSettings.getFilter());
+            sendDataToHandler(decodeParams.frame(), currentViewpoint, image, () -> key.filter == processingSettings.getFilter());
             return;
         }
 
         MetaData m = metaData[decodeParams.frame()];
         executor.submit(
                 () -> decodeImage(decodeParams, key.filter, m),
-                new J2KCallback(key, viewpoint));
+                new J2KCallback(key, currentViewpoint));
     }
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.

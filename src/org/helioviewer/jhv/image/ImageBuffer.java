@@ -164,7 +164,7 @@ public final class ImageBuffer {
     }
 
     private static final class BufferState implements Runnable {
-        private long address;
+        private final long address;
 
         private BufferState(long _address) {
             address = _address;
@@ -172,10 +172,7 @@ public final class ImageBuffer {
 
         @Override
         public void run() {
-            if (address == 0)
-                return;
             MemoryUtil.nmemFree(address);
-            address = 0;
         }
     }
 

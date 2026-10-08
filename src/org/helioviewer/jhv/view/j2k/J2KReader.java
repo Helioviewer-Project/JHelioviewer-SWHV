@@ -332,9 +332,8 @@ class J2KReader implements Runnable {
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
-            } catch (InterruptedException e) {
-                if (!isAbolished)
-                    queueIfEmpty(params);
+            } catch (InterruptedException ignore) {
+                return; // Only stop() interrupts the reader.
             } catch (J2KNative.Refused e) {
                 // The source takes no more data; what is complete stays viewable.
                 Log.error(uri + ": " + e.getMessage());
