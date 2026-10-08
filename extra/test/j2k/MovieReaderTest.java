@@ -88,7 +88,10 @@ public final class MovieReaderTest {
                 }
                 Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
                 readFrames.setAccessible(true);
-                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, size.subImage(), 0), null, false);
+                Field retries = J2KReader.class.getDeclaredField("retries");
+                retries.setAccessible(true);
+                retries.setInt(reader, 12);
+                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, size.subImage(), 0), false);
                 if (mode == Mode.PUMP) {
                     // Keep the idle worker waiting on its original queue while invoking the pump directly.
                     Field threadField = J2KReader.class.getDeclaredField("myThread");
@@ -121,6 +124,8 @@ public final class MovieReaderTest {
                 }
                 if (!(boolean) readFrames.invoke(reader, params, size, false))
                     throw new AssertionError("Prefetch interrupted unexpectedly");
+                if (retries.getInt(reader) != 0)
+                    throw new AssertionError("Received or restored frames did not reset consecutive failures");
                 JPIPCacheManager.Entry entry = JPIPCacheManager.get("movie2", 0);
                 if (entry == null || entry.block().length < 1000)
                     throw new AssertionError("Missing or damaged cache entry after the pump");

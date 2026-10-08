@@ -11,12 +11,15 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.DataUri;
@@ -58,6 +61,7 @@ public final class J2KViewTest {
                 throw new AssertionError("Expected a movie with at least four frames");
             show(view, 0, Integer.MAX_VALUE);
             await(view, frames - 1);
+            checkRefresh(view);
             // A finer level of the shown frame is fetched and delivered without another request to decode.
             ResolutionSet.Level finer = view.getResolutionLevel(0, 3);
             show(view, 0, 3);
@@ -83,8 +87,48 @@ public final class J2KViewTest {
         } finally {
             EventQueue.invokeAndWait(playback::stop);
         }
-        System.out.println("PASS: download started by a first view at a complete level, priority refresh, playing download, recovery from a lost connection");
+        System.out.println("PASS: download start, latest refresh viewpoint, detached refresh, priority refresh, playing download and connection recovery");
         System.exit(0);
+    }
+
+    private static void checkRefresh(J2KView view) throws Exception {
+        ResolutionSet.Level size = view.getResolutionLevel(0, Integer.MAX_VALUE);
+        MetaData metadata = view.getMetaData(view.getFrameTime(0));
+        Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
+        double scale = size.height() / metadata.getPhysicalRegion().height;
+        images.clear();
+        EventQueue.invokeAndWait(() -> view.decode(latest, scale, null));
+        View.ImageData image = images.poll(60, TimeUnit.SECONDS);
+        if (image == null || image.viewpoint() != latest)
+            throw new AssertionError("Latest request viewpoint was not delivered");
+
+        images.clear();
+        EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(new J2KParams.Decode(0, size.subImage(), size.level())));
+        image = images.poll(60, TimeUnit.SECONDS);
+        if (image == null || image.viewpoint() != latest)
+            throw new AssertionError("Reader refresh used an obsolete viewpoint");
+
+        // The replacement view uses the same worker. An old view's cached refresh
+        // must not invalidate its decode or drop its pending task.
+        CountDownLatch release = new CountDownLatch(1);
+        CompletableFuture<Boolean> fresh = new CompletableFuture<>();
+        try {
+            EventQueue.invokeAndWait(() -> {
+                view.setDataHandler(null);
+                worker.submit(() -> {
+                    release.await();
+                    return null;
+                }, (result, current) -> fresh.complete(current));
+                view.refreshDecodeFromReader(new J2KParams.Decode(0, size.subImage(), size.level()));
+            });
+            EventQueue.invokeAndWait(() -> {}); // the queued refresh has run
+            release.countDown();
+            if (!fresh.get(10, TimeUnit.SECONDS))
+                throw new AssertionError("Detached refresh invalidated the replacement decode");
+        } finally {
+            release.countDown();
+            EventQueue.invokeAndWait(() -> view.setDataHandler(images::add));
+        }
     }
 
     private static String[] play(URI uri, boolean drop) throws Exception {

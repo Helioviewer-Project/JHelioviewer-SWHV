@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.j2k;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +49,7 @@ public final class J2KView extends BaseView {
     private final J2KSource source;
     private final int maxFrame;
     private int targetFrame;
+    private Position currentViewpoint;
 
     private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
@@ -108,10 +108,10 @@ public final class J2KView extends BaseView {
                 String[] cacheKey = new String[maxFrame + 1];
                 if (request != null) {
                     for (int i = 0; i <= maxFrame; i++) {
-                        long milli = frameMap.key(i).milli;
-                        if (milli != metaData[i].getViewpoint().time.milli)
+                        if (frameMap.key(i).milli != metaData[i].getViewpoint().time.milli)
                             Log.warn("Badly ordered metadata: " + dataUri + "[" + i + "]: expected " + frameMap.key(i) + ", got " + metaData[i].getViewpoint().time);
-                        cacheKey[i] = request.sourceId() + "+" + milli;
+                        if (metaData[i] instanceof FitsMetaData)
+                            cacheKey[i] = request.sourceId() + "+" + metaData[i].getViewpoint().time.milli;
                     }
                 }
                 reader.setCacheKey(cacheKey);
@@ -252,23 +252,24 @@ public final class J2KView extends BaseView {
     private static final int NO_LEVEL = 10000;
     private int currentLevel = NO_LEVEL;
 
-    private void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
+    private void signalReader(J2KParams.Decode decodeParams) {
         int level = decodeParams.level;
         boolean priority = !Player.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signal(new J2KParams.Read(this, decodeParams, viewpoint, priority));
+            reader.signal(new J2KParams.Read(this, decodeParams, priority));
             currentLevel = level;
         }
     }
 
     @Override
     public void decode(Position viewpoint, double pixFactor, @Nullable ClipSet.Range clipRange) {
+        currentViewpoint = viewpoint;
         J2KParams.Decode wanted = getDecodeParams(targetFrame, pixFactor);
         J2KParams.Decode decodeParams = available(wanted); // before signalling to reader
         // The first signal starts the movie download.
         if (reader != null && (decodeParams != wanted || currentLevel == NO_LEVEL)) {
-            signalReader(wanted, viewpoint);
+            signalReader(wanted);
         }
         show(decodeParams, viewpoint);
     }
@@ -279,10 +280,10 @@ public final class J2KView extends BaseView {
         return res.level() == wanted.level ? wanted : new J2KParams.Decode(wanted.frame, res.subImage(), res.level());
     }
 
-    void refreshDecodeFromReader(J2KParams.Decode wanted, Position viewpoint) {
+    void refreshDecodeFromReader(J2KParams.Decode wanted) {
         EventQueue.invokeLater(() -> {
-            if (wanted.frame == targetFrame) {
-                show(available(wanted), viewpoint);
+            if (dataHandler != null && wanted.frame == targetFrame) {
+                show(available(wanted), currentViewpoint);
             }
         });
     }
@@ -299,13 +300,9 @@ public final class J2KView extends BaseView {
 
         MetaData m = metaData[decodeParams.frame];
         ResolutionSet.Level resolution = getResolutionLevel(decodeParams.frame, decodeParams.level);
-        try {
-            executor.submit(
-                    () -> decodeImage(decodeParams, key.filter(), m, resolution),
-                    new J2KCallback(key, viewpoint));
-        } catch (RejectedExecutionException ignore) {
-            // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
-        }
+        executor.submit(
+                () -> decodeImage(decodeParams, key.filter(), m, resolution),
+                new J2KCallback(key, viewpoint));
     }
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.
@@ -343,7 +340,8 @@ public final class J2KView extends BaseView {
 
         @Override
         public void onFailure(@Nonnull Throwable t, boolean fresh) {
-            Log.errorStack(t);
+            if (dataHandler != null)
+                Log.errorStack(t);
         }
 
     }

@@ -10,7 +10,8 @@ python3 extra/test/j2k/run_j2k_tests.py
 The default suite is offline and needs no native library:
 
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
-  zero-length reads at EOF, premature EOF, and draining a chunked body on close.
+  zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
+  read after a timeout in chunk framing or payload.
 - Socket: a local server checks the channel request and its response framing, refused
   channels, the metadata and frame request lines, two requests sent ahead with their bodies
   returned in order, a chunked body larger than the receive buffer, graceful channel close,
@@ -46,7 +47,8 @@ requests without the reader, the actual reader prefetch pump, reopened disk-cach
 with the socket aborted, and a session in which one cache entry is replaced by a block the
 client refuses (the frame is fetched and stored again). A controlled signal after two sends
 checks that two sent responses are drained before switching work. The pump is invoked directly
-without a GUI view, while its worker remains idle.
+without a GUI view, while its worker remains idle. Received or restored frames must reset
+the reader's consecutive failure count within the pass.
 
 The same movie is then opened by the real view, headless, with its reader thread. Paused and
 first shown at its coarsest level, which opening already completed, the movie must still
@@ -54,6 +56,8 @@ download; a finer level of the shown frame must be fetched and delivered by the 
 refresh. Playing, the whole movie is downloaded at a coarse level twice, once with the
 connection aborted after a third of the frames; the reader must reconnect and the pixels of
 every frame must be equal.
+Reader refreshes must use the latest viewpoint, and a detached view's refresh must leave
+the shared worker's replacement task current.
 
 The live suite also downloads a Callisto JP2 through the ROB API and checks horizontal
 crops at the origin, interior, and right edge against a full-image decode. It exercises

@@ -32,6 +32,7 @@ class J2KReader implements Runnable {
     private volatile boolean isAbolished;
     private volatile JPIPSocket socket;
     private String[] cacheKey;
+    private int retries;
 
     J2KReader(URI _uri, J2KSource _source) throws IOException {
         uri = _uri;
@@ -185,6 +186,7 @@ class J2KReader implements Runnable {
             return false;
         }
         update(frame);
+        retries = 0;
         return true;
     }
 
@@ -215,6 +217,7 @@ class J2KReader implements Runnable {
         int frame = sent.frame;
         boolean complete = isComplete(client.response(socket.receive()));
         update(frame);
+        retries = 0;
 
         ResolutionSet set = source.geometry(frame);
         if (set == null) {
@@ -278,14 +281,13 @@ class J2KReader implements Runnable {
             }
 
             if (singleFrame)
-                params.view().refreshDecodeFromReader(decode, params.viewpoint());
+                params.view().refreshDecodeFromReader(decode);
             UITimer.completionChanged();
         }
     }
 
     @Override
     public void run() {
-        int retries = 0;
         while (!isAbolished) {
             J2KParams.Read params;
             // wait for signal
@@ -302,6 +304,8 @@ class J2KReader implements Runnable {
             view.setDownloading(true);
 
             try {
+                if (retries > 0)
+                    Thread.sleep(1000);
                 if (socket.isClosed())
                     connect();
 
@@ -317,10 +321,13 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && finished && !isSettled(wanted.width(), wanted.height())) {
-                    queueIfEmpty(new J2KParams.Read(view, decode, params.viewpoint(), false));
+                    queueIfEmpty(new J2KParams.Read(view, decode, false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
+            } catch (InterruptedException e) {
+                if (!isAbolished)
+                    queueIfEmpty(params);
             } catch (J2KNative.Refused e) {
                 // The source takes no more data; what is complete stays viewable.
                 Log.error(uri + ": " + e.getMessage());
@@ -336,7 +343,7 @@ class J2KReader implements Runnable {
                 if (retries++ < 13)
                     queueIfEmpty(params); // retry unless newer work is pending
                 else
-                    Log.error("Retry limit reached: " + uri); // something may be terribly wrong
+                    Log.error("Retry limit reached: " + uri, e);
             } finally {
                 view.setDownloading(false);
             }

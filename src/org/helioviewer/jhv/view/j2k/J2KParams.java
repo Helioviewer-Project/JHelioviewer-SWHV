@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.view.j2k;
 
-import org.helioviewer.jhv.astronomy.Position;
-
 class J2KParams {
 
     record SubImage(int x, int y, int w, int h) {}
@@ -45,6 +43,6 @@ class J2KParams {
         }
     }
 
-    record Read(J2KView view, Decode decodeParams, Position viewpoint, boolean priority) {}
+    record Read(J2KView view, Decode decodeParams, boolean priority) {}
 
 }

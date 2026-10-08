@@ -65,7 +65,7 @@ public final class ROBTest {
                 if (!cached && (source.getFrameStatus(0, level).get() || JPIPCacheManager.get("image", level) != null))
                     throw new AssertionError("Level " + level + " complete or cached before it was fetched");
                 J2KParams.Decode decode = new J2KParams.Decode(0, size.subImage(), level);
-                if (!(boolean) readFrames.invoke(reader, new J2KParams.Read(null, decode, null, false), size, false))
+                if (!(boolean) readFrames.invoke(reader, new J2KParams.Read(null, decode, false), size, false))
                     throw new AssertionError("Fetch interrupted unexpectedly");
                 if (!source.getFrameStatus(0, level).get() || (level > 0 && !cached && source.getFrameStatus(0, level - 1).get()))
                     throw new AssertionError("Wrong completion after fetching level " + level);
