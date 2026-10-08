@@ -56,6 +56,7 @@ public final class RadioData extends TimelineLayer {
     private final HashMap<Long, RadioJ2KData> cache = new HashMap<>();
     private final Cache<DecodeKey, byte[]> decoded = CacheBuilder.newBuilder()
             .concurrencyLevel(1)
+            .softValues()
             .maximumWeight(MAX_DECODED_BYTES)
             .weigher((DecodeKey key, byte[] pixels) -> pixels.length)
             .build();

@@ -35,7 +35,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
             "-Djava.io.tmpdir=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
     print("Running ImageBufferCacheTest", flush=True)
-    subprocess.run([*java, "-ea", "-Dorg.lwjgl.util.DebugAllocator=true",
+    subprocess.run([*java, "-da", "-Dorg.lwjgl.util.DebugAllocator=true",
                     "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
     for name in ["JPIPSerializerTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)

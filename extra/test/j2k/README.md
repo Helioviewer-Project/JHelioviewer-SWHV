@@ -14,6 +14,7 @@ The default suite is offline and needs no JPEG 2000 native library:
   and the last release frees the pixels. Weighted LRU eviction follows recency rather than frequency.
   A full-cache, 512-frame playback check changes resolution with equally scaled images and budget;
   all new frames must be cache hits from the second loop onward.
+  Retaining or releasing an already released image must throw with Java assertions disabled.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
   read after a timeout in chunk framing or payload.
@@ -81,8 +82,9 @@ crops at the origin, interior, and right edge against a full-image decode. It ex
 all six Callisto resolution levels (0 through 5), including nonaligned requested regions.
 Full-image hashes are printed for comparison when changing the decoder. These checks cover
 grayscale pixels, not RGB composition or timeline drawing. The same fixture checks the shared
-radio crop cache under its 438 MiB byte budget: eviction follows recency across seven days,
-removing a day purges only its crops, and removed days cannot accept late decode results.
+radio crop cache under its 438 MiB byte budget: values are soft so GC can reclaim unused crops
+under memory pressure, and eviction follows recency across seven days.
+Removing a day purges only its crops, and removed days cannot accept late decode results.
 Displayed scalar pixels survive eviction and LUT changes. Immutable fixture arrays are reused
 across day entries to exercise cache weights without allocating 438 MiB of pixels.
 

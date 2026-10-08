@@ -16,17 +16,37 @@ import com.google.common.cache.Cache;
 public final class ImageBufferCacheTest {
 
     public static void main(String[] arguments) throws Exception {
+        releasedImage();
         explicitRemoval();
         heldAndQueuedImages();
         replacementAndEviction();
         weightedLRU();
         resolutionChange();
         concurrentReplacement();
-        System.out.println("PASS: weighted LRU, resolution changes, removal, held and queued images, replacement and concurrent invalidation without repainting");
+        System.out.println("PASS: release checks without assertions, weighted LRU, resolution changes, removal, held and queued images, replacement and concurrent invalidation without repainting");
     }
 
     private static DecodedImage image() {
         return new DecodedImage(ImageBuffer.fromBytes(256, 256, ImageBuffer.Format.Gray8, new byte[256 * 256]), null);
+    }
+
+    private static void releasedImage() throws Exception {
+        DecodedImage image = image();
+        EventQueue.invokeAndWait(() -> {
+            image.close();
+            try {
+                image.retain();
+                throw new AssertionError("Retained a released image");
+            } catch (IllegalStateException expected) {
+            }
+            try {
+                image.close();
+                throw new AssertionError("Released an image twice");
+            } catch (IllegalStateException expected) {
+            }
+        });
+        if (allocated(image))
+            throw new AssertionError("Released image remains allocated");
     }
 
     private static boolean allocated(DecodedImage image) {

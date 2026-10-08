@@ -25,13 +25,15 @@ public final class DecodedImage implements AutoCloseable {
     }
 
     public void retain() {
-        assert references > 0;
+        if (references <= 0)
+            throw new IllegalStateException("Decoded image has been released");
         references++;
     }
 
     @Override
     public void close() {
-        assert references > 0;
+        if (references <= 0)
+            throw new IllegalStateException("Decoded image has been released");
         if (--references == 0)
             imageBuffer.free();
     }
