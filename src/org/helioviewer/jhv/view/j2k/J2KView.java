@@ -110,7 +110,7 @@ public final class J2KView extends BaseView {
                             cacheKey[i] = request.sourceId() + "+" + metaData[i].getViewpoint().time.milli;
                     }
                 }
-                reader.setCacheKey(cacheKey);
+                reader.start(cacheKey);
             }
 
             abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source));

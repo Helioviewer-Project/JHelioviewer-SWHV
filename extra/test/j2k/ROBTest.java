@@ -19,6 +19,7 @@ public final class ROBTest {
         System.load(arguments[0]);
         System.load(arguments[1]);
         URI uri = URI.create(arguments[2]);
+        checkCloseBeforeStart(uri);
         // Reopen the production cache without exposing its shutdown method to application callers.
         Method close = JPIPCacheManager.class.getDeclaredMethod("close");
         close.setAccessible(true);
@@ -39,12 +40,34 @@ public final class ROBTest {
         }
     }
 
+    private static void checkCloseBeforeStart(URI uri) throws Exception {
+        J2KSource source = new J2KSource(null);
+        J2KReader reader = null;
+        try {
+            reader = new J2KReader(uri, source);
+            Field threadField = J2KReader.class.getDeclaredField("myThread");
+            threadField.setAccessible(true);
+            if (((Thread) threadField.get(reader)).getState() != Thread.State.NEW)
+                throw new AssertionError("Reader started before view initialization");
+            reader.stop();
+            Field socketField = J2KReader.class.getDeclaredField("socket");
+            socketField.setAccessible(true);
+            if (!((JPIPSocket) socketField.get(reader)).isClosed())
+                throw new AssertionError("Unstarted reader retained its connection");
+            System.out.println("PASS: closing an unstarted reader releases its connection");
+        } finally {
+            if (reader != null)
+                reader.stop();
+            source.close();
+        }
+    }
+
     private static String[] retrieve(URI uri, boolean cached) throws Exception {
         J2KSource source = new J2KSource(null);
         J2KReader reader = null;
         try {
             reader = new J2KReader(uri, source);
-            reader.setCacheKey(new String[]{"image"});
+            reader.start(new String[]{"image"});
             if (source.frames() != 1)
                 throw new AssertionError("Expected the single-frame ROB fixture");
             Field socketField = J2KReader.class.getDeclaredField("socket");

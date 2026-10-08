@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
@@ -47,7 +46,7 @@ class RadioJ2KData {
     private final boolean willDraw;
 
     private BufferedImage bufferedImage;
-    private Region region;
+    private Crop displayedCrop;
 
     RadioJ2KData(RadioData _owner, APIRequest req, DataUri dataUri) throws Exception {
         owner = _owner;
@@ -86,8 +85,7 @@ class RadioJ2KData {
 
     // A pixel of a level covers 2^level source pixels, also where the rows do not halve evenly.
     private void show(Crop crop, byte[] pixels) {
-        int shift = crop.level;
-        region = new Region(crop.x << shift, 0, crop.width << shift, crop.height << shift);
+        displayedCrop = crop;
         boolean hadData = bufferedImage != null;
         DataBufferByte dataBuffer = new DataBufferByte(pixels, pixels.length);
         bufferedImage = new BufferedImage(owner.getColorModel(),
@@ -191,16 +189,18 @@ class RadioJ2KData {
             return;
 
         long timeWidth = endDate - startDate;
-        long imStart = (long) (startDate + timeWidth * region.llx / j2kWidth);
-        long imEnd = (long) (startDate + timeWidth * region.urx / j2kWidth);
+        double firstColumn = displayedCrop.x << displayedCrop.level;
+        double endColumn = firstColumn + (displayedCrop.width << displayedCrop.level);
+        long imStart = (long) (startDate + timeWidth * firstColumn / j2kWidth);
+        long imEnd = (long) (startDate + timeWidth * endColumn / j2kWidth);
 
         double freqWidth = endFreq - startFreq;
-        double freqimStart = startFreq + freqWidth * region.lly / j2kHeight;
-        double freqimEnd = startFreq + freqWidth * region.ury / j2kHeight;
+        double rows = displayedCrop.height << displayedCrop.level;
+        double freqimEnd = startFreq + freqWidth * rows / j2kHeight;
 
         g.drawImage(bufferedImage,
                 xMapper.toPixel(imStart),
-                yMapper.dataToPixel(freqimStart),
+                yMapper.dataToPixel(startFreq),
                 xMapper.toPixel(imEnd),
                 yMapper.dataToPixel(freqimEnd),
                 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);

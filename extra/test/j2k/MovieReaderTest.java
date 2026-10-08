@@ -62,13 +62,13 @@ public final class MovieReaderTest {
                 source.loadFrames();
                 for (int frame = 0; frame < 4; frame++) {
                     do {
-                        socket.sendFrame(client.frame(frame).stream(), "4096,4096", "4097,4097");
+                        socket.sendFrame(client.frame(frame).stream(), 4096, 4096, 1);
                     } while (!isComplete(client.response(socket.receive())));
                     source.update(frame);
                 }
             } else {
                 reader = new J2KReader(uri, source);
-                reader.setCacheKey(new String[]{"movie0", "movie1", "movie2", "movie3"});
+                reader.start(new String[]{"movie0", "movie1", "movie2", "movie3"});
             }
             if (source.frames() < 4)
                 throw new AssertionError("Expected a movie with at least four frames");

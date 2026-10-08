@@ -46,7 +46,7 @@ public final class RadioData extends TimelineLayer {
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
     private final HashMap<Long, RadioJ2KData> cache = new HashMap<>();
-    private final HashMap<Long, RadioJPXDownload> downloads = new HashMap<>();
+    private final HashMap<Long, RadioJP2Download> downloads = new HashMap<>();
     private final HashSet<Long> failedDays = new HashSet<>();
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
@@ -116,21 +116,21 @@ public final class RadioData extends TimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloads.containsKey(date) && !cache.containsKey(date) && !failedDays.contains(date)) {
-                RadioJPXDownload download = new RadioJPXDownload(date);
+                RadioJP2Download download = new RadioJP2Download(date);
                 downloads.put(date, download);
                 changed = true;
-                Task.submitBackground(download, result -> onSuccessRadioJPX(download, result),
-                        t -> onFailureRadioJPX(download, t));
+                Task.submitBackground(download, result -> onSuccessRadioJP2(download, result),
+                        t -> onFailureRadioJP2(download, t));
             }
         }
         if (changed)
             notifyStateChanged();
     }
 
-    private final class RadioJPXDownload implements Callable<RadioJ2KData> {
+    private final class RadioJP2Download implements Callable<RadioJ2KData> {
         private final long date;
 
-        RadioJPXDownload(long _date) {
+        RadioJP2Download(long _date) {
             date = _date;
         }
 
@@ -146,7 +146,7 @@ public final class RadioData extends TimelineLayer {
 
     }
 
-    private void onSuccessRadioJPX(RadioJPXDownload download, @Nonnull RadioJ2KData result) {
+    private void onSuccessRadioJP2(RadioJP2Download download, @Nonnull RadioJ2KData result) {
         if (finishDownload(download)) {
             cache.put(download.date, result);
             fetchData(DrawController.selectedAxis);
@@ -155,7 +155,7 @@ public final class RadioData extends TimelineLayer {
         }
     }
 
-    private void onFailureRadioJPX(RadioJPXDownload download, @Nonnull Throwable t) {
+    private void onFailureRadioJP2(RadioJP2Download download, @Nonnull Throwable t) {
         if (finishDownload(download)) {
             if (AppThread.isInterrupted(t))
                 Log.warn(t);
@@ -166,7 +166,7 @@ public final class RadioData extends TimelineLayer {
         }
     }
 
-    private boolean finishDownload(RadioJPXDownload download) {
+    private boolean finishDownload(RadioJP2Download download) {
         boolean removed = downloads.remove(download.date, download);
         if (removed)
             notifyStateChanged();

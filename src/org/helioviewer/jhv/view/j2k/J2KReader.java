@@ -55,11 +55,12 @@ class J2KReader implements Runnable {
 
         // Virtual-thread interruption also closes a socket still inside its constructor.
         myThread = Thread.ofVirtual().name("Reader " + uri).unstarted(this);
-        myThread.start();
     }
 
-    void setCacheKey(String[] _cacheKey) {
+    // Start only after the view has finished parsing metadata and building cache keys.
+    void start(String[] _cacheKey) {
         cacheKey = _cacheKey;
+        myThread.start();
     }
 
     // runs in abolish thread
@@ -70,6 +71,7 @@ class J2KReader implements Runnable {
             isAbolished = true;
         }
 
+        closeSocket(); // also release the connection if initialization failed before start()
         while (myThread.isAlive()) {
             try {
                 closeSocket();
@@ -123,21 +125,21 @@ class J2KReader implements Runnable {
         } while (!isComplete(client.response(opened.receive())));
     }
 
-    private void fetchFirst(String size, String region) throws IOException {
+    private void fetchFirst(int width, int height, int pad) throws IOException {
         do {
-            socket.sendFrame(stream[0], size, region);
+            socket.sendFrame(stream[0], width, height, pad);
         } while (!isComplete(client.response(socket.receive())));
         source.update(0);
     }
 
     // First open: a coarse level of the first frame.
     private void prime() throws IOException {
-        fetchFirst("64,64", "64,64");
+        fetchFirst(64, 64, 0);
         ResolutionSet set = source.geometry(0);
         if (set != null && !set.isDisplayable()) { // the window did not cover a level
             ResolutionSet.Level res = set.getClosestLevel(64, 64);
             // Pad rsiz for the classical esajpip issue documented beside request()'s pad below.
-            fetchFirst(res.width() + "," + res.height(), (res.width() + 1) + "," + (res.height() + 1));
+            fetchFirst(res.width(), res.height(), 1);
         }
         if (set == null || !set.isDisplayable())
             throw new IOException("The server did not send a complete level of the first frame");
@@ -215,9 +217,9 @@ class J2KReader implements Runnable {
         // Details are in client/CLASSICAL.md in the esajpip repository.
         // Classical servers also lack the full-frame default for omitted rsiz.
         // TODO: Once all supported servers handle omitted rsiz as a full frame, remove
-        // rsiz from JPIPSocket.sendFrame(), this pad and the +1 in prime().
+        // rsiz and the pad argument from JPIPSocket.sendFrame(), including prime()'s padding.
         int pad = set == null ? 0 : 1;
-        socket.sendFrame(stream[frame], res.width() + "," + res.height(), (res.width() + pad) + "," + (res.height() + pad));
+        socket.sendFrame(stream[frame], res.width(), res.height(), pad);
         return new Sent(frame, set != null);
     }
 

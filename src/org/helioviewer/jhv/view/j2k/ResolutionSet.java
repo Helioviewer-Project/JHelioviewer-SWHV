@@ -6,15 +6,13 @@ public class ResolutionSet {
     // The indices represent the number of discardLayers
     private final Level[] resolutions;
     private volatile int completeFrom;
-    private final int numLevels;
     final int numComps;
 
     ResolutionSet(Level[] _resolutions, int _numComps) {
         resolutions = _resolutions;
-        numLevels = resolutions.length;
         numComps = _numComps;
 
-        completeFrom = numLevels;
+        completeFrom = resolutions.length;
     }
 
     void setComplete(int level) {
@@ -22,12 +20,12 @@ public class ResolutionSet {
     }
 
     boolean getComplete(int level) {
-        return Math.min(level, numLevels - 1) >= completeFrom;
+        return Math.min(level, resolutions.length - 1) >= completeFrom;
     }
 
     // The coarsest level is the first to be complete.
     boolean isDisplayable() {
-        return completeFrom < numLevels;
+        return completeFrom < resolutions.length;
     }
 
     // The finest complete level at this one or coarser; a displayable frame has one.
@@ -36,7 +34,7 @@ public class ResolutionSet {
     }
 
     Level getLevel(int idx) {
-        return resolutions[Math.min(idx, numLevels - 1)];
+        return resolutions[Math.min(idx, resolutions.length - 1)];
     }
 
     Level getClosestLevel(int w, int h) {
@@ -49,11 +47,11 @@ public class ResolutionSet {
     }
 
     Level getNextLevel(int w, int h) {
-        for (int i = 1; i < numLevels; ++i) {
+        for (int i = 1; i < resolutions.length; ++i) {
             if (resolutions[i].width < w || resolutions[i].height < h)
                 return resolutions[i - 1];
         }
-        return resolutions[numLevels - 1];
+        return resolutions[resolutions.length - 1];
     }
 
     public record Level(int level, int width, int height) {}

@@ -122,7 +122,7 @@ public final class JPIPSocketTest {
             // Require both requests before responding, proving the client sends ahead.
             String first = readRequest(input), second = readRequest(input);
             if (!first.startsWith("GET /jpip?cid=test&stream=7&fsiz=64,65,closest&rsiz=65,66&len=2097152 ")
-                    || !second.startsWith("GET /jpip?cid=test&stream=8&"))
+                    || !second.startsWith("GET /jpip?cid=test&stream=8&fsiz=64,64,closest&rsiz=64,64&len=2097152 "))
                 throw new IOException("Unexpected frame requests: " + first + " | " + second);
             // A chunked body larger than the client's initial buffer.
             OutputStream out = connection.getOutputStream();
@@ -144,14 +144,14 @@ public final class JPIPSocketTest {
                 client.sendMetadata();
                 if (client.receive().get(1) != 4)
                     throw new AssertionError("Wrong metadata response");
-                client.sendFrame(7, "64,65", "65,66");
-                client.sendFrame(8, "64,64", "64,64");
+                client.sendFrame(7, 64, 65, 1);
+                client.sendFrame(8, 64, 64, 0);
                 if (!client.receive().equals(ByteBuffer.wrap(large)))
                     throw new AssertionError("First response is not the large body");
                 ByteBuffer second = client.receive();
                 if (second.remaining() != 3 || second.get(1) != 1)
                     throw new AssertionError("Second response is not the short body");
-                client.sendFrame(7, "64,64", "64,64");
+                client.sendFrame(7, 64, 64, 0);
                 if (!client.receive().equals(ByteBuffer.wrap(new byte[]{5, 6, 7, 8})))
                     throw new AssertionError("Sequential request after draining failed");
                 if (!client.isClosed())
@@ -219,8 +219,8 @@ public final class JPIPSocketTest {
                 if (abort) {
                     Future<?> pending = workers.submit(() -> {
                         try {
-                            client.sendFrame(0, "64,64", "64,64");
-                            client.sendFrame(1, "64,64", "64,64");
+                            client.sendFrame(0, 64, 64, 0);
+                            client.sendFrame(1, 64, 64, 0);
                             client.receive();
                             throw new AssertionError("Stalled response completed successfully");
                         } catch (IOException expected) {
