@@ -124,25 +124,16 @@ public final class J2KNativeTest {
         int frames = source.frames();
         for (int frame = 0; frame < frames; frame++) {
             source.xml(frame);
-            ByteBuffer palette = source.palette(frame);
+            source.palette(frame);
             J2KNative.Frame info = source.frame(frame);
             int levels = info.width().length;
             check(levels > 0 && info.ready() == levels, "local frame not ready");
             for (int level = 0; level < levels; level++) {
-                J2KNative.Frame rendered = palette == null ? info
-                        : new J2KNative.Frame(info.stream(), 4, info.ready(), info.width(), info.height());
-                Reference expected = reference(path, frame, rendered, level, access);
+                Reference expected = reference(path, frame, info, level, access);
                 String where = path + " frame " + frame + " level " + level;
                 check(info.width()[level] == expected.width() && info.height()[level] == expected.height(),
                         "geometry differs from Kakadu's compositor: " + where);
-                byte[] actual = pixels(source, frame, level);
-                if (palette != null) {
-                    byte[] colors = new byte[actual.length * 4];
-                    for (int i = 0; i < actual.length; i++)
-                        palette.get(4 * (actual[i] & 255), colors, 4 * i, 4);
-                    actual = colors;
-                }
-                check(Arrays.equals(actual, expected.pixels()),
+                check(Arrays.equals(pixels(source, frame, level), expected.pixels()),
                         "pixels differ from Kakadu's compositor: " + where);
             }
         }
@@ -255,8 +246,12 @@ public final class J2KNativeTest {
     }
 
     private static void palettes(Path folder) throws Exception {
-        for (String name : List.of("small", "index2", "clamped", "gray", "swap", "mapped", "unsigned3", "signed4", "unsigned10", "signed10"))
+        for (String name : List.of("small", "clamped", "gray", "swap", "mapped", "unsigned3", "signed4", "unsigned10", "signed10"))
             local(folder.resolve(name + ".jp2"));
+        // The primitive compositor expands two-bit samples to grayscale; indices must stay 0,1,2,3.
+        try (J2KNative source = new J2KNative(folder.resolve("index2.jp2"))) {
+            check(Arrays.equals(pixels(source, 0, 0), new byte[]{0, 1, 2, 3}), "two-bit palette indices");
+        }
         for (String name : List.of("index9", "signed-index")) {
             try (J2KNative source = new J2KNative(folder.resolve(name + ".jp2"))) {
                 try { source.frame(0); throw new AssertionError("unrepresentable palette index accepted"); }
