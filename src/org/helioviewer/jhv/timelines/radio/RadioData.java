@@ -11,6 +11,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -37,10 +38,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
 
 import org.json.JSONObject;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-
 public final class RadioData extends TimelineLayer {
 
     static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
@@ -48,12 +45,9 @@ public final class RadioData extends TimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE).executor(Runnable::run)
-            .removalListener((Long k, RadioJ2KData v, RemovalCause c) -> {
-                if (v != null)
-                    v.removeData();
-            }).build();
+    private final HashMap<Long, RadioJ2KData> cache = new HashMap<>();
     private final HashMap<Long, RadioJPXDownload> downloads = new HashMap<>();
+    private final HashSet<Long> failedDays = new HashSet<>();
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
     private IndexColorModel colorModel;
@@ -92,7 +86,7 @@ public final class RadioData extends TimelineLayer {
 
     private void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
-        cache.asMap().values().forEach(data -> data.changeColormap(colorModel));
+        cache.values().forEach(data -> data.changeColormap(colorModel));
         DrawController.drawRequest();
     }
 
@@ -101,23 +95,36 @@ public final class RadioData extends TimelineLayer {
     }
 
     private void clearCache() {
-        cache.invalidateAll();
+        cache.values().forEach(RadioJ2KData::removeData);
+        cache.clear();
         downloads.clear();
+        failedDays.clear();
         DrawController.drawRequest();
     }
 
     private void requestAndOpenIntervals(long start) {
         long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
+        long first = end - (DAYS_IN_CACHE - 1) * TimeUtils.DAY_IN_MILLIS;
+        boolean changed = cache.entrySet().removeIf(entry -> {
+            boolean remove = entry.getKey() < first || entry.getKey() > end;
+            if (remove)
+                entry.getValue().removeData();
+            return remove;
+        });
+        changed |= downloads.keySet().removeIf(date -> date < first || date > end);
+        failedDays.removeIf(date -> date < first || date > end);
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
-            if (!downloads.containsKey(date) && cache.getIfPresent(date) == null) {
+            if (!downloads.containsKey(date) && !cache.containsKey(date) && !failedDays.contains(date)) {
                 RadioJPXDownload download = new RadioJPXDownload(date);
                 downloads.put(date, download);
-                notifyStateChanged();
+                changed = true;
                 Task.submitBackground(Long.toString(date), download, result -> onSuccessRadioJPX(download, result),
                         (logContext, t) -> onFailureRadioJPX(download, t));
             }
         }
+        if (changed)
+            notifyStateChanged();
     }
 
     private final class RadioJPXDownload implements Callable<RadioJ2KData> {
@@ -152,8 +159,10 @@ public final class RadioData extends TimelineLayer {
         if (finishDownload(download)) {
             if (AppThread.isInterrupted(t))
                 Log.warn(t);
-            else
+            else {
+                failedDays.add(download.date);
                 Log.errorStack(t);
+            }
         }
     }
 
@@ -212,7 +221,7 @@ public final class RadioData extends TimelineLayer {
 
     @Override
     public boolean hasData() {
-        for (RadioJ2KData data : cache.asMap().values()) {
+        for (RadioJ2KData data : cache.values()) {
             if (data.hasData()) {
                 return true;
             }
@@ -223,7 +232,7 @@ public final class RadioData extends TimelineLayer {
     private boolean isLoading() {
         if (!downloads.isEmpty())
             return true;
-        for (RadioJ2KData data : cache.asMap().values()) {
+        for (RadioJ2KData data : cache.values()) {
             if (data.isLoading())
                 return true;
         }
@@ -238,8 +247,8 @@ public final class RadioData extends TimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && canShow(selectedAxis)) {
-            cache.asMap().values().forEach(data -> data.requestData(selectedAxis));
             requestAndOpenIntervals(selectedAxis.start());
+            cache.values().forEach(data -> data.requestData(selectedAxis));
         }
     }
 
@@ -249,10 +258,10 @@ public final class RadioData extends TimelineLayer {
             return;
 
         if (canShow(xAxis)) {
-            drawMessage(g, graphArea, !hasData() && isLoading() ? "Fetching data" : "No data available");
+            drawMessage(g, graphArea, isLoading() ? "Fetching data" : "No data available");
             TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
             YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
-            cache.asMap().values().forEach(data -> data.draw(g, xMapper, yMapper));
+            cache.values().forEach(data -> data.draw(g, xMapper, yMapper));
         } else {
             drawMessage(g, graphArea, "Reduce the time interval to see the radio spectrograms.");
         }
