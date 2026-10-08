@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,7 +10,7 @@ import java.util.function.BooleanSupplier;
 
 import org.lwjgl.system.MemoryUtil;
 
-import com.github.benmanes.caffeine.cache.Cache;
+import com.google.common.cache.Cache;
 
 // Native allocation checks, without drawing or relying on garbage collection.
 public final class ImageBufferCacheTest {
@@ -19,8 +19,10 @@ public final class ImageBufferCacheTest {
         explicitRemoval();
         heldAndQueuedImages();
         replacementAndEviction();
+        weightedLRU();
+        resolutionChange();
         concurrentReplacement();
-        System.out.println("PASS: removal, held and queued images, replacement, eviction and concurrent invalidation without repainting");
+        System.out.println("PASS: weighted LRU, resolution changes, removal, held and queued images, replacement and concurrent invalidation without repainting");
     }
 
     private static DecodedImage image() {
@@ -99,16 +101,76 @@ public final class ImageBufferCacheTest {
         await(() -> !allocated(first), "Replaced image was not freed");
         if (ImageBufferCache.get(key) != second || !allocated(second))
             throw new AssertionError("Replacement image was freed");
-        Cache<Object, DecodedImage> cache = cache();
-        long maximum = cache.policy().eviction().orElseThrow().getMaximum();
-        try {
-            cache.policy().eviction().orElseThrow().setMaximum(1);
-            await(() -> !allocated(second), "Evicted image was not freed");
-            DecodedImage third = image();
-            ImageBufferCache.put(new Object(), third);
-            await(() -> !allocated(third), "Automatic eviction did not free the inserted image");
-        } finally {
-            cache.policy().eviction().orElseThrow().setMaximum(maximum);
+        ImageBufferCache.invalidateIf(candidate -> candidate == key);
+        await(() -> !allocated(second), "Replacement image was not freed on removal");
+        Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(1);
+        DecodedImage third = image();
+        cache.put(key, third);
+        await(() -> !allocated(third), "Oversized image was not freed");
+        if (cache.getIfPresent(key) != null)
+            throw new AssertionError("Oversized image remains cached");
+    }
+
+    private static void weightedLRU() throws Exception {
+        DecodedImage first = image(), second = image(), third = image();
+        DecodedImage large = new DecodedImage(ImageBuffer.fromBytes(512, 256, ImageBuffer.Format.Gray8, new byte[512 * 256]), null);
+        Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(3L * first.imageBuffer().byteSize());
+        EventQueue.invokeAndWait(() -> {
+            cache.put(0, first);
+            cache.put(1, second);
+            cache.put(2, third);
+            // A frequently used image is still evicted once it is the least recently used.
+            for (int repeat = 0; repeat < 100; repeat++)
+                cache.getIfPresent(0);
+            cache.getIfPresent(1);
+            cache.getIfPresent(2);
+            first.retain(); // A layer may continue displaying an evicted image.
+            cache.put(3, large);
+            if (cache.getIfPresent(0) != null || cache.getIfPresent(1) != null
+                    || cache.getIfPresent(2) != third || cache.getIfPresent(3) != large)
+                throw new AssertionError("Eviction did not follow recency and byte weight");
+        });
+        await(() -> !allocated(second), "LRU eviction did not free the unheld image");
+        if (!allocated(first))
+            throw new AssertionError("LRU eviction freed a layer-owned image");
+        EventQueue.invokeAndWait(first::close);
+        await(() -> !allocated(first), "Last layer release did not free the evicted image");
+        cache.invalidateAll();
+        await(() -> !allocated(third) && !allocated(large), "LRU cache removal did not free images");
+    }
+
+    private static void resolutionChange() throws Exception {
+        // Scale the images and budget equally: 512 old frames fill the cache, as at 8 GiB with 4K grayscale.
+        for (int side : new int[]{256, 128}) {
+            Cache<Object, DecodedImage> cache = ImageBufferCache.createCache(512L * 256 * 256);
+            ArrayList<DecodedImage> images = new ArrayList<>();
+            EventQueue.invokeAndWait(() -> {
+                for (int frame = 0; frame < 512; frame++) {
+                    DecodedImage image = image();
+                    images.add(image);
+                    cache.put("old-" + frame, image);
+                }
+                for (int loop = 0; loop < 20; loop++) {
+                    for (int frame = 0; frame < 512; frame++)
+                        cache.getIfPresent("old-" + frame);
+                }
+                for (int loop = 0; loop < 3; loop++) {
+                    int misses = 0;
+                    for (int frame = 0; frame < 512; frame++) {
+                        String key = "new-" + frame;
+                        if (cache.getIfPresent(key) == null) {
+                            misses++;
+                            DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(side, side, ImageBuffer.Format.Gray8, new byte[side * side]), null);
+                            images.add(image);
+                            cache.put(key, image);
+                        }
+                    }
+                    if (misses != (loop == 0 ? 512 : 0))
+                        throw new AssertionError("Resolution change caused " + misses + " decodes on loop " + loop);
+                }
+                cache.invalidateAll();
+            });
+            await(() -> images.stream().noneMatch(ImageBufferCacheTest::allocated), "Resolution-change images were not freed");
         }
     }
 
@@ -144,13 +206,6 @@ public final class ImageBufferCacheTest {
             throw new AssertionError("Concurrent replacement was removed or freed");
         ImageBufferCache.invalidateIf(candidate -> candidate == key);
         await(() -> !allocated(second), "Final image was not freed");
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Cache<Object, DecodedImage> cache() throws Exception {
-        Field field = ImageBufferCache.class.getDeclaredField("cache");
-        field.setAccessible(true);
-        return (Cache<Object, DecodedImage>) field.get(null);
     }
 
 }

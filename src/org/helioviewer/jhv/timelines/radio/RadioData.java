@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -38,14 +39,26 @@ import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
 
 import org.json.JSONObject;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public final class RadioData extends TimelineLayer {
 
     static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
 
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
+    // Two full-resolution Callisto images per retained day, with room for alternate crops and levels.
+    private static final long MAX_DECODED_BYTES = 2L * DAYS_IN_CACHE * 86400 * 380;
+
+    private record DecodeKey(RadioJ2KData day, RadioJ2KData.Crop crop) {}
 
     private final HashMap<Long, RadioJ2KData> cache = new HashMap<>();
+    private final Cache<DecodeKey, byte[]> decoded = CacheBuilder.newBuilder()
+            .concurrencyLevel(1)
+            .maximumWeight(MAX_DECODED_BYTES)
+            .weigher((DecodeKey key, byte[] pixels) -> pixels.length)
+            .build();
     private final HashMap<Long, RadioJP2Download> downloads = new HashMap<>();
     private final HashSet<Long> failedDays = new HashSet<>();
     private final LUTComboBox lutCombo;
@@ -94,7 +107,25 @@ public final class RadioData extends TimelineLayer {
         return colorModel;
     }
 
+    @Nullable
+    byte[] getDecoded(RadioJ2KData day, RadioJ2KData.Crop crop) {
+        return decoded.getIfPresent(new DecodeKey(day, crop));
+    }
+
+    boolean putDecoded(RadioJ2KData day, RadioJ2KData.Crop crop, byte[] pixels) {
+        // A completed decode may arrive after this day left the window.
+        if (!cache.containsValue(day))
+            return false;
+        decoded.put(new DecodeKey(day, crop), pixels);
+        return true;
+    }
+
+    void removeDecoded(RadioJ2KData day) {
+        decoded.asMap().keySet().removeIf(key -> key.day == day);
+    }
+
     private void clearCache() {
+        decoded.invalidateAll();
         cache.values().forEach(RadioJ2KData::removeData);
         cache.clear();
         downloads.clear();

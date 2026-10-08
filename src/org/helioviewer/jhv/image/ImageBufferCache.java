@@ -1,23 +1,28 @@
 package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public final class ImageBufferCache {
 
     private static final long MAX_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
 
-    private static final Cache<Object, DecodedImage> cache = Caffeine.newBuilder()
-            .maximumWeight(MAX_CACHE_BYTES)
-            .weigher((Object key, DecodedImage value) -> value.imageBuffer().byteSize())
-            .removalListener((Object key, DecodedImage value, RemovalCause cause) -> EventQueue.invokeLater(value::close))
-            .build();
+    private static final Cache<Object, DecodedImage> cache = createCache(MAX_CACHE_BYTES);
+
+    static Cache<Object, DecodedImage> createCache(long maximumBytes) {
+        return CacheBuilder.newBuilder()
+                .concurrencyLevel(1) // One shared byte budget and LRU order, without frequency-based admission.
+                .maximumWeight(maximumBytes)
+                .weigher((Object key, DecodedImage value) -> value.imageBuffer().byteSize())
+                .removalListener(notification -> EventQueue.invokeLater(notification.getValue()::close))
+                .build();
+    }
 
     // Borrowed during the EDT turn; retain the image before keeping it beyond that turn.
     @Nullable
@@ -31,7 +36,10 @@ public final class ImageBufferCache {
     }
 
     public static void invalidateIf(Predicate<Object> predicate) {
-        cache.asMap().entrySet().removeIf(entry -> predicate.test(entry.getKey()));
+        for (Map.Entry<Object, DecodedImage> entry : cache.asMap().entrySet()) {
+            if (predicate.test(entry.getKey()))
+                cache.asMap().remove(entry.getKey(), entry.getValue());
+        }
     }
 
     private ImageBufferCache() {}

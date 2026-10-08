@@ -22,9 +22,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.view.j2k.J2KSource;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 class RadioJ2KData {
 
     private static final int QUANTA = 32;
@@ -32,7 +29,6 @@ class RadioJ2KData {
     // Columns of a level, over its whole height.
     record Crop(int level, int x, int width, int height) {}
 
-    private final Cache<Crop, byte[]> decoded = Caffeine.newBuilder().softValues().build();
     private final RadioData owner;
     private final J2KSource source;
     private final LatestWorker<byte[]> executor;
@@ -79,6 +75,7 @@ class RadioJ2KData {
 
     void removeData() {
         executor.dispose();
+        owner.removeDecoded(this);
         AppThread.create(source::close, "Radio-Close").start(); // not on the EDT
         bufferedImage = null;
     }
@@ -112,7 +109,7 @@ class RadioJ2KData {
         if (crop == null)
             return;
 
-        byte[] pixels = decoded.getIfPresent(crop);
+        byte[] pixels = owner.getDecoded(this, crop);
         if (pixels != null) {
             executor.invalidate(); // a running decode is stale
             show(crop, pixels);
@@ -121,8 +118,7 @@ class RadioJ2KData {
         executor.submit(() -> source.decode(0, crop.level, crop.x, 0, crop.width, crop.height), new LatestWorker.Callback<>() {
             @Override
             public void onSuccess(byte[] result, boolean fresh) {
-                decoded.put(crop, result);
-                if (fresh)
+                if (owner.putDecoded(RadioJ2KData.this, crop, result) && fresh)
                     show(crop, result);
             }
 

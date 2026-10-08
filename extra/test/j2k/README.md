@@ -11,7 +11,9 @@ The default suite is offline and needs no JPEG 2000 native library:
 
 - Image memory: cache invalidation, replacement and eviction release native buffers without
   repainting or garbage collection; layer slots and queued deliveries retain their own references,
-  and the last release frees the pixels.
+  and the last release frees the pixels. Weighted LRU eviction follows recency rather than frequency.
+  A full-cache, 512-frame playback check changes resolution with equally scaled images and budget;
+  all new frames must be cache hits from the second loop onward.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
   read after a timeout in chunk framing or payload.
@@ -66,7 +68,11 @@ The live suite also downloads a Callisto JP2 through the ROB API and checks hori
 crops at the origin, interior, and right edge against a full-image decode. It exercises
 all six Callisto resolution levels (0 through 5), including nonaligned requested regions.
 Full-image hashes are printed for comparison when changing the decoder. These checks cover
-grayscale pixels, not RGB composition or timeline drawing.
+grayscale pixels, not RGB composition or timeline drawing. The same fixture checks the shared
+radio crop cache under its 438 MiB byte budget: eviction follows recency across seven days,
+removing a day purges only its crops, and removed days cannot accept late decode results.
+Displayed scalar pixels survive eviction and LUT changes. Immutable fixture arrays are reused
+across day entries to exercise cache weights without allocating 438 MiB of pixels.
 
 `run_native_test.sh` requires `KDU_VENDOR` to name a supplied Kakadu SDK.
 It builds the bridge and checks it, through `J2KNative`, against Kakadu's
@@ -90,5 +96,5 @@ up on normal exit. The live runner supports macOS and Linux x86-64.
 The live suite has been exercised only on macOS arm64. No application settings or user cache are used.
 
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
-or cache admission under sustained 8 GiB workloads. The ROB and movie reader checks decode raw pixels; the view check
+or GUI playback with 8 GiB of actual cached pixels. The ROB and movie reader checks decode raw pixels; the view check
 uses the image metadata, but does not independently validate its geometry.
