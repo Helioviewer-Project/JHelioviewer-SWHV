@@ -80,6 +80,8 @@ public final class CallistoTest {
         byte[] full = source.decode(0, 0, 0, 0, whole.width(), whole.height());
         byte[] edgePixels = source.decode(0, 0, edge.x(), 0, edge.width(), edge.height());
         byte[] newerPixels = source.decode(0, 0, newer.x(), 0, newer.width(), newer.height());
+        RadioJ2KData.Crop initial = RadioJ2KData.levelCrop(size.width() * 15 / 32, size.width() * 3 / 32, size.width(), source.level(0, 0));
+        byte[] initialPixels = source.decode(0, 0, initial.x(), 0, initial.width(), initial.height());
         try {
             for (int i = 0; i < data.length; i++) {
                 RadioJ2KData day = data[i] = new RadioJ2KData(owner, request, uri);
@@ -87,6 +89,9 @@ public final class CallistoTest {
                 EventQueue.invokeAndWait(() -> days.put(key, day));
             }
             EventQueue.invokeAndWait(() -> {
+                data[0].requestData(new TimeAxis(date + 2 * TimeUtils.DAY_IN_MILLIS, date + 3 * TimeUtils.DAY_IN_MILLIS));
+                if (data[0].isLoading() || data[0].hasData())
+                    throw new AssertionError("Offscreen day started decoding or reported loading");
                 // Reuse immutable fixture arrays across days to exercise the byte budget without allocating 438 MiB.
                 for (RadioJ2KData day : data) {
                     owner.putDecoded(day, whole, full);
@@ -103,18 +108,23 @@ public final class CallistoTest {
                 if (owner.getDecoded(data[0], whole) != null || owner.getDecoded(data[6], newer) != newerPixels
                         || owner.getDecoded(data[1], whole) != full || days.size() != 7)
                     throw new AssertionError("Radio LRU did not share its byte budget across retained days");
-                owner.putDecoded(data[0], whole, full);
-                data[0].requestData(new TimeAxis(date, date + TimeUtils.DAY_IN_MILLIS / 64));
+                owner.removeDecoded(data[0]);
+                owner.putDecoded(data[0], initial, initialPixels);
+                long noon = date + TimeUtils.DAY_IN_MILLIS / 2;
+                data[0].requestData(new TimeAxis(noon, noon + TimeUtils.DAY_IN_MILLIS / 32));
                 try {
                     BufferedImage before = (BufferedImage) field(data[0], "bufferedImage");
-                    if (before == null || ((DataBufferByte) before.getRaster().getDataBuffer()).getData() != full)
-                        throw new AssertionError("Cached radio display did not reuse scalar pixels");
+                    if (before == null || ((DataBufferByte) before.getRaster().getDataBuffer()).getData() != initialPixels)
+                        throw new AssertionError("First radio request did not reuse the padded crop's scalar pixels");
+                    data[0].requestData(new TimeAxis(noon + TimeUtils.MINUTE_IN_MILLIS, noon + TimeUtils.DAY_IN_MILLIS / 32));
+                    if (field(data[0], "bufferedImage") != before || data[0].isLoading())
+                        throw new AssertionError("Panning inside the padded crop requested another decode");
                     owner.removeDecoded(data[0]);
                     Method setLUT = RadioData.class.getDeclaredMethod("setLUT", LUT.class);
                     setLUT.setAccessible(true);
                     setLUT.invoke(owner, LUT.gray());
                     BufferedImage after = (BufferedImage) field(data[0], "bufferedImage");
-                    int sample = full[0] & 0xff;
+                    int sample = initialPixels[0] & 0xff;
                     if (after.getRaster() != before.getRaster() || after.getRGB(0, 0) != (0xff000000 | sample << 16 | sample << 8 | sample))
                         throw new AssertionError("Eviction or LUT change lost the displayed scalar raster");
                 } catch (Exception e) {
@@ -131,7 +141,7 @@ public final class CallistoTest {
         }
         if (!days.isEmpty() || owner.getDecoded(data[1], whole) != null)
             throw new AssertionError("Radio removal retained days or crops");
-        System.out.println("PASS: shared radio LRU, day isolation, late-result refusal and scalar/LUT retention after eviction");
+        System.out.println("PASS: padded first crop, offscreen days, shared radio LRU, day isolation, late-result refusal and scalar/LUT retention after eviction");
     }
 
     private static void compare(byte[] full, ResolutionSet.Level reduced, byte[] cropped, RadioJ2KData.Crop crop) {

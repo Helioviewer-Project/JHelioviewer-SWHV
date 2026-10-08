@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -43,8 +44,10 @@ import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTTimer;
@@ -80,6 +83,7 @@ public final class J2KViewTest {
         // Paused, first shown at its coarsest level, which opening already made complete: the movie still downloads.
         J2KView view = open(uri);
         try {
+            checkResolutionSelection(view);
             int frames = view.getMaximumFrameNumber() + 1;
             if (frames < 4)
                 throw new AssertionError("Expected a movie with at least four frames");
@@ -117,6 +121,40 @@ public final class J2KViewTest {
         }
         System.out.println("PASS: download start, latest refresh viewpoint, detached refresh, priority refresh, playing download and connection recovery");
         System.exit(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void checkResolutionSelection(J2KView view) throws Exception {
+        // Before signalling the reader, exercise the selector with square, tall, wide and unequal-scale geometry.
+        J2KSource source = (J2KSource) field(J2KView.class, view, "source");
+        AtomicReferenceArray<ResolutionSet> sets = (AtomicReferenceArray<ResolutionSet>) field(J2KSource.class, source, "sets");
+        MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
+        ResolutionSet originalSet = sets.get(0);
+        MetaData originalMetadata = metadata[0];
+        Method select = J2KView.class.getDeclaredMethod("getDecodeParams", int.class, double.class);
+        select.setAccessible(true);
+        try {
+            for (int[] geometry : new int[][]{{4096, 4096, 4096, 4096, 4}, {2048, 4096, 2048, 4096, 4},
+                    {4096, 2048, 4096, 2048, 4}, {4096, 4096, 8192, 4096, 3}}) {
+                ResolutionSet.Level[] levels = new ResolutionSet.Level[6];
+                for (int i = 0; i < levels.length; i++)
+                    levels[i] = new ResolutionSet.Level(i, geometry[0] >> i, geometry[1] >> i);
+                sets.set(0, new ResolutionSet(levels, 1));
+                metadata[0] = new BasicMetaData(geometry[0], geometry[1], "Selection test") {
+                    @Override
+                    public Region getPhysicalRegion() {
+                        return new Region(0, 0, geometry[2], geometry[3]);
+                    }
+                };
+                J2KParams.Decode selected = (J2KParams.Decode) select.invoke(view, 0, 1.0 / 16);
+                if (selected.level() != geometry[4])
+                    throw new AssertionError("Wrong resolution for " + Arrays.toString(geometry) + ": " + selected.level());
+            }
+        } finally {
+            sets.set(0, originalSet);
+            metadata[0] = originalMetadata;
+        }
+        System.out.println("PASS: square, tall, wide and unequal-scale resolution selection");
     }
 
     private static void checkRefresh(J2KView view) throws Exception {

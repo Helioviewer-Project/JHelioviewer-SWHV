@@ -240,8 +240,9 @@ public final class J2KView extends BaseView {
             res = source.resolutionSet(frame).getLevel(0);
         } else {
             MetaData m = metaData[frame];
+            int reqWidth = (int) (m.getPhysicalRegion().width * pixFactor + .5);
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-            res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
+            res = source.resolutionSet(frame).getNextLevel(reqWidth, reqHeight);
         }
 
         return new J2KParams.Decode(frame, res.level());

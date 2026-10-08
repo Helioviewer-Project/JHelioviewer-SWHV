@@ -159,13 +159,9 @@ class RadioJ2KData {
             return null;
         }
 
-        long newVisibleStart = startDate;
-        long newVisibleEnd = endDate;
-        if (lastState != null) {
-            long margin = xAxis.end() - xAxis.start();
-            newVisibleStart = Math.max(startDate, xAxis.start() - margin);
-            newVisibleEnd = Math.min(endDate, xAxis.end() + margin);
-        }
+        long margin = xAxis.end() - xAxis.start();
+        long newVisibleStart = Math.max(startDate, xAxis.start() - margin);
+        long newVisibleEnd = Math.min(endDate, xAxis.end() + margin);
 
         double pixPerTime = j2kWidth / (double) (endDate - startDate);
         int x0 = (int) Math.round((newVisibleStart - startDate) * pixPerTime);
@@ -203,7 +199,7 @@ class RadioJ2KData {
     }
 
     boolean isLoading() {
-        return willDraw && !hasData();
+        return lastState != null && !hasData();
     }
 
     void changeColormap(ColorModel cm) {
