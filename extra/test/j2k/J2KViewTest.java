@@ -70,7 +70,11 @@ public final class J2KViewTest {
                 image = images.poll(60, TimeUnit.SECONDS);
                 if (image == null)
                     throw new AssertionError("Finer level was not delivered");
-            } while (image.imageBuffer().width != finer.width() || image.imageBuffer().height != finer.height());
+                boolean ready = image.imageBuffer().width == finer.width() && image.imageBuffer().height == finer.height();
+                EventQueue.invokeAndWait(image.image()::close);
+                if (ready)
+                    break;
+            } while (true);
         } finally {
             close(view);
         }
@@ -96,17 +100,19 @@ public final class J2KViewTest {
         MetaData metadata = view.getMetaData(view.getFrameTime(0));
         Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
         double scale = size.height() / metadata.getPhysicalRegion().height;
-        images.clear();
+        clearImages();
         EventQueue.invokeAndWait(() -> view.decode(latest, scale, null));
         View.ImageData image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Latest request viewpoint was not delivered");
+        EventQueue.invokeAndWait(image.image()::close);
 
-        images.clear();
+        clearImages();
         EventQueue.invokeAndWait(() -> view.refreshDecodeFromReader(new J2KParams.Decode(0, size.level())));
         image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Reader refresh used an obsolete viewpoint");
+        EventQueue.invokeAndWait(image.image()::close);
 
         // The replacement view uses the same worker. An old view's cached refresh
         // must not invalidate its decode or drop its pending task.
@@ -127,7 +133,7 @@ public final class J2KViewTest {
                 throw new AssertionError("Detached refresh invalidated the replacement decode");
         } finally {
             release.countDown();
-            EventQueue.invokeAndWait(() -> view.setDataHandler(images::add));
+            EventQueue.invokeAndWait(() -> view.setDataHandler(J2KViewTest::queueImage));
         }
     }
 
@@ -162,6 +168,7 @@ public final class J2KViewTest {
                 MessageDigest hash = MessageDigest.getInstance("SHA-256");
                 hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
                 hashes[frame] = HexFormat.of().formatHex(hash.digest());
+                EventQueue.invokeAndWait(image.image()::close);
             }
             return hashes;
         } finally {
@@ -173,7 +180,7 @@ public final class J2KViewTest {
         Constructor<DataUri> constructor = DataUri.class.getDeclaredConstructor(URI.class, URI.class, File.class);
         constructor.setAccessible(true);
         J2KView view = new J2KView(worker, null, constructor.newInstance(uri, uri, null), new ImageProcessingSettings(() -> {}));
-        EventQueue.invokeAndWait(() -> view.setDataHandler(images::add));
+        EventQueue.invokeAndWait(() -> view.setDataHandler(J2KViewTest::queueImage));
         return view;
     }
 
@@ -182,6 +189,20 @@ public final class J2KViewTest {
             view.setDataHandler(null);
             view.abolish();
         });
+        clearImages();
+    }
+
+    private static void queueImage(View.ImageData image) {
+        image.image().retain();
+        images.add(image);
+    }
+
+    private static void clearImages() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            View.ImageData image;
+            while ((image = images.poll()) != null)
+                image.image().close();
+        });
     }
 
     // Asks for a frame at the level a display of that level's height would want.
@@ -189,7 +210,7 @@ public final class J2KViewTest {
         MetaData metadata = view.getMetaData(view.getFrameTime(frame));
         double scale = view.getResolutionLevel(frame, level).height() / metadata.getPhysicalRegion().height;
         AtomicBoolean selected = new AtomicBoolean();
-        images.clear();
+        clearImages();
         EventQueue.invokeAndWait(() -> {
             selected.set(view.setNearestFrame(view.getFrameTime(frame)));
             if (selected.get())

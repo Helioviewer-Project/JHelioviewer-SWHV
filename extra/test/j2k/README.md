@@ -7,8 +7,11 @@ ant compile
 python3 extra/test/j2k/run_j2k_tests.py
 ```
 
-The default suite is offline and needs no native library:
+The default suite is offline and needs no JPEG 2000 native library:
 
+- Image memory: cache invalidation, replacement and eviction release native buffers without
+  repainting or garbage collection; layer slots and queued deliveries retain their own references,
+  and the last release frees the pixels.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
   read after a timeout in chunk framing or payload.
@@ -87,5 +90,5 @@ up on normal exit. The live runner supports macOS and Linux x86-64.
 The live suite has been exercised only on macOS arm64. No application settings or user cache are used.
 
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
-or cache eviction. The ROB and movie reader checks decode raw pixels; the view check
+or cache admission under sustained 8 GiB workloads. The ROB and movie reader checks decode raw pixels; the view check
 uses the image metadata, but does not independently validate its geometry.

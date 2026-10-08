@@ -24,13 +24,16 @@ classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"),
                              *(str(p) for p in sorted((root / "lib").rglob("*.jar")))])
 with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
-    sources = ["JPIPSerializerTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java"]
+    sources = ["JPIPSerializerTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java"]
     if args.live:
         sources.extend(["ROBTest.java", "MovieReaderTest.java", "J2KViewTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
+    print("Running ImageBufferCacheTest", flush=True)
+    subprocess.run([*java, "-ea", "-Dorg.lwjgl.util.DebugAllocator=true",
+                    "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
     for name in ["JPIPSerializerTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],

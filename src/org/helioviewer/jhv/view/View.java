@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
@@ -14,12 +15,22 @@ import org.helioviewer.jhv.time.JHVTime;
 public interface View {
 
     record ImageData(
-            @Nonnull ImageBuffer imageBuffer,
+            @Nonnull DecodedImage image,
             @Nonnull MetaData metaData,
-            @Nonnull Region region,
-            @Nonnull Position viewpoint) {}
+            @Nonnull Position viewpoint) {
+
+        public ImageBuffer imageBuffer() {
+            return image.imageBuffer();
+        }
+
+        public Region region() {
+            return image.region();
+        }
+
+    }
 
     interface DataHandler {
+        // Borrowed for this call. Retain the decoded image if it will be kept afterward.
         void handleData(ImageData imageData);
     }
 

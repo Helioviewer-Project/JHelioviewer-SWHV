@@ -94,15 +94,16 @@ public class BaseView implements View {
     }
 
     protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image, BooleanSupplier isCurrent) {
-        image.imageBuffer().protectFromExplicitFree();
         MetaData m = metaData[frame];
-
-        View.ImageData data = new View.ImageData(image.imageBuffer(), m, image.region(), viewpoint);
+        View.ImageData data = new View.ImageData(image, m, viewpoint);
+        image.retain(); // The queued delivery owns a reference until its callback ends.
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null && isCurrent.getAsBoolean())
-                dataHandler.handleData(data);
-            else
-                image.imageBuffer().allowExplicitFree();
+            try {
+                if (dataHandler != null && isCurrent.getAsBoolean())
+                    dataHandler.handleData(data);
+            } finally {
+                image.close();
+            }
         });
     }
 

@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -111,7 +110,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (removed)
             return;
         view.clearCache();
-        imageData = prevImageData = baseImageData = null;
+        clearImageData();
         DisplayController.render();
     }
 
@@ -181,16 +180,22 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         view.setDataHandler(null);
         view.abolish();
 
-        imageData = prevImageData = baseImageData = null;
+        clearImageData();
+    }
+
+    // Release the CPU-side owners now; GL disposal still needs the render context.
+    void detachView() {
+        if (removed)
+            return;
+        removed = true;
+        loader.abolish();
+        unsetView();
     }
 
     @Override
     public void remove() {
-        removed = true;
-        loader.abolish();
-        unsetView();
+        detachView();
         dispose();
-        //System.gc(); // reclaim memory asap
     }
 
     @Override
@@ -315,33 +320,38 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private View.ImageData prevImageData;
     private View.ImageData baseImageData;
 
+    private static View.ImageData replaceImageData(@Nullable View.ImageData previous, @Nullable View.ImageData next) {
+        if (next != null)
+            next.image().retain();
+        if (previous != null)
+            previous.image().close();
+        return next;
+    }
+
+    private void clearImageData() {
+        imageData = replaceImageData(imageData, null);
+        prevImageData = replaceImageData(prevImageData, null);
+        baseImageData = replaceImageData(baseImageData, null);
+    }
+
     private void setImageData(@Nonnull View.ImageData newImageData) {
         long newMilli = newImageData.metaData().getViewpoint().time.milli;
         if (baseImageData == null || newMilli == view.getFirstTime().milli) {
-            baseImageData = newImageData;
+            baseImageData = replaceImageData(baseImageData, newImageData);
         }
 
         if (imageData == null || baseImageData == newImageData) { // first or loop playback
-            prevImageData = newImageData;
+            prevImageData = replaceImageData(prevImageData, newImageData);
         } else if (newMilli != imageData.metaData().getViewpoint().time.milli) { // new frame
-            prevImageData = imageData;
+            prevImageData = replaceImageData(prevImageData, imageData);
         }
 
-        imageData = newImageData;
+        imageData = replaceImageData(imageData, newImageData);
     }
 
     @Nullable
     public View.ImageData getImageData() {
         return imageData;
-    }
-
-    void collectImageBuffers(Set<ImageBuffer> retained) {
-        if (imageData != null)
-            retained.add(imageData.imageBuffer());
-        if (prevImageData != null)
-            retained.add(prevImageData.imageBuffer());
-        if (baseImageData != null)
-            retained.add(baseImageData.imageBuffer());
     }
 
     @Nonnull
@@ -351,7 +361,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void handleData(View.ImageData newImageData) {
-        newImageData.imageBuffer().allowExplicitFree();
         if (removed)
             return;
         String oldName = getName();

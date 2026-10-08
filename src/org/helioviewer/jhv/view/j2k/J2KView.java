@@ -135,12 +135,12 @@ public final class J2KView extends BaseView {
             // reader abolish may take too long in stressed conditions
             AppThread.create(() -> {
                 try {
+                    clearCache(aSerial);
                     if (aReader != null) {
                         aReader.stop();
                     }
-                    aSource.close();
                 } finally {
-                    clearCache(aSerial);
+                    aSource.close();
                 }
             }, "JHV-J2KAbolisher").start();
         }

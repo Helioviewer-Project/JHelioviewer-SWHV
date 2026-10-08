@@ -3,19 +3,15 @@ package org.helioviewer.jhv.layers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.image.ImageBuffer;
-import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -143,6 +139,8 @@ public final class Layers {
     }
 
     private static void detach(Layer layer) {
+        if (layer instanceof ImageLayer imageLayer)
+            imageLayer.detachView();
         if (!newLayers.remove(layer))
             removedLayers.add(layer);
     }
@@ -151,7 +149,6 @@ public final class Layers {
         removeLayers();
         initLayers();
         layers.forEach(Layer::prerender);
-        reapImageBuffers();
     }
 
     public static void render(MapView mv, Viewport vp) {
@@ -234,17 +231,6 @@ public final class Layers {
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
         for (int i = 0; i < imageLayersCount; i++)
             action.accept((ImageLayer) layers.get(i));
-    }
-
-    private static final Set<ImageBuffer> retained = Collections.newSetFromMap(new IdentityHashMap<>()); // EDT only, reused by reapImageBuffers
-
-    private static void reapImageBuffers() {
-        retained.clear();
-        for (int i = 0; i < imageLayersCount; i++) {
-            ((ImageLayer) layers.get(i)).collectImageBuffers(retained);
-        }
-        ImageBufferCache.reap(retained);
-        retained.clear();
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
