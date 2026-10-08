@@ -76,6 +76,7 @@ public final class URIView extends BaseView {
         }
         ImageFilter filter = ImageFilter.of(key.filter(), imageRegion, metaData[0]);
         executor.submit(
+                key,
                 () -> decodeImage(key, filter),
                 decodeCallback(key, 0, viewpoint,
                         () -> key.equals(decodeKey()), Log::errorStack));

@@ -31,7 +31,10 @@ of the cache budget.
 reference. Once published, references are retained and released on the EDT.
 
 1. `LatestWorker` runs decoding off the EDT and posts the result callback to the EDT.
-2. `BaseView.decodeCallback` closes a result if the view is detached or its
+   Repeated cache misses for the same key reuse outstanding work with the latest
+   callback, including its frame and viewpoint. Different work can decode while
+   earlier results await publication on the EDT.
+2. `BaseView.decodeCallback` releases a result if the view is detached or its
    processing settings have changed. Otherwise it transfers the decoder's
    reference to the cache. A valid superseded result can be cached without being
    delivered.

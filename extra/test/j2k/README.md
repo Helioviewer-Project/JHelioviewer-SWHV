@@ -9,6 +9,9 @@ python3 extra/test/j2k/run_j2k_tests.py
 
 The default suite is offline and needs no JPEG 2000 native library:
 
+- Decode scheduling: repeated keys reuse running work or a result awaiting its EDT callback,
+  with the latest delivery context. Checks cover A-B-A, failure/retry, invalidation,
+  independent progress of different tasks, and unchanged unkeyed submission behavior.
 - Image memory: cache invalidation, replacement and eviction release native buffers without
   repainting or garbage collection; layer slots and queued deliveries retain their own references,
   and the last release frees the pixels. Weighted LRU eviction follows recency rather than frequency.

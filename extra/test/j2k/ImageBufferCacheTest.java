@@ -7,14 +7,20 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
@@ -27,6 +33,7 @@ import com.google.common.cache.Cache;
 public final class ImageBufferCacheTest {
 
     public static void main(String[] arguments) throws Exception {
+        decodeRequests();
         releasedImage();
         writeBuffers();
         manyFiles();
@@ -39,6 +46,119 @@ public final class ImageBufferCacheTest {
     }
 
     private record TestKey(Object owner, int frame) implements ImageBufferCache.Key {}
+
+    private static void decodeRequests() throws Exception {
+        ArrayBlockingQueue<String> delivered = new ArrayBlockingQueue<>(16);
+        AtomicInteger executions = new AtomicInteger();
+        try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+            LatestWorker<Integer> worker = new LatestWorker<>(executor);
+            CountDownLatch started = new CountDownLatch(1), release = new CountDownLatch(1);
+            Callable<Integer> blocked = () -> {
+                int count = executions.incrementAndGet();
+                started.countDown();
+                if (!release.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Decode was not released");
+                return count;
+            };
+            try {
+                worker.submit("a", blocked, decodeCallback(delivered, "original"));
+                if (!started.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Decode did not start");
+                worker.submit("a", executions::incrementAndGet, decodeCallback(delivered, "repeat"));
+                worker.submit("b", executions::incrementAndGet, decodeCallback(delivered, "superseded"));
+                worker.submit("a", executions::incrementAndGet, decodeCallback(delivered, "latest viewpoint"));
+                release.countDown();
+                awaitDecode(delivered, "latest viewpoint:true");
+                if (executions.get() != 1)
+                    throw new AssertionError("Repeated key or A-B-A decoded again");
+
+                // Completion must forget the key, so an evicted image can be decoded again.
+                worker.submit("a", executions::incrementAndGet, decodeCallback(delivered, "after eviction"));
+                awaitDecode(delivered, "after eviction:true");
+
+                EventQueue.invokeAndWait(() -> {
+                    worker.submit("queued", executions::incrementAndGet, decodeCallback(delivered, "old queued"));
+                    finishTasks(executor); // Decode finished, but its callback cannot run in this EDT turn.
+                    worker.submit("queued", executions::incrementAndGet, decodeCallback(delivered, "repeat queued"));
+                    worker.submit("other", executions::incrementAndGet, decodeCallback(delivered, "other"));
+                    finishTasks(executor); // Different work continues while publication waits for the EDT.
+                    worker.submit("queued", executions::incrementAndGet, decodeCallback(delivered, "latest queued"));
+                });
+                awaitDecode(delivered, "latest queued:true");
+                awaitDecode(delivered, "other:false");
+                if (executions.get() != 4)
+                    throw new AssertionError("Result waiting for the EDT was decoded again");
+
+                worker.submit("failure", () -> {
+                    executions.incrementAndGet();
+                    throw new IllegalStateException("Decode failure");
+                }, decodeCallback(delivered, "failure"));
+                awaitDecode(delivered, "failure:failed:true");
+                worker.submit("failure", executions::incrementAndGet, decodeCallback(delivered, "retry"));
+                awaitDecode(delivered, "retry:true");
+
+                EventQueue.invokeAndWait(() -> {
+                    worker.submit("invalidated", executions::incrementAndGet, decodeCallback(delivered, "invalidated"));
+                    finishTasks(executor);
+                    worker.invalidate();
+                    worker.submit("invalidated", executions::incrementAndGet, decodeCallback(delivered, "after invalidation"));
+                });
+                awaitDecode(delivered, "invalidated:false");
+                awaitDecode(delivered, "after invalidation:true");
+
+                EventQueue.invokeAndWait(() -> {
+                    worker.submit(executions::incrementAndGet, decodeCallback(delivered, "unkeyed first"));
+                    finishTasks(executor);
+                    worker.submit(executions::incrementAndGet, decodeCallback(delivered, "unkeyed latest"));
+                });
+                awaitDecode(delivered, "unkeyed first:false");
+                awaitDecode(delivered, "unkeyed latest:true");
+
+                worker.dispose();
+                try {
+                    worker.submit("disposed", executions::incrementAndGet, decodeCallback(delivered, "disposed"));
+                    throw new AssertionError("Disposed worker accepted a decode");
+                } catch (RejectedExecutionException expected) {
+                }
+                if (executions.get() != 10 || !delivered.isEmpty())
+                    throw new AssertionError("Unexpected decode or callback count");
+            } finally {
+                release.countDown();
+                worker.dispose();
+            }
+        }
+        System.out.println("PASS: keyed running and queued decodes coalesce with the latest callback, A-B-A, retry, invalidation and unkeyed submission");
+    }
+
+    private static void finishTasks(ExecutorService executor) {
+        try {
+            // The previous task can schedule pending work behind the first fence.
+            for (int pass = 0; pass < 2; pass++)
+                executor.submit(() -> {}).get(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new AssertionError("Decode worker did not finish independently of the EDT", e);
+        }
+    }
+
+    private static LatestWorker.Callback<Integer> decodeCallback(ArrayBlockingQueue<String> delivered, String context) {
+        return new LatestWorker.Callback<>() {
+            @Override
+            public void onSuccess(Integer result, boolean fresh) {
+                delivered.add(context + ":" + fresh);
+            }
+
+            @Override
+            public void onFailure(Throwable failure, boolean fresh) {
+                delivered.add(context + ":failed:" + fresh);
+            }
+        };
+    }
+
+    private static void awaitDecode(ArrayBlockingQueue<String> delivered, String expected) throws Exception {
+        String actual = delivered.poll(5, TimeUnit.SECONDS);
+        if (!expected.equals(actual))
+            throw new AssertionError("Expected " + expected + ", got " + actual);
+    }
 
     private record OwnedKey(Object id, int frame, AtomicInteger visits) implements ImageBufferCache.Key {
         @Override

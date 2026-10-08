@@ -326,6 +326,7 @@ public final class J2KView extends BaseView {
 
         MetaData m = metaData[decodeParams.frame()];
         executor.submit(
+                key,
                 () -> decodeImage(decodeParams, key.filter, m),
                 decodeCallback(key, decodeParams.frame(), currentViewpoint,
                         () -> key.filter == processingSettings.getFilter(),
