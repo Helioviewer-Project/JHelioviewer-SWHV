@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.image;
 
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
+
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
@@ -56,7 +59,7 @@ public class ImageFilter {
 
     private static final float BDIV = 1 / 255f;
 
-    float[] apply(byte[] array, int width, int height) {
+    float[] apply(ByteBuffer pixels, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -65,14 +68,14 @@ public class ImageFilter {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int idx = rowBase; idx < rowEnd; idx++) {
-                    data[idx] = (array[idx] & 0xFF) * BDIV;
+                    data[idx] = (pixels.get(idx) & 0xFF) * BDIV;
                 }
             }
         });
         return algorithm.filter(data, width, height);
     }
 
-    float[] apply(short[] array, int width, int height) {
+    float[] apply(ShortBuffer pixels, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -81,7 +84,7 @@ public class ImageFilter {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int idx = rowBase; idx < rowEnd; idx++) {
-                    data[idx] = Float.float16ToFloat(array[idx]);
+                    data[idx] = Float.float16ToFloat(pixels.get(idx));
                 }
             }
         });

@@ -39,26 +39,25 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
     }
 
     ImageBuffer decode(ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
-        if (pixels instanceof byte[] inData) {
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter);
-            ByteBuffer outData = outBuffer.byteBuffer();
-            for (int j = 0; j < height; j++) {
-                outData.put(width * (height - 1 - j), inData, width * j, width);
-            }
-            return outBuffer.finish();
-        }
-
         ClipSet.Range range = headerRange != null ? headerRange : clipRange;
-        if (range == null)
-            return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).clearPixels().finish();
-        float min = range.lower();
-        float max = range.upper();
-        if (min >= max)
-            max = min + 1;
-
-        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16F, filter);
-        convertPixels(outBuffer.shortBuffer(), min, max, state);
-        return outBuffer.finish();
+        ImageBuffer.Format format = pixels instanceof byte[] || range == null ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.Gray16F;
+        try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, format)) {
+            if (pixels instanceof byte[] inData) {
+                ByteBuffer outData = outBuffer.byteBuffer();
+                for (int j = 0; j < height; j++) {
+                    outData.put(width * (height - 1 - j), inData, width * j, width);
+                }
+            } else if (range == null) {
+                outBuffer.clearPixels();
+            } else {
+                float min = range.lower();
+                float max = range.upper();
+                if (min >= max)
+                    max = min + 1;
+                convertPixels(outBuffer.shortBuffer(), min, max, state);
+            }
+            return outBuffer.finish(filter);
+        }
     }
 
     private SampleBuffer sampleImage() throws Exception {

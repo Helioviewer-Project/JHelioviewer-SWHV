@@ -4,7 +4,6 @@ import java.lang.ref.Cleaner;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import org.helioviewer.jhv.thread.ParallelRange;
 
@@ -38,52 +37,45 @@ public final class ImageBuffer {
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter filter) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        if (canUseDirectBuffer(format, filter))
+        if (!needsFiltering(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
-        return fromFloats(width, height, filter.apply(data, width, height));
+        return fromFloats(width, height, filter.apply(ByteBuffer.wrap(data), width, height));
     }
 
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        if (canUseDirectBuffer(format, filter))
+        if (!needsFiltering(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
-        return fromFloats(width, height, filter.apply(data, width, height));
+        return fromFloats(width, height, filter.apply(ShortBuffer.wrap(data), width, height));
     }
 
     private static ImageBuffer fromFloats(int width, int height, float[] data) {
-        ImageBuffer image = allocate(width, height, Format.Gray16F);
-        ShortBuffer buffer = (ShortBuffer) image.buffer;
-        ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int idx = rowBase; idx < rowEnd; idx++) {
-                    buffer.put(idx, Float.floatToFloat16(Math.clamp(data[idx], 0f, 1f)));
+        try (WriteBuffer output = createWriteBuffer(width, height, Format.Gray16F)) {
+            ShortBuffer buffer = output.shortBuffer();
+            ParallelRange.run(height, (from, to) -> {
+                for (int y = from; y < to; y++) {
+                    int rowBase = y * width;
+                    int rowEnd = rowBase + width;
+                    for (int idx = rowBase; idx < rowEnd; idx++) {
+                        buffer.put(idx, Float.floatToFloat16(Math.clamp(data[idx], 0f, 1f)));
+                    }
                 }
-            }
-        });
-        return image;
+            });
+            return output.finish();
+        }
     }
 
-    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter filter) {
-        return new WriteBuffer(width, height, format, filter);
+    public static WriteBuffer createWriteBuffer(int width, int height, Format format) {
+        return new WriteBuffer(width, height, format);
     }
 
-    private ImageBuffer(int _width, int _height, Format _format, ByteBuffer _buffer) {
-        this(_width, _height, _format, _buffer, MemoryUtil.memAddress(_buffer));
-    }
-
-    private ImageBuffer(int _width, int _height, Format _format, ShortBuffer _buffer) {
-        this(_width, _height, _format, _buffer, MemoryUtil.memAddress(_buffer));
-    }
-
-    private ImageBuffer(int _width, int _height, Format _format, Buffer _buffer, long address) {
+    private ImageBuffer(int _width, int _height, Format _format, Buffer _buffer) {
         width = _width;
         height = _height;
         format = _format;
         buffer = _buffer;
-        cleanable = cleaner.register(buffer, new BufferState(address));
+        cleanable = cleaner.register(buffer, new BufferState(MemoryUtil.memAddress(buffer)));
     }
 
     public int byteSize() {
@@ -95,70 +87,65 @@ public final class ImageBuffer {
     }
 
     public static final class WriteBuffer implements AutoCloseable {
-        private final int width;
-        private final int height;
-        private final Format inputFormat;
-        private final ImageFilter filter;
-        private ImageBuffer directBuffer;
-        private final Buffer writeBuffer;
+        private ImageBuffer image;
 
-        private WriteBuffer(int _width, int _height, Format _format, ImageFilter _filter) {
-            width = _width;
-            height = _height;
-            inputFormat = _format;
-            filter = _filter;
-
-            if (ImageBuffer.canUseDirectBuffer(inputFormat, filter)) {
-                directBuffer = allocate(width, height, inputFormat);
-                writeBuffer = directBuffer.buffer;
-            } else if (inputFormat == Format.Gray16F) {
-                directBuffer = null;
-                writeBuffer = ShortBuffer.allocate(Math.multiplyExact(width, height));
-            } else {
-                directBuffer = null;
-                writeBuffer = ByteBuffer.allocate(byteSize(width, height, inputFormat));
-            }
+        private WriteBuffer(int width, int height, Format format) {
+            image = allocate(width, height, format);
         }
 
         public ByteBuffer byteBuffer() {
-            return (ByteBuffer) writeBuffer;
+            return (ByteBuffer) image.buffer;
         }
 
         public ShortBuffer shortBuffer() {
-            return (ShortBuffer) writeBuffer;
+            return (ShortBuffer) image.buffer;
         }
 
         public WriteBuffer clearPixels() {
-            if (directBuffer != null)
-                MemoryUtil.memSet(MemoryUtil.memAddress(writeBuffer), 0, directBuffer.byteSize());
-            else if (writeBuffer instanceof ByteBuffer bytes)
-                Arrays.fill(bytes.array(), (byte) 0);
-            else
-                Arrays.fill(shortBuffer().array(), (short) 0);
+            image.buffer.clear();
+            MemoryUtil.memSet(MemoryUtil.memAddress(image.buffer), 0, image.byteSize());
             return this;
         }
 
+        // Transfers the written buffer to the returned image.
         public ImageBuffer finish() {
-            if (directBuffer != null) {
-                ImageBuffer image = directBuffer;
-                directBuffer = null; // Ownership passes to the returned image.
-                return image;
+            if (image == null)
+                throw new IllegalStateException("Image writer is closed");
+            ImageBuffer output = image;
+            image = null;
+            output.buffer.clear();
+            return output;
+        }
+
+        // Filtering consumes the input; the returned image owns the final pixels.
+        public ImageBuffer finish(ImageFilter filter) {
+            ImageBuffer input = finish();
+            if (!needsFiltering(input.format, filter))
+                return input;
+
+            float[] filtered;
+            try {
+                filtered = input.buffer instanceof ShortBuffer shorts
+                        ? filter.apply(shorts, input.width, input.height)
+                        : filter.apply((ByteBuffer) input.buffer, input.width, input.height);
+            } finally {
+                input.free();
             }
-            return writeBuffer instanceof ShortBuffer shorts
-                    ? fromShorts(width, height, inputFormat, shorts.array(), filter)
-                    : fromBytes(width, height, inputFormat, byteBuffer().array(), filter);
+            return fromFloats(input.width, input.height, filtered);
         }
 
         @Override
         public void close() {
-            if (directBuffer != null)
-                directBuffer.free();
+            if (image != null) {
+                image.free();
+                image = null;
+            }
         }
 
     }
 
-    private static boolean canUseDirectBuffer(Format format, ImageFilter filter) {
-        return format == Format.RGBA32 || filter.isNone();
+    private static boolean needsFiltering(Format format, ImageFilter filter) {
+        return format != Format.RGBA32 && !filter.isNone();
     }
 
     private static final class BufferState implements Runnable {

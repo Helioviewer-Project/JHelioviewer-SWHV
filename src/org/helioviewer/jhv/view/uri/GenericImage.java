@@ -92,9 +92,10 @@ final class GenericImage {
                     } finally {
                         g.dispose();
                     }
-                    ImageBuffer.WriteBuffer output = ImageBuffer.createWriteBuffer(w, h, ImageBuffer.Format.RGBA32, filter);
-                    BufferUtils.putRemaining(output.byteBuffer(), NativeImageFactory.getByteBuffer(conv)).flip();
-                    return output.finish();
+                    try (ImageBuffer.WriteBuffer output = ImageBuffer.createWriteBuffer(w, h, ImageBuffer.Format.RGBA32)) {
+                        BufferUtils.putRemaining(output.byteBuffer(), NativeImageFactory.getByteBuffer(conv));
+                        return output.finish();
+                    }
                 } finally {
                     NativeImageFactory.free(conv);
                 }

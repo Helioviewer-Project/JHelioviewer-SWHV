@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
+import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ public final class ImageBufferCacheTest {
 
     public static void main(String[] arguments) throws Exception {
         releasedImage();
+        writeBuffers();
         manyFiles();
         explicitRemoval();
         heldAndQueuedImages();
@@ -101,6 +104,61 @@ public final class ImageBufferCacheTest {
         return new DecodedImage(ImageBuffer.fromBytes(256, 256, ImageBuffer.Format.Gray8, new byte[256 * 256]), null);
     }
 
+    private static void writeBuffers() throws Exception {
+        for (ImageBuffer.Format format : ImageBuffer.Format.values()) {
+            DecodedImage result;
+            try (ImageBuffer.WriteBuffer writer = ImageBuffer.createWriteBuffer(13, 11, format)) {
+                if (format == ImageBuffer.Format.Gray16F) {
+                    if (!writer.shortBuffer().isDirect())
+                        throw new AssertionError("Writer did not allocate native pixels");
+                    writer.shortBuffer().put(Float.floatToFloat16(.5f));
+                } else {
+                    if (!writer.byteBuffer().isDirect())
+                        throw new AssertionError("Writer did not allocate native pixels");
+                    writer.byteBuffer().put((byte) 12);
+                }
+                writer.clearPixels();
+                result = new DecodedImage(writer.finish(), null);
+            }
+            if (!allocated(result) || result.imageBuffer().buffer.position() != 0)
+                throw new AssertionError("Closing a finished writer released its image or left its position advanced");
+            if (format == ImageBuffer.Format.Gray16F) {
+                for (int i = 0; i < 143; i++)
+                    if (((ShortBuffer) result.imageBuffer().buffer).get(i) != 0)
+                        throw new AssertionError("Writer did not clear all pixels");
+            } else {
+                for (int i = 0; i < result.imageBuffer().byteSize(); i++)
+                    if (((ByteBuffer) result.imageBuffer().buffer).get(i) != 0)
+                        throw new AssertionError("Writer did not clear all pixels");
+            }
+            result.close();
+            if (allocated(result))
+                throw new AssertionError("Transferred writer pixels were not released");
+        }
+
+        Constructor<ImageFilter> constructor = ImageFilter.class.getDeclaredConstructor(ImageFilter.Algorithm.class);
+        constructor.setAccessible(true);
+        ImageFilter failing = constructor.newInstance((ImageFilter.Algorithm) (pixels, width, height) -> {
+            throw new IllegalStateException("Filter failure");
+        });
+        long address;
+        try (ImageBuffer.WriteBuffer writer = ImageBuffer.createWriteBuffer(13, 11, ImageBuffer.Format.Gray8)) {
+            address = MemoryUtil.memAddress(writer.byteBuffer());
+            try {
+                writer.clearPixels().finish(failing);
+                throw new AssertionError("Filter failure was ignored");
+            } catch (IllegalStateException expected) {
+                if (!"Filter failure".equals(expected.getMessage()))
+                    throw expected;
+            }
+        }
+        MemoryUtil.memReport((allocation, bytes, thread, name, stack) -> {
+            if (allocation == address)
+                throw new AssertionError("Failed filter retained its native input");
+        });
+        System.out.println("PASS: native writers transfer ownership, clear pixels and release input on filter failure");
+    }
+
     private static void releasedImage() throws Exception {
         DecodedImage image = image();
         EventQueue.invokeAndWait(() -> {
@@ -121,7 +179,7 @@ public final class ImageBufferCacheTest {
     }
 
     private static boolean allocated(DecodedImage image) {
-        long address = MemoryUtil.memAddress((ByteBuffer) image.imageBuffer().buffer);
+        long address = MemoryUtil.memAddress(image.imageBuffer().buffer);
         AtomicBoolean found = new AtomicBoolean();
         MemoryUtil.memReport((allocation, bytes, thread, name, stack) -> {
             if (allocation == address)

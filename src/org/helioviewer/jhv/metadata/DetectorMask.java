@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ImageBuffer;
-import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.io.FileUtils;
 
 import nom.tam.fits.BasicHDU;
@@ -45,11 +44,12 @@ public final class DetectorMask {
 
             int height = pixels.length;
             int width = pixels[0].length;
-            ImageBuffer.WriteBuffer output = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, ImageFilter.NONE);
-            ByteBuffer outputPixels = output.byteBuffer();
-            for (int y = 0; y < height; y++)
-                outputPixels.put(width * (height - 1 - y), pixels[y], 0, width);
-            return output.finish();
+            try (ImageBuffer.WriteBuffer output = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8)) {
+                ByteBuffer outputPixels = output.byteBuffer();
+                for (int y = 0; y < height; y++)
+                    outputPixels.put(width * (height - 1 - y), pixels[y], 0, width);
+                return output.finish();
+            }
         } catch (Exception e) {
             Log.error("Cannot load detector mask " + resourcePath, e);
             return BUILTIN_NONE;

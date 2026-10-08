@@ -151,12 +151,10 @@ public final class J2KSource {
         return client.beginDecode(frame, level);
     }
 
-    // Gray8 or RGBA rows of a region of the job's level; runs on a decode worker.
+    // Gray8 or RGBA rows into a direct buffer; runs on a decode worker.
     // Leaves the output buffer's position unchanged.
     static void decode(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer pixels) throws IOException {
-        String warning = pixels.isDirect()
-                ? job.run(x, y, width, height, pixels)
-                : runToHeap(job, x, y, width, height, pixels);
+        String warning = job.run(x, y, width, height, pixels);
         if (warning != null)
             Log.warn(warning);
     }
@@ -164,22 +162,15 @@ public final class J2KSource {
     // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
     public byte[] decode(int frame, int level, int x, int y, int width, int height) throws IOException {
         try (J2KNative.Decode job = beginDecode(frame, level)) {
-            byte[] pixels = new byte[width * height * resolutionSet(frame).numComps];
-            decode(job, x, y, width, height, ByteBuffer.wrap(pixels));
-            return pixels;
-        }
-    }
-
-    // The bridge fills native memory only.
-    @Nullable
-    private static String runToHeap(J2KNative.Decode job, int x, int y, int width, int height, ByteBuffer heap) throws IOException {
-        ByteBuffer direct = MemoryUtil.memAlloc(heap.capacity());
-        try {
-            String warning = job.run(x, y, width, height, direct);
-            heap.put(0, direct, 0, heap.capacity());
-            return warning;
-        } finally {
-            MemoryUtil.memFree(direct);
+            ByteBuffer direct = MemoryUtil.memAlloc(width * height * resolutionSet(frame).numComps);
+            try {
+                decode(job, x, y, width, height, direct);
+                byte[] pixels = new byte[direct.capacity()];
+                direct.get(pixels);
+                return pixels;
+            } finally {
+                MemoryUtil.memFree(direct);
+            }
         }
     }
 

@@ -340,9 +340,9 @@ public final class J2KView extends BaseView {
             Region imageRegion = metadata.imageToRegion(full.width(), full.height());
             ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
             boolean gray = set.numComps == 1;
-            try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter)) {
+            try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32)) {
                 J2KSource.decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());
-                return new DecodedImage(outBuffer.finish(), imageRegion);
+                return new DecodedImage(outBuffer.finish(filter), imageRegion);
             }
         }
     }

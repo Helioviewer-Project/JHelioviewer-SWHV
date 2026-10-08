@@ -15,6 +15,8 @@ The default suite is offline and needs no JPEG 2000 native library:
   A full-cache, 512-frame playback check changes resolution with equally scaled images and budget;
   all new frames must be cache hits from the second loop onward.
   Retaining or releasing an already released image must throw with Java assertions disabled.
+  Native image writers clear every pixel, transfer ownership at finish, and release their input
+  immediately if filtering fails.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
   read after a timeout in chunk framing or payload.
