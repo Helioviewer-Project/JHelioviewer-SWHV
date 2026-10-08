@@ -106,12 +106,12 @@ public final class ImageBuffer {
         return true;
     }
 
-    public static final class WriteBuffer {
+    public static final class WriteBuffer implements AutoCloseable {
         private final int width;
         private final int height;
         private final Format inputFormat;
         private final ImageFilter filter;
-        private final ImageBuffer directBuffer;
+        private ImageBuffer directBuffer;
         private final Buffer writeBuffer;
 
         private WriteBuffer(int _width, int _height, Format _format, ImageFilter _filter) {
@@ -151,11 +151,22 @@ public final class ImageBuffer {
         }
 
         public ImageBuffer finish() {
-            if (directBuffer != null)
-                return directBuffer;
+            if (directBuffer != null) {
+                ImageBuffer image = directBuffer;
+                directBuffer = null; // Ownership passes to the returned image.
+                return image;
+            }
             return writeBuffer instanceof ShortBuffer shorts
                     ? fromShorts(width, height, inputFormat, shorts.array(), filter)
                     : fromBytes(width, height, inputFormat, byteBuffer().array(), filter);
+        }
+
+        @Override
+        public void close() {
+            if (directBuffer != null) {
+                directBuffer.free();
+                directBuffer = null;
+            }
         }
 
     }

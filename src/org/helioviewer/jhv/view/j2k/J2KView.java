@@ -311,9 +311,10 @@ public final class J2KView extends BaseView {
             Region imageRegion = metadata.imageToRegion(full.width(), full.height());
             ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
             boolean gray = set.numComps == 1;
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter);
-            J2KSource.decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());
-            return new DecodedImage(outBuffer.finish(), imageRegion);
+            try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32, filter)) {
+                J2KSource.decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());
+                return new DecodedImage(outBuffer.finish(), imageRegion);
+            }
         }
     }
 
@@ -329,7 +330,10 @@ public final class J2KView extends BaseView {
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (dataHandler == null || key.filter != processingSettings.getFilter()) return; // detached or filter changed in-flight
+            if (dataHandler == null || key.filter != processingSettings.getFilter()) {
+                result.close();
+                return;
+            }
             ImageBufferCache.put(key, result);
 
             // This decode was superseded after it started; do not publish it to the layer.

@@ -122,7 +122,10 @@ public final class URIView extends BaseView {
 
         @Override
         public void onSuccess(DecodedImage result, boolean fresh) {
-            if (dataHandler == null || !key.equals(decodeKey())) return; // detached or settings changed in-flight
+            if (dataHandler == null || !key.equals(decodeKey())) {
+                result.close();
+                return;
+            }
 
             ImageBufferCache.put(key, result);
             // This decode was superseded after it started; do not publish it to the layer.
