@@ -5,6 +5,7 @@ public class ResolutionSet {
 
     // The indices represent the number of discardLayers
     private final Level[] resolutions;
+    // Native completion snapshot, published by J2KSource.update() to EDT and decode workers.
     private volatile int completeFrom;
     final int numComps;
 
@@ -15,8 +16,8 @@ public class ResolutionSet {
         completeFrom = resolutions.length;
     }
 
-    void setComplete(int level) {
-        completeFrom = Math.min(completeFrom, level);
+    void setCompleteLevels(int count) {
+        completeFrom = resolutions.length - count;
     }
 
     boolean getComplete(int level) {

@@ -52,7 +52,8 @@ public final class J2KSource {
         return sets.length();
     }
 
-    // After new data for a frame: its header, if now known, and its complete levels.
+    // Publishes the frame's geometry and cumulative native completion.
+    // Called during initialization, then only by the JPIP reader.
     void update(int frame) throws IOException {
         J2KNative.Frame info = client.frame(frame);
         int levels = info.width().length;
@@ -69,8 +70,7 @@ public final class J2KSource {
             set = new ResolutionSet(resolutions, info.channels());
             sets.set(frame, set);
         }
-        if (info.ready() > 0)
-            set.setComplete(levels - info.ready());
+        set.setCompleteLevels(info.ready());
     }
 
     @Nullable
