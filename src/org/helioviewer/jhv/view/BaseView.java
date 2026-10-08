@@ -2,11 +2,13 @@ package org.helioviewer.jhv.view;
 
 import java.awt.EventQueue;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
+import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
@@ -91,6 +93,30 @@ public class BaseView implements View {
     @Override
     public void setDataHandler(View.DataHandler _dataHandler) {
         dataHandler = _dataHandler;
+    }
+
+    protected final LatestWorker.Callback<DecodedImage> decodeCallback(
+            Object key, int frame, Position viewpoint,
+            BooleanSupplier isCurrent, Consumer<Throwable> failureHandler) {
+        return new LatestWorker.Callback<>() {
+            @Override
+            public void onSuccess(DecodedImage result, boolean fresh) {
+                if (dataHandler == null || !isCurrent.getAsBoolean()) {
+                    result.close();
+                    return;
+                }
+
+                ImageBufferCache.put(key, result);
+                // Keep valid superseded results in the cache, without delivering them.
+                if (fresh)
+                    sendDataToHandler(frame, viewpoint, result, isCurrent);
+            }
+
+            @Override
+            public void onFailure(Throwable t, boolean fresh) {
+                failureHandler.accept(t);
+            }
+        };
     }
 
     protected final void sendDataToHandler(int frame, Position viewpoint, DecodedImage image, BooleanSupplier isCurrent) {

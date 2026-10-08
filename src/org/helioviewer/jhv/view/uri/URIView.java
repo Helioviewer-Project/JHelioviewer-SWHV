@@ -75,7 +75,10 @@ public final class URIView extends BaseView {
             return;
         }
         ImageFilter filter = createFilter(key.filter());
-        executor.submit(() -> decodeImage(key, filter), new Callback(key, viewpoint));
+        executor.submit(
+                () -> decodeImage(key, filter),
+                decodeCallback(key, 0, viewpoint,
+                        () -> key.equals(decodeKey()), Log::errorStack));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
@@ -112,36 +115,6 @@ public final class URIView extends BaseView {
                 ? FITSImage.decode(file, filter, key.fitsData(), key.clipRange())
                 : GenericImage.decode(file, filter);
         return new DecodedImage(imageBuffer, imageRegion);
-    }
-
-    private class Callback implements LatestWorker.Callback<DecodedImage> {
-
-        private final DecodeKey key;
-        private final Position viewpoint;
-
-        Callback(DecodeKey _key, Position _viewpoint) {
-            key = _key;
-            viewpoint = _viewpoint;
-        }
-
-        @Override
-        public void onSuccess(DecodedImage result, boolean fresh) {
-            if (dataHandler == null || !key.equals(decodeKey())) {
-                result.close();
-                return;
-            }
-
-            ImageBufferCache.put(key, result);
-            // This decode was superseded after it started; do not publish it to the layer.
-            if (!fresh) return;
-            sendDataToHandler(0, viewpoint, result, () -> key.equals(decodeKey()));
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t, boolean fresh) {
-            Log.errorStack(t);
-        }
-
     }
 
     @Nonnull

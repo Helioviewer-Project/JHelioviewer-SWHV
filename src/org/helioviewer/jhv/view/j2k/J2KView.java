@@ -323,7 +323,12 @@ public final class J2KView extends BaseView {
         MetaData m = metaData[decodeParams.frame()];
         executor.submit(
                 () -> decodeImage(decodeParams, key.filter, m),
-                new J2KCallback(key, currentViewpoint));
+                decodeCallback(key, decodeParams.frame(), currentViewpoint,
+                        () -> key.filter == processingSettings.getFilter(),
+                        t -> {
+                            if (dataHandler != null)
+                                Log.errorStack(t);
+                        }));
     }
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.
@@ -340,37 +345,6 @@ public final class J2KView extends BaseView {
                 return new DecodedImage(outBuffer.finish(), imageRegion);
             }
         }
-    }
-
-    private class J2KCallback implements LatestWorker.Callback<DecodedImage> {
-
-        private final DecodeKey key;
-        private final Position viewpoint;
-
-        J2KCallback(DecodeKey _key, Position _viewpoint) {
-            key = _key;
-            viewpoint = _viewpoint;
-        }
-
-        @Override
-        public void onSuccess(DecodedImage result, boolean fresh) {
-            if (dataHandler == null || key.filter != processingSettings.getFilter()) {
-                result.close();
-                return;
-            }
-            ImageBufferCache.put(key, result);
-
-            // This decode was superseded after it started; do not publish it to the layer.
-            if (!fresh) return;
-            sendDataToHandler(key.params.frame(), viewpoint, result, () -> key.filter == processingSettings.getFilter());
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t, boolean fresh) {
-            if (dataHandler != null)
-                Log.errorStack(t);
-        }
-
     }
 
     @Nullable
