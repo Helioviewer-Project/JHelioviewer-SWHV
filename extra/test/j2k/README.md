@@ -44,7 +44,8 @@ python3 extra/test/j2k/run_j2k_tests.py --live
 The native libraries come from the natives jar of the host; `--bridge PATH` supplies a
 `libjhvj2k` built by `native/jpeg2000/build.sh` while the jar has none.
 
-The live test uses a fixed single-frame AIA 171 image from September 9, 2026. It retrieves
+`J2KReaderTest` shares reader setup, raw decoding and cache restoration checks for an image
+and a movie. The single-frame fixture is an AIA 171 image from September 9, 2026. It retrieves
 levels 2 and 0 through the reader and checks completion and the persisted level after each.
 A second session restores from the disk cache after closing and reopening
 its manager. Its socket is aborted after the metadata and the first coarse level, so the
@@ -57,9 +58,8 @@ The live suite requests a fixed ROB movie through the `getJPX` API so the server
 it if needed, then uses the returned JPIP URI. It compares the first four frames using sequential
 requests without the reader, the actual reader prefetch pump, reopened disk-cache restoration
 with the socket aborted, and a session in which one cache entry is replaced by a block the
-client refuses (the frame is fetched and stored again). A controlled signal after two sends
-checks that two sent responses are drained before switching work. The pump is invoked directly
-without a GUI view, while its worker remains idle. Completed or restored frames must reset
+client refuses (the frame is fetched and stored again). The pump is invoked directly without a
+GUI view, while its worker remains idle. Completed or restored frames must reset
 the reader's consecutive failure count within the pass.
 
 The same movie is then opened by the real view, headless, with its reader thread. Paused and
@@ -72,8 +72,12 @@ Reader refreshes must use the latest viewpoint and requested resolution after zo
 even when a finer window finishes late. A detached view's refresh must leave
 the shared worker's replacement task current.
 
-The view test captures opening responses and a finer window from that movie, then replays them
-through a local server. Two failed passes must recover with an immediate first retry and a pause
+`J2KViewTest` captures opening responses and small windows for two frames, then replays them
+through a local server. The server holds both replies until the prefetch pump has sent two requests.
+The real `signal()` method queues newer work, then both replies are released: the pump must
+consume them and yield without requesting a third frame. Its worker stays unstarted for this check;
+the test does not replace the signal queue. The same captures drive the retry and refusal checks.
+Two failed passes must recover with an immediate first retry and a pause
 before the second. Fourteen consecutive failed passes must exhaust retries and log the cause once,
 even when every pass accepts byte-limited data before failing. A conflicting response must stop
 the reader and purge this source's disk entries while preserving an unrelated entry. Equal-length
@@ -114,5 +118,5 @@ up on normal exit. The live runner supports macOS and Linux x86-64.
 The live suite has been exercised only on macOS arm64. No application settings or user cache are used.
 
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
-or GUI playback with 8 GiB of actual cached pixels. The ROB and movie reader checks decode raw pixels; the view check
+or GUI playback with 8 GiB of actual cached pixels. The reader checks decode raw pixels; the view check
 uses the image metadata, but does not independently validate its geometry.

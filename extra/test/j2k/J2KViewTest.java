@@ -80,7 +80,9 @@ public final class J2KViewTest {
         System.load(arguments[1]);
         URI uri = URI.create(arguments[2]);
         checkReaper(uri);
-        checkRetriesAndKeys(capture(uri));
+        Responses responses = capture(uri);
+        checkDraining(responses);
+        checkRetriesAndKeys(responses);
 
         Field timerField = Player.class.getDeclaredField("movieTimer");
         timerField.setAccessible(true);
@@ -347,9 +349,9 @@ public final class J2KViewTest {
         }
     }
 
-    private record Responses(List<byte[]> opening, int metadataEnd, List<byte[]> finer, int level, String[] dates) {}
+    private record Responses(List<byte[]> opening, int metadataEnd, List<byte[]> finer, byte[] secondFrame, int level, String[] dates) {}
 
-    // Capture a normal opening and one finer window. Fault tests replay these locally,
+    // Capture a normal opening and two small windows. Reader tests replay these locally,
     // so timing and failure counts do not depend on a live service or stored capture folders.
     private static Responses capture(URI uri) throws Exception {
         List<byte[]> opening = new ArrayList<>(), finer = new ArrayList<>();
@@ -399,7 +401,14 @@ public final class J2KViewTest {
                 }
                 if (dates[0].length() != dates[1].length() || dates[0].equals(dates[1]))
                     throw new AssertionError("Fixture needs distinct timestamps of equal length");
-                return new Responses(opening, metadataEnd, finer, level, dates);
+                // Small windows let the drain check hold both responses after the two sends.
+                socket.sendFrame(source.client().frame(1).stream(), size.width(), size.height(), 0);
+                List<byte[]> secondFrame = new ArrayList<>();
+                reason = receive(socket, source, secondFrame);
+                source.update(1);
+                if ((reason != 1 && reason != 2) || finer.size() != 1 || !Boolean.TRUE.equals(source.getFrameStatus(1, level)))
+                    throw new AssertionError("Drain fixture needs two complete, single-response windows");
+                return new Responses(opening, metadataEnd, finer, secondFrame.getFirst(), level, dates);
             } finally {
                 socket.abort();
             }
@@ -417,6 +426,63 @@ public final class J2KViewTest {
         if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
             throw new AssertionError("Unexpected captured EOR: " + reason);
         return reason;
+    }
+
+    private static void checkDraining(Responses responses) throws Exception {
+        CountDownLatch sent = new CountDownLatch(1), release = new CountDownLatch(1);
+        J2KSource source = new J2KSource(null);
+        J2KReader reader = null;
+        try (ServerSocket listener = new ServerSocket(0, 16, InetAddress.getByName("127.0.0.1"));
+                ExecutorService tasks = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(10000);
+            Future<?> served = tasks.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(10000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+                    for (int i = 0; i < responses.opening.size(); i++) {
+                        readRequest(input);
+                        reply(connection, i == 0, responses.opening.get(i));
+                    }
+                    readRequest(input);
+                    readRequest(input);
+                    sent.countDown();
+                    if (!release.await(5, TimeUnit.SECONDS))
+                        throw new AssertionError("No newer signal after the two sends");
+                    reply(connection, false, responses.finer.getFirst());
+                    reply(connection, false, responses.secondFrame);
+                    if (input.readLine() != null)
+                        throw new AssertionError("Reader sent another request instead of draining");
+                }
+                return null;
+            });
+            try {
+                reader = new J2KReader(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/drain"), source);
+                // Invoke only the prefetch pass; no worker consumes the real signal queue.
+                Field keys = J2KReader.class.getDeclaredField("cacheKey");
+                keys.setAccessible(true);
+                keys.set(reader, new String[3]);
+                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, responses.level), false);
+                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
+                readFrames.setAccessible(true);
+                J2KReader current = reader;
+                Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.resolutionSet(0).getLevel(responses.level), false));
+                if (!sent.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Reader did not pipeline two requests");
+                reader.signal(params);
+                release.countDown();
+                if (pump.get(5, TimeUnit.SECONDS) || !Boolean.TRUE.equals(source.getFrameStatus(0, responses.level))
+                        || !Boolean.TRUE.equals(source.getFrameStatus(1, responses.level)) || source.geometry(2) != null)
+                    throw new AssertionError("Reader did not drain both responses before yielding to newer work");
+            } finally {
+                release.countDown();
+                if (reader != null)
+                    reader.stop();
+            }
+            served.get(5, TimeUnit.SECONDS);
+        } finally {
+            source.close();
+        }
+        System.out.println("PASS: a real signal after two sends drains both responses without fetching the next frame");
     }
 
     private static Object field(Class<?> type, Object instance, String name) throws Exception {

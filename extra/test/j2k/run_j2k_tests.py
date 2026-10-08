@@ -26,9 +26,9 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     if platform.system() == "Windows" and not temporary.isascii():
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
-    sources = ["JPIPSerializerTest.java", "JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java"]
+    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java"]
     if args.live:
-        sources.extend(["ROBTest.java", "MovieReaderTest.java", "J2KViewTest.java", "CallistoTest.java"])
+        sources.extend(["J2KReaderTest.java", "J2KViewTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
@@ -37,7 +37,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     print("Running ImageBufferCacheTest", flush=True)
     subprocess.run([*java, "-da", "-Dorg.lwjgl.util.DebugAllocator=true",
                     "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
-    for name in ["JPIPSerializerTest", "JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
+    for name in ["JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],
                        check=True, timeout=60)
@@ -65,18 +65,15 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
             else:
                 Path(libraries[1]).write_bytes(jar.read(native_directory + "libjhvj2k" + suffix))
         uri = "jpip://jpip.swhv.oma.be/aia_171/2026/09/09/2026_09_09__12_00_33_349__SDO_AIA_AIA_171.jp2"
-        print("Retrieving " + uri, flush=True)
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.ROBTest", *libraries, uri],
-                       check=True, timeout=180)
-
         movie_request = ("https://api.swhv.oma.be/hv_docpage/v2/getJPX/?sourceId=10"
                          "&startTime=2026-09-08T12:00:00Z&endTime=2026-09-10T12:00:00Z"
                          "&cadence=1800&verbose=true&linked=true&jpip=true")
         print("Preparing movie through " + movie_request, flush=True)
         with urlopen(movie_request, timeout=180) as response:
             movie = json.load(response)["uri"]
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.MovieReaderTest", *libraries, movie],
-                       check=True, timeout=180)
+        print("Running J2KReaderTest (single image and movie)", flush=True)
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.J2KReaderTest", *libraries, uri, movie],
+                       check=True, timeout=360)
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.J2KViewTest", *libraries, movie],
                        check=True, timeout=300)
 
