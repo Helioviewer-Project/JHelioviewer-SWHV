@@ -331,11 +331,7 @@ public final class J2KView extends BaseView {
                     key,
                     () -> decodeImage(decodeParams, key.filter, m),
                     decodeCallback(key, decodeParams.frame(), currentViewpoint,
-                            () -> key.filter == processingSettings.getFilter(),
-                            t -> {
-                                if (dataHandler != null)
-                                    Log.errorStack(t);
-                            }));
+                            () -> key.filter == processingSettings.getFilter()));
         } catch (RejectedExecutionException ignore) {
             // Teardown may dispose the worker before a late decode request.
         }

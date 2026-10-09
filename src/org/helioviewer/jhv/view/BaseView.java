@@ -2,10 +2,10 @@ package org.helioviewer.jhv.view;
 
 import java.awt.EventQueue;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBufferCache;
@@ -96,8 +96,7 @@ public class BaseView implements View {
     }
 
     protected final LatestWorker.Callback<DecodedImage> decodeCallback(
-            ImageBufferCache.Key key, int frame, Position viewpoint,
-            BooleanSupplier isCurrent, Consumer<Throwable> failureHandler) {
+            ImageBufferCache.Key key, int frame, Position viewpoint, BooleanSupplier isCurrent) {
         return new LatestWorker.Callback<>() {
             @Override
             public void onSuccess(DecodedImage result, boolean fresh) {
@@ -114,7 +113,8 @@ public class BaseView implements View {
 
             @Override
             public void onFailure(Throwable t, boolean fresh) {
-                failureHandler.accept(t);
+                if (dataHandler != null)
+                    Log.errorStack(t);
             }
         };
     }

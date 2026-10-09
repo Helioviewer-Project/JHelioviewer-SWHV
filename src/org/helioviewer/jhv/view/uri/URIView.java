@@ -80,8 +80,7 @@ public final class URIView extends BaseView {
             executor.submit(
                     key,
                     () -> decodeImage(key, filter),
-                    decodeCallback(key, 0, viewpoint,
-                            () -> key.equals(decodeKey()), Log::errorStack));
+                    decodeCallback(key, 0, viewpoint, () -> key.equals(decodeKey())));
         } catch (RejectedExecutionException ignore) {
             // Teardown may dispose the worker before a late decode request.
         }
