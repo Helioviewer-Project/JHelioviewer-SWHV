@@ -59,7 +59,7 @@ final class LoadImageHandler {
             AppThread.create(() -> {
                 try {
                     new ImageLayers.WaitUntilLoaded(List.of(layer)).call();
-                    boolean success = EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && layer.isViewLoadFinished());
+                    boolean success = EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && layer.isLoadFinished());
                     context.complete(success, success ? "Image loaded." : "Image load failed.", null);
                 } catch (Exception e) {
                     context.complete(false, message(e), null);
