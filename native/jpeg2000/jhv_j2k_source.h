@@ -24,8 +24,9 @@ public:
     int get_capabilities() override { return KDU_SOURCE_CAP_SEQUENTIAL | KDU_SOURCE_CAP_SEEKABLE; }
     int read(kdu_byte *out, int size) override {
         if (size < 0) throw std::runtime_error("negative codestream read");
-        size_t count = hvc_input_read(input, position, out, static_cast<size_t>(size));
-        if (count == SIZE_MAX) throw std::runtime_error("codestream read failed");
+        char error[256];
+        size_t count = hvc_input_read(input, position, out, static_cast<size_t>(size), error, sizeof error);
+        if (count == SIZE_MAX) throw std::runtime_error(error);
         position += count;
         return static_cast<int>(count);
     }
@@ -72,6 +73,7 @@ private:
 
     static int inspect(hvc *source, size_t frame, void *context,
                        hvc_info *info, char *error, size_t error_size) noexcept;
+    const description &describe(size_t frame);
 
     [[noreturn]] void fail() { throw std::runtime_error(hvc_error(client)); }
 

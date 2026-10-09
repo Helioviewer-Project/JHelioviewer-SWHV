@@ -50,27 +50,35 @@ template<class T, class F> static T guarded(char *error, T failed, F call, size_
     return failed;
 }
 
-int jhv_j2k_source::inspect(hvc *source, size_t frame, void *context,
-                            hvc_info *info, char *error, size_t error_size) noexcept {
-    return guarded(error, -1, [&] {
-        jhv_j2k_source &owner = *static_cast<jhv_j2k_source *>(context);
-        // Jobs retain this source and borrow its immutable frame descriptions.
-        if (owner.descriptions.empty()) owner.descriptions.resize(owner.frames());
-        // The coarsest level suffices: every header is kept at any reduction.
-        decoder_input input(source, frame, INT_MAX);
-        description result = description();
-        const char *reason = input.with_stream([&](kdu_codestream &stream) {
-            if (hvc_render_read(source, frame, stream.get_num_components(true), &result.render))
-                first_component(result.render);
+const jhv_j2k_source::description &jhv_j2k_source::describe(size_t frame) {
+    // Allocate once: jobs retain this source and borrow these stable slots.
+    if (descriptions.empty()) descriptions.resize(frames());
+    description &stored = descriptions.at(frame);
+    if (stored.geometry.resolutions) return stored;
+
+    // The coarsest level suffices: every header is kept at any reduction.
+    decoder_input input(client, frame, INT_MAX);
+    description result = description();
+    const char *reason = input.with_stream([&](kdu_codestream &stream) {
+        if (hvc_render_read(client, frame, stream.get_num_components(true), &result.render))
+            first_component(result.render);
+        return jhv_kdu_read_geometry(stream, result.render, result.geometry);
+    });
+    if (reason && result.render.channel_count > 1 && result.render.channel[0].palette_column < 0) {
+        first_component(result.render);
+        reason = input.with_stream([&](kdu_codestream &stream) {
             return jhv_kdu_read_geometry(stream, result.render, result.geometry);
         });
-        if (reason && result.render.channel_count > 1 && result.render.channel[0].palette_column < 0) {
-            first_component(result.render);
-            reason = input.with_stream([&](kdu_codestream &stream) {
-                return jhv_kdu_read_geometry(stream, result.render, result.geometry);
-            });
-        }
-        if (reason) throw std::runtime_error(reason);
+    }
+    if (reason) throw std::runtime_error(reason);
+    stored = result;
+    return stored;
+}
+
+int jhv_j2k_source::inspect(hvc *, size_t frame, void *context,
+                            hvc_info *info, char *error, size_t error_size) noexcept {
+    return guarded(error, -1, [&] {
+        const description &result = static_cast<jhv_j2k_source *>(context)->describe(frame);
         info->components = result.geometry.plane_count;
         info->resolutions = result.geometry.resolutions;
         info->layers = result.geometry.layers;
@@ -78,7 +86,6 @@ int jhv_j2k_source::inspect(hvc *source, size_t frame, void *context,
             info->width[r] = result.geometry.level[r].width;
             info->height[r] = result.geometry.level[r].height;
         }
-        owner.descriptions[frame] = result;
         return 0;
     }, error_size);
 }
