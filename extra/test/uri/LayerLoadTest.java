@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.thread.EDTQueue;
 
 // The layer's load-finished future, headless, through the real registry.
@@ -62,7 +64,24 @@ public final class LayerLoadTest {
             throw new AssertionError("Removal did not complete the pending wait false");
         System.out.println("PASS: removal completes a pending wait false");
 
-        EventQueue.invokeAndWait(() -> Layers.remove(layer));
+        // Load.image completes at the same readiness: true, false for a removed layer, failing with no files.
+        if (!Load.image(fits).get(60, TimeUnit.SECONDS))
+            throw new AssertionError("Load.image of a FITS file did not complete true");
+        if (Load.image(bogus).get(60, TimeUnit.SECONDS))
+            throw new AssertionError("Load.image of an unreadable file did not complete false");
+        try {
+            Load.image(List.of()).get(10, TimeUnit.SECONDS);
+            throw new AssertionError("Load.image of nothing completed");
+        } catch (ExecutionException e) {
+            if (!"No image files found.".equals(e.getCause().getMessage()))
+                throw new AssertionError("Unexpected failure: " + e.getCause().getMessage(), e);
+        }
+        System.out.println("PASS: Load.image completes at readiness, false after removal, failing with no files");
+
+        EventQueue.invokeAndWait(() -> { // the layers Load.image added are not needed any more
+            for (ImageLayer l : List.copyOf(Layers.getImageLayers()))
+                Layers.remove(l);
+        });
         System.exit(0);
     }
 

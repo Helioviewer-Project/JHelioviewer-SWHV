@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -9,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.AppThread;
 
 import org.astrogrid.samp.Message;
@@ -44,20 +42,14 @@ final class LoadImageHandler {
         };
     }
 
-    private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<ImageLayer> future) {
-        future.whenComplete((layer, t) -> {
-            if (t != null) {
+    // The reply goes out off the EDT, which completes the load future.
+    private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<Boolean> future) {
+        future.whenComplete((success, t) -> AppThread.create(() -> {
+            if (t != null)
                 context.complete(false, message(t), null);
-                return;
-            }
-            if (layer == null) {
-                context.complete(false, "No image files found.", null);
-                return;
-            }
-            EventQueue.invokeLater(() -> layer.whenLoadFinished().thenAccept(success -> AppThread.create(
-                    () -> context.complete(success, success ? "Image loaded." : "Image load failed.", null),
-                    "JHV-WaitImageLoad").start()));
-        });
+            else
+                context.complete(success, success ? "Image loaded." : "Image load failed.", null);
+        }, "JHV-WaitImageLoad").start());
     }
 
     private static String message(Throwable t) {

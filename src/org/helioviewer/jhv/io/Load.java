@@ -20,24 +20,21 @@ import org.json.JSONObject;
 // All data load entry points.
 public final class Load {
 
-    public static CompletableFuture<ImageLayer> image(@Nonnull URI uri) {
+    public static CompletableFuture<Boolean> image(@Nonnull URI uri) {
         return image(List.of(uri));
     }
 
-    public static CompletableFuture<ImageLayer> image(@Nonnull List<URI> uris) {
+    public static CompletableFuture<Boolean> image(@Nonnull List<URI> uris) {
         return image(uris, null);
     }
 
-    public static CompletableFuture<ImageLayer> image(@Nonnull List<URI> uris, @Nullable JSONObject imageParams) {
-        CompletableFuture<ImageLayer> future = new CompletableFuture<>();
-        if (uris.isEmpty()) {
-            future.complete(null);
-            return future;
-        }
-
+    // Completes once the new layer's load has finished, with whether the layer is still registered;
+    // fails when the URIs resolve to no image files.
+    public static CompletableFuture<Boolean> image(@Nonnull List<URI> uris, @Nullable JSONObject imageParams) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         Task.submitBackground(() -> FileUtils.resolveURIList(uris), resolved -> {
             if (resolved.isEmpty()) {
-                future.complete(null);
+                future.completeExceptionally(new Exception("No image files found."));
                 return;
             }
 
@@ -45,7 +42,7 @@ public final class Load {
                 ImageLayer layer = ImageLayer.create();
                 layer.applyImageParams(imageParams);
                 layer.load(resolved);
-                future.complete(layer);
+                layer.whenLoadFinished().thenAccept(future::complete);
             } catch (Exception e) {
                 future.completeExceptionally(e);
             }
