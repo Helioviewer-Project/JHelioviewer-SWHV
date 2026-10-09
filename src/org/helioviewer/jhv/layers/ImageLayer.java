@@ -21,6 +21,7 @@ import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.view.BaseView;
@@ -150,23 +151,24 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     void setView(View _view) {
-        replaceView(_view);
-        activateView();
-    }
-
-    private void replaceView(View newView) {
+        // Only the initial placeholder is a bare BaseView.
+        boolean firstLoad = view.getClass() == BaseView.class;
         unsetView();
-        view = newView;
+        view = _view;
         loader.clearLoadFuture();
         view.setDataHandler(this);
-    }
-
-    private void activateView() {
         displaySettings.setLUT(view.getDefaultLUT(), displaySettings.getInvertLUT());
-        setEnabled(true);
+
+        if (firstLoad)
+            setEnabled(true);
 
         DisplayController.zoomMiniToFit();
-        Layers.setActiveImageLayer(this);
+        if (firstLoad || Layers.getActiveImageLayer() == this) {
+            Layers.setActiveImageLayer(this);
+        } else {
+            view.setNearestFrame(Player.getTime());
+            DisplayController.render();
+        }
         Layers.fireLayerUpdated(this);
     }
 
