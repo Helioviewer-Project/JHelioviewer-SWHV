@@ -66,6 +66,7 @@ public final class J2KSource implements Source {
     }
 
     // Start the reader only after the metadata is parsed and the cache keys are built.
+    @Override
     public void start(String[] cacheKey) {
         if (reader != null)
             reader.start(cacheKey);
@@ -219,6 +220,12 @@ public final class J2KSource implements Source {
             reader.signal(new J2KParams.Read(new J2KParams.Decode(frame, level), priority));
             currentLevel = level;
         }
+    }
+
+    @Override
+    public boolean displayable(int frame) {
+        ResolutionSet set = sets.get(frame);
+        return set != null && set.isDisplayable();
     }
 
     // Null: not displayable; false: displayable, incomplete at the level; true: complete at the level.

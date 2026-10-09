@@ -58,8 +58,8 @@ The native libraries come from the host's bundled native JAR. `--bridge PATH`
 overrides its bridge with a supplied `libjhvj2k`; Kakadu still comes from the JAR
 and must be compatible with that bridge.
 The live runner supports macOS arm64, macOS x86-64 and Linux x86-64.
-GC-dependent abandoned-view cleanup is opt-in with `--live --cleaner`.
-The live view test has a 480-second internal deadline,
+GC-dependent abandoned-timeline cleanup is opt-in with `--live --cleaner`.
+The live decoder test has a 480-second internal deadline,
 with a 510-second process timeout so it can report its own failure first.
 
 `J2KReaderTest` shares reader setup, raw decoding and cache restoration checks for an image
@@ -80,7 +80,7 @@ client refuses (the frame is fetched and stored again). The pump is invoked dire
 GUI view, while its worker remains idle. Completed or restored frames must reset
 the reader's consecutive failure count within the pass.
 
-The same movie is then opened by the real view, headless, with its reader thread. Paused and
+The same movie is then opened as a real timeline with its decoder, headless, with its reader thread. Paused and
 first shown at its coarsest level, which opening already completed, the movie must still
 download; a finer level of the shown frame must be fetched and delivered by the reader's
 refresh. With the player in its playing state, the test selects frames explicitly and
@@ -88,10 +88,10 @@ downloads the whole movie at a coarse level twice, once with the connection abor
 after a third of the frames; the reader must reconnect and the pixels of
 every frame must be equal.
 Reader refreshes must use the latest viewpoint and requested resolution after zooming out,
-even when a finer window finishes late. Detached refreshes are exercised with the
-data handler cleared.
+even when a finer window finishes late. A refresh after the decoder has moved to another
+timeline must deliver nothing.
 
-`J2KViewTest` captures opening responses and small windows for two frames in memory,
+`J2KFixture` captures opening responses and small windows for two frames in memory,
 then replays them through a local server. There are no committed replay fixtures;
 these checks require `--live` to obtain the captures. The server holds both replies
 until the prefetch pump has sent two requests.

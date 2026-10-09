@@ -30,11 +30,11 @@ public class ResolutionSet {
     }
 
     // The finest complete level at this one or coarser; a displayable frame has one.
-    Level getCompleteLevel(int level) {
+    public Level getCompleteLevel(int level) {
         return getLevel(Math.max(level, completeFrom));
     }
 
-    Level getLevel(int idx) {
+    public Level getLevel(int idx) {
         return resolutions[Math.min(idx, resolutions.length - 1)];
     }
 
@@ -52,7 +52,7 @@ public class ResolutionSet {
         return closest;
     }
 
-    Level getNextLevel(int w, int h) {
+    public Level getNextLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
             if (resolutions[i].width < w || resolutions[i].height < h)
                 return resolutions[i - 1];

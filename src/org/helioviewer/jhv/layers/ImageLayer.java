@@ -11,6 +11,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.image.ImageDisplaySettings.DifferenceMode;
@@ -24,57 +25,56 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
-import org.helioviewer.jhv.view.BaseView;
-import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONObject;
 
-public class ImageLayer extends AbstractLayer implements View.DataHandler {
+public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Frames.Listener {
 
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage = new GLSLImage(displaySettings);
-    private final ImageLayerLoader loader;
+    private final FrameDecoder decoder = new FrameDecoder(processingSettings, this);
+    private final ImageLayerLoader loader = new ImageLayerLoader(this::loaded, this::loadFailed);
 
+    private Frames frames;
+    @Nullable
+    private APIRequest request;
+    @Nullable
+    private String baseName;
+    private boolean loaded;
     private boolean removed;
-    protected View view;
 
     public static ImageLayer create() {
-        ImageLayer imageLayer = new ImageLayer();
+        ImageLayer imageLayer = new ImageLayer(Frames.placeholder());
         Layers.add(imageLayer);
         return imageLayer;
     }
 
     // Only for state restore, which batches layer registration.
     public static ImageLayer createDetached(JSONObject jo) {
-        ImageLayer imageLayer = new ImageLayer();
+        ImageLayer imageLayer = new ImageLayer(Frames.placeholder());
         imageLayer.applyImageParams(jo.optJSONObject("imageParams"));
         imageLayer.load(APIRequest.fromJson(jo.getJSONObject("APIRequest")));
         return imageLayer;
     }
 
+    // The placeholder layer, and the start of every other.
+    ImageLayer(Frames _frames) {
+        frames = _frames;
+        frames.setListener(this);
+        decoder.reset(frames.serial());
+    }
+
     @Override
     public void serialize(JSONObject jo) {
-        APIRequest apiRequest = view.getAPIRequest();
-        if (apiRequest != null) {
-            jo.put("APIRequest", apiRequest.toJson());
+        if (request != null) {
+            jo.put("APIRequest", request.toJson());
             JSONObject imageParams = displaySettings.toJson();
             processingSettings.serialize(imageParams);
             jo.put("imageParams", imageParams);
         }
-    }
-
-    // Constructor for NullImageLayer
-    protected ImageLayer(View _view) {
-        view = _view;
-        loader = new ImageLayerLoader(processingSettings, v -> {}, () -> {});
-    }
-
-    private ImageLayer() {
-        view = new BaseView(null, null, processingSettings);
-
-        loader = new ImageLayerLoader(processingSettings, this::setView, this::loadFailed);
     }
 
     public void applyImageParams(@Nullable JSONObject imageParams) {
@@ -93,7 +93,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     void decode(Position viewpoint, double pixFactor) {
-        view.decode(viewpoint, pixFactor, processingSettings.fitsParameters().clipRange(view.getClipSet()));
+        decoder.decode(frames, viewpoint, pixFactor);
     }
 
     public ImageProcessingSettings getProcessingSettings() {
@@ -103,7 +103,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private void refreshImage() {
         if (removed)
             return;
-        view.clearCache();
+        frames.clearCache();
         clearImageData();
         DisplayController.render();
     }
@@ -111,7 +111,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void load(APIRequest req) {
         if (removed)
             return;
-        if (req.equals(view.getAPIRequest())) {
+        if (req.equals(request)) {
             loader.cancelLoad();
             Layers.fireLayerUpdated(this);
             return;
@@ -130,10 +130,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     private void loadFailed() {
-        if (view.getClass() == BaseView.class)
-            Layers.remove(this);
-        else
+        if (loaded)
             Layers.fireLayerUpdated(this);
+        else
+            Layers.remove(this);
     }
 
     @Override
@@ -147,14 +147,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         ImageLayers.arrangeMultiView();
     }
 
-    void setView(View _view) {
-        // Only the initial placeholder is a bare BaseView.
-        boolean firstLoad = view.getClass() == BaseView.class;
+    private void loaded(ImageLayerLoader.Result result) {
+        boolean firstLoad = !loaded;
+        loaded = true;
         loader.cancelDownload();
-        unsetView();
-        view = _view;
-        view.setDataHandler(this);
-        displaySettings.setLUT(view.getDefaultLUT(), displaySettings.getInvertLUT());
+        request = result.request();
+        baseName = result.baseName();
+        setFrames(result.frames());
+        displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
 
         if (firstLoad)
             setEnabled(true);
@@ -163,25 +163,32 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (firstLoad || Layers.getActiveImageLayer() == this) {
             Layers.setActiveImageLayer(this);
         } else {
-            view.setNearestFrame(Player.getTime());
+            frames.select(Player.getTime());
             DisplayController.render();
         }
         Layers.fireLayerUpdated(this);
     }
 
-    private void unsetView() {
-        DisplayController.zoomMiniToFit();
-        view.setDataHandler(null);
-        view.abolish();
-
+    // One replacement: outstanding decodes of the old timeline are dropped before it is closed.
+    void setFrames(Frames next) {
+        frames.setListener(null);
+        decoder.reset(next.serial());
         clearImageData();
+        Frames old = frames;
+        frames = next;
+        frames.setListener(this);
+        old.close();
     }
 
     // Release the CPU-side owners now; GL disposal still needs the render context.
-    void detachView() {
+    void detach() {
         removed = true;
         loader.abolish();
-        unsetView();
+        decoder.dispose();
+        frames.setListener(null);
+        frames.close();
+        clearImageData();
+        DisplayController.zoomMiniToFit();
     }
 
     @Override
@@ -191,11 +198,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void prerender() {
-        View.ImageData current = imageData;
+        ImageData current = imageData;
         if (current == null) {
             return;
         }
-        View.ImageData comparisonData = comparisonImageData(current);
+        ImageData comparisonData = comparisonImageData(current);
         ImageBuffer differenceBuffer = displaySettings.getDifferenceMode() == DifferenceMode.None
                 ? null : comparisonData.imageBuffer();
         glImage.streamImages(current.imageBuffer(), differenceBuffer);
@@ -216,7 +223,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        View.ImageData current = imageData;
+        ImageData current = imageData;
         if (current == null) {
             return;
         }
@@ -227,7 +234,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         glImage.applyFilters(current.imageBuffer(), meta0, getFilter() == ImageFilter.Type.RHEF);
 
         Position metaViewpoint0 = meta0.getViewpoint();
-        View.ImageData imageDataDiff = comparisonImageData(current);
+        ImageData imageDataDiff = comparisonImageData(current);
         MetaData meta1 = imageDataDiff.metaData();
         Position metaViewpoint1 = meta1.getViewpoint();
         WcsHeader wcs0 = meta0.getWcsHeader();
@@ -285,8 +292,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nonnull
-    private View.ImageData comparisonImageData(@Nonnull View.ImageData current) {
-        View.ImageData comparison = displaySettings.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+    private ImageData comparisonImageData(@Nonnull ImageData current) {
+        ImageData comparison = displaySettings.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
         return comparison == null ? current : comparison;
     }
 
@@ -312,14 +319,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nullable
-    private View.ImageData imageData;
+    private ImageData imageData;
     @Nullable
-    private View.ImageData prevImageData;
+    private ImageData prevImageData;
     @Nullable
-    private View.ImageData baseImageData;
+    private ImageData baseImageData;
 
     @Nullable
-    private static View.ImageData replaceImageData(@Nullable View.ImageData previous, @Nullable View.ImageData next) {
+    private static ImageData replaceImageData(@Nullable ImageData previous, @Nullable ImageData next) {
         if (next != null)
             next.image().retain();
         if (previous != null)
@@ -333,9 +340,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         baseImageData = replaceImageData(baseImageData, null);
     }
 
-    private void setImageData(@Nonnull View.ImageData newImageData) {
+    private void setImageData(@Nonnull ImageData newImageData) {
         long newMilli = newImageData.metaData().getViewpoint().time.milli;
-        boolean base = baseImageData == null || newMilli == view.getFirstTime().milli;
+        boolean base = baseImageData == null || newMilli == frames.first().milli;
         if (base) {
             baseImageData = replaceImageData(baseImageData, newImageData);
         }
@@ -350,17 +357,17 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nullable
-    public View.ImageData getImageData() {
+    public ImageData getImageData() {
         return imageData;
     }
 
     @Nonnull
     public MetaData getMetaData() { //!
-        return imageData == null ? view.getMetaData(view.getFirstTime()) : imageData.metaData();
+        return imageData == null ? frames.metaData(frames.first()) : imageData.metaData();
     }
 
     @Override
-    public void handleData(@Nonnull View.ImageData newImageData) {
+    public void handleData(@Nonnull ImageData newImageData) {
         String oldName = getName();
 
         setImageData(newImageData);
@@ -372,14 +379,26 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         ImageLayers.displaySynced(newImageData.viewpoint());
     }
 
+    // A frame arrived: catch up with the requested time, or refine the frame already shown.
+    @Override
+    public void frameReady(Frames _frames, Source source, int frame) {
+        if (_frames != frames)
+            return;
+        UITimer.completionChanged();
+        boolean moved = frames.select(frames.requested());
+        Frames.Frame current = frames.get(frames.current());
+        if (moved || (current.source() == source && current.index() == frame))
+            decoder.redecode(frames);
+    }
+
     @Override
     public boolean isDownloading() {
-        return loader.isLoading() || view.isDownloading();
+        return loader.isLoading() || frames.isDownloading();
     }
 
     @Override
     public boolean isLocal() {
-        return view.getAPIRequest() == null;
+        return request == null;
     }
 
     @Nonnull
@@ -388,8 +407,23 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nonnull
-    public View getView() {
-        return view;
+    public Frames frames() {
+        return frames;
+    }
+
+    @Nullable
+    public APIRequest getAPIRequest() {
+        return request;
+    }
+
+    public boolean isComplete() {
+        return frames.isComplete();
+    }
+
+    // Snapshot: null when unavailable, false when partial, true when complete.
+    @Nullable
+    public Boolean frameCompletion(int frame) {
+        return frames.completion(frame);
     }
 
     public boolean isLoadingForTimespan() {
@@ -397,17 +431,15 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     public long getStartTime() {
-        APIRequest req = view.getAPIRequest(); // for locked timelines
-        return req == null ? view.getFirstTime().milli : req.startTime();
+        return request == null ? frames.first().milli : request.startTime(); // for locked timelines
     }
 
     public long getEndTime() {
-        APIRequest req = view.getAPIRequest(); // for locked timelines
-        return req == null ? view.getLastTime().milli : req.endTime();
+        return request == null ? frames.last().milli : request.endTime(); // for locked timelines
     }
 
-    public boolean isViewLoadFinished() {
-        return !loader.isLoading() && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
+    public boolean isLoadFinished() {
+        return !loader.isLoading() && frames.completion(frames.size() - 1) != null;
     }
 
     public void cancelDownloadTask() {
@@ -415,10 +447,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     public void startDownload(DownloadLayer.Progress progress) {
-        APIRequest req = view.getAPIRequest();
-        String baseName = view.getBaseName();
-        if (req != null && baseName != null) // should not happen
-            loader.startDownload(req, this, baseName, progress);
+        if (request != null && baseName != null) // should not happen
+            loader.startDownload(request, this, baseName, progress);
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.layers.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
@@ -14,7 +15,6 @@ import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.json.JSONObject;
@@ -178,7 +178,7 @@ public final class DisplayController {
     }
 
     private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, MapMode mode) {
-        View.ImageData imageData = layer.getImageData();
+        ImageData imageData = layer.getImageData();
         if (imageData == null)
             return 0;
 

@@ -31,9 +31,9 @@ import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
 // This element provides its own look and feel. Therefore, it is independent
@@ -371,19 +371,19 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
             g.setStroke(thickStroke);
 
             int y = slider.getSize().height / 2;
-            View view = Layers.getActiveImageLayer().getView();
-            if (view.isComplete()) {
+            ImageLayer layer = Layers.getActiveImageLayer();
+            if (layer.isComplete()) {
                 g.setColor(completeColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
-                int len = view.getMaximumFrameNumber() + 1; // frames are 0...max inclusively
+                int len = layer.frames().size();
                 for (int i = 0; i < len; i++) {
                     int begin = (int) ((float) i / len * trackRect.width);
                     int end = (int) ((float) (i + 1) / len * trackRect.width);
                     if (end == begin)
                         end++;
 
-                    Boolean status = view.getFrameCompletion(i);
+                    Boolean status = layer.frameCompletion(i);
                     g.setColor(status == null ? emptyColor : (status ? completeColor : partialColor));
                     g.drawLine(trackRect.x + begin, y, trackRect.x + end, y);
                 }

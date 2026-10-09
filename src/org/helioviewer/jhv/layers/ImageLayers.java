@@ -18,7 +18,6 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
@@ -94,7 +93,7 @@ public final class ImageLayers {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isVisibleIdx() == -1)
                 continue;
-            View.ImageData data = layer.getImageData();
+            ImageData data = layer.getImageData();
             if (data != null && viewpoint != data.viewpoint() /* deliberate on reference */)
                 return;
         }
@@ -113,7 +112,7 @@ public final class ImageLayers {
         }
 
         private static boolean isLoadingForState(ImageLayer layer) throws Exception {
-            return EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && !layer.isViewLoadFinished());
+            return EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && !layer.isLoadFinished());
         }
     }
 
@@ -147,7 +146,7 @@ public final class ImageLayers {
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest req = layer.getView().getAPIRequest();
+            APIRequest req = layer.getAPIRequest();
             if (req == null)
                 continue;
             layer.load(new APIRequest(req.server(), req.sourceId(), startTime, endTime, cadence));
@@ -168,11 +167,11 @@ public final class ImageLayers {
         }
 
         ImageLayer activeLayer = Layers.getActiveImageLayer();
-        APIRequest req = activeLayer.getView().getAPIRequest();
+        APIRequest req = activeLayer.getAPIRequest();
         if (req != null) {
             str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
         }
-        View.ImageData id = activeLayer.getImageData();
+        ImageData id = activeLayer.getImageData();
         if (id != null) {
             Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
             str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
@@ -192,8 +191,8 @@ public final class ImageLayers {
 
     public static void getSAMPMessage(Message msg) {
         ImageLayer activeLayer = Layers.getActiveImageLayer();
-        APIRequest req = activeLayer.getView().getAPIRequest();
-        View.ImageData id = activeLayer.getImageData();
+        APIRequest req = activeLayer.getAPIRequest();
+        ImageData id = activeLayer.getImageData();
         if (req == null || id == null)
             return;
 
@@ -262,7 +261,7 @@ public final class ImageLayers {
     private static void refreshLayersSpan() {
         long now = System.currentTimeMillis();
         for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest req = layer.getView().getAPIRequest();
+            APIRequest req = layer.getAPIRequest();
             if (req == null)
                 continue;
             layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));

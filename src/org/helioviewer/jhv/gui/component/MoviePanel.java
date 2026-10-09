@@ -251,7 +251,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
     public void changeDataset(ImageLayer layer) {
         layerToReplace = layer;
-        APIRequest req = layer.getView().getAPIRequest();
+        APIRequest req = layer.getAPIRequest();
         if (req != null)
             imageDialog.selectDataset(req.server(), req.sourceId());
         imageDialog.showDialog(true);

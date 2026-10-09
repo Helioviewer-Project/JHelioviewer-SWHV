@@ -2,65 +2,72 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
-import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.source.J2KView;
-import org.helioviewer.jhv.source.URIView;
-import org.helioviewer.jhv.thread.LatestWorker;
-import org.helioviewer.jhv.view.ManyView;
-import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.metadata.BasicMetaData;
+import org.helioviewer.jhv.metadata.FitsMetaData;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.source.FITSSource;
+import org.helioviewer.jhv.source.J2KSource;
+import org.helioviewer.jhv.source.RasterSource;
+import org.helioviewer.jhv.source.ResolutionSet;
+import org.helioviewer.jhv.source.Source;
+import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 final class ImageLayerLoader {
 
-    private final LatestWorker<DecodedImage> executor = new LatestWorker<>("View-Decoder");
-    private final ImageProcessingSettings processingSettings;
-    private final Consumer<View> onViewLoaded;
+    // baseName names the single source of a request load; warnings are for the user.
+    record Result(Frames frames, @Nullable APIRequest request, @Nullable String baseName, List<String> warnings) {}
+
+    private final Consumer<Result> onLoaded;
     private final Runnable onLoadFailed;
 
     // Owned by the EDT, including results queued after the worker has exited.
     private Thread loadThread;
     private Future<?> downloadFuture;
 
-    ImageLayerLoader(ImageProcessingSettings _processingSettings, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onLoadFailed) {
-        processingSettings = _processingSettings;
-        onViewLoaded = _onViewLoaded;
+    ImageLayerLoader(@Nonnull Consumer<Result> _onLoaded, @Nonnull Runnable _onLoadFailed) {
+        onLoaded = _onLoaded;
         onLoadFailed = _onLoadFailed;
     }
 
     void load(APIRequest req) {
-        load(() -> createView(req, requestAPI(req.toJpipRequest())));
+        load(() -> open(req, List.of(requestAPI(req.toJpipRequest()))));
     }
 
     void load(List<URI> uriList) {
-        load(() -> loadUri(uriList));
+        load(() -> open(null, uriList));
     }
 
-    private void load(Callable<View> task) {
+    private void load(Callable<Result> task) {
         cancelLoad();
         Thread nextLoad = Thread.ofVirtual().name("Image-Load").unstarted(() -> {
             Thread worker = Thread.currentThread();
             try {
-                View result = task.call();
+                Result result = task.call();
                 // Unlike FutureTask cancellation, this always transfers the result for cleanup.
                 EventQueue.invokeLater(() -> finishLoad(worker, result, null));
             } catch (Throwable t) {
@@ -94,22 +101,22 @@ final class ImageLayerLoader {
         }
     }
 
-    // EDT teardown: the layer is already excluded from getImageLayers(), so no new decode may be submitted.
     void abolish() {
         cancelLoad();
         cancelDownload();
-        executor.dispose();
     }
 
-    private void finishLoad(Thread worker, @Nullable View result, @Nullable Throwable error) {
+    private void finishLoad(Thread worker, @Nullable Result result, @Nullable Throwable error) {
         if (worker != loadThread) {
             if (result != null)
-                result.abolish();
+                result.frames().close();
             return;
         }
         loadThread = null;
         if (error == null) {
-            onViewLoaded.accept(result);
+            onLoaded.accept(result);
+            if (!result.warnings().isEmpty())
+                Message.warn("Warning", String.join("\n", result.warnings()));
             return;
         }
         onLoadFailed.run();
@@ -117,38 +124,140 @@ final class ImageLayerLoader {
         Message.err("Error getting the data", error.getMessage());
     }
 
-    private View loadUri(List<URI> uriList) throws Exception {
-        if (uriList.size() == 1)
-            return createView(null, uriList.getFirst());
-        Thread worker = Thread.currentThread();
-        // Keep JPIP initialization on the interruptible loader thread.
-        boolean jpip = uriList.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
-        List<View> views = (jpip ? uriList.stream() : uriList.parallelStream()).map(uri -> {
-            if (worker.isInterrupted())
-                return null;
-            try {
-                return createView(null, uri);
-            } catch (Exception e) {
-                Log.warn(uri.toString(), e);
-                return null;
-            }
-        }).filter(Objects::nonNull).toList();
+    // A source and its frames in file order.
+    private record Opened(Source source, DataUri dataUri, List<Frames.Frame> frames) {}
+
+    // The loader owns every source it opens until the timeline does.
+    static Result open(@Nullable APIRequest request, List<URI> uris) throws Exception {
+        List<String> failures = new ArrayList<>();
+        List<Opened> opened = new ArrayList<>();
         try {
-            return new ManyView(views);
+            opened.addAll(openMany(request, uris, failures));
+            if (opened.isEmpty())
+                throw new Exception(failures.isEmpty() ? "No images" : String.join("\n", failures));
+
+            List<Frames.Frame> all = new ArrayList<>();
+            for (Opened o : opened)
+                all.addAll(o.frames);
+            all.sort(Comparator.comparingLong(f -> f.time().milli));
+
+            // A time already present drops the later frame; a source left without frames is closed.
+            List<Frames.Frame> kept = new ArrayList<>(all.size());
+            List<String> dropped = new ArrayList<>();
+            for (Frames.Frame frame : all) {
+                if (!kept.isEmpty() && kept.getLast().time().milli == frame.time().milli)
+                    dropped.add(frame.metaData().getDisplayName() + " " + frame.time());
+                else
+                    kept.add(frame);
+            }
+            List<String> warnings = new ArrayList<>(failures);
+            if (!dropped.isEmpty()) {
+                warnings.add("Skipped " + dropped.size() + " frame(s) with a time already present:\n" + String.join("\n", dropped));
+                Set<Source> retained = new HashSet<>();
+                for (Frames.Frame frame : kept)
+                    retained.add(frame.source());
+                for (Opened o : opened) {
+                    if (!retained.contains(o.source))
+                        o.source.close();
+                }
+            }
+            String baseName = opened.size() == 1 ? opened.getFirst().dataUri.baseName() : null;
+            return new Result(new Frames(kept), request, baseName, warnings);
         } catch (Throwable t) {
-            views.forEach(View::abolish);
+            for (Opened o : opened) {
+                try {
+                    o.source.close();
+                } catch (Exception e) {
+                    Log.error(e);
+                }
+            }
             throw t;
         }
     }
 
-    private View createView(APIRequest req, URI uri) throws Exception {
+    // Several URIs tolerate failures of some; one URI fails the load.
+    private static List<Opened> openMany(@Nullable APIRequest request, List<URI> uris, List<String> failures) throws Exception {
+        if (uris.size() == 1)
+            return openUri(request, uris.getFirst(), failures);
+        Thread worker = Thread.currentThread();
+        // Keep JPIP initialization on the interruptible loader thread.
+        boolean jpip = uris.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
+        return (jpip ? uris.stream() : uris.parallelStream()).flatMap(uri -> {
+            if (worker.isInterrupted())
+                return Stream.empty();
+            try {
+                return openUri(request, uri, failures).stream();
+            } catch (Exception e) {
+                Log.warn(uri.toString(), e);
+                synchronized (failures) {
+                    failures.add(e.getMessage());
+                }
+                return Stream.empty();
+            }
+        }).toList();
+    }
+
+    private static List<Opened> openUri(@Nullable APIRequest request, URI uri, List<String> failures) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
-        return switch (dataUri.format()) {
-            case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri, processingSettings);
-            case FITS, PNG, JPEG -> new URIView(executor, dataUri, processingSettings);
-            case ZIP -> loadUri(FileUtils.unZip(dataUri.uri()));
-            default -> throw new Exception("Unknown image type");
-        };
+        if (dataUri.format() == DataUri.Format.ZIP)
+            return openMany(null, FileUtils.unZip(dataUri.uri()), failures);
+
+        Source source = null;
+        try {
+            source = switch (dataUri.format()) {
+                case JPIP -> J2KSource.open(dataUri.uri());
+                case JP2, JPX -> new J2KSource(dataUri.file().toPath());
+                case FITS -> new FITSSource(dataUri.file());
+                case PNG, JPEG -> new RasterSource(dataUri.file());
+                default -> throw new Exception("Unknown image type");
+            };
+            List<Frames.Frame> frames = frames(source, dataUri);
+            String[] cacheKey = new String[frames.size()];
+            if (request != null) {
+                for (int i = 0; i < cacheKey.length; i++) {
+                    Frames.Frame frame = frames.get(i);
+                    if (frame.metaData() instanceof FitsMetaData)
+                        cacheKey[i] = request.sourceId() + "+" + frame.time().milli;
+                }
+            }
+            source.start(cacheKey);
+            return List.of(new Opened(source, dataUri, frames));
+        } catch (Exception e) {
+            if (source != null)
+                source.close();
+            throw new Exception(e.getMessage() + ": " + dataUri, e);
+        }
+    }
+
+    // Interprets the metadata once per frame and requires increasing times.
+    private static List<Frames.Frame> frames(Source source, DataUri dataUri) throws Exception {
+        int count = source.frames();
+        List<Frames.Frame> list = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            String xml;
+            MetaData m;
+            try {
+                xml = source.xml(i);
+                if (xml == null)
+                    throw new Exception("Missing XML metadata");
+                m = new FitsMetaData(new XMLMetaDataContainer(xml), dataUri.sourceUri());
+            } catch (Exception e) {
+                xml = Frames.EMPTY_METAXML;
+                // A JPIP frame's own size may not be known yet.
+                ResolutionSet.Level level = source.levels(source.displayable(i) ? i : 0).getLevel(0);
+                m = new BasicMetaData(level.width(), level.height(), dataUri.baseName(), dataUri.sourceUri());
+                Log.warn("Helioviewer metadata missing for " + dataUri.baseName() + " frame " + i, e);
+            }
+            JHVTime time = m.getViewpoint().time;
+            if (i > 0) {
+                JHVTime previous = list.get(i - 1).time();
+                if (time.milli <= previous.milli)
+                    throw new Exception((time.milli == previous.milli ? "Duplicate frame timestamp" : "Out-of-order frame timestamp")
+                            + "\nFrame " + (i - 1) + ": " + previous + "\nFrame " + i + ": " + time);
+            }
+            list.add(new Frames.Frame(time, m, xml, source, i));
+        }
+        return list;
     }
 
     private URI requestAPI(String url) throws Exception {

@@ -19,7 +19,6 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.view.NullView;
 
 @SuppressWarnings("unchecked")
 public final class Layers {
@@ -40,15 +39,15 @@ public final class Layers {
 
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
-    private static final NullImageLayer nullImageLayer = new NullImageLayer(NullView.create(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli,
+    private static final ImageLayer nullImageLayer = new ImageLayer(Frames.synthetic(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli,
             TimeUtils.defaultCadence(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli)));
     private static ImageLayer activeLayer = nullImageLayer;
 
     public static final TimeListener.Selection timeSelectionListener = Layers::timeSelectionChanged;
 
     private static void timeSelectionChanged(long start, long end) {
-        nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
-        // Replacing the placeholder NullView also needs a full Movie resync when it is active.
+        nullImageLayer.setFrames(Frames.synthetic(start, end, TimeUtils.defaultCadence(start, end)));
+        // Replacing the placeholder timeline also needs a full Movie resync when it is active.
         if (activeLayer == nullImageLayer)
             Player.resetToMaster();
     }
@@ -144,7 +143,7 @@ public final class Layers {
 
     private static void detach(Layer layer) {
         if (layer instanceof ImageLayer imageLayer)
-            imageLayer.detachView();
+            imageLayer.detach();
         if (!newLayers.remove(layer))
             removedLayers.add(layer);
     }
@@ -239,9 +238,9 @@ public final class Layers {
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
         if (imageLayersCount == 0)
-            nullImageLayer.getView().setNearestFrame(dateTime);
+            nullImageLayer.frames().select(dateTime);
         else
-            forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
+            forEachImageLayer(layer -> layer.frames().select(dateTime));
     }
 
     public static List<ImageLayer> getImageLayers() {

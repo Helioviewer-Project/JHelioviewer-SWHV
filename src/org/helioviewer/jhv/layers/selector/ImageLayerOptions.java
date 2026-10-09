@@ -218,7 +218,7 @@ final class ImageLayerOptions extends JPanel {
     public void refresh(Layer layer) {
         ImageLayer imageLayer = (ImageLayer) layer;
         downloadButton.setVisible(!imageLayer.isLocal());
-        boolean hasFITS = imageLayer.getView().hasFITS();
+        boolean hasFITS = imageLayer.frames().hasFITS();
         fitsButton.setVisible(hasFITS);
         fitsSettings.setVisible(hasFITS && fitsButton.isSelected());
         lutPanel.refresh();

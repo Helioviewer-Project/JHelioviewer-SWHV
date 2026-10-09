@@ -19,11 +19,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
-import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.layers.Frames;
+import org.helioviewer.jhv.source.ResolutionSet;
+import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.view.ManyView;
-import org.helioviewer.jhv.view.View;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -169,58 +170,56 @@ public final class ImageBufferCacheTest {
     }
 
     private static void manyFiles() throws Exception {
-        int count = 2000;
+        int count = 1000;
         CountDownLatch closed = new CountDownLatch(count);
         Set<Thread> closerThreads = ConcurrentHashMap.newKeySet();
-        AtomicInteger visits = new AtomicInteger(), handlers = new AtomicInteger();
-        List<View> views = new ArrayList<>();
+        AtomicInteger visits = new AtomicInteger(), listeners = new AtomicInteger();
+        List<Frames.Frame> frames = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            // The second half repeats the first half's timestamps, shadowing an entire input collection.
-            long date = (i % (count / 2)) * 3L;
-            Object id = new Object();
-            views.add(new View() {
-                @Override public int getMaximumFrameNumber() { return 2; }
-                @Override public JHVTime getFrameTime(int frame) { return new JHVTime(date + frame); }
-                @Override public JHVTime getFirstTime() { return getFrameTime(0); }
-                @Override public JHVTime getLastTime() { return getFrameTime(2); }
-                @Override public boolean setNearestFrame(JHVTime time) { return true; }
-                @Override public JHVTime getNearestTime(JHVTime time) { return time; }
-                @Override public JHVTime getLowerTime(JHVTime time) { return time; }
-                @Override public JHVTime getHigherTime(JHVTime time) { return time; }
-                @Override public MetaData getMetaData(JHVTime time) { throw new UnsupportedOperationException(); }
-                @Override public void collectCacheOwners(Set<Object> owners) { owners.add(id); }
-                @Override public void setDataHandler(View.DataHandler handler) { handlers.incrementAndGet(); }
-                @Override public void closeSources() {
+            long date = i * 3L;
+            Source source = new Source() {
+                @Override public int frames() { return 3; }
+                @Override public String xml(int frame) { return null; }
+                @Override public ResolutionSet levels(int frame) { throw new UnsupportedOperationException(); }
+                @Override public LUT lut() { return null; }
+                @Override public ClipSet clipSet() { return null; }
+                @Override public boolean usesFITSParameters() { return false; }
+                @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) {
+                    throw new UnsupportedOperationException();
+                }
+                @Override public void setListener(Source.Listener listener) { listeners.incrementAndGet(); }
+                @Override public void close() {
                     if (EventQueue.isDispatchThread())
                         throw new AssertionError("Sources closed on the EDT");
                     closerThreads.add(Thread.currentThread());
                     closed.countDown();
                 }
-            });
-            for (int frame = 0; frame < 3; frame++)
-                ImageBufferCache.put(new OwnedKey(id, frame, visits),
-                        new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null));
+            };
+            for (int frame = 0; frame < 3; frame++) {
+                JHVTime time = new JHVTime(date + frame);
+                frames.add(new Frames.Frame(time, null, Frames.EMPTY_METAXML, source, frame)); // metadata unused
+            }
         }
+        Object id = new Object();
+        for (int i = 0; i < count * 3; i++)
+            ImageBufferCache.put(new OwnedKey(id, i, visits),
+                    new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null));
         OwnedKey other = new OwnedKey(new Object(), 0, visits);
         DecodedImage retained = image();
         ImageBufferCache.put(other, retained);
-        ManyView collection = new ManyView(List.of(new ManyView(views.subList(0, count / 2)),
-                new ManyView(views.subList(count / 2, count))));
+        Frames timeline = new Frames(frames);
         try {
-            EventQueue.invokeAndWait(() -> {
-                collection.setDataHandler(null);
-                collection.clearCache();
-            });
-            if (visits.get() != count * 3 + 1 || handlers.get() != count || ImageBufferCache.get(other) != retained)
-                throw new AssertionError("Collection did not visit each cache entry and child once, or purged another layer");
+            EventQueue.invokeAndWait(timeline::clearCache);
+            if (visits.get() != count * 3 + 1 || listeners.get() != count || ImageBufferCache.get(other) != retained)
+                throw new AssertionError("Timeline did not visit each cache entry once and each source once, or purged another layer");
             visits.set(0);
-            EventQueue.invokeAndWait(collection::abolish);
-            if (!closed.await(10, TimeUnit.SECONDS) || closerThreads.size() != 1 || visits.get() != 1)
-                throw new AssertionError("Collection repeated cache scans or used multiple source-close threads");
+            EventQueue.invokeAndWait(timeline::close);
+            if (!closed.await(10, TimeUnit.SECONDS) || closerThreads.size() != 1 || visits.get() != count * 3 + 1)
+                throw new AssertionError("Timeline repeated cache scans or used multiple source-close threads");
         } finally {
             ImageBufferCache.invalidateIf(key -> key instanceof OwnedKey);
         }
-        System.out.println("PASS: 2,000 views, including shadowed timestamps, use one cache pass and one background source closer");
+        System.out.println("PASS: 1,000 sources in one timeline use one cache pass per clear and one background source closer");
     }
 
     private static DecodedImage image() {

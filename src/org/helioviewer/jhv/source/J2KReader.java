@@ -10,7 +10,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
@@ -290,25 +289,25 @@ class J2KReader implements Runnable {
         while (true) {
             // On newer work, drain sent responses without issuing any more requests.
             draining |= isAbolished || !signalQueue.isEmpty() || Thread.interrupted();
+            int frame;
             if (!draining && sent.size() < limit && !remaining.isEmpty()) {
-                Sent request = request(remaining.removeFirst(), wanted);
+                frame = remaining.removeFirst();
+                Sent request = request(frame, wanted);
                 if (request != null) {
                     sent.addLast(request);
                     continue;
                 }
             } else if (!sent.isEmpty()) {
                 Sent first = sent.removeFirst();
+                frame = first.frame;
                 if (!receive(first, wanted)) {
-                    remaining.addFirst(first.frame); // finish this frame first
+                    remaining.addFirst(frame); // finish this frame first
                     continue;
                 }
             } else {
                 return !draining;
             }
-
-            if (singleFrame)
-                source.frameUpdated(decode.frame());
-            UITimer.completionChanged();
+            source.frameUpdated(frame); // settled, or a response consumed
         }
     }
 

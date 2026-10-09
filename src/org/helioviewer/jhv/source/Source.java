@@ -42,6 +42,14 @@ public interface Source extends AutoCloseable {
     // Held weakly by the source.
     default void setListener(@Nullable Listener listener) {}
 
+    // Begins background retrieval; keys name the frames in the disk cache, null for none.
+    default void start(String[] cacheKey) {}
+
+    // A frame whose coarsest level is present.
+    default boolean displayable(int frame) {
+        return true;
+    }
+
     // Asks a remote source for the level; the source keeps its own request state.
     default void request(int frame, int level, boolean priority) {}
 

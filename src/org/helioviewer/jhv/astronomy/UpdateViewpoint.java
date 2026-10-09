@@ -19,7 +19,7 @@ public interface UpdateViewpoint {
     class Observer implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            return Layers.getActiveImageLayer().getView().getMetaData(time).getViewpoint();
+            return Layers.getActiveImageLayer().frames().metaData(time).getViewpoint();
         }
     }
 

@@ -93,3 +93,17 @@ JHV_NOM_TAM_JAR=/absolute/path/to/nom-tam-fits-candidate.jar \
 Both runners support `JHV_NOM_TAM_JAR`. They exclude the bundled nom-tam JAR and compile all current JHV sources
 against the candidate into their temporary build directory. The verifier prints the loaded nom-tam location.
 Without this variable, the runners use the bundled library as before.
+
+## Timeline load check
+
+`FramesLoadTest` runs the image layer loader headless on local FITS fixtures: three files sorted
+into one timeline and the first frame decoded, a repeated file dropped with one warning, a zip
+expanded alongside a file, an unreadable file skipped with a warning in a multi-file load and
+failing a single-file load, and a single file keeping its base name. Compile it against
+`bin:resources` plus `lib/*.jar` and run it with a temporary `user.home`:
+
+```sh
+java -Djava.awt.headless=true -Duser.home=/tmp/jhv-frames --enable-native-access=ALL-UNNAMED \
+  -cp "<test classes>:bin:resources:lib/*" org.helioviewer.jhv.layers.FramesLoadTest \
+  a.fits b.fits c.fits two.zip not-an-image
+```

@@ -150,7 +150,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Observation Date: " + fitsMetadata.getViewpoint().time +
                 (hasSourceUri ? "<br/>" + sourceText : ""));
 
-        String xml = layer.getView().getXMLMetaData(fitsMetadata.getViewpoint().time);
+        String xml = layer.frames().xml(fitsMetadata.getViewpoint().time);
         String filename = fitsMetadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(fitsMetadata.getViewpoint().time.milli) + ".fits.xml";
         Task.submitBackground("metadata", () -> parseMetadata(xml, filename), parsed -> applyMetadata(request, parsed), Log::error);
     }

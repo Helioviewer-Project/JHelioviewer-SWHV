@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
     sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java"]
     if args.live:
-        sources.extend(["J2KViewTest.java", "CallistoTest.java"])
+        sources.extend(["J2KFixture.java", "FrameDecoderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
                     *(str(Path(__file__).parent / name) for name in sources)], check=True, timeout=60)
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
@@ -81,7 +81,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
                        check=True, timeout=360)
         subprocess.run([*java, "-Xmx512m", "-Djhv.test.timeoutSeconds=480",
                         "-Djhv.test.cleaner=" + str(args.cleaner).lower(),
-                        "org.helioviewer.jhv.source.J2KViewTest", *libraries, movie],
+                        "org.helioviewer.jhv.layers.FrameDecoderTest", *libraries, movie],
                        check=True, timeout=510)
 
         callisto = "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?sourceId=5000&date=2026-09-09T00:00:00Z"
