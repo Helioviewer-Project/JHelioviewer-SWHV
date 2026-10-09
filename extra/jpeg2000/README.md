@@ -66,8 +66,10 @@ python3 extra/test/j2k/check_native_build.py /path/to/builds/macos-arm64 --esajp
 ```
 
 This uses the existing native test and committed RGB, grayscale and JPX fixtures.
-Small generated palette fixtures also check raw indices, channel ordering,
-signed sample conversion, short buffers and final colors against the compositor.
+Small generated palette fixtures check raw indices and fixed expected RGBA table
+bytes, including channel ordering, signed sample conversion and last-entry padding.
+They also check short buffers and unsupported index depths. Indexed decode comparisons
+use the compositor's raw-component path, as JHV does on `master`.
 The Java binding consumes a 256-entry RGBA8 table and raw unsigned index bytes.
 It checks every frame and resolution against Kakadu's compositor, jobs that
 outlive their source, failure recovery, and repeated open/decode/close cycles.

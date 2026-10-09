@@ -80,12 +80,14 @@ def main():
             "javac", "--release", "25", "-nowarn", "-cp", classpath, "-d", directory,
             str(root / "src/org/helioviewer/jhv/view/j2k/J2KNative.java"),
             str(root / "extra/test/j2k/J2KNativeTest.java"),
-        ], check=True)
+        ], check=True, timeout=60)
+        java_args = ["--enable-native-access=ALL-UNNAMED", "-cp", classpath + os.pathsep + directory,
+                     "org.helioviewer.jhv.view.j2k.J2KNativeTest"]
+        subprocess.run(["java", "-Xmx64m", *java_args, "--responses", str(args.libraries.resolve())], check=True, timeout=30)
         subprocess.run([
-            "java", "--enable-native-access=ALL-UNNAMED", "-cp", classpath + os.pathsep + directory,
-            "org.helioviewer.jhv.view.j2k.J2KNativeTest", "--local",
+            "java", *java_args, "--local",
             str(args.libraries.resolve()), directory, *(str(image) for image in images),
-        ], check=True)
+        ], check=True, timeout=300)
 
 
 if __name__ == "__main__":

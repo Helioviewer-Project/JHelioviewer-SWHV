@@ -364,6 +364,8 @@ class J2KReader implements Runnable {
                 return;
             } catch (Exception e) {
                 closeSocket();
+                if (isAbolished)
+                    return;
 
                 if (retries++ < 13)
                     queueIfEmpty(params); // retry unless newer work is pending

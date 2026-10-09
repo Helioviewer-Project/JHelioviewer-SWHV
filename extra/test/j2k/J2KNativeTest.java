@@ -207,6 +207,51 @@ public final class J2KNativeTest {
         System.out.println("failures, retry and 200 open/decode/close cycles");
     }
 
+    private static void rejectResponse(byte[] bytes, String label) throws Exception {
+        ByteBuffer reply = ByteBuffer.allocateDirect(bytes.length);
+        reply.put(bytes).flip();
+        try (J2KNative source = new J2KNative(null)) {
+            try {
+                source.response(reply, 0);
+                throw new AssertionError("Accepted " + label);
+            } catch (J2KNative.Refused expected) {
+                check(!expected.getMessage().isEmpty(), "Missing refusal diagnostic: " + label);
+            }
+        }
+    }
+
+    private static void responseParsing() throws Exception {
+        byte[] message = {0x60, 8, 0, 0, 1, 42, 0, 2, 0};
+        ByteBuffer reply = ByteBuffer.allocateDirect(message.length);
+        reply.put(message).flip();
+        try (J2KNative source = new J2KNative(null)) {
+            check(source.response(reply, 0).reason() == 2, "valid response baseline");
+        }
+        for (int cut = 0; cut < message.length; cut++)
+            rejectResponse(Arrays.copyOf(message, cut), "response prefix of " + cut + " bytes");
+        rejectResponse(new byte[]{0x60, 10, 0, 0, 0, 0, 2, 0}, "unknown class");
+        rejectResponse(new byte[]{0x10, 0, 2, 0}, "reserved header form");
+        byte[] overlong = new byte[18];
+        overlong[0] = 0x60;
+        overlong[1] = 8;
+        Arrays.fill(overlong, 4, 14, (byte) 0x80);
+        overlong[16] = 2;
+        rejectResponse(overlong, "overlong length VBAS");
+        // A length of Integer.MAX_VALUE with no payload must be refused before allocation.
+        rejectResponse(new byte[]{0x60, 8, 0, 0, (byte) 0x87, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x7f, 0, 2, 0},
+                "huge missing payload");
+        for (int reason : new int[]{1, 2, 3, 4, 5, 6, 7, 255}) {
+            ByteBuffer eor = ByteBuffer.allocateDirect(3);
+            eor.put(new byte[]{0, (byte) reason, 0}).flip();
+            try (J2KNative source = new J2KNative(null)) {
+                check(source.response(eor, 0).reason() == reason, "EOR reason " + reason);
+            }
+        }
+        rejectResponse(new byte[]{0, 0, 0}, "EOR zero");
+        rejectResponse(new byte[]{0, 8, 0}, "unknown EOR reason");
+        System.out.println("response truncations, unsupported headers, overlong VBAS, missing payload and EOR reasons");
+    }
+
     private static void responseProgress() throws Exception {
         // One byte of metadata bin 0, followed by a byte-limit EOR.
         byte[] message = {0x60, 8, 0, 0, 1, 42, 0, 4, 0};
@@ -246,11 +291,32 @@ public final class J2KNativeTest {
     }
 
     private static void palettes(Path folder) throws Exception {
-        for (String name : List.of("small", "clamped", "gray", "swap", "mapped", "unsigned3", "signed4", "unsigned10", "signed10"))
-            local(folder.resolve(name + ".jp2"));
-        // The primitive compositor expands two-bit samples to grayscale; indices must stay 0,1,2,3.
-        try (J2KNative source = new J2KNative(folder.resolve("index2.jp2"))) {
-            check(Arrays.equals(pixels(source, 0, 0), new byte[]{0, 1, 2, 3}), "two-bit palette indices");
+        for (String name : List.of("small", "index2", "clamped", "gray", "swap", "mapped", "unsigned3", "signed4", "unsigned10", "signed10")) {
+            // Fixed RGBA bytes for the samples and mappings written by palette_fixtures.
+            int[] colors = switch (name) {
+                case "small", "index2" -> new int[]{0x000000ff, 0xff0000ff, 0x00ff00ff, 0x0000ffff};
+                case "clamped" -> new int[]{0x000000ff, 0xff0000ff};
+                case "gray" -> new int[]{0x000000ff, 0x000000ff, 0x000000ff, 0xffffffff};
+                case "swap" -> new int[]{0x000000ff, 0x0000ffff, 0x00ff00ff, 0xff0000ff};
+                case "mapped" -> new int[]{0x000000ff, 0x00ff00ff, 0x0000ffff, 0xff0000ff};
+                case "unsigned3" -> new int[]{0x000000ff, 0x494949ff, 0x929292ff, 0xffffffff};
+                case "signed4" -> new int[]{0x000000ff, 0x555555ff, 0xaaaaaaff, 0xffffffff};
+                case "unsigned10", "signed10" -> new int[]{0x000000ff, 0x555555ff, 0xabababff, 0xffffffff};
+                default -> throw new AssertionError("Missing palette expectation: " + name);
+            };
+            Path path = folder.resolve(name + ".jp2");
+            try (J2KNative source = new J2KNative(path)) {
+                ByteBuffer table = source.palette(0);
+                check(table != null && table.remaining() == 256 * 4, "palette table size: " + name);
+                for (int entry = 0; entry < 256; entry++)
+                    check(table.getInt(4 * entry) == colors[Math.min(entry, colors.length - 1)],
+                            "palette RGBA bytes: " + name + " entry " + entry);
+                // The primitive compositor expands two-bit samples to grayscale; indices must stay 0,1,2,3.
+                if (name.equals("index2"))
+                    check(Arrays.equals(pixels(source, 0, 0), new byte[]{0, 1, 2, 3}), "two-bit palette indices");
+            }
+            if (!name.equals("index2"))
+                local(path);
         }
         for (String name : List.of("index9", "signed-index")) {
             try (J2KNative source = new J2KNative(folder.resolve(name + ".jp2"))) {
@@ -375,12 +441,16 @@ public final class J2KNativeTest {
     // Arguments: Kakadu library, bridge library, folder made by run_native_test.sh, its image, then JP2/JPX files.
     public static void main(String[] args) throws Exception {
         // Check a prebuilt set without building the server or generating responses.
-        if (args[0].equals("--local")) {
+        if (args[0].equals("--local") || args[0].equals("--responses")) {
             Path libraries = Path.of(args[1]);
             if (System.getProperty("os.name").startsWith("Windows"))
                 System.load(libraries.resolve("kdu_v7AR.dll").toString());
             System.load(libraries.resolve(System.mapLibraryName("kdu_jni")).toString());
             System.load(libraries.resolve(System.mapLibraryName("jhvj2k")).toString());
+            if (args[0].equals("--responses")) {
+                responseParsing();
+                return;
+            }
             responseProgress();
             palettes(Path.of(args[2]));
             for (int i = 3; i < args.length; i++)
@@ -390,6 +460,7 @@ public final class J2KNativeTest {
         }
         System.load(args[0]);
         System.load(args[1]);
+        responseParsing();
         responseProgress();
         Path folder = Path.of(args[2]), image = Path.of(args[4]);
         for (int i = 4; i < args.length; i++)

@@ -47,5 +47,9 @@ EOF
 classpath=$(find lib extra/test/j2k/lib -name '*.jar' | tr '\n' ':')
 javac -nowarn -cp "$classpath" -d "$test/classes" \
     src/org/helioviewer/jhv/view/j2k/J2KNative.java extra/test/j2k/J2KNativeTest.java
-java --enable-native-access=ALL-UNNAMED -cp "$classpath$test/classes" \
-    org.helioviewer.jhv.view.j2k.J2KNativeTest "$kdu" "$library" "$test" "$image" "$@"
+python3 - "$classpath$test/classes" "$kdu" "$library" "$test" "$image" "$@" <<'EOF'
+import os, subprocess, sys
+subprocess.run(["java", "--enable-native-access=ALL-UNNAMED", "-cp", sys.argv[1],
+                "org.helioviewer.jhv.view.j2k.J2KNativeTest", *sys.argv[2:]],
+               check=True, timeout=int(os.environ.get("JHV_NATIVE_TEST_TIMEOUT", "600")))
+EOF

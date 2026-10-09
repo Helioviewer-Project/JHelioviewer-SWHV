@@ -20,9 +20,10 @@ public final class J2KReaderTest {
     private enum Mode { SEQUENTIAL, PREFETCH, CACHED, DAMAGED }
 
     public static void main(String[] arguments) throws Exception {
+        testResolutions();
         testContinuation();
         if (arguments.length == 0) {
-            System.out.println("PASS: reader continuation, stalled windows, EOR validation and interruption without native libraries");
+            System.out.println("PASS: resolution boundaries, reader continuation, stalled windows, EOR validation and interruption without native libraries");
             return;
         }
         System.load(arguments[0]);
@@ -47,6 +48,28 @@ public final class J2KReaderTest {
         } finally {
             close.invoke(null);
         }
+    }
+
+    private static void testResolutions() {
+        ResolutionSet set = new ResolutionSet(new ResolutionSet.Level[]{
+                new ResolutionSet.Level(0, 100, 60), new ResolutionSet.Level(1, 50, 30),
+                new ResolutionSet.Level(2, 25, 15)}, 1);
+        for (int[] expected : new int[][]{{101, 61, 0}, {100, 60, 0}, {51, 30, 0}, {50, 31, 0},
+                {50, 30, 1}, {49, 29, 1}, {26, 15, 1}, {25, 16, 1}, {25, 15, 2}, {24, 14, 2}, {0, 0, 2}}) {
+            if (set.getNextLevel(expected[0], expected[1]).level() != expected[2])
+                throw new AssertionError("Wrong resolution at boundary " + Arrays.toString(expected));
+        }
+        ResolutionSet single = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, 100, 60)}, 1);
+        if (single.getNextLevel(1, 1).level() != 0 || single.getNextLevel(101, 61).level() != 0)
+            throw new AssertionError("Single resolution selection");
+        if (set.isDisplayable())
+            throw new AssertionError("Unready resolutions are displayable");
+        set.setCompleteLevels(1);
+        if (!set.getComplete(2) || set.getComplete(1) || set.getCompleteLevel(0).level() != 2)
+            throw new AssertionError("Coarsest completion");
+        set.setCompleteLevels(2);
+        if (!set.getComplete(1) || set.getComplete(0) || set.getCompleteLevel(0).level() != 1)
+            throw new AssertionError("Progressive completion");
     }
 
     private static void testContinuation() throws Exception {

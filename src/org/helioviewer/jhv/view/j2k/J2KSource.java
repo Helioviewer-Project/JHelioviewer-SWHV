@@ -46,7 +46,8 @@ public final class J2KSource {
         return client;
     }
 
-    // JPIP: once the metadata has arrived.
+    // Initializes the frame array in the local constructor or JPIP reader constructor,
+    // after metadata arrives and before the source is exposed to its view.
     void loadFrames() throws IOException {
         sets = new AtomicReferenceArray<>(client.frames());
     }

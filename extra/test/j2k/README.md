@@ -37,6 +37,8 @@ The default suite is offline and needs no JPEG 2000 native library:
   The test verifies that its cache stays beneath its temporary directory. On non-Windows hosts,
   it also runs with Windows cache-path selection enabled. The runner isolates both `user.home`
   and `java.io.tmpdir`; Windows requires an ASCII temporary path and fails before testing otherwise.
+- Resolution selection: exact dimensions, one pixel above and below each boundary,
+  either axis of a rectangular image, a single level and progressive completion.
 
 To also retrieve from ROB using the actual JPIP socket, client, disk cache and decoder:
 
@@ -46,6 +48,9 @@ python3 extra/test/j2k/run_j2k_tests.py --live
 
 The native libraries come from the natives jar of the host; `--bridge PATH` supplies a
 `libjhvj2k` built by `native/jpeg2000/build.sh` while the jar has none.
+GC-dependent abandoned-view cleanup is opt-in with `--live --cleaner`.
+The live view test has a 480-second internal deadline,
+with a 510-second process timeout so it can report its own failure first.
 
 `J2KReaderTest` shares reader setup, raw decoding and cache restoration checks for an image
 and a movie. The single-frame fixture is an AIA 171 image from September 9, 2026. It retrieves
@@ -80,13 +85,14 @@ through a local server. The server holds both replies until the prefetch pump ha
 The real `signal()` method queues newer work, then both replies are released: the pump must
 consume them and yield without requesting a third frame. Its worker stays unstarted for this check;
 the test does not replace the signal queue. The same captures drive the retry and refusal checks.
-Two failed passes must recover with an immediate first retry and a pause
-before the second. Fourteen consecutive failed passes must exhaust retries and log the cause once,
+Two failed passes must recover, with a pause before the second retry. There is no upper
+elapsed-time assertion on the first retry: scheduling stalls are not reader-imposed pauses.
+Fourteen consecutive failed passes must exhaust retries and log the cause once,
 even when every pass accepts byte-limited data before failing. A conflicting response must stop
 the reader and purge this source's disk entries while preserving an unrelated entry. Equal-length
 timestamp edits create duplicate and out-of-order frames: both movies must be rejected with
 the offending frame indices and timestamps, and their connections must close before background
-downloading starts. Ordered movies retain their per-frame disk keys. No capture folders are required.
+downloading starts. Ordered movies retain their per-frame disk keys.
 
 The live suite also downloads a Callisto JP2 through the ROB API and checks horizontal
 crops at the origin, interior, and right edge against a full-image decode. It exercises
@@ -104,6 +110,8 @@ It builds the bridge and checks it, through `J2KNative`, against Kakadu's
 compositor as an independent decoder: geometry and pixels of every frame and level of the
 given files, JPIP responses written by esajpip's server code, cache entries, refusals and
 failures. The compositor's Java binding, `lib/kdu_jni.jar` here, is used by tests only.
+The Java process has a 600-second timeout; set `JHV_NATIVE_TEST_TIMEOUT` to change
+that budget for a larger supplied corpus. This also bounds a stalled native compositor call.
 
 For prebuilt KDU and bridge libraries, use the same native test without building
 the server or generating JPIP responses:
@@ -115,6 +123,15 @@ python3 extra/test/j2k/check_native_build.py /path/to/platform-libraries --esajp
 This checks committed RGB, grayscale and JPX fixtures and supports macOS, Linux
 and Windows. On Windows it loads the core DLL before JNI/support and the bridge;
 the file-descriptor count check applies only on Unix.
+With a 64 MiB Java heap, it also checks response parsing through the FFM binding:
+every truncated prefix, unknown classes, reserved headers, overlong VBAS, a missing
+2 GiB payload, and defined and invalid EOR reasons. Native allocation is outside
+the Java heap limit; the missing-payload case must return a refusal.
+Response checks have a 30-second process timeout; fixture decoding has a separate
+300-second timeout, and compilation has a 60-second timeout.
+Generated palette fixtures assert fixed RGBA bytes for channel ordering, grayscale
+replication, signed and unsigned sample conversion, opaque alpha and last-entry padding.
+Palette indices are compared as raw components, separately from their color tables.
 
 Test classes, extracted native libraries, and cache data use temporary directories, cleaned
 up on normal exit. The live runner supports macOS and Linux x86-64.

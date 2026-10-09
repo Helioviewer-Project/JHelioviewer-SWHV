@@ -40,9 +40,14 @@ public class ResolutionSet {
 
     Level getClosestLevel(int w, int h) {
         Level closest = resolutions[0];
-        for (Level res : resolutions) {
-            if (Math.abs(res.width - w) + Math.abs(res.height - h) < Math.abs(closest.width - w) + Math.abs(closest.height - h))
+        int bestDistance = Math.abs(closest.width - w) + Math.abs(closest.height - h);
+        for (int i = 1; i < resolutions.length; i++) {
+            Level res = resolutions[i];
+            int distance = Math.abs(res.width - w) + Math.abs(res.height - h);
+            if (distance < bestDistance) {
                 closest = res;
+                bestDistance = distance;
+            }
         }
         return closest;
     }

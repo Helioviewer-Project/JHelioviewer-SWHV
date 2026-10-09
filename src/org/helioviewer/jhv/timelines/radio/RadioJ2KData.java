@@ -38,7 +38,6 @@ class RadioJ2KData {
     private final double startFreq;
     private final double endFreq;
     private final int j2kWidth;
-    private final int j2kHeight;
     private final boolean willDraw;
 
     private BufferedImage bufferedImage;
@@ -51,7 +50,6 @@ class RadioJ2KData {
         try {
             ResolutionSet.Level resLevel = source.level(0, 0);
             j2kWidth = resLevel.width();
-            j2kHeight = resLevel.height();
 
             String xml = source.xml(0);
             if (xml == null)
@@ -80,7 +78,6 @@ class RadioJ2KData {
         bufferedImage = null;
     }
 
-    // A pixel of a level covers 2^level source pixels, also where the rows do not halve evenly.
     private void show(Crop crop, byte[] pixels) {
         displayedCrop = crop;
         boolean hadData = bufferedImage != null;
@@ -183,19 +180,15 @@ class RadioJ2KData {
 
         long timeWidth = endDate - startDate;
         double firstColumn = displayedCrop.x << displayedCrop.level;
-        double endColumn = firstColumn + (displayedCrop.width << displayedCrop.level);
+        double endColumn = Math.min(firstColumn + ((long) displayedCrop.width << displayedCrop.level), j2kWidth);
         long imStart = (long) (startDate + timeWidth * firstColumn / j2kWidth);
         long imEnd = (long) (startDate + timeWidth * endColumn / j2kWidth);
-
-        double freqWidth = endFreq - startFreq;
-        double rows = displayedCrop.height << displayedCrop.level;
-        double freqimEnd = startFreq + freqWidth * rows / j2kHeight;
 
         g.drawImage(bufferedImage,
                 xMapper.toPixel(imStart),
                 yMapper.dataToPixel(startFreq),
                 xMapper.toPixel(imEnd),
-                yMapper.dataToPixel(freqimEnd),
+                yMapper.dataToPixel(endFreq),
                 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);
     }
 
