@@ -46,7 +46,6 @@ class RadioJ2KData {
     RadioJ2KData(RadioData _owner, APIRequest req, DataUri dataUri) throws Exception {
         owner = _owner;
         source = new J2KSource(dataUri.file().toPath());
-        executor = new LatestWorker<>("Radio-Decoder");
         try {
             ResolutionSet.Level resLevel = source.level(0, 0);
             j2kWidth = resLevel.width();
@@ -64,8 +63,8 @@ class RadioJ2KData {
             }
 
             willDraw = startDate == req.startTime(); // didn't get closest
-        } catch (Exception e) {
-            executor.dispose();
+            executor = new LatestWorker<>("Radio-Decoder");
+        } catch (Exception | Error e) {
             source.close();
             throw e;
         }
