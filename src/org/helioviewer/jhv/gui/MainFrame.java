@@ -189,7 +189,7 @@ public final class MainFrame {
         mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
         mainFrame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
-        Player.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
+        Player.resetToMaster(); //! for nullImageLayer
 
         // Prewarm ANGLE off the EDT, then return here via attachAndRender() to attach the real render canvas.
         startAngleWarmup();

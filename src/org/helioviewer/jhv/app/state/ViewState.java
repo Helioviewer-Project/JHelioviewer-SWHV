@@ -28,10 +28,6 @@ public final class ViewState {
         void recordingConfigChanged();
     }
 
-    public interface PlaybackRangeListener {
-        void playbackRangeChanged();
-    }
-
     public enum PlaybackSpeedUnit {
         FRAMES_PER_SECOND("Frames/sec", 0),
         MINUTES_PER_SECOND("Solar minutes/sec", 60),
@@ -119,7 +115,6 @@ public final class ViewState {
 
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
     private static final ArrayList<PlaybackConfigListener> playbackConfigListeners = new ArrayList<>();
-    private static final ArrayList<PlaybackRangeListener> playbackRangeListeners = new ArrayList<>();
     private static final ArrayList<RecordingConfigListener> recordingConfigListeners = new ArrayList<>();
     private static boolean suppressModeNotifications;
 
@@ -129,8 +124,6 @@ public final class ViewState {
     private static Player.AdvanceMode playbackAdvanceMode = Player.AdvanceMode.Loop;
     private static int playbackSpeed = Player.FPS_RELATIVE_DEFAULT;
     private static PlaybackSpeedUnit playbackSpeedUnit = PlaybackSpeedUnit.FRAMES_PER_SECOND;
-    private static int playbackFirstFrame;
-    private static int playbackLastFrame;
     private static RecordingMode recordingMode = RecordingMode.LOOP;
     private static RecordingSize recordingSize = RecordingSize.ORIGINAL;
 
@@ -139,7 +132,7 @@ public final class ViewState {
     }
 
     public static PlaybackData playbackData() {
-        return new PlaybackData(playbackAdvanceMode, playbackSpeed, playbackSpeedUnit, playbackFirstFrame, playbackLastFrame);
+        return new PlaybackData(playbackAdvanceMode, playbackSpeed, playbackSpeedUnit, Player.getPlaybackFirstFrame(), Player.getPlaybackLastFrame());
     }
 
     public static RecordingData recordingData() {
@@ -427,23 +420,7 @@ public final class ViewState {
         applyPlaybackUpdateRaw(advanceMode, speed, speedUnit, null, null);
     }
 
-    public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
-        int lastFrame = Math.max(0, newPlaybackLastFrame);
-        int firstFrame = Math.clamp(newPlaybackFirstFrame, 0, lastFrame);
-        if (lastFrame != newPlaybackLastFrame)
-            Log.warn("Clamping invalid playback last frame " + newPlaybackLastFrame + " to " + lastFrame);
-        if (firstFrame != newPlaybackFirstFrame)
-            Log.warn("Clamping invalid playback first frame " + newPlaybackFirstFrame + " to " + firstFrame);
-        if (playbackFirstFrame == firstFrame && playbackLastFrame == lastFrame)
-            return;
-
-        applyPlaybackRangeState(firstFrame, lastFrame);
-        notifyPlaybackRangeListeners();
-    }
-
-    private static void applyPlaybackRangeState(int firstFrame, int lastFrame) {
-        playbackFirstFrame = firstFrame;
-        playbackLastFrame = lastFrame;
+    public static void setPlaybackRange(int firstFrame, int lastFrame) {
         Player.setPlaybackRange(firstFrame, lastFrame);
     }
 
@@ -554,17 +531,6 @@ public final class ViewState {
         playbackConfigListeners.remove(listener);
     }
 
-    public static void addPlaybackRangeListener(PlaybackRangeListener listener) {
-        if (!playbackRangeListeners.contains(listener)) {
-            playbackRangeListeners.add(listener);
-            listener.playbackRangeChanged();
-        }
-    }
-
-    public static void removePlaybackRangeListener(PlaybackRangeListener listener) {
-        playbackRangeListeners.remove(listener);
-    }
-
     public static void addRecordingConfigListener(RecordingConfigListener listener) {
         if (!recordingConfigListeners.contains(listener)) {
             recordingConfigListeners.add(listener);
@@ -584,10 +550,6 @@ public final class ViewState {
 
     private static void notifyPlaybackConfigListeners() {
         playbackConfigListeners.forEach(PlaybackConfigListener::playbackConfigChanged);
-    }
-
-    private static void notifyPlaybackRangeListeners() {
-        playbackRangeListeners.forEach(PlaybackRangeListener::playbackRangeChanged);
     }
 
     private static void notifyRecordingConfigListeners() {

@@ -27,7 +27,6 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
-import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -40,7 +39,7 @@ import org.helioviewer.jhv.view.View;
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Player.Listener, Player.StatusListener, ViewState.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Player.Listener, Player.StatusListener, Player.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -79,7 +78,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         Player.addFrameListener(this);
         Player.addStatusListener(this);
         UITimer.register(this);
-        ViewState.addPlaybackRangeListener(this);
+        Player.addPlaybackRangeListener(this);
         setToolTipText(Platform.isMacOS()
                 ? "Drag: scrub • ⌥-drag: trim • ⌘-drag: move"
                 : "Drag: scrub • Alt-drag: trim • Ctrl-drag: move");
@@ -166,10 +165,10 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         setCursor(cursorFor(dragMode));
         int value = sliderUI.valueForXPosition(e.getX());
         switch (dragMode) {
-            case Frame -> setValue(Math.clamp(value, getPlaybackFirstFrame(), getPlaybackLastFrame()));
+            case Frame -> setValue(Math.clamp(value, Player.getPlaybackFirstFrame(), Player.getPlaybackLastFrame()));
             case Range -> dragRange(value);
-            case RangeStart -> setRange(value, getPlaybackLastFrame());
-            case RangeEnd -> setRange(getPlaybackFirstFrame(), value);
+            case RangeStart -> setRange(value, Player.getPlaybackLastFrame());
+            case RangeEnd -> setRange(Player.getPlaybackFirstFrame(), value);
         }
     }
 
@@ -198,8 +197,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
             Commands.pause();
         dragMode = dragModeFor(e);
         dragAnchorValue = sliderUI.valueForXPosition(e.getX());
-        dragRangeMin = getPlaybackFirstFrame();
-        dragRangeMax = getPlaybackLastFrame();
+        dragRangeMin = Player.getPlaybackFirstFrame();
+        dragRangeMax = Player.getPlaybackLastFrame();
         mouseDragged(e);
     }
 
@@ -252,17 +251,9 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     private DragMode nearestBoundary(int x) {
-        int rangeStartX = sliderUI.xPosition(getPlaybackFirstFrame());
-        int rangeEndX = sliderUI.xPosition(getPlaybackLastFrame());
+        int rangeStartX = sliderUI.xPosition(Player.getPlaybackFirstFrame());
+        int rangeEndX = sliderUI.xPosition(Player.getPlaybackLastFrame());
         return Math.abs(x - rangeStartX) <= Math.abs(x - rangeEndX) ? DragMode.RangeStart : DragMode.RangeEnd;
-    }
-
-    private static int getPlaybackFirstFrame() {
-        return ViewState.playbackData().firstFrame();
-    }
-
-    private static int getPlaybackLastFrame() {
-        return ViewState.playbackData().lastFrame();
     }
 
     @Override
@@ -398,8 +389,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
                 }
             }
 
-            int rangeStartX = xPosition(getPlaybackFirstFrame());
-            int rangeEndX = xPosition(getPlaybackLastFrame());
+            int rangeStartX = xPosition(Player.getPlaybackFirstFrame());
+            int rangeEndX = xPosition(Player.getPlaybackLastFrame());
             int left = Math.min(rangeStartX, rangeEndX);
             int right = Math.max(rangeStartX, rangeEndX);
             int width = Math.max(1, right - left + 1);
@@ -408,8 +399,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         }
 
         private void paintRangeMarkers(Graphics2D g) {
-            int rangeStartX = xPosition(getPlaybackFirstFrame());
-            int rangeEndX = xPosition(getPlaybackLastFrame());
+            int rangeStartX = xPosition(Player.getPlaybackFirstFrame());
+            int rangeEndX = xPosition(Player.getPlaybackLastFrame());
             int left = Math.min(rangeStartX, rangeEndX);
             int right = Math.max(rangeStartX, rangeEndX);
             int markerY = trackRect.y + trackRect.height - 1;

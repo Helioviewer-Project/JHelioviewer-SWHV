@@ -50,7 +50,7 @@ public final class Layers {
         nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
         // Replacing the placeholder NullView also needs a full Movie resync when it is active.
         if (activeLayer == nullImageLayer)
-            Player.setMaster(activeLayer);
+            Player.resetToMaster();
     }
 
     @Nonnull
@@ -60,7 +60,7 @@ public final class Layers {
 
     public static void setActiveImageLayer(@Nullable ImageLayer layer) {
         activeLayer = layer == null ? nullImageLayer : layer;
-        Player.setMaster(activeLayer);
+        Player.resetToMaster();
     }
 
     private static int imageLayersCount;

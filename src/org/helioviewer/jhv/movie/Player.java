@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -29,9 +29,15 @@ public class Player {
         void movieStatusChanged();
     }
 
+    public interface PlaybackRangeListener {
+        void playbackRangeChanged();
+    }
+
     public static final int FPS_RELATIVE_DEFAULT = 20;
     public static final int FPS_ABSOLUTE = 30;
 
+    private static int playbackFirstFrame;
+    private static int playbackLastFrame;
     private static JHVTime playbackFirstTime = TimeUtils.START;
     private static JHVTime playbackLastTime = TimeUtils.START;
     private static AdvanceMode advanceMode = AdvanceMode.Loop;
@@ -69,21 +75,40 @@ public class Player {
         return next;
     }
 
-    public static void setMaster(ImageLayer layer) {
-        View view = layer.getView();
-        playbackFirstTime = view.getFirstTime();
-        playbackLastTime = view.getLastTime();
-        ViewState.setPlaybackRange(0, view.getMaximumFrameNumber());
+    public static void resetToMaster() {
+        setPlaybackRange(0, getMaximumFrameNumber());
         syncTime(playbackFirstTime);
         notifyStatusChanged();
         timeRangeChanged();
     }
 
-    public static void setPlaybackRange(int firstFrame, int lastFrame) {
+    public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
+        int lastFrame = Math.max(0, newPlaybackLastFrame);
+        int firstFrame = Math.clamp(newPlaybackFirstFrame, 0, lastFrame);
+        if (lastFrame != newPlaybackLastFrame)
+            Log.warn("Clamping invalid playback last frame " + newPlaybackLastFrame + " to " + lastFrame);
+        if (firstFrame != newPlaybackFirstFrame)
+            Log.warn("Clamping invalid playback first frame " + newPlaybackFirstFrame + " to " + firstFrame);
+
         View view = Layers.getActiveImageLayer().getView();
         int maximum = view.getMaximumFrameNumber();
+        // A replacement view can have the same frame count but different times.
         playbackFirstTime = view.getFrameTime(Math.clamp(firstFrame, 0, maximum));
         playbackLastTime = view.getFrameTime(Math.clamp(lastFrame, 0, maximum));
+        if (playbackFirstFrame == firstFrame && playbackLastFrame == lastFrame)
+            return;
+
+        playbackFirstFrame = firstFrame;
+        playbackLastFrame = lastFrame;
+        playbackRangeListeners.forEach(PlaybackRangeListener::playbackRangeChanged);
+    }
+
+    public static int getPlaybackFirstFrame() {
+        return playbackFirstFrame;
+    }
+
+    public static int getPlaybackLastFrame() {
+        return playbackLastFrame;
     }
 
     public static long getStartTime() {
@@ -217,10 +242,22 @@ public class Player {
         ExportMovie.playbackFrameReady(last);
     }
 
+    private static final ArrayList<PlaybackRangeListener> playbackRangeListeners = new ArrayList<>();
     private static final ArrayList<Listener> frameListeners = new ArrayList<>();
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Change> timeListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Range> timeRangeListeners = new ArrayList<>();
+
+    public static void addPlaybackRangeListener(PlaybackRangeListener listener) {
+        if (!playbackRangeListeners.contains(listener)) {
+            playbackRangeListeners.add(listener);
+            listener.playbackRangeChanged();
+        }
+    }
+
+    public static void removePlaybackRangeListener(PlaybackRangeListener listener) {
+        playbackRangeListeners.remove(listener);
+    }
 
     public static void addFrameListener(Listener listener) {
         if (!frameListeners.contains(listener))
