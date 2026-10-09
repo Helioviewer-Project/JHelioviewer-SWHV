@@ -1,9 +1,10 @@
 package org.helioviewer.jhv.layers;
 
-import java.net.SocketTimeoutException;
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
@@ -22,7 +23,6 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
-import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
@@ -36,43 +36,43 @@ final class ImageLayerLoader {
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("View-Decoder");
     private final ImageProcessingSettings processingSettings;
     private final Consumer<View> onViewLoaded;
-    private final Runnable onUnload;
+    private final Runnable onLoadFailed;
 
-    private Future<View> loadFuture;
+    // Owned by the EDT, including results queued after the worker has exited.
+    private Thread loadThread;
     private Future<?> downloadFuture;
-    private int loadGeneration;
 
-    ImageLayerLoader(ImageProcessingSettings _processingSettings, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
+    ImageLayerLoader(ImageProcessingSettings _processingSettings, @Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onLoadFailed) {
         processingSettings = _processingSettings;
         onViewLoaded = _onViewLoaded;
-        onUnload = _onUnload;
+        onLoadFailed = _onLoadFailed;
     }
 
     void load(APIRequest req) {
-        cancelLoad();
-        int gen = ++loadGeneration;
-        loadFuture = Task.submit(task -> Thread.ofVirtual().name("Image-Load").start(task), () -> {
-                    URI uri = requestAPI(req.toJpipRequest());
-                    return uri == null ? null : createView(req, uri);
-                },
-                result -> onSuccess(result, gen),
-                t -> onFailure(t, gen));
+        load(() -> createView(req, requestAPI(req.toJpipRequest())));
     }
 
     void load(List<URI> uriList) {
+        load(() -> loadUri(uriList));
+    }
+
+    private void load(Callable<View> task) {
         cancelLoad();
-        int gen = ++loadGeneration;
-        loadFuture = Task.submit(task -> Thread.ofVirtual().name("Image-Load").start(task), () -> loadUri(uriList),
-                result -> onSuccess(result, gen),
-                t -> onFailure(t, gen));
+        loadThread = Thread.ofVirtual().name("Image-Load").unstarted(() -> {
+            Thread worker = Thread.currentThread();
+            try {
+                View result = task.call();
+                // Unlike FutureTask cancellation, this always transfers the result for cleanup.
+                EventQueue.invokeLater(() -> finishLoad(worker, result, null));
+            } catch (Throwable t) {
+                EventQueue.invokeLater(() -> finishLoad(worker, null, t));
+            }
+        });
+        loadThread.start();
     }
 
     boolean isLoading() {
-        return loadFuture != null;
-    }
-
-    void clearLoadFuture() {
-        loadFuture = null;
+        return loadThread != null;
     }
 
     void startDownload(APIRequest req, ImageLayer layer, String baseName, DownloadLayer.Progress progress) {
@@ -81,10 +81,9 @@ final class ImageLayerLoader {
     }
 
     void cancelLoad() {
-        loadGeneration++; // Invalidate any pending callbacks
-        if (loadFuture != null) {
-            loadFuture.cancel(true);
-            loadFuture = null;
+        if (loadThread != null) {
+            loadThread.interrupt();
+            loadThread = null;
         }
     }
 
@@ -101,41 +100,37 @@ final class ImageLayerLoader {
         executor.dispose();
     }
 
-    private void onSuccess(View result, int gen) {
-        if (gen != loadGeneration) {
-            if (result != null) {
+    private void finishLoad(Thread worker, @Nullable View result, @Nullable Throwable error) {
+        if (worker != loadThread) {
+            if (result != null)
                 result.abolish();
-            }
             return;
         }
-        if (result != null) {
+        loadThread = null;
+        if (error == null) {
             onViewLoaded.accept(result);
-        } else {
-            onUnload.run();
-        }
-    }
-
-    private void onFailure(Throwable t, int gen) {
-        if (gen != loadGeneration) {
             return;
         }
-        if (AppThread.isInterrupted(t)) {
-            Log.warn(t);
+        onLoadFailed.run();
+        if (AppThread.isInterrupted(error)) {
+            Log.warn(error);
             return;
         }
-        onUnload.run();
 
-        Log.errorStack(t);
-        Message.err("Error getting the data", t.getMessage());
+        Log.errorStack(error);
+        Message.err("Error getting the data", error.getMessage());
     }
 
     private View loadUri(List<URI> uriList) throws Exception {
         if (uriList.size() == 1) {
             return createView(null, uriList.getFirst());
         } else {
+            Thread worker = Thread.currentThread();
             // Keep JPIP initialization on the interruptible loader thread.
             boolean jpip = uriList.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
             List<View> views = (jpip ? uriList.stream() : uriList.parallelStream()).map(uri -> {
+                if (worker.isInterrupted())
+                    return null;
                 try {
                     return createView(null, uri);
                 } catch (Exception e) {
@@ -143,7 +138,12 @@ final class ImageLayerLoader {
                     return null;
                 }
             }).filter(Objects::nonNull).toList();
-            return new ManyView(views);
+            try {
+                return new ManyView(views);
+            } catch (Throwable t) {
+                views.forEach(View::abolish);
+                throw t;
+            }
         }
     }
 
@@ -162,21 +162,15 @@ final class ImageLayerLoader {
         return loadUri(uriList);
     }
 
-    @Nullable
-    private static URI requestAPI(String url) throws Exception {
+    private URI requestAPI(String url) throws Exception {
         try {
             return parseAPIResponse(JSONUtils.get(new URI(url)));
-        } catch (SocketTimeoutException e) {
-            Log.error("Socket timeout while requesting JPIP URL", e);
-            Message.err("Socket timeout", "Socket timeout while requesting JPIP URL.");
         } catch (Exception e) {
-            throw new Exception("Invalid response for " + url, e);
+            throw new Exception("Invalid response for " + url + ": " + e.getMessage(), e);
         }
-        return null;
     }
 
-    @Nullable
-    private static URI parseAPIResponse(JSONObject data) throws Exception {
+    private URI parseAPIResponse(JSONObject data) throws Exception {
         if (!data.isNull("frames")) {
             JSONArray arr = data.getJSONArray("frames");
             data.put("frames", arr.length()); // don't log timestamps, modifies input
@@ -185,13 +179,15 @@ final class ImageLayerLoader {
 
         String message = data.optString("message", null);
         if (message != null) {
-            Message.warn("Warning", message);
+            Thread worker = Thread.currentThread();
+            EventQueue.invokeLater(() -> {
+                if (worker == loadThread)
+                    Message.warn("Warning", message);
+            });
         }
         String error = data.optString("error", null);
         if (error != null) {
-            Log.error(error);
-            Message.err("Error getting the data", error);
-            return null;
+            throw new Exception(error);
         }
         return new URI(data.getString("uri"));
     }

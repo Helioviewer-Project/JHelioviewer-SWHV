@@ -73,7 +73,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         view = new BaseView(null, null, processingSettings);
 
         glImage = new GLSLImage(displaySettings);
-        loader = new ImageLayerLoader(processingSettings, this::setView, this::unload);
+        loader = new ImageLayerLoader(processingSettings, this::setView, this::loadFailed);
 
         if (jo != null) {
             applyImageParams(jo.optJSONObject("imageParams"));
@@ -118,8 +118,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void load(APIRequest req) {
         if (removed)
             return;
-        if (req.equals(view.getAPIRequest()))
+        if (req.equals(view.getAPIRequest())) {
+            loader.cancelLoad();
+            Layers.fireLayerUpdated(this);
             return;
+        }
 
         loader.load(req);
         Layers.fireLayerUpdated(this); // give feedback asap
@@ -133,10 +136,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 
-    public void unload() {
-        if (view.getBaseName() == null)
+    private void loadFailed() {
+        if (view.getClass() == BaseView.class)
             Layers.remove(this);
-        loader.cancelLoad();
+        else
+            Layers.fireLayerUpdated(this);
     }
 
     @Override
@@ -155,7 +159,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         boolean firstLoad = view.getClass() == BaseView.class;
         unsetView();
         view = _view;
-        loader.clearLoadFuture();
         view.setDataHandler(this);
         displaySettings.setLUT(view.getDefaultLUT(), displaySettings.getInvertLUT());
 

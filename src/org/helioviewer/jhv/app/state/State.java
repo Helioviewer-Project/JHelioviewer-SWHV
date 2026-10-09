@@ -179,7 +179,7 @@ public final class State {
             for (Object o : imageLayers) {
                 if (o instanceof JSONObject jo) {
                     JSONObject jd = jo.optJSONObject("data");
-                    if (jd == null)
+                    if (jd == null || jd.optJSONObject("APIRequest") == null)
                         continue;
 
                     try {
@@ -216,7 +216,6 @@ public final class State {
         }
 
         void onSuccess(Void result) {
-            newLayers.keySet().forEach(ImageLayer::unload); // prune failed layers
             for (ImageLayer layer : Layers.getImageLayers()) {
                 Boolean enabled = newLayers.get(layer);
                 if (enabled != null) // user may have loaded a new layer in the meanwhile
