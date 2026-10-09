@@ -6,7 +6,6 @@ import java.lang.ref.Cleaner;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
@@ -326,15 +325,11 @@ public final class J2KView extends BaseView {
         }
 
         MetaData m = metaData[decodeParams.frame()];
-        try {
-            executor.submit(
-                    key,
-                    () -> decodeImage(decodeParams, key.filter, m),
-                    decodeCallback(key, decodeParams.frame(), currentViewpoint,
-                            () -> key.filter == processingSettings.getFilter()));
-        } catch (RejectedExecutionException ignore) {
-            // Teardown may dispose the worker before a late decode request.
-        }
+        executor.submit(
+                key,
+                () -> decodeImage(decodeParams, key.filter, m),
+                decodeCallback(key, decodeParams.frame(), currentViewpoint,
+                        () -> key.filter == processingSettings.getFilter()));
     }
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.

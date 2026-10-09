@@ -21,7 +21,6 @@ import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
@@ -112,38 +111,31 @@ final class ImageLayerLoader {
             return;
         }
         onLoadFailed.run();
-        if (AppThread.isInterrupted(error)) {
-            Log.warn(error);
-            return;
-        }
-
         Log.errorStack(error);
         Message.err("Error getting the data", error.getMessage());
     }
 
     private View loadUri(List<URI> uriList) throws Exception {
-        if (uriList.size() == 1) {
+        if (uriList.size() == 1)
             return createView(null, uriList.getFirst());
-        } else {
-            Thread worker = Thread.currentThread();
-            // Keep JPIP initialization on the interruptible loader thread.
-            boolean jpip = uriList.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
-            List<View> views = (jpip ? uriList.stream() : uriList.parallelStream()).map(uri -> {
-                if (worker.isInterrupted())
-                    return null;
-                try {
-                    return createView(null, uri);
-                } catch (Exception e) {
-                    Log.warn(uri.toString(), e);
-                    return null;
-                }
-            }).filter(Objects::nonNull).toList();
+        Thread worker = Thread.currentThread();
+        // Keep JPIP initialization on the interruptible loader thread.
+        boolean jpip = uriList.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
+        List<View> views = (jpip ? uriList.stream() : uriList.parallelStream()).map(uri -> {
+            if (worker.isInterrupted())
+                return null;
             try {
-                return new ManyView(views);
-            } catch (Throwable t) {
-                views.forEach(View::abolish);
-                throw t;
+                return createView(null, uri);
+            } catch (Exception e) {
+                Log.warn(uri.toString(), e);
+                return null;
             }
+        }).filter(Objects::nonNull).toList();
+        try {
+            return new ManyView(views);
+        } catch (Throwable t) {
+            views.forEach(View::abolish);
+            throw t;
         }
     }
 
@@ -152,14 +144,9 @@ final class ImageLayerLoader {
         return switch (dataUri.format()) {
             case JPIP, JP2, JPX -> new J2KView(executor, req, dataUri, processingSettings);
             case FITS, PNG, JPEG -> new URIView(executor, dataUri, processingSettings);
-            case ZIP -> loadZip(dataUri.uri());
+            case ZIP -> loadUri(FileUtils.unZip(dataUri.uri()));
             default -> throw new Exception("Unknown image type");
         };
-    }
-
-    private View loadZip(URI uriZip) throws Exception {
-        List<URI> uriList = FileUtils.unZip(uriZip);
-        return loadUri(uriList);
     }
 
     private URI requestAPI(String url) throws Exception {

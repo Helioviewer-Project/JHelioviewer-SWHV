@@ -239,7 +239,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         long end = samplingPanel.isSingleFrame() ? start : getEndTime();
         int cadence = getCadence();
         for (DataSourcesTree.SourceItem item : items) {
-            ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
+            ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
             imageLayer.load(new APIRequest(item.server, item.sourceId, start, end, cadence));
         }
     }

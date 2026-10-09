@@ -40,15 +40,18 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private boolean removed;
     protected View view;
 
-    public static ImageLayer create(JSONObject jo) {
-        ImageLayer imageLayer = createDetached(jo);
+    public static ImageLayer create() {
+        ImageLayer imageLayer = new ImageLayer();
         Layers.add(imageLayer);
         return imageLayer;
     }
 
     // Only for state restore, which batches layer registration.
     public static ImageLayer createDetached(JSONObject jo) {
-        return new ImageLayer(jo);
+        ImageLayer imageLayer = new ImageLayer();
+        imageLayer.applyImageParams(jo.optJSONObject("imageParams"));
+        imageLayer.load(APIRequest.fromJson(jo.getJSONObject("APIRequest")));
+        return imageLayer;
     }
 
     @Override
@@ -69,19 +72,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         loader = new ImageLayerLoader(processingSettings, v -> {}, () -> {});
     }
 
-    private ImageLayer(JSONObject jo) {
+    private ImageLayer() {
         view = new BaseView(null, null, processingSettings);
 
         glImage = new GLSLImage(displaySettings);
         loader = new ImageLayerLoader(processingSettings, this::setView, this::loadFailed);
-
-        if (jo != null) {
-            applyImageParams(jo.optJSONObject("imageParams"));
-
-            JSONObject apiRequest = jo.optJSONObject("APIRequest");
-            if (apiRequest != null)
-                load(APIRequest.fromJson(apiRequest));
-        }
     }
 
     public void applyImageParams(@Nullable JSONObject imageParams) {
@@ -157,6 +152,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     void setView(View _view) {
         // Only the initial placeholder is a bare BaseView.
         boolean firstLoad = view.getClass() == BaseView.class;
+        loader.cancelDownload();
         unsetView();
         view = _view;
         view.setDataHandler(this);
@@ -176,8 +172,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     private void unsetView() {
-        loader.cancelDownload();
-
         DisplayController.zoomMiniToFit();
         view.setDataHandler(null);
         view.abolish();
@@ -414,10 +408,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     public void startDownload(DownloadLayer.Progress progress) {
-        cancelDownloadTask();
         APIRequest req = view.getAPIRequest();
-        if (req != null && view.getBaseName() != null) // should not happen
-            loader.startDownload(req, this, view.getBaseName(), progress);
+        String baseName = view.getBaseName();
+        if (req != null && baseName != null) // should not happen
+            loader.startDownload(req, this, baseName, progress);
     }
 
 }

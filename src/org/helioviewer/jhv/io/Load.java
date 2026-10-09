@@ -42,7 +42,7 @@ public final class Load {
             }
 
             try {
-                ImageLayer layer = ImageLayer.create(null);
+                ImageLayer layer = ImageLayer.create();
                 layer.applyImageParams(imageParams);
                 layer.load(resolved);
                 future.complete(layer);

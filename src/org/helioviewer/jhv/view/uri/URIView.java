@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -76,14 +75,10 @@ public final class URIView extends BaseView {
             return;
         }
         ImageFilter filter = ImageFilter.of(key.filter(), imageRegion, metaData[0]);
-        try {
-            executor.submit(
-                    key,
-                    () -> decodeImage(key, filter),
-                    decodeCallback(key, 0, viewpoint, () -> key.equals(decodeKey())));
-        } catch (RejectedExecutionException ignore) {
-            // Teardown may dispose the worker before a late decode request.
-        }
+        executor.submit(
+                key,
+                () -> decodeImage(key, filter),
+                decodeCallback(key, 0, viewpoint, () -> key.equals(decodeKey())));
     }
 
     @Nullable
