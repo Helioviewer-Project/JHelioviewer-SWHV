@@ -32,7 +32,6 @@ import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.view.View;
@@ -381,12 +380,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
             g.setStroke(thickStroke);
 
             int y = slider.getSize().height / 2;
-            View view;
-            ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer == null) {
-                g.setColor(emptyColor);
-                g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
-            } else if ((view = layer.getView()).isComplete()) {
+            View view = Layers.getActiveImageLayer().getView();
+            if (view.isComplete()) {
                 g.setColor(completeColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {

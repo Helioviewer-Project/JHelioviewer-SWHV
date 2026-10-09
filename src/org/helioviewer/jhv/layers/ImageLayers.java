@@ -168,19 +168,17 @@ public final class ImageLayers {
         }
 
         ImageLayer activeLayer = Layers.getActiveImageLayer();
-        if (activeLayer != null) {
-            APIRequest req;
-            if ((req = activeLayer.getView().getAPIRequest()) != null) {
-                str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
-            }
-            View.ImageData id;
-            if ((id = activeLayer.getImageData()) != null) {
-                Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
-                str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
-                str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
-                str.append(String.format("&width=%.1f", region.width));
-                str.append(String.format("&height=%.1f", region.height));
-            }
+        APIRequest req = activeLayer.getView().getAPIRequest();
+        if (req != null) {
+            str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
+        }
+        View.ImageData id = activeLayer.getImageData();
+        if (id != null) {
+            Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
+            str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
+            str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
+            str.append(String.format("&width=%.1f", region.width));
+            str.append(String.format("&height=%.1f", region.height));
         }
 
         long start = Player.getStartTime();
@@ -193,12 +191,12 @@ public final class ImageLayers {
     }
 
     public static void getSAMPMessage(Message msg) {
-        View.ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
-        if (activeLayer == null || activeLayer.getView().getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
+        APIRequest req = activeLayer.getView().getAPIRequest();
+        View.ImageData id = activeLayer.getImageData();
+        if (req == null || id == null)
             return;
 
-        APIRequest req = activeLayer.getView().getAPIRequest();
         msg.addParam("timestamp", Player.getTime().toString());
         msg.addParam("start", TimeUtils.format(Player.getStartTime()));
         msg.addParam("end", TimeUtils.format(Player.getEndTime()));

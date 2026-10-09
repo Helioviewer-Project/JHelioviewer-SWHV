@@ -150,9 +150,6 @@ public final class ExportMovie {
                          ViewState.RecordingData recordingData, int fps) {
             operationContext = _operationContext;
             mode = recordingData.mode();
-            if (mode == ViewState.RecordingMode.LOOP && !Player.hasActiveImage())
-                throw new IllegalStateException("Loop recording requires an active image.");
-
             ViewState.Size size = recordingData.size().getSize();
             width = mode == ViewState.RecordingMode.SHOT ?
                     size.width() : size.width() / MACROBLOCK * MACROBLOCK;

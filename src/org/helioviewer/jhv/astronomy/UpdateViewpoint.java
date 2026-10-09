@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.astronomy;
 
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
@@ -20,8 +19,7 @@ public interface UpdateViewpoint {
     class Observer implements UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
-            ImageLayer layer = Layers.getActiveImageLayer();
-            return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
+            return Layers.getActiveImageLayer().getView().getMetaData(time).getViewpoint();
         }
     }
 

@@ -70,33 +70,20 @@ public class Player {
     }
 
     public static void setMaster(ImageLayer layer) {
-        if (layer == null) {
-            ExportMovie.shallStop();
-            playbackFirstTime = TimeUtils.START;
-            playbackLastTime = TimeUtils.START;
-            ViewState.setPlaybackRange(0, 0);
-        } else {
-            View view = layer.getView();
-            playbackFirstTime = view.getFirstTime();
-            playbackLastTime = view.getLastTime();
-            ViewState.setPlaybackRange(0, view.getMaximumFrameNumber());
-            syncTime(playbackFirstTime);
-        }
+        View view = layer.getView();
+        playbackFirstTime = view.getFirstTime();
+        playbackLastTime = view.getLastTime();
+        ViewState.setPlaybackRange(0, view.getMaximumFrameNumber());
+        syncTime(playbackFirstTime);
         notifyStatusChanged();
         timeRangeChanged();
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer == null) {
-            playbackFirstTime = TimeUtils.START;
-            playbackLastTime = TimeUtils.START;
-        } else {
-            View view = layer.getView();
-            int maximum = view.getMaximumFrameNumber();
-            playbackFirstTime = view.getFrameTime(Math.clamp(firstFrame, 0, maximum));
-            playbackLastTime = view.getFrameTime(Math.clamp(lastFrame, 0, maximum));
-        }
+        View view = Layers.getActiveImageLayer().getView();
+        int maximum = view.getMaximumFrameNumber();
+        playbackFirstTime = view.getFrameTime(Math.clamp(firstFrame, 0, maximum));
+        playbackLastTime = view.getFrameTime(Math.clamp(lastFrame, 0, maximum));
     }
 
     public static long getStartTime() {
@@ -107,55 +94,41 @@ public class Player {
         return movieEnd;
     }
 
-    private static long getMovieStart() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer == null || layer.isLoadingForTimespan())
-            return lastTimestamp.milli;
-        return layer.getStartTime();
-    }
-
-    private static long getMovieEnd() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer == null || layer.isLoadingForTimespan())
-            return lastTimestamp.milli;
-        return layer.getEndTime();
-    }
-
     public static void timeRangeChanged() {
-        movieStart = getMovieStart();
-        movieEnd = getMovieEnd();
+        ImageLayer layer = Layers.getActiveImageLayer();
+        if (layer.isLoadingForTimespan()) {
+            movieStart = lastTimestamp.milli;
+            movieEnd = lastTimestamp.milli;
+        } else {
+            movieStart = layer.getStartTime();
+            movieEnd = layer.getEndTime();
+        }
         timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
     }
 
     private static int deltaT;
 
     private static void relativeTimeAdvance() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            View view = layer.getView();
-            JHVTime next = nextTime(advanceMode, lastTimestamp,
-                    time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
-                    time -> JHVTime.clamp(view.getHigherTime(time), playbackFirstTime, playbackLastTime));
+        View view = Layers.getActiveImageLayer().getView();
+        JHVTime next = nextTime(advanceMode, lastTimestamp,
+                time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
+                time -> JHVTime.clamp(view.getHigherTime(time), playbackFirstTime, playbackLastTime));
 
-            if (next == null)
-                pause();
-            else
-                syncTime(next);
-        }
+        if (next == null)
+            pause();
+        else
+            syncTime(next);
     }
 
     private static void absoluteTimeAdvance() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            JHVTime next = nextTime(advanceMode, lastTimestamp,
-                    time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
-                    time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
+        JHVTime next = nextTime(advanceMode, lastTimestamp,
+                time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
+                time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
 
-            if (next == null)
-                pause();
-            else
-                syncTime(next);
-        }
+        if (next == null)
+            pause();
+        else
+            syncTime(next);
     }
 
     private static final EDTTimer movieTimer = new EDTTimer(1000 / FPS_RELATIVE_DEFAULT, Player::relativeTimeAdvance);
@@ -165,8 +138,7 @@ public class Player {
     }
 
     public static void play() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null && layer.getView().isMultiFrame()) {
+        if (isAvailable()) {
             movieTimer.restart();
             notifyStatusChanged();
         }
@@ -186,31 +158,23 @@ public class Player {
     }
 
     public static void setTime(JHVTime dateTime) {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            syncTime(JHVTime.clamp(layer.getView().getNearestTime(dateTime), playbackFirstTime, playbackLastTime));
-        }
+        View view = Layers.getActiveImageLayer().getView();
+        syncTime(JHVTime.clamp(view.getNearestTime(dateTime), playbackFirstTime, playbackLastTime));
     }
 
     public static void setFrame(int frame) {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            syncTime(JHVTime.clamp(layer.getView().getFrameTime(frame), playbackFirstTime, playbackLastTime));
-        }
+        View view = Layers.getActiveImageLayer().getView();
+        syncTime(JHVTime.clamp(view.getFrameTime(frame), playbackFirstTime, playbackLastTime));
     }
 
     public static void nextFrame() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            syncTime(JHVTime.clamp(layer.getView().getHigherTime(lastTimestamp), playbackFirstTime, playbackLastTime));
-        }
+        View view = Layers.getActiveImageLayer().getView();
+        syncTime(JHVTime.clamp(view.getHigherTime(lastTimestamp), playbackFirstTime, playbackLastTime));
     }
 
     public static void previousFrame() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer != null) {
-            syncTime(JHVTime.clamp(layer.getView().getLowerTime(lastTimestamp), playbackFirstTime, playbackLastTime));
-        }
+        View view = Layers.getActiveImageLayer().getView();
+        syncTime(JHVTime.clamp(view.getLowerTime(lastTimestamp), playbackFirstTime, playbackLastTime));
     }
 
     private static JHVTime lastTimestamp = TimeUtils.START;
@@ -222,17 +186,11 @@ public class Player {
     }
 
     public static boolean isAvailable() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        return layer != null && layer.getView().isMultiFrame();
-    }
-
-    static boolean hasActiveImage() {
-        return Layers.getActiveImageLayer() != null;
+        return Layers.getActiveImageLayer().getView().isMultiFrame();
     }
 
     public static int getMaximumFrameNumber() {
-        ImageLayer layer = Layers.getActiveImageLayer();
-        return layer == null ? 0 : layer.getView().getMaximumFrameNumber();
+        return Layers.getActiveImageLayer().getView().getMaximumFrameNumber();
     }
 
     private static void notifyStatusChanged() {
@@ -251,7 +209,7 @@ public class Player {
 
         timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));
 
-        View view = Layers.getActiveImageLayer().getView(); // should be not null
+        View view = Layers.getActiveImageLayer().getView();
         int activeFrame = view.getCurrentFrameNumber();
         boolean last = view.getFrameTime(activeFrame).equals(playbackLastTime);
 

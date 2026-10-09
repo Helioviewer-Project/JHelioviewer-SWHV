@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -50,11 +53,12 @@ public final class Layers {
             Player.setMaster(activeLayer);
     }
 
+    @Nonnull
     public static ImageLayer getActiveImageLayer() {
         return activeLayer;
     }
 
-    public static void setActiveImageLayer(ImageLayer layer) {
+    public static void setActiveImageLayer(@Nullable ImageLayer layer) {
         activeLayer = layer == null ? nullImageLayer : layer;
         Player.setMaster(activeLayer);
     }

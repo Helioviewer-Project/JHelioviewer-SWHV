@@ -166,9 +166,6 @@ public final class DisplayController {
 
     public static void zoomOneToOne() {
         ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer == null)
-            return;
-
         Camera camera = Display.getCamera();
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         double cameraWidth = oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode);
