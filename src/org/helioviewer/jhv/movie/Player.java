@@ -273,7 +273,7 @@ public class Player {
     public static void setDesiredAbsoluteSpeed(int sec) {
         movieTimer.setTask(Player::absoluteTimeAdvance);
         movieTimer.setDelay(1000 / FPS_ABSOLUTE);
-        deltaT = 1000 / FPS_ABSOLUTE * sec;
+        deltaT = (int) (1000L * sec / FPS_ABSOLUTE);
     }
 
     public static void setAdvanceMode(AdvanceMode mode) {
