@@ -25,12 +25,10 @@ public final class Task {
                 try {
                     T result = get();
                     EventQueue.invokeLater(() -> onSuccess.accept(result));
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
                     Throwable cause = e.getCause();
                     EventQueue.invokeLater(() -> onFailure.accept(cause));
-                } catch (CancellationException e) {
+                } catch (InterruptedException | CancellationException e) {
                     EventQueue.invokeLater(() -> onFailure.accept(e));
                 }
             }

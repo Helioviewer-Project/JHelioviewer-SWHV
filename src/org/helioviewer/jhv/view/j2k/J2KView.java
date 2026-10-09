@@ -134,7 +134,7 @@ public final class J2KView extends BaseView {
     }
 
     private static void clearCache(int aSerial) {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.serial == aSerial);
+        ImageBufferCache.invalidateOwners(Set.of(aSerial));
     }
 
     private record J2KAbolisher(int aSerial, WeakReference<J2KView> aView, J2KReader aReader, J2KSource aSource) implements Runnable {

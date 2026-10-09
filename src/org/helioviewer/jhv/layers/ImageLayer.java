@@ -329,11 +329,12 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private void setImageData(@Nonnull View.ImageData newImageData) {
         long newMilli = newImageData.metaData().getViewpoint().time.milli;
-        if (baseImageData == null || newMilli == view.getFirstTime().milli) {
+        boolean base = baseImageData == null || newMilli == view.getFirstTime().milli;
+        if (base) {
             baseImageData = replaceImageData(baseImageData, newImageData);
         }
 
-        if (imageData == null || baseImageData == newImageData) { // first or loop playback
+        if (imageData == null || base) { // first or loop playback
             prevImageData = replaceImageData(prevImageData, newImageData);
         } else if (newMilli != imageData.metaData().getViewpoint().time.milli) { // new frame
             prevImageData = replaceImageData(prevImageData, imageData);
