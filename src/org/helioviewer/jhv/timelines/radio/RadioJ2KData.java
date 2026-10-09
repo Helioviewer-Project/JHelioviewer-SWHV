@@ -123,8 +123,10 @@ class RadioJ2KData {
             @Override
             public void onFailure(@Nonnull Throwable t, boolean fresh) {
                 LatestWorker.Callback.super.onFailure(t, fresh);
-                if (fresh) // still the last request: ask again
+                if (fresh) { // still the last request: ask again
                     lastState = null;
+                    DrawController.drawRequest();
+                }
             }
         });
     }

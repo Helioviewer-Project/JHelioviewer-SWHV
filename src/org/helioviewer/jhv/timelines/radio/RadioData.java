@@ -176,7 +176,11 @@ public final class RadioData extends TimelineLayer {
         @Override
         public RadioJ2KData call() throws Exception {
             APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ALL);
-            DataUri dataUri = NetFileCache.get(new URI(req.toFileRequest()));
+            URI uri = new URI(req.toFileRequest());
+            // ROB replaces the current day's file as observations arrive.
+            if (date == TimeUtils.floorDay(System.currentTimeMillis()))
+                NetFileCache.invalidate(uri);
+            DataUri dataUri = NetFileCache.get(uri);
             if (dataUri.format() != DataUri.Format.JP2) // paranoia
                 throw new Exception("Invalid data format");
 
@@ -205,8 +209,10 @@ public final class RadioData extends TimelineLayer {
 
     private boolean finishDownload(RadioJP2Download download) {
         boolean removed = downloads.remove(download.date, download);
-        if (removed)
+        if (removed) {
             notifyStateChanged();
+            DrawController.drawRequest();
+        }
         return removed;
     }
 

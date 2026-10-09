@@ -436,7 +436,14 @@ public final class TimelineDataTest {
                 state.put("fullResolution", true);
                 Band full = (Band) Band.deserialize(state);
                 layers.restore(List.of(full));
-                check(TimelineLayers.get().getFirst() == full && layers.getRowCount() == 1, "Restoring full resolution duplicates the layer");
+                check(TimelineLayers.get().getFirst() == full && layers.getRowCount() == 2, "Restoring full resolution duplicates the layer");
+                check(TimelineLayers.get().getLast() instanceof RadioData && !TimelineLayers.get().getLast().isEnabled(), "State without Callisto loses its disabled default");
+
+                RadioData radio = new RadioData(null);
+                layers.restore(List.of(full, radio));
+                check(TimelineLayers.get().getLast() == radio && layers.getRowCount() == 2, "Explicit Callisto entry is replaced or duplicated");
+                layers.restore(List.of());
+                check(layers.getRowCount() == 1 && TimelineLayers.get().getFirst() instanceof RadioData && !TimelineLayers.get().getFirst().isEnabled(), "Empty state loses disabled Callisto");
             } catch (Exception e) {
                 throw new AssertionError(e);
             } finally {

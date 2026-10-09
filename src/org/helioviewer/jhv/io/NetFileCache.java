@@ -43,6 +43,10 @@ public class NetFileCache {
                 }
             });
 
+    public static void invalidate(@Nonnull URI uri) {
+        cache.invalidate(uri);
+    }
+
     public static DataUri get(@Nonnull URI uri) throws IOException {
         try {
             return cache.get(uri);
