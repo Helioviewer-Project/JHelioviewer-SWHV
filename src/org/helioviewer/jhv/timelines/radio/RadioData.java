@@ -155,11 +155,12 @@ public final class RadioData extends TimelineLayer {
         for (long date = lastRequested; date >= firstRequested; date -= TimeUtils.DAY_IN_MILLIS) {
             if (!downloads.containsKey(date) && !cache.containsKey(date)) {
                 RadioJP2Download download = new RadioJP2Download(date);
-                downloads.put(date, download);
-                changed = true;
                 Task.submit(task -> download.thread = Thread.ofVirtual().name("Radio-Download").start(task),
                         download, result -> onSuccessRadioJP2(download, result),
                         t -> onFailureRadioJP2(download, t));
+                // Startup is synchronous; its EDT callbacks run after registration.
+                downloads.put(date, download);
+                changed = true;
             }
         }
         if (changed)
