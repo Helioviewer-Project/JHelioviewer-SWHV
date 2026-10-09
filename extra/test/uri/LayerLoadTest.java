@@ -1,18 +1,20 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
+import java.io.InterruptedIOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.thread.EDTQueue;
 
@@ -69,14 +71,29 @@ public final class LayerLoadTest {
             throw new AssertionError("Load.image of a FITS file did not complete true");
         if (Load.image(bogus).get(60, TimeUnit.SECONDS))
             throw new AssertionError("Load.image of an unreadable file did not complete false");
+        if (Load.image(List.of()).get(60, TimeUnit.SECONDS))
+            throw new AssertionError("Load.image of nothing completed true");
+        Path empty = Files.createTempDirectory("jhv-empty");
         try {
-            Load.image(List.of()).get(10, TimeUnit.SECONDS);
-            throw new AssertionError("Load.image of nothing completed");
-        } catch (ExecutionException e) {
-            if (!"No image files found.".equals(e.getCause().getMessage()))
-                throw new AssertionError("Unexpected failure: " + e.getCause().getMessage(), e);
+            if (Load.image(empty.toUri()).get(60, TimeUnit.SECONDS))
+                throw new AssertionError("Load.image of an empty directory completed true");
+            if (!Load.image(Path.of(arguments[0]).getParent().toUri()).get(120, TimeUnit.SECONDS))
+                throw new AssertionError("Load.image of the fixture directory did not complete true");
+        } finally {
+            Files.delete(empty);
         }
-        System.out.println("PASS: Load.image completes at readiness, false after removal, failing with no files");
+        System.out.println("PASS: Load.image completes at readiness, false after removal, nothing or an empty directory, true for a directory");
+
+        // An interrupted load thread stops enumerating a directory.
+        Thread.currentThread().interrupt();
+        try {
+            FileUtils.resolveURIList(List.of(Path.of(arguments[0]).getParent().toUri()));
+            throw new AssertionError("Interrupted enumeration completed");
+        } catch (InterruptedIOException expected) {
+        } finally {
+            Thread.interrupted();
+        }
+        System.out.println("PASS: directory enumeration stops when interrupted");
 
         EventQueue.invokeAndWait(() -> { // the layers Load.image added are not needed any more
             for (ImageLayer l : List.copyOf(Layers.getImageLayers()))

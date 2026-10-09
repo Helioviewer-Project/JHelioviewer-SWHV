@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,25 +29,16 @@ public final class Load {
         return image(uris, null);
     }
 
-    // Completes once the new layer's load has finished, with whether the layer is still registered;
-    // fails when the URIs resolve to no image files.
+    // A new layer over the files, directories expanded by its loader. Completes once the load has finished,
+    // with whether the layer is still registered; a load that found nothing removes it.
     public static CompletableFuture<Boolean> image(@Nonnull List<URI> uris, @Nullable JSONObject imageParams) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        Task.submitBackground(() -> FileUtils.resolveURIList(uris), resolved -> {
-            if (resolved.isEmpty()) {
-                future.completeExceptionally(new Exception("No image files found."));
-                return;
-            }
-
-            try {
-                ImageLayer layer = ImageLayer.create();
-                layer.applyImageParams(imageParams);
-                layer.load(resolved);
-                layer.whenLoadFinished().thenAccept(future::complete);
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
-        }, future::completeExceptionally);
+        EventQueue.invokeLater(() -> { // layers belong to the EDT; callers come from any thread
+            ImageLayer layer = ImageLayer.create();
+            layer.applyImageParams(imageParams);
+            layer.load(uris);
+            layer.whenLoadFinished().thenAccept(future::complete);
+        });
         return future;
     }
 

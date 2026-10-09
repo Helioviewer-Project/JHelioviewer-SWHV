@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -17,6 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -129,10 +131,17 @@ public final class FileUtils {
         }
     }
 
+    // Stops between entries when the thread is interrupted.
     public static List<URI> listDir(Path path) throws IOException {
+        List<URI> uris = new ArrayList<>();
         try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
-            return stream.map(Path::toUri).toList();
+            for (Iterator<Path> files = stream.iterator(); files.hasNext(); ) {
+                if (Thread.currentThread().isInterrupted())
+                    throw new InterruptedIOException("Directory listing interrupted: " + path);
+                uris.add(files.next().toUri());
+            }
         }
+        return uris;
     }
 
     private static List<URI> expandURI(URI uri) throws IOException {
@@ -148,11 +157,14 @@ public final class FileUtils {
         return listDir(path);
     }
 
-    public static List<URI> resolveURIList(List<URI> uris) {
+    // Directories expanded to their files; an unreadable directory stays as it is. Interruption propagates.
+    public static List<URI> resolveURIList(List<URI> uris) throws InterruptedIOException {
         List<URI> resolved = new ArrayList<>();
         for (URI uri : uris) {
             try {
                 resolved.addAll(expandURI(uri));
+            } catch (InterruptedIOException e) {
+                throw e;
             } catch (Exception e) {
                 Log.warn("Error reading directory: " + uri, e);
                 resolved.add(uri);

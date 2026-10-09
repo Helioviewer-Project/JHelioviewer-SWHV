@@ -62,8 +62,9 @@ final class ImageLayerLoader {
         });
     }
 
+    // Directories are expanded on the load thread, so cancelling covers the enumeration.
     void load(List<URI> uriList) {
-        load(() -> open(null, uriList));
+        load(() -> open(null, FileUtils.resolveURIList(uriList)));
     }
 
     private void load(Callable<Result> task) {
@@ -142,7 +143,7 @@ final class ImageLayerLoader {
         try {
             opened.addAll(openMany(request, uris, failures));
             if (opened.isEmpty())
-                throw new Exception(failures.isEmpty() ? "No images" : String.join("\n", failures));
+                throw new Exception(failures.isEmpty() ? "No image files found." : String.join("\n", failures));
 
             List<Frames.Frame> all = new ArrayList<>();
             for (Opened o : opened)
