@@ -1,9 +1,11 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
+import java.io.InterruptedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -47,8 +49,9 @@ public class DownloadLayer {
         @Override
         public Path call() throws Exception {
             URI uri = new URI(req.toFileRequest());
+            Path partial = Files.createTempFile(dstPath.getParent(), "jhv-", ".part");
             try {
-                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
+                try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(partial))) {
                     long contentLength = nc.getContentLength();
                     long bytesRead, totalRead = 0, lastProgress = 0;
                     Buffer sinkBuffer = sink.getBuffer();
@@ -64,10 +67,14 @@ public class DownloadLayer {
                         }
                     }
                 }
+                if (Thread.currentThread().isInterrupted())
+                    throw new InterruptedIOException("Download canceled");
+                // Publish only after the download and its output stream have finished.
+                Files.move(partial, dstPath, StandardCopyOption.ATOMIC_MOVE);
                 return dstPath;
             } catch (Exception e) {
                 try {
-                    Files.deleteIfExists(dstPath);
+                    Files.deleteIfExists(partial);
                 } catch (Exception e2) {
                     Log.error(e2);
                 }
