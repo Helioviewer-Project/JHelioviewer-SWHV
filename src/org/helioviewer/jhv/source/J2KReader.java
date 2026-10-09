@@ -107,13 +107,17 @@ class J2KReader implements Runnable {
         }
     }
 
-    enum Window { COMPLETE, CONTINUE, STALLED }
+    enum Window {COMPLETE, CONTINUE, STALLED}
 
     @FunctionalInterface
-    interface Request { void send() throws IOException; }
+    interface Request {
+        void send() throws IOException;
+    }
 
     @FunctionalInterface
-    interface Response { J2KNative.Response receive() throws IOException; }
+    interface Response {
+        J2KNative.Response receive() throws IOException;
+    }
 
     static Window window(J2KNative.Response response) throws IOException {
         return switch (response.reason()) {

@@ -115,6 +115,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         if (req.equals(request)) {
             loader.cancelLoad();
             Layers.fireLayerUpdated(this);
+            settleLoad();
             return;
         }
 
@@ -385,8 +386,10 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Layers.fireCompletionUpdated(this);
         boolean moved = frames.select(frames.requested());
         Frames.Frame current = frames.get(frames.current());
-        if (moved || (current.source() == source && current.index() == frame))
-            decoder.redecode(frames);
+        if (moved)
+            decoder.redecode(frames, true);
+        else if (current.source() == source && current.index() == frame)
+            decoder.redecode(frames, false);
         settleLoad();
     }
 

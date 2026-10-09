@@ -27,6 +27,7 @@ public final class J2KSource implements Source {
     private final J2KNative client;
     // An entry exists once the frame's header is known.
     private AtomicReferenceArray<ResolutionSet> sets;
+
     private record Completion(int displayableFrames, int completeFrames) {}
 
     // Published by the reader; consumers see both prefix lengths from the same update.

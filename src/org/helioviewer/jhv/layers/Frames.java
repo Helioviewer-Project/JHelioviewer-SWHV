@@ -57,7 +57,7 @@ public final class Frames implements Source.Listener {
 
         List<Frame> list = new ArrayList<>();
         list.add(empty(start));
-        if (cadence > 0) {
+        if (cadence > 0 && end > start) {
             long t = start;
             while (true) {
                 t += cadence * 1000L;
@@ -237,28 +237,25 @@ public final class Frames implements Source.Listener {
         return frame.source == null || frame.source.displayable(frame.index);
     }
 
-    // Selects the nearest frame, or the nearest displayable one by frame count while that one is not.
+    // Selects the nearest frame, or the nearest displayable one in time while that one is not.
     // True when the selection moved.
     public boolean select(JHVTime time) {
         requested = time;
         int i = nearestIndex(time);
         if (!displayable(i)) {
-            int lo = i - 1, hi = i + 1, found = -1;
-            while (found < 0 && (lo >= 0 || hi < frames.length)) {
-                boolean low = lo >= 0 && displayable(lo);
-                boolean high = hi < frames.length && displayable(hi);
-                if (low && high)
-                    found = time.milli - times[lo].milli <= times[hi].milli - time.milli ? lo : hi;
-                else if (low)
-                    found = lo;
-                else if (high)
-                    found = hi;
+            int lo = i - 1, hi = i + 1;
+            while (lo >= 0 && !displayable(lo))
                 lo--;
+            while (hi < frames.length && !displayable(hi))
                 hi++;
-            }
-            if (found < 0)
+            if (lo < 0 && hi >= frames.length)
                 return false;
-            i = found;
+            if (lo < 0)
+                i = hi;
+            else if (hi >= frames.length)
+                i = lo;
+            else
+                i = time.milli - times[lo].milli <= times[hi].milli - time.milli ? lo : hi;
         }
         if (i == current)
             return false;

@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     if platform.system() == "Windows" and not temporary.isascii():
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
-    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java"]
+    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java"]
     if args.live:
         sources.extend(["J2KFixture.java", "FrameDecoderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
@@ -44,6 +44,8 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.source.jpip." + name],
                        check=True, timeout=60)
+    print("Running FramesTest", flush=True)
+    subprocess.run([*java, "org.helioviewer.jhv.layers.FramesTest"], check=True, timeout=60)
     print("Running J2KReaderTest without native libraries", flush=True)
     subprocess.run([*java, "org.helioviewer.jhv.source.J2KReaderTest"], check=True, timeout=60)
     if platform.system() != "Windows":

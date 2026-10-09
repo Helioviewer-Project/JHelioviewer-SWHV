@@ -291,8 +291,10 @@ public final class FrameDecoderTest {
             frames.setListener((f, source, frame) -> {
                 boolean moved = f.select(f.requested());
                 Frames.Frame current = f.get(f.current());
-                if (moved || (current.source() == source && current.index() == frame))
-                    decoder.redecode(f);
+                if (moved)
+                    decoder.redecode(f, true);
+                else if (current.source() == source && current.index() == frame)
+                    decoder.redecode(f, false);
             });
         });
         return new Opened(frames, decoder, (J2KSource) frames.get(0).source());

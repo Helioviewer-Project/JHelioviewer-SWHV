@@ -65,11 +65,12 @@ final class FrameDecoder {
         viewpoint = _viewpoint;
         pixFactor = _pixFactor;
         priority = _priority;
-        redecode(frames);
+        redecode(frames, true);
     }
 
-    // The current frame at the last viewpoint, scale and priority.
-    void redecode(Frames frames) {
+    // The current frame at the last viewpoint, scale and priority. Without a request, shows what the source
+    // has: a settled frame would otherwise be requested and reported again without end.
+    void redecode(Frames frames, boolean request) {
         if (viewpoint == null || frames.serial() != installation)
             return;
         int index = frames.current();
@@ -81,7 +82,8 @@ final class FrameDecoder {
         int wanted = level(frame, pixFactor);
         // The whole finest complete level while a remote frame lacks the wanted one, read before requesting.
         int available = source.levels(frame.index()).getCompleteLevel(wanted).level();
-        source.request(frame.index(), wanted, priority);
+        if (request)
+            source.request(frame.index(), wanted, priority);
 
         ImageProcessingSettings.FITSParameters fits = source.usesFITSParameters() ? settings.fitsParameters() : null;
         ClipSet.Range clip = fits == null ? null : fits.clipRange(frames.clipSet());

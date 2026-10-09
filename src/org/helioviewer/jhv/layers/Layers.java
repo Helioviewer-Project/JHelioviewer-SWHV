@@ -321,6 +321,7 @@ public final class Layers {
         setActiveImageLayer(null);
         listeners.forEach(Listener::layersCleared);
         ImageLayers.arrangeMultiView();
+        DisplayController.zoomMiniToFit();
     }
 
     private Layers() {}
