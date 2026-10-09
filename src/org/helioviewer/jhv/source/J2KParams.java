@@ -4,6 +4,6 @@ class J2KParams {
 
     record Decode(int frame, int level) {}
 
-    record Read(J2KView view, Decode decodeParams, boolean priority) {}
+    record Read(Decode decodeParams, boolean priority) {}
 
 }

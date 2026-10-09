@@ -307,7 +307,7 @@ class J2KReader implements Runnable {
             }
 
             if (singleFrame)
-                params.view().refreshDecodeFromReader(decode.frame());
+                source.frameUpdated(decode.frame());
             UITimer.completionChanged();
         }
     }
@@ -328,11 +328,10 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            J2KView view = params.view();
             J2KParams.Decode decode = params.decodeParams();
-            ResolutionSet.Level wanted = source.resolutionSet(decode.frame()).getLevel(decode.level());
+            ResolutionSet.Level wanted = source.levels(decode.frame()).getLevel(decode.level());
 
-            view.setDownloading(true);
+            source.setDownloading(true);
 
             try {
                 pauseBeforeRetry(retries);
@@ -351,7 +350,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && finished && !isSettled(wanted.width(), wanted.height())) {
-                    queueIfEmpty(new J2KParams.Read(view, decode, false));
+                    queueIfEmpty(new J2KParams.Read(decode, false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
@@ -376,7 +375,7 @@ class J2KReader implements Runnable {
                 else
                     Log.error("Retry limit reached: " + uri, e);
             } finally {
-                view.setDownloading(false);
+                source.setDownloading(false);
             }
         }
     }

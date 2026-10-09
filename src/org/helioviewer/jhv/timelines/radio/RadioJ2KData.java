@@ -111,7 +111,7 @@ class RadioJ2KData {
             show(crop, pixels);
             return;
         }
-        executor.submit(() -> source.decode(0, crop.level, crop.x, 0, crop.width, crop.height), new LatestWorker.Callback<>() {
+        executor.submit(() -> source.decodeRegion(0, crop.level, crop.x, 0, crop.width, crop.height), new LatestWorker.Callback<>() {
             @Override
             public void onSuccess(byte[] result, boolean fresh) {
                 owner.putDecoded(RadioJ2KData.this, crop, result);

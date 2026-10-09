@@ -19,18 +19,76 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 
-final class GenericImage {
+// One image readable by ImageIO; the file is read again for each decode.
+public final class RasterSource implements Source {
 
-    private GenericImage() {}
+    private record Info(@Nullable String xml, int width, int height, @Nullable LUT lut) {}
 
     private interface ReaderAction<T> {
         T run(ImageReader reader) throws Exception;
     }
+
+    private final File file;
+    private final @Nullable String xml;
+    private final ResolutionSet levels;
+    private final @Nullable LUT lut;
+
+    public RasterSource(File _file) throws Exception {
+        file = _file;
+        Info info = withReader(file, reader -> readInfo(file, reader));
+        xml = info.xml();
+        levels = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, info.width(), info.height())}, 1);
+        lut = info.lut();
+    }
+
+    @Override
+    public int frames() {
+        return 1;
+    }
+
+    @Nullable
+    @Override
+    public String xml(int frame) {
+        return xml;
+    }
+
+    @Override
+    public ResolutionSet levels(int frame) {
+        return levels;
+    }
+
+    @Nullable
+    @Override
+    public LUT lut() {
+        return lut;
+    }
+
+    @Nullable
+    @Override
+    public ClipSet clipSet() {
+        return null;
+    }
+
+    @Override
+    public boolean usesFITSParameters() {
+        return false;
+    }
+
+    @Override
+    public ImageBuffer decode(int frame, int level, ImageFilter filter,
+                              @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws Exception {
+        return withReader(file, reader -> convertImage(reader.read(0), filter));
+    }
+
+    @Override
+    public void close() {}
 
     private static <T> T withReader(File file, ReaderAction<T> action) throws Exception {
         try (ImageInputStream iis = new FileImageInputStream(file)) {
@@ -47,27 +105,21 @@ final class GenericImage {
         }
     }
 
-    static URIView.SourceInfo readInfo(File file) throws Exception {
-        return withReader(file, reader -> {
-            String xml = null;
-            // read metadata of first image
-            try {
-                IIOMetadata metadata = reader.getImageMetadata(0); // random files may have malformed metadata
-                IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
-                Object text = root.getElementsByTagName("TextEntry").item(0);
-                if (text instanceof IIOMetadataNode mn) {
-                    xml = mn.getAttribute("value");
-                }
-            } catch (Exception e) {
-                Log.error(file.toString(), e);
+    private static Info readInfo(File file, ImageReader reader) throws Exception {
+        String xml = null;
+        // read metadata of first image
+        try {
+            IIOMetadata metadata = reader.getImageMetadata(0); // random files may have malformed metadata
+            IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree("javax_imageio_1.0");
+            Object text = root.getElementsByTagName("TextEntry").item(0);
+            if (text instanceof IIOMetadataNode mn) {
+                xml = mn.getAttribute("value");
             }
-            LUT lut = readLUT(reader.getImageTypes(0).next().getColorModel());
-            return new URIView.SourceInfo(xml, reader.getWidth(0), reader.getHeight(0), lut, null);
-        });
-    }
-
-    static ImageBuffer decode(File file, ImageFilter filter) throws Exception {
-        return withReader(file, reader -> convertImage(reader.read(0), filter));
+        } catch (Exception e) {
+            Log.error(file.toString(), e);
+        }
+        LUT lut = readLUT(reader.getImageTypes(0).next().getColorModel());
+        return new Info(xml, reader.getWidth(0), reader.getHeight(0), lut);
     }
 
     private static ImageBuffer convertImage(BufferedImage image, ImageFilter filter) {
@@ -123,4 +175,5 @@ final class GenericImage {
         }
         return null;
     }
+
 }

@@ -178,7 +178,7 @@ public final class J2KReaderTest {
                 retries.setInt(reader, 12);
             int index = frames;
             for (int level : levels) {
-                ResolutionSet.Level size = reader == null ? new ResolutionSet.Level(0, 4096, 4096) : source.resolutionSet(0).getLevel(level);
+                ResolutionSet.Level size = reader == null ? new ResolutionSet.Level(0, 4096, 4096) : source.levels(0).getLevel(level);
                 if (frames == 1 && mode == Mode.PREFETCH
                         && (Boolean.TRUE.equals(source.getFrameStatus(0, level)) || JPIPCacheManager.get(keys[0], level) != null))
                     throw new AssertionError("Level " + level + " complete or cached before retrieval");
@@ -192,7 +192,7 @@ public final class J2KReaderTest {
                         source.update(frame);
                     }
                 } else {
-                    J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, level), false);
+                    J2KParams.Read params = new J2KParams.Read(new J2KParams.Decode(0, level), false);
                     if (!(boolean) readFrames.invoke(reader, params, size, false))
                         throw new AssertionError("Prefetch interrupted unexpectedly");
                     if (retries.getInt(reader) != 0)
@@ -204,7 +204,7 @@ public final class J2KReaderTest {
                         || (mode == Mode.PREFETCH && level > 0 && source.isComplete(level - 1))))
                     throw new AssertionError("Source completion does not match the retrieved level");
                 for (int frame = 0; frame < frames; frame++) {
-                    if (!source.resolutionSet(frame).getLevel(level).equals(size))
+                    if (!source.levels(frame).getLevel(level).equals(size))
                         throw new AssertionError("Fixture frames have different resolution grids");
                     if (!Boolean.TRUE.equals(source.getFrameStatus(frame, level)))
                         throw new AssertionError("Incomplete frame " + frame + " at level " + level);

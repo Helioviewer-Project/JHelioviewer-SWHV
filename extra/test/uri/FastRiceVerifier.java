@@ -18,7 +18,7 @@ import java.util.Random;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.source.FITSImage;
+import org.helioviewer.jhv.source.FITSSource;
 import org.helioviewer.jhv.source.FastRiceProvider;
 
 import nom.tam.fits.compression.algorithm.api.ICompressorControl;
@@ -592,8 +592,10 @@ public final class FastRiceVerifier {
         ImageBuffer expected = null, actual = null;
         try {
             ImageProcessingSettings.FITSParameters state = new ImageProcessingSettings(() -> {}).fitsParameters();
-            expected = FITSImage.decode(reference.toFile(), ImageFilter.NONE, state, state.clipRange(FITSImage.readInfo(reference.toFile()).clipSet()));
-            actual = FITSImage.decode(compressed.toFile(), ImageFilter.NONE, state, state.clipRange(FITSImage.readInfo(compressed.toFile()).clipSet()));
+            FITSSource referenceSource = new FITSSource(reference.toFile());
+            expected = referenceSource.decode(0, 0, ImageFilter.NONE, state, state.clipRange(referenceSource.clipSet()));
+            FITSSource compressedSource = new FITSSource(compressed.toFile());
+            actual = compressedSource.decode(0, 0, ImageFilter.NONE, state, state.clipRange(compressedSource.clipSet()));
             if (expected.width != actual.width || expected.height != actual.height || expected.format != actual.format || !expected.buffer.equals(actual.buffer))
                 throw new AssertionError("compressed and uncompressed images differ");
         } finally {

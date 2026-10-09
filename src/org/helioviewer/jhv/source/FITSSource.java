@@ -9,6 +9,7 @@ import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
+import org.helioviewer.jhv.image.lut.LUT;
 
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
@@ -22,18 +23,62 @@ import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-public final class FITSImage {
+// One FITS image; the file is read again for each decode.
+public final class FITSSource implements Source {
 
-    private FITSImage() {}
+    private final File file;
+    private final String xml;
+    private final ResolutionSet levels;
+    private final @Nullable ClipSet clipSet;
 
-    public static URIView.SourceInfo readInfo(File file) throws Exception {
+    public FITSSource(File _file) throws Exception {
+        file = _file;
         FITSData data = readData(file);
-        return new URIView.SourceInfo(getHeaderAsXML(data.header()), data.width(), data.height(), null, data.calculateClipSet());
+        xml = getHeaderAsXML(data.header());
+        levels = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, data.width(), data.height())}, 1);
+        clipSet = data.calculateClipSet();
     }
 
-    public static ImageBuffer decode(File file, ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
-        return readData(file).decode(filter, state, clipRange);
+    @Override
+    public int frames() {
+        return 1;
     }
+
+    @Override
+    public String xml(int frame) {
+        return xml;
+    }
+
+    @Override
+    public ResolutionSet levels(int frame) {
+        return levels;
+    }
+
+    @Nullable
+    @Override
+    public LUT lut() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public ClipSet clipSet() {
+        return clipSet;
+    }
+
+    @Override
+    public boolean usesFITSParameters() {
+        return true;
+    }
+
+    @Override
+    public ImageBuffer decode(int frame, int level, ImageFilter filter,
+                              @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws Exception {
+        return readData(file).decode(filter, fits, clip);
+    }
+
+    @Override
+    public void close() {}
 
     private static FITSData readData(File file) throws Exception {
         try (Fits f = new Fits(file)) {
@@ -130,4 +175,5 @@ public final class FITSImage {
         builder.append("</fits>").append(nl).append("</meta>");
         return builder.toString();
     }
+
 }

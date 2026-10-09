@@ -63,7 +63,7 @@ public final class FITSLoadBenchmark {
         try {
             ImageProcessingSettings.FITSParameters state = new ImageProcessingSettings(() -> {}).fitsParameters();
             ClipSet.Range clipRange = options.mode() == Mode.Buffer
-                    ? state.clipRange(FITSImage.readInfo(file).clipSet()) : null;
+                    ? state.clipRange(new FITSSource(file).clipSet()) : null;
             for (int i = 0; i < options.warmup(); i++)
                 free(load(file, options, state, clipRange));
 
@@ -94,10 +94,10 @@ public final class FITSLoadBenchmark {
 
     private static Result load(File file, Options options, ImageProcessingSettings.FITSParameters state, ClipSet.Range clipRange) throws Exception {
         if (options.mode() == Mode.Info) {
-            URIView.SourceInfo info = FITSImage.readInfo(file);
-            return new Result(info.width(), info.height(), null, "");
+            ResolutionSet.Level size = new FITSSource(file).levels(0).getLevel(0);
+            return new Result(size.width(), size.height(), null, "");
         }
-        ImageBuffer buffer = FITSImage.decode(file, ImageFilter.of(options.filter(), null, null), state, clipRange);
+        ImageBuffer buffer = new FITSSource(file).decode(0, 0, ImageFilter.of(options.filter(), null, null), state, clipRange);
         return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 

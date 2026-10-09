@@ -10,11 +10,9 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -27,9 +25,7 @@ import org.helioviewer.jhv.view.BaseView;
 
 public final class URIView extends BaseView {
 
-    public record SourceInfo(@Nullable String xml, int width, int height, @Nullable LUT lut, @Nullable ClipSet clipSet) {}
-
-    private final @Nullable ClipSet clipSet;
+    private final Source source;
     private @Nullable ClipSet.Range clipRange;
     private final String xml;
     private final Region imageRegion;
@@ -38,27 +34,27 @@ public final class URIView extends BaseView {
         super(_executor, _dataUri, _processingSettings);
 
         try {
-            MetaData m;
             File file = dataUri.file();
-            SourceInfo info = hasFITS() ? FITSImage.readInfo(file) : GenericImage.readInfo(file);
-            clipSet = info.clipSet();
+            source = dataUri.format() == DataUri.Format.FITS ? new FITSSource(file) : new RasterSource(file);
+            ResolutionSet.Level full = source.levels(0).getLevel(0);
 
-            String readXml = info.xml();
+            MetaData m;
+            String readXml = source.xml(0);
             try {
                 if (readXml == null)
                     throw new Exception("Missing XML metadata");
                 m = new FitsMetaData(new XMLMetaDataContainer(readXml), dataUri.sourceUri());
             } catch (Exception e) {
                 readXml = EMPTY_METAXML;
-                m = new BasicMetaData(info.width(), info.height(), dataUri.baseName(), dataUri.sourceUri());
+                m = new BasicMetaData(full.width(), full.height(), dataUri.baseName(), dataUri.sourceUri());
                 Log.warn("Helioviewer metadata missing for " + dataUri.baseName(), e);
             }
             xml = readXml;
 
-            imageRegion = m.imageToRegion(info.width(), info.height());
+            imageRegion = m.imageToRegion(full.width(), full.height());
             metaData[0] = m;
 
-            builtinLUT = info.lut();
+            builtinLUT = source.lut();
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
@@ -85,12 +81,12 @@ public final class URIView extends BaseView {
     @Nullable
     @Override
     public ClipSet getClipSet() {
-        return clipSet;
+        return source.clipSet();
     }
 
     @Override
     public boolean hasFITS() {
-        return dataUri.format() == DataUri.Format.FITS;
+        return source.usesFITSParameters();
     }
 
     private record DecodeKey(DataUri uri, ImageFilter.Type filter, @Nullable ImageProcessingSettings.FITSParameters fitsData,
@@ -107,11 +103,7 @@ public final class URIView extends BaseView {
     }
 
     private DecodedImage decodeImage(DecodeKey key, ImageFilter filter) throws Exception {
-        File file = key.uri().file();
-        ImageBuffer imageBuffer = hasFITS()
-                ? FITSImage.decode(file, filter, key.fitsData(), key.clipRange())
-                : GenericImage.decode(file, filter);
-        return new DecodedImage(imageBuffer, imageRegion);
+        return new DecodedImage(source.decode(0, 0, filter, key.fitsData(), key.clipRange()), imageRegion);
     }
 
     @Nonnull

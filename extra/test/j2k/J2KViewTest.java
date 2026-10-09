@@ -264,7 +264,7 @@ public final class J2KViewTest {
             show(view, 0, 4);
             if (drop) {
                 await(view, frames / 3);
-                J2KReader reader = (J2KReader) field(J2KView.class, view, "reader");
+                J2KReader reader = (J2KReader) field(J2KSource.class, source(view), "reader");
                 ((JPIPSocket) field(J2KReader.class, reader, "socket")).abort();
             }
             long deadline = System.nanoTime() + 120_000_000_000L;
@@ -371,14 +371,14 @@ public final class J2KViewTest {
                 J2KReader.readWindow(() -> socket.sendFrame(stream, 64, 64, 0),
                         () -> receive(socket, source, opening, 0));
                 source.update(0);
-                ResolutionSet set = source.resolutionSet(0);
+                ResolutionSet set = source.levels(0);
                 if (!set.isDisplayable()) {
                     ResolutionSet.Level size = set.getClosestLevel(64, 64);
                     J2KReader.readWindow(() -> socket.sendFrame(stream, size.width(), size.height(), 1),
                             () -> receive(socket, source, opening, 0));
                     source.update(0);
                 }
-                int level = source.resolutionSet(0).getCompleteLevel(0).level() - 1;
+                int level = source.levels(0).getCompleteLevel(0).level() - 1;
                 if (level < 0 || source.getFrameStatus(0, level))
                     throw new AssertionError("Fixture needs an incomplete level finer than its opening");
                 ResolutionSet.Level size = set.getLevel(level);
@@ -456,11 +456,11 @@ public final class J2KViewTest {
                 Field keys = J2KReader.class.getDeclaredField("cacheKey");
                 keys.setAccessible(true);
                 keys.set(reader, new String[3]);
-                J2KParams.Read params = new J2KParams.Read(null, new J2KParams.Decode(0, responses.level), false);
+                J2KParams.Read params = new J2KParams.Read(new J2KParams.Decode(0, responses.level), false);
                 Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
                 readFrames.setAccessible(true);
                 J2KReader current = reader;
-                Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.resolutionSet(0).getLevel(responses.level), false));
+                Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.levels(0).getLevel(responses.level), false));
                 if (!sent.await(5, TimeUnit.SECONDS))
                     throw new AssertionError("Reader did not pipeline two requests");
                 reader.signal(params);
@@ -572,7 +572,7 @@ public final class J2KViewTest {
             });
             URI uri = URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test");
             J2KView view = open(uri, new APIRequest("ROB", 10, 0, 0, APIRequest.CADENCE_ALL));
-            J2KReader reader = (J2KReader) field(J2KView.class, view, "reader");
+            J2KReader reader = (J2KReader) field(J2KSource.class, source(view), "reader");
             try {
                 J2KSource source = source(view);
                 MetaData[] metadata = (MetaData[]) field(BaseView.class, view, "metaData");
@@ -591,7 +591,7 @@ public final class J2KViewTest {
                     }
                     JPIPCacheManager.store("unrelated", 0, () -> new byte[]{2});
                 }
-                reader.signal(new J2KParams.Read(view, new J2KParams.Decode(0, responses.level), true));
+                reader.signal(new J2KParams.Read(new J2KParams.Decode(0, responses.level), true));
                 if (refuse || failures == 14) {
                     if (!logged.await(30, TimeUnit.SECONDS))
                         throw new AssertionError("Reader never reported its terminal failure: " + records.stream().map(LogRecord::getMessage).toList());

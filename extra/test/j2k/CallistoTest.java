@@ -38,12 +38,12 @@ public final class CallistoTest {
             System.out.println("Callisto dimensions=" + size.width() + "x" + size.height());
             for (int level = 0; level <= 5; level++) {
                 ResolutionSet.Level reduced = source.level(0, level);
-                byte[] full = source.decode(0, reduced.level(), 0, 0, reduced.width(), reduced.height());
+                byte[] full = source.decodeRegion(0, reduced.level(), 0, 0, reduced.width(), reduced.height());
                 if (full.length != reduced.width() * reduced.height())
                     throw new AssertionError("Expected indexed grayscale Callisto data");
                 for (int x : new int[]{0, size.width() / 3 + 7, size.width() - 103}) {
                     RadioJ2KData.Crop crop = RadioJ2KData.levelCrop(x, size.width() / 5, size.width(), reduced);
-                    compare(full, reduced, source.decode(0, crop.level(), crop.x(), 0, crop.width(), crop.height()), crop);
+                    compare(full, reduced, source.decodeRegion(0, crop.level(), crop.x(), 0, crop.width(), crop.height()), crop);
                 }
                 System.out.println("PASS: Callisto level=" + level + " origin, interior and right-edge crops sha256="
                         + HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(full)));
@@ -77,11 +77,11 @@ public final class CallistoTest {
         RadioJ2KData.Crop whole = new RadioJ2KData.Crop(0, 0, size.width(), size.height());
         RadioJ2KData.Crop edge = new RadioJ2KData.Crop(0, 32, size.width() - 32, size.height());
         RadioJ2KData.Crop newer = new RadioJ2KData.Crop(0, 64, size.width() - 64, size.height());
-        byte[] full = source.decode(0, 0, 0, 0, whole.width(), whole.height());
-        byte[] edgePixels = source.decode(0, 0, edge.x(), 0, edge.width(), edge.height());
-        byte[] newerPixels = source.decode(0, 0, newer.x(), 0, newer.width(), newer.height());
+        byte[] full = source.decodeRegion(0, 0, 0, 0, whole.width(), whole.height());
+        byte[] edgePixels = source.decodeRegion(0, 0, edge.x(), 0, edge.width(), edge.height());
+        byte[] newerPixels = source.decodeRegion(0, 0, newer.x(), 0, newer.width(), newer.height());
         RadioJ2KData.Crop initial = RadioJ2KData.levelCrop(size.width() * 15 / 32, size.width() * 3 / 32, size.width(), source.level(0, 0));
-        byte[] initialPixels = source.decode(0, 0, initial.x(), 0, initial.width(), initial.height());
+        byte[] initialPixels = source.decodeRegion(0, 0, initial.x(), 0, initial.width(), initial.height());
         try {
             for (int i = 0; i < data.length; i++) {
                 RadioJ2KData day = data[i] = new RadioJ2KData(owner, request, uri);

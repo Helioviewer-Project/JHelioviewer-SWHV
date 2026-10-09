@@ -15,7 +15,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.DecodedImage;
-import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
@@ -34,7 +33,7 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 
-public final class J2KView extends BaseView {
+public final class J2KView extends BaseView implements Source.Listener {
 
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
@@ -53,27 +52,18 @@ public final class J2KView extends BaseView {
     private final String[] xmlMetaData;
     private final TimeMap<Integer> frameMap = new TimeMap<>();
 
-    private final J2KReader reader;
-
     public J2KView(LatestWorker<DecodedImage> _executor, APIRequest _request, DataUri _dataUri, ImageProcessingSettings _processingSettings) throws Exception {
         super(_executor, _dataUri, _processingSettings);
         serial = globalSerial.incrementAndGet();
         request = _request;
 
-        J2KSource acquiredSource = null;
-        J2KReader acquiredReader = null;
+        J2KSource acquired = null;
         try {
-            switch (dataUri.format()) {
-                case JPIP -> {
-                    source = acquiredSource = new J2KSource(null);
-                    reader = acquiredReader = new J2KReader(dataUri.uri(), source);
-                }
-                case JP2, JPX -> {
-                    reader = null;
-                    source = acquiredSource = new J2KSource(dataUri.file().toPath());
-                }
+            source = acquired = switch (dataUri.format()) {
+                case JPIP -> J2KSource.open(dataUri.uri());
+                case JP2, JPX -> new J2KSource(dataUri.file().toPath());
                 default -> throw new Exception("Unknown image type");
-            }
+            };
 
             builtinLUT = source.lut();
 
@@ -90,7 +80,7 @@ public final class J2KView extends BaseView {
                     xmlMetaData[i] = EMPTY_METAXML;
                     // A JPIP frame's own size may not be known yet.
                     ResolutionSet set = source.geometry(i);
-                    ResolutionSet.Level level = (set == null ? source.resolutionSet(0) : set).getLevel(0);
+                    ResolutionSet.Level level = (set == null ? source.levels(0) : set).getLevel(0);
                     metaData[i] = new BasicMetaData(level.width(), level.height(), dataUri.baseName(), dataUri.sourceUri());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
@@ -105,23 +95,20 @@ public final class J2KView extends BaseView {
             }
             frameMap.buildIndex();
 
-            if (reader != null) {
-                String[] cacheKey = new String[maxFrame + 1];
-                if (request != null) {
-                    for (int i = 0; i <= maxFrame; i++) {
-                        if (metaData[i] instanceof FitsMetaData)
-                            cacheKey[i] = request.sourceId() + "+" + metaData[i].getViewpoint().time.milli;
-                    }
+            String[] cacheKey = new String[maxFrame + 1];
+            if (request != null) {
+                for (int i = 0; i <= maxFrame; i++) {
+                    if (metaData[i] instanceof FitsMetaData)
+                        cacheKey[i] = request.sourceId() + "+" + metaData[i].getViewpoint().time.milli;
                 }
-                reader.start(cacheKey);
             }
+            source.setListener(this);
+            source.start(cacheKey);
 
-            abolishable = reaper.register(this, new J2KAbolisher(serial, new WeakReference<>(this), reader, source));
+            abolishable = reaper.register(this, new J2KAbolisher(serial, new WeakReference<>(this), source));
         } catch (Exception e) {
-            if (acquiredReader != null)
-                acquiredReader.stop();
-            if (acquiredSource != null)
-                acquiredSource.close();
+            if (acquired != null)
+                acquired.close();
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }
     }
@@ -137,24 +124,14 @@ public final class J2KView extends BaseView {
         ImageBufferCache.invalidateOwners(Set.of(aSerial));
     }
 
-    private record J2KAbolisher(int aSerial, WeakReference<J2KView> aView, J2KReader aReader, J2KSource aSource) implements Runnable {
+    private record J2KAbolisher(int aSerial, WeakReference<J2KView> aView, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
             // Explicit owners have already cleared the cache, possibly in one collection-wide pass.
             if (aView.get() == null)
                 clearCache(aSerial);
-            if (aReader == null) {
-                aSource.close();
-                return;
-            }
-            // reader abolish may take too long in stressed conditions
-            AppThread.create(() -> {
-                try {
-                    aReader.stop();
-                } finally {
-                    aSource.close();
-                }
-            }, "JHV-J2KAbolisher").start();
+            // Stopping a reader may take too long in stressed conditions.
+            AppThread.create(aSource::close, "JHV-J2KAbolisher").start();
         }
     }
 
@@ -167,10 +144,7 @@ public final class J2KView extends BaseView {
     @Override
     public void abolish() {
         clearCache();
-        if (reader == null)
-            AppThread.create(this::closeSources, "JHV-J2KAbolisher").start();
-        else
-            closeSources();
+        closeSources();
     }
 
     @Override
@@ -249,42 +223,23 @@ public final class J2KView extends BaseView {
         return metaData[frameMap.nearestIndex(time)];
     }
 
-    private volatile boolean isDownloading;
-
-    void setDownloading(boolean val) {
-        isDownloading = val;
-    }
-
     @Override
     public boolean isDownloading() {
-        return isDownloading;
+        return source.isDownloading();
     }
 
     private J2KParams.Decode getDecodeParams(int frame, double pixFactor) {
         ResolutionSet.Level res;
         if (ExportMovie.isRecording()) { // all bets are off
-            res = source.resolutionSet(frame).getLevel(0);
+            res = source.levels(frame).getLevel(0);
         } else {
             MetaData m = metaData[frame];
             int reqWidth = (int) (m.getPhysicalRegion().width * pixFactor + .5);
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-            res = source.resolutionSet(frame).getNextLevel(reqWidth, reqHeight);
+            res = source.levels(frame).getNextLevel(reqWidth, reqHeight);
         }
 
         return new J2KParams.Decode(frame, res.level());
-    }
-
-    private static final int NO_LEVEL = 10000;
-    private int currentLevel = NO_LEVEL;
-
-    private void signalReader(J2KParams.Decode decodeParams) {
-        int level = decodeParams.level();
-        boolean priority = !Player.isPlaying();
-
-        if (priority || level < currentLevel) {
-            reader.signal(new J2KParams.Read(this, decodeParams, priority));
-            currentLevel = level;
-        }
     }
 
     @Override
@@ -292,18 +247,20 @@ public final class J2KView extends BaseView {
         currentViewpoint = viewpoint;
         J2KParams.Decode wanted = getDecodeParams(targetFrame, pixFactor);
         requestedDecode = wanted;
-        J2KParams.Decode decodeParams = available(wanted); // before signalling to reader
-        // The first signal starts the movie download.
-        if (reader != null && (decodeParams != wanted || currentLevel == NO_LEVEL)) {
-            signalReader(wanted);
-        }
+        J2KParams.Decode decodeParams = available(wanted); // before requesting from the reader
+        source.request(wanted.frame(), wanted.level(), !Player.isPlaying());
         show(decodeParams);
     }
 
     // The request itself, or the whole finest complete level while a JPIP frame lacks the wanted one.
     private J2KParams.Decode available(J2KParams.Decode wanted) {
-        ResolutionSet.Level res = source.resolutionSet(wanted.frame()).getCompleteLevel(wanted.level());
+        ResolutionSet.Level res = source.levels(wanted.frame()).getCompleteLevel(wanted.level());
         return res.level() == wanted.level() ? wanted : new J2KParams.Decode(wanted.frame(), res.level());
+    }
+
+    @Override
+    public void frameUpdated(Source _source, int frame) {
+        refreshDecodeFromReader(frame);
     }
 
     void refreshDecodeFromReader(int frame) {
@@ -334,29 +291,21 @@ public final class J2KView extends BaseView {
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.
     private DecodedImage decodeImage(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metadata) throws IOException {
-        try (J2KNative.Decode job = source.beginDecode(params.frame(), params.level())) {
-            ResolutionSet set = source.resolutionSet(params.frame());
-            ResolutionSet.Level resolution = set.getLevel(params.level());
-            ResolutionSet.Level full = set.getLevel(0);
-            Region imageRegion = metadata.imageToRegion(full.width(), full.height());
-            ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
-            boolean gray = set.numComps == 1;
-            try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32)) {
-                J2KSource.decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());
-                return new DecodedImage(outBuffer.finish(filter), imageRegion);
-            }
-        }
+        ResolutionSet.Level full = source.levels(params.frame()).getLevel(0);
+        Region imageRegion = metadata.imageToRegion(full.width(), full.height());
+        ImageFilter filter = ImageFilter.of(filterType, imageRegion, metadata);
+        return new DecodedImage(source.decode(params.frame(), params.level(), filter, null, null), imageRegion);
     }
 
     @Nullable
     @Override
     public Boolean getFrameCompletion(int frame) {
-        return source.getFrameStatus(frame, currentLevel);
+        return source.completion(frame);
     }
 
     @Override
     public boolean isComplete() {
-        return source.isComplete(currentLevel);
+        return source.isComplete();
     }
 
     @Nonnull
