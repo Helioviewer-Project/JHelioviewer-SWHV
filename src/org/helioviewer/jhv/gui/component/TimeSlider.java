@@ -39,7 +39,7 @@ import org.helioviewer.jhv.movie.Player;
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Player.Listener, Player.StatusListener, Player.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, Layers.Listener, MouseListener, MouseMotionListener, MouseWheelListener, Player.Listener, Player.StatusListener, Player.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -78,6 +78,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         Player.addFrameListener(this);
         Player.addStatusListener(this);
         UITimer.register(this);
+        Layers.addListener(this);
         Player.addPlaybackRangeListener(this);
         setToolTipText(Platform.isMacOS()
                 ? "Drag: scrub • ⌥-drag: trim • ⌘-drag: move"
@@ -259,6 +260,12 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void playbackRangeChanged() {
         repaint();
+    }
+
+    @Override
+    public void completionUpdated(ImageLayer layer) {
+        if (layer == Layers.getActiveImageLayer())
+            repaint();
     }
 
     @Override

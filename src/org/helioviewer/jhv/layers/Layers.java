@@ -24,17 +24,20 @@ import org.helioviewer.jhv.time.TimeUtils;
 public final class Layers {
 
     public interface Listener {
-        void layerAdded(int index, Layer layer);
+        default void layerAdded(int index, Layer layer) {}
 
-        void layerRemoved(int index, Layer layer);
+        default void layerRemoved(int index, Layer layer) {}
 
-        void layersCleared();
+        default void layersCleared() {}
 
-        void nameUpdated(Layer layer);
+        default void nameUpdated(Layer layer) {}
 
-        void layerUpdated(Layer layer);
+        default void layerUpdated(Layer layer) {}
 
-        void timeUpdated(Layer layer);
+        default void timeUpdated(Layer layer) {}
+
+        // Frames of the layer arrived or settled; the slider's completion colors are stale.
+        default void completionUpdated(ImageLayer layer) {}
     }
 
     private static final ArrayList<Listener> listeners = new ArrayList<>();
@@ -215,6 +218,10 @@ public final class Layers {
 
     public static void fireLayerUpdated(Layer layer) {
         listeners.forEach(listener -> listener.layerUpdated(layer));
+    }
+
+    static void fireCompletionUpdated(ImageLayer layer) {
+        listeners.forEach(listener -> listener.completionUpdated(layer));
     }
 
     public static void addListener(Listener listener) {

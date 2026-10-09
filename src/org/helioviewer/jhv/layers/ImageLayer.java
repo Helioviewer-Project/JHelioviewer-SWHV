@@ -11,7 +11,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.image.ImageDisplaySettings.DifferenceMode;
@@ -389,7 +388,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     public void frameReady(Frames _frames, Source source, int frame) {
         if (_frames != frames)
             return;
-        UITimer.completionChanged();
+        Layers.fireCompletionUpdated(this);
         boolean moved = frames.select(frames.requested());
         Frames.Frame current = frames.get(frames.current());
         if (moved || (current.source() == source && current.index() == frame))

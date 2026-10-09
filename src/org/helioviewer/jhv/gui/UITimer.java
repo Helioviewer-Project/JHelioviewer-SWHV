@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.gui.component.BusyIndicator;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 
 public final class UITimer {
 
@@ -20,21 +19,8 @@ public final class UITimer {
             lazyComponents.add(component);
     }
 
-    private static volatile boolean completionChanged = false;
-
-    // accessed from J2KReader threads
-    public static void completionChanged() {
-        completionChanged = true;
-    }
-
     private static void action() {
         BusyIndicator.incrementAngle();
-
-        if (completionChanged) {
-            completionChanged = false;
-            MoviePanel.getTimeSlider().repaint();
-        }
-
         lazyComponents.forEach(Interfaces.LazyComponent::lazyRepaint);
     }
 

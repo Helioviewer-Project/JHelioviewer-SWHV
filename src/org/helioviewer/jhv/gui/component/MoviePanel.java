@@ -306,10 +306,6 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         ViewState.setPlaybackSpeed(speed, unit);
     }
 
-    public static TimeSlider getTimeSlider() {
-        return timeSlider;
-    }
-
     @Override
     public void movieStatusChanged() {
         boolean playing = Player.isPlaying();

@@ -62,9 +62,6 @@ public final class LayerOptions implements Layers.Listener {
     }
 
     @Override
-    public void layerAdded(int index, Layer layer) {}
-
-    @Override
     public void layerRemoved(int index, Layer layer) {
         panels.remove(layer);
     }
@@ -75,16 +72,10 @@ public final class LayerOptions implements Layers.Listener {
     }
 
     @Override
-    public void nameUpdated(Layer layer) {}
-
-    @Override
     public void layerUpdated(Layer layer) {
         if (panels.get(layer) instanceof ImageLayerOptions panel)
             panel.refresh(layer);
     }
-
-    @Override
-    public void timeUpdated(Layer layer) {}
 
     private LayerOptions() {}
 }
