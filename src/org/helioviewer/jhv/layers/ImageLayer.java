@@ -340,7 +340,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     private void setImageData(@Nonnull ImageData newImageData) {
-        long newMilli = newImageData.metaData().getViewpoint().time.milli;
+        long newMilli = newImageData.frame().time().milli;
         boolean base = baseImageData == null || newMilli == frames.first().milli;
         if (base) {
             baseImageData = replaceImageData(baseImageData, newImageData);
@@ -348,7 +348,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
         if (imageData == null || base) { // first or loop playback
             prevImageData = replaceImageData(prevImageData, newImageData);
-        } else if (newMilli != imageData.metaData().getViewpoint().time.milli) { // new frame
+        } else if (newMilli != imageData.frame().time().milli) { // new frame
             prevImageData = replaceImageData(prevImageData, imageData);
         }
 

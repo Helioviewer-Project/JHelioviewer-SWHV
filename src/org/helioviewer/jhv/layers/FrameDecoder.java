@@ -133,7 +133,7 @@ final class FrameDecoder {
     }
 
     private void deliver(Key key, Frames.Frame frame, Position vp, DecodedImage image) {
-        ImageData data = new ImageData(image, frame.metaData(), vp);
+        ImageData data = new ImageData(image, frame, vp);
         image.retain(); // The queued delivery owns a reference until its callback ends.
         EventQueue.invokeLater(() -> {
             try {

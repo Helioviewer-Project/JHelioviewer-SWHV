@@ -28,6 +28,8 @@ import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.XMLUtils;
+import org.helioviewer.jhv.layers.Frames;
+import org.helioviewer.jhv.layers.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -133,7 +135,9 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         exportFitsButton.setEnabled(false);
         int request = ++metadataRequest;
 
-        MetaData metadata = layer.getMetaData();
+        ImageData imageData = layer.getImageData();
+        Frames.Frame frame = imageData == null ? layer.frames().get(0) : imageData.frame();
+        MetaData metadata = frame.metaData();
         URI sourceUri = metadata.getSourceUri();
         boolean hasSourceUri = !sourceUri.equals(MetaData.UNKNOWN_SOURCE_URI);
         String source = HtmlEscapers.htmlEscaper().escape(sourceUri.toString());
@@ -150,7 +154,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Observation Date: " + fitsMetadata.getViewpoint().time +
                 (hasSourceUri ? "<br/>" + sourceText : ""));
 
-        String xml = layer.frames().xml(fitsMetadata.getViewpoint().time);
+        String xml = frame.xml();
         String filename = fitsMetadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(fitsMetadata.getViewpoint().time.milli) + ".fits.xml";
         Task.submitBackground("metadata", () -> parseMetadata(xml, filename), parsed -> applyMetadata(request, parsed), Log::error);
     }

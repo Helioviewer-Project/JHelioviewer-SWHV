@@ -8,10 +8,15 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 
+// The decoded pixels of a frame, at the viewpoint they were requested for.
 public record ImageData(
         @Nonnull DecodedImage image,
-        @Nonnull MetaData metaData,
+        @Nonnull Frames.Frame frame,
         @Nonnull Position viewpoint) {
+
+    public MetaData metaData() {
+        return frame.metaData();
+    }
 
     public ImageBuffer imageBuffer() {
         return image.imageBuffer();

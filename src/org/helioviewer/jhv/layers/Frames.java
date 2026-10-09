@@ -220,10 +220,6 @@ public final class Frames implements Source.Listener {
         return frames[nearestIndex(time)].metaData;
     }
 
-    public String xml(JHVTime time) {
-        return frames[nearestIndex(time)].xml;
-    }
-
     public int current() {
         return current;
     }
