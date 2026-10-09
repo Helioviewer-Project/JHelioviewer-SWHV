@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -21,7 +22,6 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -34,8 +34,6 @@ import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.time.JHVTime;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 final class ImageLayerLoader {
 
@@ -55,7 +53,13 @@ final class ImageLayerLoader {
     }
 
     void load(APIRequest req) {
-        load(() -> open(req, List.of(requestAPI(req.toJpipRequest()))));
+        load(() -> {
+            APIRequest.Response response = req.resolve();
+            List<String> warnings = new ArrayList<>();
+            if (response.message() != null)
+                warnings.add(response.message());
+            return open(req, List.of(response.uri()), warnings);
+        });
     }
 
     void load(List<URI> uriList) {
@@ -82,9 +86,9 @@ final class ImageLayerLoader {
         return loadThread != null;
     }
 
-    void startDownload(APIRequest req, ImageLayer layer, String baseName, DownloadLayer.Progress progress) {
+    void startDownload(APIRequest req, String baseName, DownloadLayer.Progress progress, Consumer<Path> onDownloaded) {
         cancelDownload();
-        downloadFuture = DownloadLayer.submit(req, layer, baseName, progress);
+        downloadFuture = DownloadLayer.submit(req, baseName, progress, onDownloaded);
     }
 
     void cancelLoad() {
@@ -127,8 +131,12 @@ final class ImageLayerLoader {
     // A source and its frames in file order.
     private record Opened(Source source, DataUri dataUri, List<Frames.Frame> frames) {}
 
-    // The loader owns every source it opens until the timeline does.
     static Result open(@Nullable APIRequest request, List<URI> uris) throws Exception {
+        return open(request, uris, new ArrayList<>());
+    }
+
+    // The loader owns every source it opens until the timeline does. Warnings are reported together after the load.
+    private static Result open(@Nullable APIRequest request, List<URI> uris, List<String> warnings) throws Exception {
         List<String> failures = new ArrayList<>();
         List<Opened> opened = new ArrayList<>();
         try {
@@ -150,7 +158,7 @@ final class ImageLayerLoader {
                 else
                     kept.add(frame);
             }
-            List<String> warnings = new ArrayList<>(failures);
+            warnings.addAll(failures);
             if (!dropped.isEmpty()) {
                 warnings.add("Skipped " + dropped.size() + " frame(s) with a time already present:\n" + String.join("\n", dropped));
                 Set<Source> retained = new HashSet<>();
@@ -260,33 +268,4 @@ final class ImageLayerLoader {
         return list;
     }
 
-    private URI requestAPI(String url) throws Exception {
-        try {
-            return parseAPIResponse(JSONUtils.get(new URI(url)));
-        } catch (Exception e) {
-            throw new Exception("Invalid response for " + url + ": " + e.getMessage(), e);
-        }
-    }
-
-    private URI parseAPIResponse(JSONObject data) throws Exception {
-        if (!data.isNull("frames")) {
-            JSONArray arr = data.getJSONArray("frames");
-            data.put("frames", arr.length()); // don't log timestamps, modifies input
-        }
-        Log.info(data.toString());
-
-        String message = data.optString("message", null);
-        if (message != null) {
-            Thread worker = Thread.currentThread();
-            EventQueue.invokeLater(() -> {
-                if (worker == loadThread)
-                    Message.warn("Warning", message);
-            });
-        }
-        String error = data.optString("error", null);
-        if (error != null) {
-            throw new Exception(error);
-        }
-        return new URI(data.getString("uri"));
-    }
 }

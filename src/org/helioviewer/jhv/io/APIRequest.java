@@ -1,7 +1,11 @@
 package org.helioviewer.jhv.io;
 
-import javax.annotation.Nonnull;
+import java.net.URI;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -48,6 +52,25 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
     public String toJpipRequest() throws Exception {
         String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
         return toFileRequest() + jsonReq + "&jpip=true";
+    }
+
+    // The server's answer: the JPIP URI to open, and a message for the user if it sent one.
+    public record Response(URI uri, @Nullable String message) {}
+
+    public Response resolve() throws Exception {
+        String url = toJpipRequest();
+        try {
+            JSONObject data = JSONUtils.get(new URI(url));
+            if (!data.isNull("frames"))
+                data.put("frames", data.getJSONArray("frames").length()); // don't log timestamps, modifies input
+            Log.info(data.toString());
+            String error = data.optString("error", null);
+            if (error != null)
+                throw new Exception(error);
+            return new Response(new URI(data.getString("uri")), data.optString("message", null));
+        } catch (Exception e) {
+            throw new Exception("Invalid response for " + url + ": " + e.getMessage(), e);
+        }
     }
 
     public JSONObject toJson() {

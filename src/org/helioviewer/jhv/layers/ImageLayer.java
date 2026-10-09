@@ -453,7 +453,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     public void startDownload(DownloadLayer.Progress progress) {
         if (request != null && baseName != null) // should not happen
-            loader.startDownload(request, this, baseName, progress);
+            loader.startDownload(request, baseName, progress, path -> load(List.of(path.toUri())));
     }
 
 }

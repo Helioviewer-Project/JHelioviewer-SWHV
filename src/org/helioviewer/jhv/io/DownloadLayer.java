@@ -6,15 +6,14 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
@@ -34,11 +33,11 @@ public class DownloadLayer {
     }
 
     @Nullable
-    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName, @Nonnull Progress progress) {
+    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull String baseName, @Nonnull Progress progress, @Nonnull Consumer<Path> onDownloaded) {
         Path dstPath = Path.of(Directories.DOWNLOADS.getPath(), baseName);
         return Task.submitBackground(baseName,
                 new LayerDownload(req, progress, dstPath),
-                result -> onSuccess(layer, progress, result),
+                result -> onSuccess(onDownloaded, progress, result),
                 (logContext, t) -> onFailure(progress, t));
     }
 
@@ -83,9 +82,9 @@ public class DownloadLayer {
         }
     }
 
-    private static void onSuccess(ImageLayer layer, Progress progress, Path result) {
+    private static void onSuccess(Consumer<Path> onDownloaded, Progress progress, Path result) {
         progress.done();
-        layer.load(List.of(result.toUri()));
+        onDownloaded.accept(result);
         progress.success(result.toString());
     }
 
