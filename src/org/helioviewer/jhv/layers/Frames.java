@@ -232,9 +232,10 @@ public final class Frames implements Source.Listener {
         return requested;
     }
 
-    private boolean displayable(int i) {
+    // A remote frame whose coarsest level has not arrived.
+    private boolean missing(int i) {
         Frame frame = frames[i];
-        return frame.source == null || frame.source.displayable(frame.index);
+        return frame.source != null && !frame.source.displayable(frame.index);
     }
 
     // Selects the nearest frame, or the nearest displayable one in time while that one is not.
@@ -242,11 +243,11 @@ public final class Frames implements Source.Listener {
     public boolean select(JHVTime time) {
         requested = time;
         int i = nearestIndex(time);
-        if (!displayable(i)) {
+        if (missing(i)) {
             int lo = i - 1, hi = i + 1;
-            while (lo >= 0 && !displayable(lo))
+            while (lo >= 0 && missing(lo))
                 lo--;
-            while (hi < frames.length && !displayable(hi))
+            while (hi < frames.length && missing(hi))
                 hi++;
             if (lo < 0 && hi >= frames.length)
                 return false;

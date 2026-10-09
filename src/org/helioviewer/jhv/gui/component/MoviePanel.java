@@ -48,7 +48,6 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
     private final ImageDialog imageDialog;
     private ImageLayer layerToReplace;
 
-    private static TimeSlider timeSlider;
     private final JideButton playButton;
 
     private final RecordButton recordButton;
@@ -75,7 +74,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         // Time slider
-        timeSlider = new TimeSlider(0, 0, 0);
+        TimeSlider timeSlider = new TimeSlider(0, 0, 0);
 
         JPanel sliderPanel = new JPanel(new BorderLayout());
         sliderPanel.add(timeSlider);

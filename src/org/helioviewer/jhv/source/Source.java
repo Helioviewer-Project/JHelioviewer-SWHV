@@ -11,7 +11,7 @@ import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 
 // The pixels of one file or one JPIP stream. Knows nothing about layers.
-public interface Source extends AutoCloseable {
+public interface Source {
 
     interface Listener {
         // Called from the reader thread; frame is the source's own index.
@@ -67,7 +67,6 @@ public interface Source extends AutoCloseable {
         return false;
     }
 
-    @Override
     void close();
 
 }
