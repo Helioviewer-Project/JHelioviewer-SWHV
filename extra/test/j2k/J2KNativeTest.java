@@ -311,13 +311,11 @@ public final class J2KNativeTest {
                 for (int entry = 0; entry < 256; entry++)
                     check(table.getInt(4 * entry) == colors[Math.min(entry, colors.length - 1)],
                             "palette RGBA bytes: " + name + " entry " + entry);
-                // The primitive compositor expands two-bit samples to grayscale; indices must stay 0,1,2,3.
-                if (name.equals("index2"))
-                    check(Arrays.equals(pixels(source, 0, 0), new byte[]{0, 1, 2, 3}), "two-bit palette indices");
+                // Raw indices stay 0,1,2,3, including the two-bit codestream.
+                check(Arrays.equals(pixels(source, 0, 0), new byte[]{0, 1, 2, 3}), "palette indices: " + name);
             }
-            if (!name.equals("index2"))
-                local(path);
         }
+        local(folder.resolve("small.jp2"));
         for (String name : List.of("index9", "signed-index")) {
             try (J2KNative source = new J2KNative(folder.resolve(name + ".jp2"))) {
                 try { source.frame(0); throw new AssertionError("unrepresentable palette index accepted"); }
@@ -419,25 +417,6 @@ public final class J2KNativeTest {
         System.out.println("JPIP responses: readiness, continuation, pixels at every level, cache entry, refusal");
     }
 
-    private static void benchmark(Path image) throws Exception {
-        try (J2KNative source = new J2KNative(image)) {
-            J2KNative.Frame info = source.frame(0);
-            int width = info.width()[0], height = info.height()[0];
-            ByteBuffer out = ByteBuffer.allocateDirect(width * height * info.channels());
-            double[] times = new double[21];
-            for (int i = -5; i < times.length; i++) {
-                out.clear();
-                long start = System.nanoTime();
-                try (J2KNative.Decode job = source.beginDecode(0, 0)) {
-                    job.run(0, 0, width, height, out);
-                }
-                if (i >= 0) times[i] = (System.nanoTime() - start) / 1e6;
-            }
-            Arrays.sort(times);
-            System.out.printf("%dx%d warm decode with input creation: median %.2f ms, min %.2f ms%n", width, height, times[10], times[0]);
-        }
-    }
-
     // Arguments: Kakadu library, bridge library, folder made by run_native_test.sh, its image, then JP2/JPX files.
     public static void main(String[] args) throws Exception {
         // Check a prebuilt set without building the server or generating responses.
@@ -468,7 +447,6 @@ public final class J2KNativeTest {
         failures(image);
         unsupported(folder);
         remote(folder, Path.of(args[3]));
-        benchmark(image);
     }
 
 }

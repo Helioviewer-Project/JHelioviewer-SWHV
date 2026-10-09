@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
@@ -90,9 +91,7 @@ public final class J2KViewTest {
         checkDraining(responses);
         checkRetriesAndKeys(responses);
 
-        Field timerField = Player.class.getDeclaredField("movieTimer");
-        timerField.setAccessible(true);
-        EDTTimer playback = (EDTTimer) timerField.get(null);
+        EDTTimer playback = (EDTTimer) field(Player.class, null, "movieTimer");
 
         // Paused, first shown at its coarsest level, which opening already made complete: the movie still downloads.
         J2KView view = open(uri);
@@ -236,8 +235,7 @@ public final class J2KViewTest {
             throw new AssertionError("Reader refresh used an obsolete resolution: " + width + "x" + height
                     + ", wanted " + size.width() + "x" + size.height());
 
-        // The replacement view uses the same worker. An old view's cached refresh
-        // must not invalidate its decode or drop its pending task.
+        // A detached view's refresh must leave work on the shared worker current.
         CountDownLatch release = new CountDownLatch(1);
         CompletableFuture<Boolean> fresh = new CompletableFuture<>();
         try {
@@ -266,12 +264,8 @@ public final class J2KViewTest {
             show(view, 0, 4);
             if (drop) {
                 await(view, frames / 3);
-                Field readerField = J2KView.class.getDeclaredField("reader");
-                readerField.setAccessible(true);
-                Object reader = readerField.get(view);
-                Field socketField = J2KReader.class.getDeclaredField("socket");
-                socketField.setAccessible(true);
-                ((JPIPSocket) socketField.get(reader)).abort();
+                J2KReader reader = (J2KReader) field(J2KView.class, view, "reader");
+                ((JPIPSocket) field(J2KReader.class, reader, "socket")).abort();
             }
             long deadline = System.nanoTime() + 120_000_000_000L;
             while (!view.isComplete()) {
@@ -370,36 +364,26 @@ public final class J2KViewTest {
             JPIPSocket socket = new JPIPSocket(uri);
             try {
                 receive(socket, source, opening, -1);
-                int reason;
-                do {
-                    socket.sendMetadata();
-                    reason = receive(socket, source, opening, -1);
-                } while (reason == 4 || reason == 7);
+                J2KReader.readWindow(socket::sendMetadata, () -> receive(socket, source, opening, -1));
                 int metadataEnd = opening.size();
                 source.loadFrames();
                 long stream = source.client().frame(0).stream();
-                do {
-                    socket.sendFrame(stream, 64, 64, 0);
-                    reason = receive(socket, source, opening, 0);
-                } while (reason == 4 || reason == 7);
+                J2KReader.readWindow(() -> socket.sendFrame(stream, 64, 64, 0),
+                        () -> receive(socket, source, opening, 0));
                 source.update(0);
                 ResolutionSet set = source.resolutionSet(0);
                 if (!set.isDisplayable()) {
                     ResolutionSet.Level size = set.getClosestLevel(64, 64);
-                    do {
-                        socket.sendFrame(stream, size.width(), size.height(), 1);
-                        reason = receive(socket, source, opening, 0);
-                    } while (reason == 4 || reason == 7);
+                    J2KReader.readWindow(() -> socket.sendFrame(stream, size.width(), size.height(), 1),
+                            () -> receive(socket, source, opening, 0));
                     source.update(0);
                 }
                 int level = source.resolutionSet(0).getCompleteLevel(0).level() - 1;
                 if (level < 0 || source.getFrameStatus(0, level))
                     throw new AssertionError("Fixture needs an incomplete level finer than its opening");
                 ResolutionSet.Level size = set.getLevel(level);
-                do {
-                    socket.sendFrame(stream, size.width(), size.height(), 1);
-                    reason = receive(socket, source, finer, 0);
-                } while (reason == 4 || reason == 7);
+                J2KReader.readWindow(() -> socket.sendFrame(stream, size.width(), size.height(), 1),
+                        () -> receive(socket, source, finer, 0));
                 source.update(0);
                 if (!source.getFrameStatus(0, level))
                     throw new AssertionError("Captured finer window is incomplete");
@@ -414,7 +398,7 @@ public final class J2KViewTest {
                 // Small windows let the drain check hold both responses after the two sends.
                 socket.sendFrame(source.client().frame(1).stream(), size.width(), size.height(), 0);
                 List<byte[]> secondFrame = new ArrayList<>();
-                reason = receive(socket, source, secondFrame, 1);
+                int reason = receive(socket, source, secondFrame, 1).reason();
                 source.update(1);
                 if ((reason != 1 && reason != 2) || finer.size() != 1 || !Boolean.TRUE.equals(source.getFrameStatus(1, level)))
                     throw new AssertionError("Drain fixture needs two complete, single-response windows");
@@ -427,15 +411,16 @@ public final class J2KViewTest {
         }
     }
 
-    private static int receive(JPIPSocket socket, J2KSource source, List<byte[]> captured, int window) throws Exception {
+    private static J2KNative.Response receive(JPIPSocket socket, J2KSource source, List<byte[]> captured, int window) throws IOException {
         ByteBuffer response = socket.receive();
         byte[] bytes = new byte[response.remaining()];
         response.duplicate().get(bytes);
         captured.add(bytes);
-        int reason = source.client().response(response, window).reason();
+        J2KNative.Response parsed = source.client().response(response, window);
+        int reason = parsed.reason();
         if (reason != 1 && reason != 2 && reason != 4 && reason != 7)
             throw new AssertionError("Unexpected captured EOR: " + reason);
-        return reason;
+        return parsed;
     }
 
     private static void checkDraining(Responses responses) throws Exception {

@@ -4,7 +4,8 @@ The `jhvj2k` bridge builds the static esajpip client and JPEG 2000 reader as
 part of the same CMake project. It requires a Kakadu SDK and compatible Kakadu
 libraries, supplied separately. OpenJPEG, GLib, llhttp and zlib are not required.
 
-With CMake 3.20 or later, build against supplied libraries:
+Use CMake 3.20 or later and a C11/C++11 compiler. From the JHV root, build
+against supplied libraries:
 
 ```sh
 cmake -S native/jpeg2000 -B /path/to/build -DCMAKE_BUILD_TYPE=Release \
@@ -14,21 +15,32 @@ cmake --build /path/to/build --target jhvj2k --parallel
 ```
 
 Use `.dylib` on macOS, with `-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0` and the
-appropriate `-DCMAKE_OSX_ARCHITECTURES`. Windows requires MinGW and also
+appropriate `-DCMAKE_OSX_ARCHITECTURES=arm64` or
+`-DCMAKE_OSX_ARCHITECTURES=x86_64`. Windows requires MinGW and also
 `-DKDU_CORE_LIBRARY=/path/to/kdu_v7AR.dll`; supply `kdu_jni.dll` as `KDU_LIBRARY`.
 The SDK and libraries must match, and all libraries must target the same architecture.
 The Windows JNI/support DLL must also export the Kakadu support functions used
 by the bridge.
 
-For a host build against JHV's bundled Kakadu library:
+On macOS arm64, macOS x86-64 or Linux x86-64, the host script builds against
+JHV's bundled Kakadu library:
 
 ```sh
 KDU_VENDOR=/path/to/kakadu-sdk bash native/jpeg2000/build.sh
 ```
 
-Validate each platform's libraries with `extra/test/j2k/check_native_build.py`
-before staging. Each platform directory must contain `build-info.txt` with
-SHA-256 checksums in `sha256sum` format for its libraries, for example:
+It writes the extracted Kakadu library and built bridge to `tmp/j2k-native`.
+Set `BUILD` to change this directory and `ESAJPIP` to change the default
+esajpip checkout, `../esajpip-SWHV`.
+
+Validate each platform's libraries on that platform with
+`extra/test/j2k/check_native_build.py` before staging. The check requires
+Python 3, JDK 25 and an esajpip source checkout containing its existing test
+fixtures; it does not build esajpip or require server dependencies.
+
+Each platform directory must contain `build-info.txt` with SHA-256 checksums
+in `sha256sum` format for its libraries, using filenames without directory
+prefixes, for example:
 
 ```sh
 cd /path/to/builds/linux-x64
@@ -54,8 +66,8 @@ From the JHV root, stage the updated JARs:
 python3 extra/jpeg2000/prepare_natives.py /path/to/builds /path/to/staged-jars
 ```
 
-The script verifies build checksums, replaces the KDU and bridge entries in
-copies of the current native JARs, and verifies that unrelated entries retain
+The Python 3 script verifies build checksums, replaces the Kakadu and bridge
+entries in copies of the current native JARs, and verifies that unrelated entries retain
 their contents. Review the staged JARs and build records before copying the JARs
 into `lib/jhv`. `--platform macos-arm64`, for example, stages a single platform.
 
@@ -65,13 +77,21 @@ To check a local build without rebuilding it:
 python3 extra/test/j2k/check_native_build.py /path/to/builds/macos-arm64 --esajpip ../esajpip-SWHV
 ```
 
-This uses the existing native test and committed RGB, grayscale and JPX fixtures.
-Small generated palette fixtures check raw indices and fixed expected RGBA table
-bytes, including channel ordering, signed sample conversion and last-entry padding.
-They also check short buffers and unsupported index depths. Indexed decode comparisons
-use the compositor's raw-component path, as JHV does on `master`.
-The Java binding consumes a 256-entry RGBA8 table and raw unsigned index bytes.
-It checks every frame and resolution against Kakadu's compositor, jobs that
-outlive their source, failure recovery, and repeated open/decode/close cycles.
-File-descriptor counts are checked on Unix. The full JPIP test still uses
-`extra/test/j2k/run_native_test.sh` and requires the server build dependencies.
+The check runs `J2KNativeTest` through JHV's Java binding. It compares every
+frame and resolution of the existing RGB, grayscale and JPX fixtures in the
+esajpip checkout against Kakadu's compositor. It also checks concurrent decode
+jobs that outlive their source, failure recovery, repeated open/decode/close
+cycles, and malformed JPIP response parsing. File-descriptor counts are checked
+on Unix.
+
+Small palette files are generated in a temporary directory and removed afterward.
+They check raw indices and fixed expected bytes for the 256-entry RGBA8 table,
+including channel ordering, signed and unsigned sample conversion, opaque alpha,
+last-entry padding, short buffers and unsupported indices. Every palette file must
+decode to fixed expected raw indices. One eight-bit palette file also runs the
+compositor comparison and job lifetime checks. Color tables are checked separately.
+
+The additional `extra/test/j2k/run_native_test.sh` test builds the bridge and
+generates JPIP responses using esajpip's server code. It requires the server
+build dependencies, `KDU_VENDOR`, and at least one JP2/JPX file argument.
+See [the test README](../test/j2k/README.md) for commands and test limits.
