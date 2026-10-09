@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
@@ -120,9 +121,9 @@ public final class ImageLayers {
         return null;
     }
 
-    public static void syncLayersSpan(long startTime, long endTime, int cadence) {
+    public static void syncLayersSpan(ImageRequestSettings settings) {
         for (ImageLayer layer : Layers.getImageLayers())
-            layer.reload(startTime, endTime, cadence);
+            layer.reload(settings.start(), settings.requestEnd(), settings.cadence());
     }
 
     private static boolean diffRotationMode;

@@ -8,38 +8,42 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
-import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.ImageRequestSettings;
 
+// Edits and shows the sampling of the image request settings.
 @SuppressWarnings("serial")
-public final class SamplingPanel extends JPanel {
+public final class SamplingPanel extends JPanel implements ImageRequestSettings.Listener {
 
     private static final String[] TIME_STEP_UNITS = {"sec", "min", "hours", "days", "get all"};
     private static final int GET_ALL_INDEX = TIME_STEP_UNITS.length - 1;
     private static final int CADENCE_MIN = 1, CADENCE_MAX = 10000;
     private static final int FRAME_COUNT_MIN = 1, FRAME_COUNT_MAX = 1000;
 
-    private final TimeSelectorPanel timeSelectorPanel;
+    private final ImageRequestSettings settings = ImageRequestSettings.instance();
     private final JRadioButton timeStepButton = new JRadioButton("Time step", true);
     private final JRadioButton frameCountButton = new JRadioButton("Frame count");
     private final JHVSpinner cadenceSpinner = new JHVSpinner(1, CADENCE_MIN, CADENCE_MAX, 1);
     private final JComboBox<String> unitCombo = new JComboBox<>(TIME_STEP_UNITS);
     private final JHVSpinner frameCountSpinner = new JHVSpinner(97, FRAME_COUNT_MIN, FRAME_COUNT_MAX, 1);
+    private boolean syncing;
 
-    public SamplingPanel(TimeSelectorPanel _timeSelectorPanel) {
-        timeSelectorPanel = _timeSelectorPanel;
+    public SamplingPanel() {
         setLayout(new GridBagLayout());
 
         ButtonGroup group = new ButtonGroup();
         group.add(timeStepButton);
         group.add(frameCountButton);
 
-        applyCadence(APIRequest.CADENCE_DEFAULT);
-        timeStepButton.addActionListener(e -> updateEnabled());
-        frameCountButton.addActionListener(e -> updateEnabled());
-        unitCombo.addActionListener(e -> updateEnabled());
         configureSpinner(cadenceSpinner);
         configureSpinner(frameCountSpinner);
+        samplingChanged(settings.sampling());
+        settings.addListener(this);
+
+        timeStepButton.addActionListener(e -> push());
+        frameCountButton.addActionListener(e -> push());
+        unitCombo.addActionListener(e -> push());
+        cadenceSpinner.addChangeListener(e -> push());
+        frameCountSpinner.addChangeListener(e -> push());
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
@@ -61,8 +65,6 @@ public final class SamplingPanel extends JPanel {
         c.gridx = 1;
         c.weightx = 0;
         add(frameCountSpinner, c);
-
-        updateEnabled();
     }
 
     private static void configureSpinner(JHVSpinner spinner) {
@@ -75,18 +77,44 @@ public final class SamplingPanel extends JPanel {
         return ((Number) spinner.getValue()).intValue();
     }
 
-    public int getCadence() {
-        return frameCountButton.isSelected() ? cadenceForFrameCount(spinnerValue(frameCountSpinner)) : selectedCadence();
-    }
-
-    public void setCadence(int cadence) {
-        timeStepButton.setSelected(true);
-        applyCadence(cadence);
+    // The widgets to the settings.
+    private void push() {
         updateEnabled();
+        if (syncing)
+            return;
+        ImageRequestSettings.Sampling sampling;
+        if (frameCountButton.isSelected())
+            sampling = new ImageRequestSettings.FrameCount(spinnerValue(frameCountSpinner));
+        else if (unitCombo.getSelectedIndex() == GET_ALL_INDEX)
+            sampling = new ImageRequestSettings.All();
+        else
+            sampling = new ImageRequestSettings.TimeStep(selectedCadence());
+        settings.setSampling(sampling);
     }
 
-    public boolean isSingleFrame() {
-        return frameCountButton.isSelected() && spinnerValue(frameCountSpinner) == 1;
+    // The settings to the widgets.
+    @Override
+    public void samplingChanged(ImageRequestSettings.Sampling sampling) {
+        syncing = true;
+        try {
+            switch (sampling) {
+                case ImageRequestSettings.TimeStep step -> {
+                    timeStepButton.setSelected(true);
+                    applyCadence(step.seconds());
+                }
+                case ImageRequestSettings.All ignored -> {
+                    timeStepButton.setSelected(true);
+                    unitCombo.setSelectedIndex(GET_ALL_INDEX);
+                }
+                case ImageRequestSettings.FrameCount count -> {
+                    frameCountButton.setSelected(true);
+                    frameCountSpinner.setValue(Math.clamp(count.frames(), FRAME_COUNT_MIN, FRAME_COUNT_MAX));
+                }
+            }
+        } finally {
+            syncing = false;
+        }
+        updateEnabled();
     }
 
     private void updateEnabled() {
@@ -102,15 +130,12 @@ public final class SamplingPanel extends JPanel {
             case 0 -> value;
             case 1 -> value * 60;
             case 2 -> value * 3600;
-            case 3 -> value * 86400;
-            default -> APIRequest.CADENCE_ALL;
+            default -> value * 86400;
         };
     }
 
     private void applyCadence(int cadence) {
-        if (cadence == APIRequest.CADENCE_ALL) {
-            unitCombo.setSelectedIndex(GET_ALL_INDEX);
-        } else if (cadence % 86400 == 0) {
+        if (cadence % 86400 == 0) {
             setTimeStep(cadence / 86400, 3);
         } else if (cadence % 3600 == 0) {
             setTimeStep(cadence / 3600, 2);
@@ -126,8 +151,4 @@ public final class SamplingPanel extends JPanel {
         unitCombo.setSelectedItem(TIME_STEP_UNITS[unit]);
     }
 
-    private int cadenceForFrameCount(int frameCount) {
-        long span = Math.max(0, timeSelectorPanel.getEndTime() - timeSelectorPanel.getStartTime());
-        return (int) Math.max(1, Math.round((double) span / frameCount / 1000));
-    }
 }

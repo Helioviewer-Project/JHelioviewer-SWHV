@@ -26,9 +26,9 @@ import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesTree;
+import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 
@@ -43,8 +43,9 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
     private boolean isAdvanced;
 
+    private final ImageRequestSettings settings = ImageRequestSettings.instance();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
+    private final SamplingPanel samplingPanel = new SamplingPanel();
     private final ImageDialog imageDialog;
     private ImageLayer layerToReplace;
 
@@ -177,7 +178,15 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         c.gridx = 3;
         recordPanel.add(recordSizeComboBox, c);
 
-        timeSelectorPanel.addListener(Layers.timeSelectionListener);
+        // The selector edits the settings and shows what they accepted.
+        timeSelectorPanel.setTime(settings.start(), settings.end());
+        timeSelectorPanel.addListener(settings::setInterval);
+        settings.addListener(new ImageRequestSettings.Listener() {
+            @Override
+            public void intervalChanged(long start, long end) {
+                timeSelectorPanel.setTime(start, end);
+            }
+        });
         GridBagConstraints samplingConstraints = new GridBagConstraints();
         samplingConstraints.gridy = 2;
         samplingConstraints.gridx = 0;
@@ -213,33 +222,18 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         ViewState.addRecordingConfigListener(this);
     }
 
-    private int getCadence() {
-        return samplingPanel.getCadence();
-    }
-
     @Override
     public void setDefaultTimeRange(long start, long end) {
-        timeSelectorPanel.setTime(start, end);
-    }
-
-    private long getStartTime() {
-        return timeSelectorPanel.getStartTime();
-    }
-
-    private long getEndTime() {
-        return timeSelectorPanel.getEndTime();
+        settings.setInterval(start, end);
     }
 
     @Override
     public void loadDatasets(List<DataSourcesTree.SourceItem> items) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
-        long start = getStartTime();
-        long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-        int cadence = getCadence();
         for (DataSourcesTree.SourceItem item : items) {
             ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
-            imageLayer.load(new APIRequest(item.server, item.sourceId, start, end, cadence));
+            imageLayer.load(settings.request(item.server, item.sourceId));
         }
     }
 
@@ -256,16 +250,14 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         imageDialog.showDialog(true);
     }
 
-    // Lock and Difference panel: show the range in the time fields, then reload all image layers.
+    // Lock and Difference panel: take the range, then reload all image layers.
     public void syncLayersSpan(long start, long end) {
-        timeSelectorPanel.setTime(start, end);
+        settings.setInterval(start, end);
         loadLayersSpan();
     }
 
     private void loadLayersSpan() {
-        long start = getStartTime();
-        long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-        ImageLayers.syncLayersSpan(start, end, getCadence());
+        ImageLayers.syncLayersSpan(settings);
     }
 
     private static class RecordButton extends JideToggleButton {

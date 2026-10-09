@@ -15,9 +15,9 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("unchecked")
@@ -46,7 +46,14 @@ public final class Layers {
             TimeUtils.defaultCadence(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli)));
     private static ImageLayer activeLayer = nullImageLayer;
 
-    public static final TimeListener.Selection timeSelectionListener = Layers::timeSelectionChanged;
+    static {
+        ImageRequestSettings.instance().addListener(new ImageRequestSettings.Listener() {
+            @Override
+            public void intervalChanged(long start, long end) {
+                timeSelectionChanged(start, end);
+            }
+        });
+    }
 
     private static void timeSelectionChanged(long start, long end) {
         nullImageLayer.setFrames(Frames.synthetic(start, end, TimeUtils.defaultCadence(start, end)));
