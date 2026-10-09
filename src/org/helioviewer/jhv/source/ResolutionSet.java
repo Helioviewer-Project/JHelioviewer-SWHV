@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k;
+package org.helioviewer.jhv.source;
 
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {

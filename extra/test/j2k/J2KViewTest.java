@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k;
+package org.helioviewer.jhv.source;
 
 import java.awt.EventQueue;
 import java.io.BufferedReader;
@@ -56,12 +56,12 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.source.jpip.JPIPSocket;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 
 // The real view and reader thread on a JPIP movie, headless.
 // Arguments: Kakadu library, bridge library, JPIP URI of a movie.

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k;
+package org.helioviewer.jhv.source;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -10,8 +10,8 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HexFormat;
 
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
+import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
 // Raw reader pixels, independent of the view's delivery and filtering path.
 // Arguments: Kakadu library, bridge library, single-frame JPIP URI, movie JPIP URI.

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.io.File;
 import java.util.Set;
@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
@@ -23,7 +24,6 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.BaseView;
-import org.helioviewer.jhv.view.ClipSet;
 
 public final class URIView extends BaseView {
 

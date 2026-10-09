@@ -25,7 +25,6 @@ import org.helioviewer.jhv.layers.filters.LUTPanel;
 import org.helioviewer.jhv.layers.filters.RangeSliderFilterPanel;
 import org.helioviewer.jhv.layers.filters.SectorPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
-import org.helioviewer.jhv.view.uri.FITSSettings;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;

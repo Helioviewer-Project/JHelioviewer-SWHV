@@ -43,8 +43,8 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.thread.Task;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;

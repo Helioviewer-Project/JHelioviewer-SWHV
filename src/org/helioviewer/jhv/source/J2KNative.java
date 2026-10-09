@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k;
+package org.helioviewer.jhv.source;
 
 import java.io.IOException;
 import java.lang.foreign.Arena;

@@ -22,7 +22,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.metadata.DetectorMask;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 
 import nom.tam.fits.FitsFactory;
 

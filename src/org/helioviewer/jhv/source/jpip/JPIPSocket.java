@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.jpip;
+package org.helioviewer.jhv.source.jpip;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
+import org.helioviewer.jhv.source.jpip.http.HTTPSocket;
 
 // One JPIP channel over a persistent HTTP connection. Responses arrive in request order.
 public final class JPIPSocket extends HTTPSocket {

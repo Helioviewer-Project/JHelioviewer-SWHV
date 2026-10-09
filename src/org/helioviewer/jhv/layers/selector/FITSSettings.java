@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

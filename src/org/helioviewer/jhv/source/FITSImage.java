@@ -1,14 +1,14 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.io.File;
 import java.nio.Buffer;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.view.ClipSet;
 
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k;
+package org.helioviewer.jhv.source;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
+import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
+import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
 class J2KReader implements Runnable {
 

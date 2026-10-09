@@ -78,11 +78,11 @@ def main():
         palette_fixtures(Path(directory))
         subprocess.run([
             "javac", "--release", "25", "-nowarn", "-cp", classpath, "-d", directory,
-            str(root / "src/org/helioviewer/jhv/view/j2k/J2KNative.java"),
+            str(root / "src/org/helioviewer/jhv/source/J2KNative.java"),
             str(root / "extra/test/j2k/J2KNativeTest.java"),
         ], check=True, timeout=60)
         java_args = ["--enable-native-access=ALL-UNNAMED", "-cp", classpath + os.pathsep + directory,
-                     "org.helioviewer.jhv.view.j2k.J2KNativeTest"]
+                     "org.helioviewer.jhv.source.J2KNativeTest"]
         subprocess.run(["java", "-Xmx64m", *java_args, "--responses", str(args.libraries.resolve())], check=True, timeout=30)
         subprocess.run([
             "java", *java_args, "--local",

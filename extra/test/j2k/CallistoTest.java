@@ -18,10 +18,10 @@ import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.source.J2KSource;
+import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.view.j2k.J2KSource;
-import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 // Arguments: Kakadu library, bridge library, Callisto JP2 file.
 public final class CallistoTest {

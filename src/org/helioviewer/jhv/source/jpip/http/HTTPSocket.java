@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.jpip.http;
+package org.helioviewer.jhv.source.jpip.http;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -14,10 +14,10 @@ import java.util.Locale;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
 
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.view.ClipSet;
 
 import nom.tam.fits.FitsFactory;
 

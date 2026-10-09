@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;

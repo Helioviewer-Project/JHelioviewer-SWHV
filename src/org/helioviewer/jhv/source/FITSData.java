@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -6,12 +6,12 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
-import org.helioviewer.jhv.view.ClipSet;
 
 import nom.tam.fits.Header;
 

@@ -42,13 +42,13 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
                     "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
     for name in ["JPIPCacheManagerTest", "http.HTTPStreamTest", "JPIPSocketTest"]:
         print("Running " + name, flush=True)
-        subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip." + name],
+        subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.source.jpip." + name],
                        check=True, timeout=60)
     print("Running J2KReaderTest without native libraries", flush=True)
-    subprocess.run([*java, "org.helioviewer.jhv.view.j2k.J2KReaderTest"], check=True, timeout=60)
+    subprocess.run([*java, "org.helioviewer.jhv.source.J2KReaderTest"], check=True, timeout=60)
     if platform.system() != "Windows":
         print("Running JPIPCacheManagerTest with Windows cache paths", flush=True)
-        subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManagerTest", "--windows-path"],
+        subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.source.jpip.JPIPCacheManagerTest", "--windows-path"],
                        check=True, timeout=60)
     if args.live:
         system = platform.system()
@@ -77,11 +77,11 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         with urlopen(movie_request, timeout=180) as response:
             movie = json.load(response)["uri"]
         print("Running J2KReaderTest (single image and movie)", flush=True)
-        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.view.j2k.J2KReaderTest", *libraries, uri, movie],
+        subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.source.J2KReaderTest", *libraries, uri, movie],
                        check=True, timeout=360)
         subprocess.run([*java, "-Xmx512m", "-Djhv.test.timeoutSeconds=480",
                         "-Djhv.test.cleaner=" + str(args.cleaner).lower(),
-                        "org.helioviewer.jhv.view.j2k.J2KViewTest", *libraries, movie],
+                        "org.helioviewer.jhv.source.J2KViewTest", *libraries, movie],
                        check=True, timeout=510)
 
         callisto = "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?sourceId=5000&date=2026-09-09T00:00:00Z"

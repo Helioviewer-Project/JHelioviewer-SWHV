@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view;
+package org.helioviewer.jhv.image;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.uri;
+package org.helioviewer.jhv.source;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;

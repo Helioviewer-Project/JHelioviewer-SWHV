@@ -18,8 +18,8 @@ import java.util.Random;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
-import org.helioviewer.jhv.view.uri.FITSImage;
-import org.helioviewer.jhv.view.uri.FastRiceProvider;
+import org.helioviewer.jhv.source.FITSImage;
+import org.helioviewer.jhv.source.FastRiceProvider;
 
 import nom.tam.fits.compression.algorithm.api.ICompressorControl;
 import nom.tam.fits.compression.algorithm.rice.RiceCompressOption;

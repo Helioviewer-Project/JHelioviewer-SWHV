@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.thread.AppThread;

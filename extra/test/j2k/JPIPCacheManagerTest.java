@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.view.j2k.jpip;
+package org.helioviewer.jhv.source.jpip;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

@@ -48,7 +48,7 @@ fi
 JAVA_LOG="$BUILD_DIR/java-output.log"
 set +e
 java "${JAVA_ARGS[@]}" --enable-native-access=ALL-UNNAMED -Duser.timezone=UTC -Duser.language=en -Duser.country=US \
-  -cp "$BUILD_DIR:$CP" org.helioviewer.jhv.view.uri.FITSLoadBenchmark "$@" > "$JAVA_LOG" 2>&1
+  -cp "$BUILD_DIR:$CP" org.helioviewer.jhv.source.FITSLoadBenchmark "$@" > "$JAVA_LOG" 2>&1
 STATUS=$?
 set -e
 

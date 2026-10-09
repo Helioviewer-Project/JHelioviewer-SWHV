@@ -21,11 +21,11 @@ import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
+import org.helioviewer.jhv.source.J2KView;
+import org.helioviewer.jhv.source.URIView;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
-import org.helioviewer.jhv.view.j2k.J2KView;
-import org.helioviewer.jhv.view.uri.URIView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
