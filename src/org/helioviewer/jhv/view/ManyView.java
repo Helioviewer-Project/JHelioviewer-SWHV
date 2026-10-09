@@ -115,7 +115,7 @@ public class ManyView implements View {
     }
 
     @Override
-    public void setDataHandler(View.DataHandler dataHandler) {
+    public void setDataHandler(@Nullable View.DataHandler dataHandler) {
         views.forEach(view -> view.setDataHandler(dataHandler));
     }
 

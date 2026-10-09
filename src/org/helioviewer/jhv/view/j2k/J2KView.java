@@ -334,7 +334,7 @@ public final class J2KView extends BaseView {
 
     // Runs on the decode worker; the view owns solar geometry and image filtering.
     private DecodedImage decodeImage(J2KParams.Decode params, ImageFilter.Type filterType, MetaData metadata) throws IOException {
-        try (J2KNative.Decode job = source.client().beginDecode(params.frame(), params.level())) {
+        try (J2KNative.Decode job = source.beginDecode(params.frame(), params.level())) {
             ResolutionSet set = source.resolutionSet(params.frame());
             ResolutionSet.Level resolution = set.getLevel(params.level());
             ResolutionSet.Level full = set.getLevel(0);

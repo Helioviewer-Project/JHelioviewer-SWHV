@@ -19,9 +19,10 @@ public final class J2KSource {
     private final J2KNative client;
     // An entry exists once the frame's header is known.
     private AtomicReferenceArray<ResolutionSet> sets;
-    // Prefix lengths advanced only by update(), published to the EDT and reader.
-    private volatile int displayableFrames;
-    private volatile int completeFrames;
+    private record Completion(int displayableFrames, int completeFrames) {}
+
+    // Published by the reader; consumers see both prefix lengths from the same update.
+    private volatile Completion completion = new Completion(0, 0);
 
     // A local file, or an empty JPIP source for null.
     public J2KSource(@Nullable Path path) throws IOException {
@@ -44,6 +45,11 @@ public final class J2KSource {
 
     J2KNative client() {
         return client;
+    }
+
+    // Acquire the input before allocating output. The caller closes the job after decoding.
+    J2KNative.Decode beginDecode(int frame, int level) throws IOException {
+        return client.beginDecode(frame, level);
     }
 
     // Initializes the frame array in the local constructor or JPIP reader constructor,
@@ -79,8 +85,11 @@ public final class J2KSource {
         }
 
         // A complete coarsest level makes the frame displayable.
-        displayableFrames = completeUntil(displayableFrames, Integer.MAX_VALUE);
-        completeFrames = completeUntil(completeFrames, 0);
+        Completion previous = completion;
+        int displayable = completeUntil(previous.displayableFrames, Integer.MAX_VALUE);
+        int complete = completeUntil(previous.completeFrames, 0);
+        if (displayable != previous.displayableFrames || complete != previous.completeFrames)
+            completion = new Completion(displayable, complete);
     }
 
     // The first frame at or after from without a complete level.
@@ -130,7 +139,7 @@ public final class J2KSource {
     // Null: not displayable; false: displayable, incomplete at the level; true: complete at the level.
     @Nullable
     Boolean getFrameStatus(int frame, int level) {
-        if (completeFrames == sets.length())
+        if (completion.completeFrames == sets.length())
             return true;
         ResolutionSet set = sets.get(frame);
         return set != null && set.isDisplayable() ? set.getComplete(level) : null;
@@ -138,11 +147,11 @@ public final class J2KSource {
 
     // The last frame of the displayable prefix.
     int getPartialUntil() {
-        return Math.max(0, displayableFrames - 1);
+        return Math.max(0, completion.displayableFrames - 1);
     }
 
     boolean isComplete(int level) {
-        return completeUntil(completeFrames, level) == frames();
+        return completeUntil(completion.completeFrames, level) == frames();
     }
 
     // Gray8 or RGBA rows into a direct buffer; runs on a decode worker.
@@ -155,7 +164,7 @@ public final class J2KSource {
 
     // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
     public byte[] decode(int frame, int level, int x, int y, int width, int height) throws IOException {
-        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
+        try (J2KNative.Decode job = beginDecode(frame, level)) {
             ByteBuffer direct = MemoryUtil.memAlloc(width * height * resolutionSet(frame).numComps);
             try {
                 decode(job, x, y, width, height, direct);

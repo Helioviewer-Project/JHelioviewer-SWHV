@@ -34,7 +34,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
-    private final GLSLImage glImage;
+    private final GLSLImage glImage = new GLSLImage(displaySettings);
     private final ImageLayerLoader loader;
 
     private boolean removed;
@@ -68,14 +68,12 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     // Constructor for NullImageLayer
     protected ImageLayer(View _view) {
         view = _view;
-        glImage = null;
         loader = new ImageLayerLoader(processingSettings, v -> {}, () -> {});
     }
 
     private ImageLayer() {
         view = new BaseView(null, null, processingSettings);
 
-        glImage = new GLSLImage(displaySettings);
         loader = new ImageLayerLoader(processingSettings, this::setView, this::loadFailed);
     }
 
@@ -193,13 +191,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void prerender() {
-        if (imageData == null) {
+        View.ImageData current = imageData;
+        if (current == null) {
             return;
         }
-        View.ImageData comparisonData = comparisonImageData();
-        ImageBuffer differenceBuffer = displaySettings.getDifferenceMode() == DifferenceMode.None || comparisonData == null
+        View.ImageData comparisonData = comparisonImageData(current);
+        ImageBuffer differenceBuffer = displaySettings.getDifferenceMode() == DifferenceMode.None
                 ? null : comparisonData.imageBuffer();
-        glImage.streamImages(imageData.imageBuffer(), differenceBuffer);
+        glImage.streamImages(current.imageBuffer(), differenceBuffer);
     }
 
     @Override
@@ -217,17 +216,18 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (imageData == null) {
+        View.ImageData current = imageData;
+        if (current == null) {
             return;
         }
         if (!isVisible[vp.idx])
             return;
 
-        MetaData meta0 = imageData.metaData();
-        glImage.applyFilters(imageData.imageBuffer(), meta0, getFilter() == ImageFilter.Type.RHEF);
+        MetaData meta0 = current.metaData();
+        glImage.applyFilters(current.imageBuffer(), meta0, getFilter() == ImageFilter.Type.RHEF);
 
         Position metaViewpoint0 = meta0.getViewpoint();
-        View.ImageData imageDataDiff = comparisonImageData();
+        View.ImageData imageDataDiff = comparisonImageData(current);
         MetaData meta1 = imageDataDiff.metaData();
         Position metaViewpoint1 = meta1.getViewpoint();
         WcsHeader wcs0 = meta0.getWcsHeader();
@@ -277,15 +277,17 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
 
         GLSLImageShader.bindImages(
-                imageData.region(), planeToImage0, crval0, wcs0,
+                current.region(), planeToImage0, crval0, wcs0,
                 (float) metaViewpoint0.distance, deltaT0, cameraDiff0, sourceView0,
                 imageDataDiff.region(), planeToImage1, crval1, wcs1,
                 (float) metaViewpoint1.distance, deltaT1, cameraDiff1, sourceView1);
         GLSLImageShader.render(mv.mode(), wcs0.pv2, wcs1.pv2);
     }
 
-    private View.ImageData comparisonImageData() {
-        return displaySettings.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+    @Nonnull
+    private View.ImageData comparisonImageData(@Nonnull View.ImageData current) {
+        View.ImageData comparison = displaySettings.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+        return comparison == null ? current : comparison;
     }
 
     @Override
@@ -309,10 +311,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         glImage.dispose();
     }
 
+    @Nullable
     private View.ImageData imageData;
+    @Nullable
     private View.ImageData prevImageData;
+    @Nullable
     private View.ImageData baseImageData;
 
+    @Nullable
     private static View.ImageData replaceImageData(@Nullable View.ImageData previous, @Nullable View.ImageData next) {
         if (next != null)
             next.image().retain();
@@ -354,7 +360,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Override
-    public void handleData(View.ImageData newImageData) {
+    public void handleData(@Nonnull View.ImageData newImageData) {
         String oldName = getName();
 
         setImageData(newImageData);
@@ -363,7 +369,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             Layers.fireNameUpdated(this);
         Layers.fireTimeUpdated(this);
 
-        ImageLayers.displaySynced(imageData.viewpoint());
+        ImageLayers.displaySynced(newImageData.viewpoint());
     }
 
     @Override

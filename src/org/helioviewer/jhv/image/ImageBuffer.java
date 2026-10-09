@@ -37,7 +37,7 @@ public final class ImageBuffer {
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter filter) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        if (!needsFiltering(format, filter))
+        if (keepsOriginalPixels(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
         return fromFloats(width, height, filter.apply(ByteBuffer.wrap(data), width, height));
     }
@@ -45,7 +45,7 @@ public final class ImageBuffer {
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        if (!needsFiltering(format, filter))
+        if (keepsOriginalPixels(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
         return fromFloats(width, height, filter.apply(ShortBuffer.wrap(data), width, height));
     }
@@ -120,7 +120,7 @@ public final class ImageBuffer {
         // Filtering consumes the input; the returned image owns the final pixels.
         public ImageBuffer finish(ImageFilter filter) {
             ImageBuffer input = finish();
-            if (!needsFiltering(input.format, filter))
+            if (keepsOriginalPixels(input.format, filter))
                 return input;
 
             float[] filtered;
@@ -144,8 +144,8 @@ public final class ImageBuffer {
 
     }
 
-    private static boolean needsFiltering(Format format, ImageFilter filter) {
-        return format != Format.RGBA32 && !filter.isNone();
+    private static boolean keepsOriginalPixels(Format format, ImageFilter filter) {
+        return format == Format.RGBA32 || filter.isNone();
     }
 
     private static final class BufferState implements Runnable {

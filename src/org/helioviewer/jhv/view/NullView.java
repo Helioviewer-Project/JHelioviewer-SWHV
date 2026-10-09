@@ -2,6 +2,8 @@ package org.helioviewer.jhv.view;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
@@ -42,7 +44,7 @@ public class NullView implements View {
     }
 
     @Override
-    public void setDataHandler(View.DataHandler dataHandler) {}
+    public void setDataHandler(@Nullable View.DataHandler dataHandler) {}
 
     @Override
     public JHVTime getFrameTime(int frame) {

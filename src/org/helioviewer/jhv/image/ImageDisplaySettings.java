@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.image;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.image.lut.LUT;
 
 import org.json.JSONObject;
@@ -142,7 +144,7 @@ public final class ImageDisplaySettings {
         sharpen = Math.clamp(_sharpen, -1, 1);
     }
 
-    public void setLUT(LUT newLUT, boolean invert) {
+    public void setLUT(@Nullable LUT newLUT, boolean invert) {
         lut = newLUT == null ? LUT.gray() : newLUT;
         invertLUT = invert;
     }

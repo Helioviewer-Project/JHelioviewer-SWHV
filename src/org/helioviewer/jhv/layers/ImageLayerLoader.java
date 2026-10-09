@@ -57,7 +57,7 @@ final class ImageLayerLoader {
 
     private void load(Callable<View> task) {
         cancelLoad();
-        loadThread = Thread.ofVirtual().name("Image-Load").unstarted(() -> {
+        Thread nextLoad = Thread.ofVirtual().name("Image-Load").unstarted(() -> {
             Thread worker = Thread.currentThread();
             try {
                 View result = task.call();
@@ -67,7 +67,8 @@ final class ImageLayerLoader {
                 EventQueue.invokeLater(() -> finishLoad(worker, null, t));
             }
         });
-        loadThread.start();
+        nextLoad.start();
+        loadThread = nextLoad;
     }
 
     boolean isLoading() {
@@ -93,6 +94,7 @@ final class ImageLayerLoader {
         }
     }
 
+    // EDT teardown: the layer is already excluded from getImageLayers(), so no new decode may be submitted.
     void abolish() {
         cancelLoad();
         cancelDownload();

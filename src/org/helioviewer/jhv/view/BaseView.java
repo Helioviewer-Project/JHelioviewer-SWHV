@@ -88,10 +88,11 @@ public class BaseView implements View {
         return m instanceof FitsMetaData fm ? LUT.get(fm) : null;
     }
 
+    @Nullable
     protected View.DataHandler dataHandler;
 
     @Override
-    public void setDataHandler(View.DataHandler _dataHandler) {
+    public void setDataHandler(@Nullable View.DataHandler _dataHandler) {
         dataHandler = _dataHandler;
     }
 

@@ -35,7 +35,7 @@ public interface View {
 
     interface DataHandler {
         // Borrowed for this call. Retain the decoded image if it will be kept afterward.
-        void handleData(ImageData imageData);
+        void handleData(@Nonnull ImageData imageData);
     }
 
     String EMPTY_METAXML = "<xml/>";
@@ -91,7 +91,7 @@ public interface View {
         return 0;
     }
 
-    void setDataHandler(DataHandler dataHandler);
+    void setDataHandler(@Nullable DataHandler dataHandler);
 
     default boolean isDownloading() {
         return false;
