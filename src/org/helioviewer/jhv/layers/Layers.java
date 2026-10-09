@@ -130,6 +130,7 @@ public final class Layers {
         if (layer instanceof ImageLayer) {
             imageLayersCount--;
             ImageLayers.arrangeMultiView();
+            DisplayController.zoomMiniToFit();
         }
         detach(layer);
 

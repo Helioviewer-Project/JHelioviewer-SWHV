@@ -194,7 +194,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         frames.setListener(null);
         frames.close();
         clearImageData();
-        DisplayController.zoomMiniToFit();
     }
 
     @Override
