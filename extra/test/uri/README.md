@@ -107,3 +107,8 @@ java -Djava.awt.headless=true -Duser.home=/tmp/jhv-frames --enable-native-access
   -cp "<test classes>:bin:resources:lib/*" org.helioviewer.jhv.layers.FramesLoadTest \
   a.fits b.fits c.fits two.zip not-an-image
 ```
+
+`LayerLoadTest` checks the layer's load-finished future through the real registry, headless:
+a successful FITS load completes true and a finished layer answers at once, a failed first load
+removes the layer and completes false, and removing a layer with a pending wait completes it
+false. Run it like `FramesLoadTest`, with a FITS file and a file that is not an image.

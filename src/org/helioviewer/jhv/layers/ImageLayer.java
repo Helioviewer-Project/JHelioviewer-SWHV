@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,6 +45,8 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     private String baseName;
     private boolean loaded;
     private boolean removed;
+    @Nullable
+    private CompletableFuture<Boolean> loadFinished;
 
     public static ImageLayer create() {
         ImageLayer imageLayer = new ImageLayer(Frames.placeholder());
@@ -139,6 +142,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
             Layers.fireLayerUpdated(this);
         else
             Layers.remove(this);
+        settleLoad();
     }
 
     @Override
@@ -172,6 +176,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
             DisplayController.render();
         }
         Layers.fireLayerUpdated(this);
+        settleLoad();
     }
 
     // One replacement: outstanding decodes of the old timeline are dropped before it is closed.
@@ -193,6 +198,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         frames.setListener(null);
         frames.close();
         clearImageData();
+        settleLoad();
     }
 
     @Override
@@ -393,6 +399,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Frames.Frame current = frames.get(frames.current());
         if (moved || (current.source() == source && current.index() == frame))
             decoder.redecode(frames);
+        settleLoad();
     }
 
     @Override
@@ -444,6 +451,25 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     public boolean isLoadFinished() {
         return !loader.isLoading() && frames.completion(frames.size() - 1) != null;
+    }
+
+    // Completes with whether the layer is still registered once its load has finished. EDT only.
+    public CompletableFuture<Boolean> whenLoadFinished() {
+        CompletableFuture<Boolean> future = loadFinished;
+        if (future == null) {
+            future = new CompletableFuture<>();
+            loadFinished = future;
+            settleLoad(); // may complete it at once
+        }
+        return future;
+    }
+
+    private void settleLoad() {
+        if (loadFinished == null || (!removed && !isLoadFinished()))
+            return;
+        CompletableFuture<Boolean> future = loadFinished;
+        loadFinished = null;
+        future.complete(!removed);
     }
 
     public void cancelDownloadTask() {

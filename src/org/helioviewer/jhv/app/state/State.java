@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.app.state;
 
+import java.awt.EventQueue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -9,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
@@ -17,14 +19,12 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.thread.AppThread;
-import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -200,10 +200,8 @@ public final class State {
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
         Callback callback = new Callback(context, newLayers, masterLayer, time, modeData);
-        Task.submitBackground(
-                new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
-                callback::onSuccess,
-                callback::onFailure);
+        CompletableFuture.allOf(newLayers.keySet().stream().map(ImageLayer::whenLoadFinished).toArray(CompletableFuture[]::new))
+                .thenRun(() -> EventQueue.invokeLater(callback::onSuccess));
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
@@ -215,7 +213,7 @@ public final class State {
             DisplayController.refreshCamera();
         }
 
-        void onSuccess(Void result) {
+        void onSuccess() {
             for (ImageLayer layer : Layers.getImageLayers()) {
                 Boolean enabled = newLayers.get(layer);
                 if (enabled != null) // user may have loaded a new layer in the meanwhile
@@ -225,12 +223,6 @@ public final class State {
                 Layers.setActiveImageLayer(masterLayer);
             applyRestoredPlaybackState();
             Commands.notifyLoadStateFinished(context, true, "State loaded.");
-        }
-
-        void onFailure(Throwable t) {
-            Log.error(t);
-            String message = t.getMessage() == null || t.getMessage().isBlank() ? "State load failed." : t.getMessage();
-            Commands.notifyLoadStateFinished(context, false, message);
         }
 
     }
