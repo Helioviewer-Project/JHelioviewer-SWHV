@@ -92,8 +92,8 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         processingSettings.setFilter(type);
     }
 
-    void decode(Position viewpoint, double pixFactor) {
-        decoder.decode(frames, viewpoint, pixFactor);
+    void decode(Position viewpoint, double pixFactor, boolean priority) {
+        decoder.decode(frames, viewpoint, pixFactor, priority);
     }
 
     public ImageProcessingSettings getProcessingSettings() {

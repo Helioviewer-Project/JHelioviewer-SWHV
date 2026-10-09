@@ -109,7 +109,7 @@ public final class FramesLoadTest {
             EventQueue.invokeAndWait(() -> {
                 decoder.reset(frames.serial());
                 frames.select(frames.first());
-                decoder.decode(frames, first.metaData().getViewpoint(), scale);
+                decoder.decode(frames, first.metaData().getViewpoint(), scale, true);
             });
             ImageData image = images.poll(60, TimeUnit.SECONDS);
             if (image == null || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())

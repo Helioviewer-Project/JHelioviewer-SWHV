@@ -51,13 +51,11 @@ import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.source.J2KFixture;
 import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
-import org.helioviewer.jhv.thread.EDTTimer;
 
 // The real timeline, decoder and reader thread on a JPIP movie, headless.
 // Arguments: Kakadu library, bridge library, JPIP URI of a movie.
@@ -95,8 +93,6 @@ public final class FrameDecoderTest {
         J2KFixture.checkDraining(responses);
         checkRetriesAndKeys(responses);
 
-        EDTTimer playback = (EDTTimer) field(Player.class, null, "movieTimer");
-
         // Paused, first shown at its coarsest level, which opening already made complete: the movie still downloads.
         Opened opened = open(uri);
         try {
@@ -104,11 +100,11 @@ public final class FrameDecoderTest {
             int frames = opened.frames.size();
             if (frames < 4)
                 throw new AssertionError("Expected a movie with at least four frames");
-            show(opened, 0, Integer.MAX_VALUE);
+            show(opened, 0, Integer.MAX_VALUE, true);
             await(opened, frames - 1);
             // A finer level of the shown frame is fetched and delivered without another request to decode.
             ResolutionSet.Level finer = opened.source.level(0, 3);
-            show(opened, 0, 3);
+            show(opened, 0, 3, true);
             ImageData image;
             do {
                 image = images.poll(60, TimeUnit.SECONDS);
@@ -124,18 +120,10 @@ public final class FrameDecoderTest {
             close(opened);
         }
 
-        // Playing: the whole movie at one level, undisturbed and with the connection lost once.
-        EventQueue.invokeAndWait(() -> {
-            playback.setInitialDelay(Integer.MAX_VALUE); // playing, without advancing the timeline
-            playback.start();
-        });
-        try {
-            String[] reference = play(uri, false);
-            if (!Arrays.equals(reference, play(uri, true)))
-                throw new AssertionError("Movie pixels differ after a lost connection");
-        } finally {
-            EventQueue.invokeAndWait(playback::stop);
-        }
+        // Playing, so without priority: the whole movie at one level, undisturbed and with the connection lost once.
+        String[] reference = play(uri, false);
+        if (!Arrays.equals(reference, play(uri, true)))
+            throw new AssertionError("Movie pixels differ after a lost connection");
         System.out.println("PASS: download start, latest refresh viewpoint and resolution, replaced-timeline refresh, priority refresh, playing download and connection recovery");
         System.exit(0);
     }
@@ -228,7 +216,7 @@ public final class FrameDecoderTest {
         Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
         double scale = size.height() / metadata.getPhysicalRegion().height;
         clearImages();
-        EventQueue.invokeAndWait(() -> decoder.decode(frames, latest, scale));
+        EventQueue.invokeAndWait(() -> decoder.decode(frames, latest, scale, true));
         ImageData image = images.poll(60, TimeUnit.SECONDS);
         if (image == null || image.viewpoint() != latest)
             throw new AssertionError("Latest request viewpoint was not delivered");
@@ -259,7 +247,7 @@ public final class FrameDecoderTest {
         Opened opened = open(uri);
         try {
             int frames = opened.frames.size();
-            show(opened, 0, 4);
+            show(opened, 0, 4, false);
             if (drop) {
                 await(opened, frames / 3);
                 Object reader = field(J2KSource.class, opened.source, "reader");
@@ -275,7 +263,7 @@ public final class FrameDecoderTest {
             String[] hashes = new String[frames];
             for (int frame = 0; frame < frames; frame++) {
                 ResolutionSet.Level size = opened.source.level(frame, 4);
-                show(opened, frame, 4);
+                show(opened, frame, 4, false);
                 ImageData image = images.poll(60, TimeUnit.SECONDS);
                 if (image == null || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
                     throw new AssertionError("Complete frame " + frame + " was not delivered at its level");
@@ -333,7 +321,7 @@ public final class FrameDecoderTest {
     }
 
     // Asks for a frame at the level a display of that level's height would want.
-    private static void show(Opened opened, int frame, int level) throws Exception {
+    private static void show(Opened opened, int frame, int level, boolean priority) throws Exception {
         Frames frames = opened.frames;
         MetaData metadata = frames.get(frame).metaData();
         double scale = opened.source.level(frame, level).height() / metadata.getPhysicalRegion().height;
@@ -341,7 +329,7 @@ public final class FrameDecoderTest {
         EventQueue.invokeAndWait(() -> {
             frames.select(frames.time(frame));
             if (frames.current() == frame)
-                opened.decoder.decode(frames, metadata.getViewpoint(), scale);
+                opened.decoder.decode(frames, metadata.getViewpoint(), scale, priority);
         });
         if (frames.current() != frame)
             throw new AssertionError("Frame " + frame + " cannot be selected");

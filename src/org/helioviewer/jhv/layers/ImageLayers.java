@@ -14,6 +14,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.EDTTimer;
@@ -26,12 +27,14 @@ import org.astrogrid.samp.SampUtils;
 public final class ImageLayers {
 
     public static boolean decode(Position viewpoint) {
+        boolean recording = ExportMovie.isRecording(); // the finest level, whatever the display needs
+        boolean priority = !Player.isPlaying();
         boolean decoded = false;
         for (ImageLayer layer : Layers.getImageLayers()) {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
-                double pixFactor = DisplayController.getImagePixelFactor(Display.getViewport(idx));
-                layer.decode(viewpoint, pixFactor);
+                double pixFactor = recording ? Double.POSITIVE_INFINITY : DisplayController.getImagePixelFactor(Display.getViewport(idx));
+                layer.decode(viewpoint, pixFactor, priority);
                 decoded = true;
             }
         }

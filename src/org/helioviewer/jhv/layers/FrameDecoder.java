@@ -13,8 +13,6 @@ import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
-import org.helioviewer.jhv.movie.ExportMovie;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.LatestWorker;
@@ -43,6 +41,7 @@ final class FrameDecoder {
     private int installation = -1;
     private Position viewpoint;
     private double pixFactor;
+    private boolean priority;
 
     FrameDecoder(ImageProcessingSettings _settings, Target _target) {
         settings = _settings;
@@ -61,13 +60,15 @@ final class FrameDecoder {
         executor.dispose();
     }
 
-    void decode(Frames frames, Position _viewpoint, double _pixFactor) {
+    // An infinite pixFactor asks for the finest level; priority puts a remote request ahead of the movie download.
+    void decode(Frames frames, Position _viewpoint, double _pixFactor, boolean _priority) {
         viewpoint = _viewpoint;
         pixFactor = _pixFactor;
+        priority = _priority;
         redecode(frames);
     }
 
-    // The current frame at the last viewpoint and scale.
+    // The current frame at the last viewpoint, scale and priority.
     void redecode(Frames frames) {
         if (viewpoint == null || frames.serial() != installation)
             return;
@@ -80,7 +81,7 @@ final class FrameDecoder {
         int wanted = level(frame, pixFactor);
         // The whole finest complete level while a remote frame lacks the wanted one, read before requesting.
         int available = source.levels(frame.index()).getCompleteLevel(wanted).level();
-        source.request(frame.index(), wanted, !Player.isPlaying());
+        source.request(frame.index(), wanted, priority);
 
         ImageProcessingSettings.FITSParameters fits = source.usesFITSParameters() ? settings.fitsParameters() : null;
         ClipSet.Range clip = fits == null ? null : fits.clipRange(frames.clipSet());
@@ -115,10 +116,8 @@ final class FrameDecoder {
         });
     }
 
-    // Level 0 while recording; otherwise the coarsest level not smaller than the display needs.
+    // The coarsest level not smaller than the display needs.
     static int level(Frames.Frame frame, double pixFactor) {
-        if (ExportMovie.isRecording())
-            return 0;
         MetaData m = frame.metaData();
         int reqWidth = (int) (m.getPhysicalRegion().width * pixFactor + .5);
         int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
