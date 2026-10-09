@@ -9,7 +9,9 @@ python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 The default suite uses loopback servers and needs no external network or JPEG 2000
-native library. Image-memory checks use the bundled LWJGL native allocator:
+native library. It also runs two timeline checks that need no network: `FramesTest`
+for frame selection and synthesis, and `ImageRequestSettingsTest` for the request interval
+and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
 
 - Decode scheduling: repeated keys reuse running work or a result awaiting its EDT callback,
   with the latest delivery context. Checks cover A-B-A, failure/retry, invalidation,
