@@ -150,7 +150,9 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Observation Date: " + fitsMetadata.getViewpoint().time +
                 (hasSourceUri ? "<br/>" + sourceText : ""));
 
-        Task.submitBackground("metadata", () -> parseMetadata(layer, fitsMetadata), parsed -> applyMetadata(request, parsed), Log::error);
+        String xml = layer.getView().getXMLMetaData(fitsMetadata.getViewpoint().time);
+        String filename = fitsMetadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(fitsMetadata.getViewpoint().time.milli) + ".fits.xml";
+        Task.submitBackground("metadata", () -> parseMetadata(xml, filename), parsed -> applyMetadata(request, parsed), Log::error);
     }
 
     private void applyMetadata(int request, ParsedMetadata parsed) {
@@ -170,20 +172,18 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         }
     }
 
-    private static ParsedMetadata parseMetadata(ImageLayer layer, FitsMetaData metadata) throws Exception {
-        String xml = layer.getView().getXMLMetaData();
+    private static ParsedMetadata parseMetadata(String xml, String filename) throws Exception {
         Document doc = XMLUtils.parse(xml);
 
         List<NodeValue> fits = new ArrayList<>();
         StringBuilder helioviewer = new StringBuilder();
         Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
         if (root != null)
-            readFitsXMLData(fits, root);
+            readXMLData(root, fits::add);
         root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
         if (root != null)
-            readHelioviewerXMLData(helioviewer, root);
+            readXMLData(root, value -> helioviewer.append(value.name).append(": ").append(value.text).append("<br/>"));
 
-        String filename = metadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(metadata.getViewpoint().time.milli) + ".fits.xml";
         return new ParsedMetadata(fits, helioviewer.toString(), xml, filename);
     }
 
@@ -244,14 +244,6 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             return String.class;
         }
 
-    }
-
-    private static void readFitsXMLData(List<NodeValue> fits, Node node) {
-        readXMLData(node, fits::add);
-    }
-
-    private static void readHelioviewerXMLData(StringBuilder hvSB, Node node) {
-        readXMLData(node, value -> hvSB.append(value.name).append(": ").append(value.text).append("<br/>"));
     }
 
     private static void readXMLData(Node node, Consumer<NodeValue> consumer) {

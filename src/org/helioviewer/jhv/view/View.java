@@ -126,7 +126,7 @@ public interface View {
     // -->
 
     @Nonnull
-    default String getXMLMetaData() {
+    default String getXMLMetaData(JHVTime time) {
         return EMPTY_METAXML;
     }
 

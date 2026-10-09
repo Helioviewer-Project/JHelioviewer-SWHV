@@ -21,6 +21,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.thread.LatestWorker;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.ClipSet;
 
@@ -115,7 +116,7 @@ public final class URIView extends BaseView {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() {
+    public String getXMLMetaData(JHVTime time) {
         return xml;
     }
 

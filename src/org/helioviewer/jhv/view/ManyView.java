@@ -175,8 +175,9 @@ public class ManyView implements View {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() {
-        return frameMap.indexedValue(targetFrame).view.getXMLMetaData();
+    public String getXMLMetaData(JHVTime time) {
+        FrameInfo frameInfo = frameMap.nearestValue(time);
+        return frameInfo.view.getXMLMetaData(frameInfo.timeView);
     }
 
 }

@@ -361,8 +361,8 @@ public final class J2KView extends BaseView {
 
     @Nonnull
     @Override
-    public String getXMLMetaData() {
-        return xmlMetaData[targetFrame];
+    public String getXMLMetaData(JHVTime time) {
+        return xmlMetaData[frameMap.nearestIndex(time)];
     }
 
 }
