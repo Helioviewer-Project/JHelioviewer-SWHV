@@ -131,8 +131,8 @@ public final class RadioData extends TimelineLayer {
         DrawController.drawRequest();
     }
 
-    private void requestAndOpenIntervals(long start) {
-        long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
+    private void requestAndOpenIntervals(TimeAxis axis) {
+        long end = Math.min(TimeUtils.floorDay(axis.start()) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
         long first = end - (DAYS_IN_CACHE - 1) * TimeUtils.DAY_IN_MILLIS;
         boolean changed = cache.entrySet().removeIf(entry -> {
             boolean remove = entry.getKey() < first || entry.getKey() > end;
@@ -149,8 +149,10 @@ public final class RadioData extends TimelineLayer {
                 changed = true;
             }
         }
-        for (int i = 0; i < DAYS_IN_CACHE; i++) {
-            long date = end - i * TimeUtils.DAY_IN_MILLIS;
+        long firstRequested = TimeUtils.floorDay(axis.start()) - TimeUtils.DAY_IN_MILLIS;
+        // An axis ending at midnight does not display the following day.
+        long lastRequested = Math.min(TimeUtils.floorDay(axis.end() - 1) + TimeUtils.DAY_IN_MILLIS, end);
+        for (long date = lastRequested; date >= firstRequested; date -= TimeUtils.DAY_IN_MILLIS) {
             if (!downloads.containsKey(date) && !cache.containsKey(date)) {
                 RadioJP2Download download = new RadioJP2Download(date);
                 downloads.put(date, download);
@@ -290,7 +292,7 @@ public final class RadioData extends TimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && canShow(selectedAxis)) {
-            requestAndOpenIntervals(selectedAxis.start());
+            requestAndOpenIntervals(selectedAxis);
             cache.values().forEach(data -> data.requestData(selectedAxis));
         }
     }
