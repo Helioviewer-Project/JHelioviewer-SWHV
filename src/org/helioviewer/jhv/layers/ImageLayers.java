@@ -92,8 +92,10 @@ public final class ImageLayers {
 
     static void displaySynced(Position viewpoint) { // coalesce layers
         for (ImageLayer layer : Layers.getImageLayers()) {
-            View.ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.viewpoint() /* deliberate on reference */)
+            if (layer.isVisibleIdx() == -1)
+                continue;
+            View.ImageData data = layer.getImageData();
+            if (data != null && viewpoint != data.viewpoint() /* deliberate on reference */)
                 return;
         }
         DisplayController.display(viewpoint);
