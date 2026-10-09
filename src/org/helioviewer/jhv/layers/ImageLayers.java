@@ -121,9 +121,17 @@ public final class ImageLayers {
         return null;
     }
 
-    public static void syncLayersSpan(ImageRequestSettings settings) {
+    // Reloads every remote layer with the requested interval and sampling.
+    public static void syncLayersSpan() {
+        ImageRequestSettings settings = ImageRequestSettings.instance();
         for (ImageLayer layer : Layers.getImageLayers())
             layer.reload(settings.start(), settings.requestEnd(), settings.cadence());
+    }
+
+    // Takes the interval first: the timeline lock and a layer's own range sync through here.
+    public static void syncLayersSpan(long start, long end) {
+        ImageRequestSettings.instance().setInterval(start, end);
+        syncLayersSpan();
     }
 
     private static boolean diffRotationMode;

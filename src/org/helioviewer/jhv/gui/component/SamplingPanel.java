@@ -77,24 +77,29 @@ public final class SamplingPanel extends JPanel implements ImageRequestSettings.
         return ((Number) spinner.getValue()).intValue();
     }
 
+    // What the widgets show.
+    private ImageRequestSettings.Sampling current() {
+        if (frameCountButton.isSelected())
+            return new ImageRequestSettings.FrameCount(spinnerValue(frameCountSpinner));
+        if (unitCombo.getSelectedIndex() == GET_ALL_INDEX)
+            return new ImageRequestSettings.All();
+        return new ImageRequestSettings.TimeStep(selectedCadence());
+    }
+
     // The widgets to the settings.
     private void push() {
         updateEnabled();
-        if (syncing)
-            return;
-        ImageRequestSettings.Sampling sampling;
-        if (frameCountButton.isSelected())
-            sampling = new ImageRequestSettings.FrameCount(spinnerValue(frameCountSpinner));
-        else if (unitCombo.getSelectedIndex() == GET_ALL_INDEX)
-            sampling = new ImageRequestSettings.All();
-        else
-            sampling = new ImageRequestSettings.TimeStep(selectedCadence());
-        settings.setSampling(sampling);
+        if (!syncing)
+            settings.setSampling(current());
     }
 
-    // The settings to the widgets.
+    // The settings to the widgets, keeping the units the user chose when they already show the sampling.
     @Override
     public void samplingChanged(ImageRequestSettings.Sampling sampling) {
+        if (sampling.equals(current())) {
+            updateEnabled();
+            return;
+        }
         syncing = true;
         try {
             switch (sampling) {

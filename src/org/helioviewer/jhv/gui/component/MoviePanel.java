@@ -250,14 +250,8 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         imageDialog.showDialog(true);
     }
 
-    // Lock and Difference panel: take the range, then reload all image layers.
-    public void syncLayersSpan(long start, long end) {
-        settings.setInterval(start, end);
-        loadLayersSpan();
-    }
-
-    private void loadLayersSpan() {
-        ImageLayers.syncLayersSpan(settings);
+    private static void loadLayersSpan() {
+        ImageLayers.syncLayersSpan();
     }
 
     private static class RecordButton extends JideToggleButton {
