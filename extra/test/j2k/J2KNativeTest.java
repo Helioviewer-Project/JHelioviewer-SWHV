@@ -442,7 +442,7 @@ public final class J2KNativeTest {
         responseParsing();
         responseProgress();
         Path folder = Path.of(args[2]), image = Path.of(args[4]);
-        for (int i = 4; i < args.length; i++)
+        for (int i = 3; i < args.length; i++)
             local(Path.of(args[i]));
         failures(image);
         unsupported(folder);

@@ -312,6 +312,11 @@ class J2KReader implements Runnable {
         }
     }
 
+    static void pauseBeforeRetry(int retries) throws InterruptedException {
+        if (retries > 1)
+            Thread.sleep(1000);
+    }
+
     @Override
     public void run() {
         while (!isAbolished) {
@@ -330,8 +335,7 @@ class J2KReader implements Runnable {
             view.setDownloading(true);
 
             try {
-                if (retries > 1)
-                    Thread.sleep(1000);
+                pauseBeforeRetry(retries);
                 if (socket.isClosed())
                     connect();
 

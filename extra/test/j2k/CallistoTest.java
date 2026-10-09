@@ -116,8 +116,11 @@ public final class CallistoTest {
                     BufferedImage before = (BufferedImage) field(data[0], "bufferedImage");
                     if (before == null || ((DataBufferByte) before.getRaster().getDataBuffer()).getData() != initialPixels)
                         throw new AssertionError("First radio request did not reuse the padded crop's scalar pixels");
+                    Object executor = field(data[0], "executor");
+                    int generation = (int) field(executor, "generation");
                     data[0].requestData(new TimeAxis(noon + TimeUtils.MINUTE_IN_MILLIS, noon + TimeUtils.DAY_IN_MILLIS / 32));
-                    if (field(data[0], "bufferedImage") != before || data[0].isLoading())
+                    if ((int) field(executor, "generation") != generation
+                            || field(data[0], "bufferedImage") != before || data[0].isLoading())
                         throw new AssertionError("Panning inside the padded crop requested another decode");
                     owner.removeDecoded(data[0]);
                     Method setLUT = RadioData.class.getDeclaredMethod("setLUT", LUT.class);

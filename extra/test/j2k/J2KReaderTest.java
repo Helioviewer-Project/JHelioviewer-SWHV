@@ -22,8 +22,9 @@ public final class J2KReaderTest {
     public static void main(String[] arguments) throws Exception {
         testResolutions();
         testContinuation();
+        testRetryPause();
         if (arguments.length == 0) {
-            System.out.println("PASS: resolution boundaries, reader continuation, stalled windows, EOR validation and interruption without native libraries");
+            System.out.println("PASS: resolution boundaries, reader continuation, stalled windows, EOR validation, interruption and retry pauses without native libraries");
             return;
         }
         System.load(arguments[0]);
@@ -107,6 +108,23 @@ public final class J2KReaderTest {
                 throw new AssertionError("Interrupted window sent a request");
         } finally {
             Thread.interrupted();
+        }
+    }
+
+    private static void testRetryPause() {
+        // An interrupted sleep throws immediately: exercise the actual pause without timing or waiting.
+        for (int retries = 0; retries <= 14; retries++) {
+            boolean paused = false;
+            Thread.currentThread().interrupt();
+            try {
+                J2KReader.pauseBeforeRetry(retries);
+            } catch (InterruptedException expected) {
+                paused = true;
+            } finally {
+                Thread.interrupted();
+            }
+            if (paused != (retries > 1))
+                throw new AssertionError("Wrong pause decision after " + retries + " failures");
         }
     }
 
