@@ -25,6 +25,10 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         }
     }
 
+    public APIRequest withSpan(long start, long end, int _cadence) {
+        return new APIRequest(server, sourceId, start, end, _cadence);
+    }
+
     public String toFileRequest() throws Exception {
         DataSources.Server source = DataSources.getServer(server);
         if (source == null)

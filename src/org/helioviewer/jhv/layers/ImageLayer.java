@@ -121,6 +121,12 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 
+    // Re-requests a remote layer over another span; a local layer has nothing to reload.
+    public void reload(long start, long end, int cadence) {
+        if (request != null)
+            load(request.withSpan(start, end, cadence));
+    }
+
     public void load(List<URI> uris) {
         if (removed)
             return;

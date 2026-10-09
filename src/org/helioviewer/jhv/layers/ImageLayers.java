@@ -148,12 +148,8 @@ public final class ImageLayers {
     }
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest req = layer.getAPIRequest();
-            if (req == null)
-                continue;
-            layer.load(new APIRequest(req.server(), req.sourceId(), startTime, endTime, cadence));
-        }
+        for (ImageLayer layer : Layers.getImageLayers())
+            layer.reload(startTime, endTime, cadence);
     }
 
     public static String getSDOCutoutString() {
@@ -265,9 +261,8 @@ public final class ImageLayers {
         long now = System.currentTimeMillis();
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
-            if (req == null)
-                continue;
-            layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));
+            if (req != null)
+                layer.reload(now - (req.endTime() - req.startTime()), now, req.cadence());
         }
     }
 
