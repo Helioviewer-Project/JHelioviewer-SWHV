@@ -2,6 +2,7 @@ package org.helioviewer.jhv.io.samp;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,11 +13,19 @@ import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.layers.ImageData;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.metadata.FitsMetaData;
+import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
+import org.astrogrid.samp.SampUtils;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
@@ -118,14 +127,53 @@ public final class SampClient extends HubConnector {
         }
     }
 
+    // The active layer's request and region and every enabled layer's metadata.
+    private static Message vsoLoadMessage() {
+        Message msg = new Message("jhv.vso.load");
+        ImageLayer activeLayer = Layers.getActiveImageLayer();
+        APIRequest req = activeLayer.getAPIRequest();
+        ImageData id = activeLayer.getImageData();
+        if (req == null || id == null)
+            return msg;
+
+        msg.addParam("timestamp", Player.getTime().toString());
+        msg.addParam("start", TimeUtils.format(Player.getStartTime()));
+        msg.addParam("end", TimeUtils.format(Player.getEndTime()));
+        msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
+        msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
+
+        Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
+        msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
+        msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
+        msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
+        msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
+
+        ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled() || (id = layer.getImageData()) == null)
+                continue;
+
+            if (id.metaData() instanceof FitsMetaData fm) {
+                HashMap<String, String> layerMsg = new HashMap<>();
+                layerMsg.put("observatory", fm.getObservatory());
+                layerMsg.put("instrument", fm.getInstrument());
+                layerMsg.put("detector", fm.getDetector());
+                layerMsg.put("measurement", fm.getMeasurement());
+                layerMsg.put("timestamp", fm.getViewpoint().time.toString());
+                layersData.add(layerMsg);
+            }
+        }
+        msg.addParam("layers", layersData);
+        return msg;
+    }
+
     public static void notifyRequestData() {
         if (instance == null) {
             Log.warn("SAMP client not initialized yet");
             return;
         }
 
-        Message msg = new Message("jhv.vso.load");
-        ImageLayers.getSAMPMessage(msg);
+        Message msg = vsoLoadMessage();
         try {
             HubConnection c = instance.getConnection();
             if (c != null)

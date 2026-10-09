@@ -28,7 +28,7 @@ import org.helioviewer.jhv.gui.dialog.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.io.SDOCutout;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -376,8 +376,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String baseURL = "https://www.lmsal.com/get_aia_data/?";
-            DesktopIntegration.openURL(baseURL + ImageLayers.getSDOCutoutString());
+            DesktopIntegration.openURL(SDOCutout.url());
         }
     }
 

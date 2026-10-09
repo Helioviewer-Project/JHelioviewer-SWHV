@@ -1,25 +1,17 @@
 package org.helioviewer.jhv.layers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.metadata.FitsMetaData;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.wcs.ImageBounds;
-
-import org.astrogrid.samp.Message;
-import org.astrogrid.samp.SampUtils;
 
 public final class ImageLayers {
 
@@ -131,79 +123,6 @@ public final class ImageLayers {
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers())
             layer.reload(startTime, endTime, cadence);
-    }
-
-    public static String getSDOCutoutString() {
-        StringBuilder str = new StringBuilder("&wavelengths=");
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            if (!layer.isEnabled())
-                continue;
-
-            MetaData m = layer.getMetaData();
-            if (!(m instanceof FitsMetaData fm))
-                continue;
-            if (fm.getObservatory().contains("SDO") && fm.getInstrument().contains("AIA"))
-                str.append(',').append(fm.getMeasurement());
-        }
-
-        ImageLayer activeLayer = Layers.getActiveImageLayer();
-        APIRequest req = activeLayer.getAPIRequest();
-        if (req != null) {
-            str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
-        }
-        ImageData id = activeLayer.getImageData();
-        if (id != null) {
-            Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
-            str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
-            str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
-            str.append(String.format("&width=%.1f", region.width));
-            str.append(String.format("&height=%.1f", region.height));
-        }
-
-        long start = Player.getStartTime();
-        str.append("&startDate=").append(TimeUtils.formatDate(start));
-        str.append("&startTime=").append(TimeUtils.formatTime(start));
-        long end = Player.getEndTime();
-        str.append("&stopDate=").append(TimeUtils.formatDate(end));
-        str.append("&stopTime=").append(TimeUtils.formatTime(end));
-        return str.toString();
-    }
-
-    public static void getSAMPMessage(Message msg) {
-        ImageLayer activeLayer = Layers.getActiveImageLayer();
-        APIRequest req = activeLayer.getAPIRequest();
-        ImageData id = activeLayer.getImageData();
-        if (req == null || id == null)
-            return;
-
-        msg.addParam("timestamp", Player.getTime().toString());
-        msg.addParam("start", TimeUtils.format(Player.getStartTime()));
-        msg.addParam("end", TimeUtils.format(Player.getEndTime()));
-        msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
-        msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
-
-        Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
-        msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
-        msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
-        msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
-        msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
-
-        ArrayList<HashMap<String, String>> layersData = new ArrayList<>();
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            if (!layer.isEnabled() || (id = layer.getImageData()) == null)
-                continue;
-
-            if (id.metaData() instanceof FitsMetaData fm) {
-                HashMap<String, String> layerMsg = new HashMap<>();
-                layerMsg.put("observatory", fm.getObservatory());
-                layerMsg.put("instrument", fm.getInstrument());
-                layerMsg.put("detector", fm.getDetector());
-                layerMsg.put("measurement", fm.getMeasurement());
-                layerMsg.put("timestamp", fm.getViewpoint().time.toString());
-                layersData.add(layerMsg);
-            }
-        }
-        msg.addParam("layers", layersData);
     }
 
     private static boolean diffRotationMode;
