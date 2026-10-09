@@ -45,8 +45,10 @@ public final class LayerLoadTest {
             failing.load(List.of(bogus));
             return failing.whenLoadFinished();
         });
-        if (finished.get(60, TimeUnit.SECONDS) || EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(failing)))
-            throw new AssertionError("Failed first load did not remove the layer and complete false");
+        if (finished.get(60, TimeUnit.SECONDS))
+            throw new AssertionError("Failed first load completed true");
+        if (EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(failing)))
+            throw new AssertionError("Failed first load did not remove the layer");
         System.out.println("PASS: a failed first load completes false after removal");
 
         // Removing a layer with a pending wait completes it false.

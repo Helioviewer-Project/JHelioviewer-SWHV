@@ -22,7 +22,6 @@ import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.source.Source;
@@ -164,18 +163,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         baseName = result.baseName();
         setFrames(result.frames());
         displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
-
-        if (firstLoad)
-            setEnabled(true);
-
-        DisplayController.zoomMiniToFit();
-        if (firstLoad || Layers.getActiveImageLayer() == this) {
-            Layers.setActiveImageLayer(this);
-        } else {
-            frames.select(Player.getTime());
-            DisplayController.render();
-        }
-        Layers.fireLayerUpdated(this);
+        Layers.imageLayerLoaded(this, firstLoad);
         settleLoad();
     }
 

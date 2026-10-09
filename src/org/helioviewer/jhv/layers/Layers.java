@@ -65,6 +65,20 @@ public final class Layers {
         Player.resetToMaster();
     }
 
+    // A layer's frames arrived: a first load enables and activates it, a reload of the active layer resyncs the player.
+    static void imageLayerLoaded(ImageLayer layer, boolean firstLoad) {
+        if (firstLoad)
+            layer.setEnabled(true);
+        DisplayController.zoomMiniToFit();
+        if (firstLoad || activeLayer == layer) {
+            setActiveImageLayer(layer);
+        } else {
+            layer.frames().select(Player.getTime());
+            DisplayController.render();
+        }
+        fireLayerUpdated(layer);
+    }
+
     private static int imageLayersCount;
     private static final ArrayList<Layer> layers = new ArrayList<>();
     private static final ArrayList<Layer> newLayers = new ArrayList<>();
