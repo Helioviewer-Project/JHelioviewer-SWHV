@@ -53,11 +53,20 @@ import com.jidesoft.dialog.StandardDialog;
 public final class SettingsDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
     private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
+    private final JButton clearCache = new JButton("Clear Cache");
 
     private void updateCacheSize() {
+        if (!JPIPCacheManager.isAvailable()) {
+            clearCache.setEnabled(false);
+            cacheSizeLabel.setText("JPIP disk cache is unavailable.");
+            return;
+        }
         Task.submitBackground("cache-size",
                 JPIPCacheManager::getSize,
-                size -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))),
+                size -> {
+                    if (JPIPCacheManager.isAvailable())
+                        cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.))));
+                },
                 Log::error);
     }
 
@@ -235,18 +244,17 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     }
 
     private JPanel createCachePanel() {
-        JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             clearCache.setEnabled(false);
             Task.submitBackground("clear-cache", () -> {
                 JPIPCacheManager.clear();
                 return null;
             }, _ -> {
-                clearCache.setEnabled(true);
+                clearCache.setEnabled(JPIPCacheManager.isAvailable());
                 updateCacheSize();
             }, (logContext, t) -> {
                 Log.error(logContext, t);
-                clearCache.setEnabled(true);
+                clearCache.setEnabled(JPIPCacheManager.isAvailable());
                 updateCacheSize();
             });
         });

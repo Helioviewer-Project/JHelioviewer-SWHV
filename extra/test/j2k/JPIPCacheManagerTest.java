@@ -56,6 +56,7 @@ public final class JPIPCacheManagerTest {
             } catch (RuntimeException e) {
                 Log.error("JPIP cache initialization error", e);
             }
+            check(!JPIPCacheManager.isAvailable(), "failed initialization reports an available cache");
 
             int startupRecords = logCounter.records;
             for (int i = 0; i < 500; i++)
@@ -66,6 +67,7 @@ public final class JPIPCacheManagerTest {
 
             lockHolder.close();
             JPIPCacheManager.init();
+            check(JPIPCacheManager.isAvailable(), "initialized cache reports unavailable");
             byte[] coarse = {1, 2, 3}, fine = {4, 5, 6, 7};
             JPIPCacheManager.store("frame", 2, () -> coarse);
             check(Arrays.equals(JPIPCacheManager.get("frame", 2).block(), coarse) && JPIPCacheManager.get("frame", 3).level() == 2, "stored entry");
@@ -76,6 +78,7 @@ public final class JPIPCacheManagerTest {
             JPIPCacheManager.store("frame", 0, () -> fine);
             check(Arrays.equals(JPIPCacheManager.get("frame", 2).block(), fine), "finer entry did not replace the coarser one");
             JPIPCacheManager.clear();
+            check(JPIPCacheManager.isAvailable(), "clearing disables the initialized cache");
             check(JPIPCacheManager.get("frame", 5) == null, "cleared entry");
             JPIPCacheManager.store("frame", 0, () -> fine);
             JPIPCacheManager.remove("frame");
