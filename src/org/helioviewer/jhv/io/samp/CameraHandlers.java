@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.thread.UiThread;
 
 final class CameraHandlers {
 
@@ -14,7 +13,7 @@ final class CameraHandlers {
         client.addMessageHandler(SampHandlers.command("jhv.view.reset", Commands::resetView));
         client.addMessageHandler(SampHandlers.command("jhv.view.reset-axis", Commands::resetViewAxis));
         client.addMessageHandler(SampHandlers.create("jhv.view.rotate90",
-                (senderId, sender, msg) -> EventQueue.invokeLater(() -> Commands.rotateView90(SampHandlers.optionalString(msg, "axis")))));
+                (senderId, sender, msg) -> UiThread.post(() -> Commands.rotateView90(SampHandlers.optionalString(msg, "axis")))));
     }
 
     private CameraHandlers() {}

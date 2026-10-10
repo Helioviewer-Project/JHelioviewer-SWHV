@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.event;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -72,7 +72,7 @@ public class SWEKDownloader {
             if (requests.cancelled)
                 return;
 
-            EventQueue.invokeLater(() -> {
+            UiThread.post(() -> {
                 if (requests.cancelled)
                     return;
                 try {
@@ -174,7 +174,7 @@ public class SWEKDownloader {
     }
 
     private static void updateGroupBusy(SWEKGroup group) {
-        EventQueue.invokeLater(() -> groupChanged.accept(group));
+        UiThread.post(() -> groupChanged.accept(group));
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {

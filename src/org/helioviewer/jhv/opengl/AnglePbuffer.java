@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
+import org.helioviewer.jhv.thread.UiThread;
 
 public final class AnglePbuffer {
 
@@ -20,7 +19,7 @@ public final class AnglePbuffer {
             return;
 
         renderPending = true;
-        EventQueue.invokeLater(() -> {
+        UiThread.post(() -> {
             renderPending = false;
             Position renderViewpoint = pendingViewpoint;
             pendingViewpoint = null;

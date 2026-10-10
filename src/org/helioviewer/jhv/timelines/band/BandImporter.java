@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.EventQueue;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.concurrent.Callable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -35,7 +35,7 @@ public final class BandImporter {
         if (dates.length == 0)
             return;
 
-        EventQueue.invokeLater(() -> {
+        UiThread.post(() -> {
             acceptData(bands);
             DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });

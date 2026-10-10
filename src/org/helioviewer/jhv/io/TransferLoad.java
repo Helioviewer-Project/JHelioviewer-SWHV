@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.thread.UiThread;
 
 public final class TransferLoad {
 
@@ -65,7 +65,7 @@ public final class TransferLoad {
     }
 
     private static void loadData(List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
-        EventQueue.invokeLater(() -> {
+        UiThread.post(() -> {
             Load.cdf(cdfUris);
             Load.image(imageUris);
             Load.sunJSON(jsonUris);

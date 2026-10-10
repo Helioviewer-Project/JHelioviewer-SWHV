@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
 import java.lang.ref.Cleaner;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 
 // The timeline of an image layer: frames sorted by time, each from a source or empty. EDT only.
@@ -151,7 +151,7 @@ public final class Frames implements Source.Listener {
 
     @Override
     public void frameUpdated(Source source, int frame) {
-        EventQueue.invokeLater(() -> {
+        UiThread.post(() -> {
             if (listener != null)
                 listener.frameReady(this, source, frame);
         });

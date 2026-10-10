@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
@@ -16,6 +14,7 @@ import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.LatestWorker;
+import org.helioviewer.jhv.thread.UiThread;
 
 // Decodes a layer's current frame on a worker and delivers it on the EDT. EDT only.
 final class FrameDecoder {
@@ -135,7 +134,7 @@ final class FrameDecoder {
     private void deliver(Key key, Frames.Frame frame, Position vp, DecodedImage image) {
         ImageData data = new ImageData(image, frame, vp);
         image.retain(); // The queued delivery owns a reference until its callback ends.
-        EventQueue.invokeLater(() -> {
+        UiThread.post(() -> {
             try {
                 if (isCurrent(key))
                     target.handleData(data);

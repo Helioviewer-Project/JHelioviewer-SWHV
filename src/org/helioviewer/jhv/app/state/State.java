@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.app.state;
 
-import java.awt.EventQueue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -26,6 +25,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -208,7 +208,7 @@ public final class State {
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
         Callback callback = new Callback(context, newLayers, masterLayer, time, modeData, serial);
         CompletableFuture.allOf(newLayers.keySet().stream().map(ImageLayer::whenLoadFinished).toArray(CompletableFuture[]::new))
-                .thenRun(() -> EventQueue.invokeLater(callback::onSuccess));
+                .thenRun(() -> UiThread.post(callback::onSuccess));
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,

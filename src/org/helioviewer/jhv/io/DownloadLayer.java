@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -16,6 +15,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 
 import okio.Buffer;
 import okio.BufferedSink;
@@ -75,7 +75,7 @@ public final class DownloadLayer {
                         if (totalRead - lastProgress >= PROGRESS_INTERVAL) {
                             lastProgress = totalRead;
                             int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
-                            EventQueue.invokeLater(() -> progress.progress(percent));
+                            UiThread.post(() -> progress.progress(percent));
                         }
                     }
                 }

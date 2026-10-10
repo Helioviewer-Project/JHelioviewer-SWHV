@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.pfss;
 
-import java.awt.EventQueue;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -88,7 +88,7 @@ class PfssLoader {
                 } catch (Exception e) { // continue in case of list error
                     Log.warn("PFSS list error", e);
                 }
-                EventQueue.invokeLater(() -> cache().put(uris));
+                UiThread.post(() -> cache().put(uris));
 
                 if (startMonth == 11) {
                     startMonth = 0;

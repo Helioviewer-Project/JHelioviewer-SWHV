@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.thread.UiThread;
 
 final class ViewHandlers {
 
@@ -15,7 +14,7 @@ final class ViewHandlers {
             String refresh = SampHandlers.optionalString(msg, "refresh");
             String showCorona = SampHandlers.optionalString(msg, "showCorona");
             String differentialRotation = SampHandlers.optionalString(msg, "differentialRotation");
-            EventQueue.invokeLater(() -> Commands.setViewStateRaw(projection, annotationMode, multiview, tracking,
+            UiThread.post(() -> Commands.setViewStateRaw(projection, annotationMode, multiview, tracking,
                     refresh, showCorona, differentialRotation));
         }));
     }

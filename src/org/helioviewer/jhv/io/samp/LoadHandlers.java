@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.function.Consumer;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.Load;
+import org.helioviewer.jhv.thread.UiThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -53,13 +53,13 @@ final class LoadHandlers {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> uriConsumer.accept(uri));
+                UiThread.post(() -> uriConsumer.accept(uri));
                 return;
             }
 
             String value = SampHandlers.optionalString(msg, "value");
             if (value != null)
-                EventQueue.invokeLater(() -> valueConsumer.accept(value));
+                UiThread.post(() -> valueConsumer.accept(value));
         });
     }
 
@@ -70,12 +70,12 @@ final class LoadHandlers {
             Object input = msg.getParam("url");
             if (input != null) {
                 URI uri = toURI(input.toString());
-                EventQueue.invokeLater(() -> Load.state(context, uri));
+                UiThread.post(() -> Load.state(context, uri));
                 return;
             }
             String value = SampHandlers.optionalString(msg, "value");
             if (value != null) {
-                EventQueue.invokeLater(() -> Load.state(context, value));
+                UiThread.post(() -> Load.state(context, value));
                 return;
             }
             Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");
@@ -90,7 +90,7 @@ final class LoadHandlers {
         URI uri = requiredURI(msg);
         if (uri == null)
             return false;
-        EventQueue.invokeLater(() -> consumer.accept(uri));
+        UiThread.post(() -> consumer.accept(uri));
         return true;
     }
 
@@ -102,7 +102,7 @@ final class LoadHandlers {
         ArrayList<URI> uris = new ArrayList<>();
         for (Object obj : urls)
             uris.add(toURI(obj.toString()));
-        EventQueue.invokeLater(() -> listConsumer.accept(uris));
+        UiThread.post(() -> listConsumer.accept(uris));
         return true;
     }
 

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.astrogrid.samp.Message;
@@ -99,7 +99,7 @@ public final class SampClient extends HubConnector {
     static Commands.OperationContext operationContext(String senderId, Message msg, String mtype, String completionMType) {
         String requestId = SampHandlers.optionalString(msg, "requestId");
         return new Commands.OperationContext(senderId, requestId, mtype,
-                (context, success, message, output) -> EventQueue.invokeLater(() ->
+                (context, success, message, output) -> UiThread.post(() ->
                         notifyCompletion(context, completionMType, success, message, output)));
     }
 

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.app;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
@@ -18,6 +17,7 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
+import org.helioviewer.jhv.thread.UiThread;
 
 public final class JHVUncaughtExceptionHandler {
 
@@ -56,7 +56,7 @@ public final class JHVUncaughtExceptionHandler {
     private static final class GUI extends Base {
         @Override
         void handle(String msg) {
-            EventQueue.invokeLater(() -> showErrorDialog(msg));
+            UiThread.post(() -> showErrorDialog(msg));
         }
 
         private static void showErrorDialog(String msg) {

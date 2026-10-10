@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
-
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.astrogrid.samp.Message;
@@ -32,7 +31,7 @@ final class PlaybackHandlers {
                     SampHandlers.optionalString(msg, "speedUnit"),
                     SampHandlers.optionalString(msg, "firstFrame"),
                     SampHandlers.optionalString(msg, "lastFrame"));
-            EventQueue.invokeLater(() -> Commands.setPlayback(input));
+            UiThread.post(() -> Commands.setPlayback(input));
         });
     }
 
@@ -42,7 +41,7 @@ final class PlaybackHandlers {
             return;
         try {
             int value = Integer.parseInt(frame);
-            EventQueue.invokeLater(() -> Commands.seekFrame(value));
+            UiThread.post(() -> Commands.seekFrame(value));
         } catch (NumberFormatException e) {
             Log.warn("Ignoring invalid seek frame value: " + frame, e);
         }
@@ -54,7 +53,7 @@ final class PlaybackHandlers {
             return;
         try {
             JHVTime value = new JHVTime(time);
-            EventQueue.invokeLater(() -> Commands.seekTime(value));
+            UiThread.post(() -> Commands.seekTime(value));
         } catch (RuntimeException e) {
             Log.warn("Ignoring invalid seek time value: " + time, e);
         }

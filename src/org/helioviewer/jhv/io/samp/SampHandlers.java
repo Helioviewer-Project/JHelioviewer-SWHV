@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.awt.EventQueue;
 import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.thread.UiThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -38,7 +38,7 @@ final class SampHandlers {
     }
 
     static AbstractMessageHandler command(String type, Runnable command) {
-        return create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
+        return create(type, (senderId, sender, msg) -> UiThread.post(command));
     }
 
     static @Nullable String optionalString(Message msg, String key) {

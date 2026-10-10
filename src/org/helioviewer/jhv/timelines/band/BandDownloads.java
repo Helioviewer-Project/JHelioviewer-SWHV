@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,6 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -99,7 +99,7 @@ final class BandDownloads {
     private static void schedulePending() {
         if (!submitPendingScheduled && !pendingDownloads.isEmpty()) {
             submitPendingScheduled = true;
-            EventQueue.invokeLater(BandDownloads::submitPending);
+            UiThread.post(BandDownloads::submitPending);
         }
     }
 

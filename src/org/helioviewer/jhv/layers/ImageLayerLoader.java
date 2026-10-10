@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.EventQueue;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.RasterSource;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 
 final class ImageLayerLoader {
@@ -73,9 +73,9 @@ final class ImageLayerLoader {
             try {
                 Result result = task.call();
                 // Unlike FutureTask cancellation, this always transfers the result for cleanup.
-                EventQueue.invokeLater(() -> finishLoad(worker, result, null));
+                UiThread.post(() -> finishLoad(worker, result, null));
             } catch (Throwable t) {
-                EventQueue.invokeLater(() -> finishLoad(worker, null, t));
+                UiThread.post(() -> finishLoad(worker, null, t));
             }
         });
         nextLoad.start();

@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +13,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.ModelLayer;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.timelines.band.BandImporter;
 
 import org.json.JSONObject;
@@ -35,7 +35,7 @@ public final class Load {
         if (uris.isEmpty())
             return CompletableFuture.completedFuture(false);
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        EventQueue.invokeLater(() -> { // layers belong to the EDT; callers come from any thread
+        UiThread.post(() -> { // layers belong to the UI thread; callers come from any thread
             ImageLayer layer = ImageLayer.create();
             layer.applyImageParams(imageParams);
             layer.load(uris);

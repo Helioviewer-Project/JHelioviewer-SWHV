@@ -1,9 +1,10 @@
 package org.helioviewer.jhv.image;
 
-import java.awt.EventQueue;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.thread.UiThread;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -23,7 +24,7 @@ public final class ImageBufferCache {
                 .concurrencyLevel(1) // One shared byte budget and LRU order, without frequency-based admission.
                 .maximumWeight(maximumBytes)
                 .weigher((Key key, DecodedImage value) -> value.imageBuffer().byteSize())
-                .removalListener(notification -> EventQueue.invokeLater(notification.getValue()::release))
+                .removalListener(notification -> UiThread.post(notification.getValue()::release))
                 .build();
     }
 
