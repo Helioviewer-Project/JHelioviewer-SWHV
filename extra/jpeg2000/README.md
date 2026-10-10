@@ -18,6 +18,7 @@ Use `.dylib` on macOS, with `-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0` and the
 appropriate `-DCMAKE_OSX_ARCHITECTURES=arm64` or
 `-DCMAKE_OSX_ARCHITECTURES=x86_64`. Windows requires MinGW and also
 `-DKDU_CORE_LIBRARY=/path/to/kdu_v7AR.dll`; supply `kdu_jni.dll` as `KDU_LIBRARY`.
+MinGW produces `libjhvj2k.dll`; copy it as `jhvj2k.dll` before validation and packaging.
 The SDK and libraries must match, and all libraries must target the same architecture.
 The Windows JNI/support DLL must also export the Kakadu support functions used
 by the bridge.

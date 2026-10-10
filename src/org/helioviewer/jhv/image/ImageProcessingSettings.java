@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-
 import org.json.JSONObject;
 
 public final class ImageProcessingSettings {
@@ -113,9 +112,6 @@ public final class ImageProcessingSettings {
     }
 
     public void fromJson(JSONObject jo) {
-        if (jo == null)
-            return;
-
         FITSParameters old = fitsParameters();
         clippingMin = Math.clamp(jo.optDouble("clippingMin", clippingMin), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
@@ -133,13 +129,21 @@ public final class ImageProcessingSettings {
 
     public void setClippingMin(double value) {
         double newClippingMin = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
-        if (updateClippingMin(newClippingMin) && clippingMode == ClippingMode.Range)
+        if (clippingMin == newClippingMin)
+            return;
+        clippingMin = newClippingMin;
+        notifyFITSListeners();
+        if (clippingMode == ClippingMode.Range)
             onChange.run();
     }
 
     public void setClippingMax(double value) {
         double newClippingMax = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
-        if (updateClippingMax(newClippingMax) && clippingMode == ClippingMode.Range)
+        if (clippingMax == newClippingMax)
+            return;
+        clippingMax = newClippingMax;
+        notifyFITSListeners();
+        if (clippingMode == ClippingMode.Range)
             onChange.run();
     }
 
@@ -161,19 +165,31 @@ public final class ImageProcessingSettings {
 
     public void setGamma(double value) {
         double newGamma = Math.clamp(value, GAMMA_MIN, GAMMA_MAX);
-        if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma)
+        if (gamma == newGamma)
+            return;
+        gamma = newGamma;
+        notifyFITSListeners();
+        if (scalingMode == ScalingMode.Gamma)
             onChange.run();
     }
 
     public void setBeta(double value) {
         double newBeta = Math.clamp(value, BETA_MIN, BETA_MAX);
-        if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta)
+        if (beta == newBeta)
+            return;
+        beta = newBeta;
+        notifyFITSListeners();
+        if (scalingMode == ScalingMode.Beta)
             onChange.run();
     }
 
     public void setAlpha(double value) {
         double newAlpha = Math.clamp(value, ALPHA_MIN, ALPHA_MAX);
-        if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha)
+        if (alpha == newAlpha)
+            return;
+        alpha = newAlpha;
+        notifyFITSListeners();
+        if (scalingMode == ScalingMode.Alpha)
             onChange.run();
     }
 
@@ -184,46 +200,6 @@ public final class ImageProcessingSettings {
     private void notifyFITSListeners() {
         fitsParameters = createFITSParameters();
         listeners.forEach(FITSListener::fitsParametersChanged);
-    }
-
-    private boolean updateClippingMin(double newClippingMin) {
-        if (clippingMin == newClippingMin)
-            return false;
-        clippingMin = newClippingMin;
-        notifyFITSListeners();
-        return true;
-    }
-
-    private boolean updateClippingMax(double newClippingMax) {
-        if (clippingMax == newClippingMax)
-            return false;
-        clippingMax = newClippingMax;
-        notifyFITSListeners();
-        return true;
-    }
-
-    private boolean updateGamma(double newGamma) {
-        if (gamma == newGamma)
-            return false;
-        gamma = newGamma;
-        notifyFITSListeners();
-        return true;
-    }
-
-    private boolean updateBeta(double newBeta) {
-        if (beta == newBeta)
-            return false;
-        beta = newBeta;
-        notifyFITSListeners();
-        return true;
-    }
-
-    private boolean updateAlpha(double newAlpha) {
-        if (alpha == newAlpha)
-            return false;
-        alpha = newAlpha;
-        notifyFITSListeners();
-        return true;
     }
 
     private static <E extends Enum<E>> E readEnum(Class<E> type, String name, E fallback) {

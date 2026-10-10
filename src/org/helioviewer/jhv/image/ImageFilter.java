@@ -38,19 +38,13 @@ public class ImageFilter {
         algorithm = _algorithm;
     }
 
-    private static ImageFilter of(Type type) {
+    public static ImageFilter of(Type type, Region imageRegion, MetaData metaData) {
         return switch (type) {
             case None -> NONE;
             case MGN -> MGN;
             case WOW -> WOW;
-            case RHEF -> throw new IllegalArgumentException("RHEF requires image geometry");
+            case RHEF -> new ImageFilter(new FilterRHEF(SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift())));
         };
-    }
-
-    public static ImageFilter of(Type type, Region imageRegion, MetaData metaData) {
-        return type == Type.RHEF
-                ? new ImageFilter(new FilterRHEF(SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift())))
-                : of(type);
     }
 
     boolean isNone() {

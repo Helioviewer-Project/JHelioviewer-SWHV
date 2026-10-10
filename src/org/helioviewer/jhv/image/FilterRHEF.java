@@ -25,10 +25,10 @@ class FilterRHEF implements ImageFilter.Algorithm {
             return data;
 
         // Buffer geometry in physical units; the region origin sits at the Sun center.
-        // Without a region, assume the Sun at the image center with pixel units.
-        Region region = sunCenteredRegion == null ? null : sunCenteredRegion.region();
+        // With invalid region dimensions, assume the Sun at the image center with pixel units.
+        Region region = sunCenteredRegion.region();
         double pixX, pixY, llx, lly;
-        if (region == null || !(region.width > 0) || !(region.height > 0)) {
+        if (!(region.width > 0) || !(region.height > 0)) {
             pixX = 1;
             pixY = 1;
             llx = -.5 * width;
