@@ -266,10 +266,9 @@ public final class Layers {
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
-        if (imageLayersCount == 0)
+        if (activeLayer == nullImageLayer)
             nullImageLayer.frames().select(dateTime);
-        else
-            forEachImageLayer(layer -> layer.frames().select(dateTime));
+        forEachImageLayer(layer -> layer.frames().select(dateTime));
     }
 
     public static List<ImageLayer> getImageLayers() {
