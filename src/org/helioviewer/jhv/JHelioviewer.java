@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.AppInit;
-import org.helioviewer.jhv.app.HeadlessEDT;
 import org.helioviewer.jhv.app.JHVUncaughtExceptionHandler;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
@@ -29,7 +28,9 @@ import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.thread.QueueUiThread;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 
 public class JHelioviewer {
 
@@ -110,8 +111,11 @@ public class JHelioviewer {
         });
     }
 
-    private static void startHeadless() throws InterruptedException {
-        HeadlessEDT.invokeLater(() -> {
+    // The main thread becomes the UI thread; no AWT toolkit is involved.
+    private static void startHeadless() {
+        QueueUiThread uiThread = new QueueUiThread();
+        UiThread.install(uiThread);
+        uiThread.post(() -> {
             Log.info("Start headless mode");
             AnglePbuffer renderer = new AnglePbuffer();
             DisplayController.setRenderRequestHandler(renderer::requestRender);
@@ -120,6 +124,7 @@ public class JHelioviewer {
 
             startInitialization(false);
         });
+        uiThread.run();
     }
 
     private static void loadPlugins(boolean loadTimelines) {
