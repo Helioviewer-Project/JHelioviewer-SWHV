@@ -18,7 +18,7 @@ from urllib.request import urlopen
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--live", action="store_true", help="also test live ROB retrieval (requires network and the native libraries)")
 parser.add_argument("--cleaner", action="store_true", help="with --live, also exercise GC-dependent abandoned-view cleanup")
-parser.add_argument("--bridge", help="libjhvj2k built by native/jpeg2000/build.sh, when the natives jar has none")
+parser.add_argument("--bridge", help="libjhvj2k to use instead of the one in the natives jar")
 args = parser.parse_args()
 if args.cleaner and not args.live:
     parser.error("--cleaner requires --live")
@@ -47,7 +47,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     print("Running ImageRequestSettingsTest", flush=True)
     subprocess.run([*java, "org.helioviewer.jhv.io.ImageRequestSettingsTest"], check=True, timeout=60)
     print("Running FramesTest", flush=True)
-    subprocess.run([*java, "org.helioviewer.jhv.layers.FramesTest"], check=True, timeout=60)
+    subprocess.run([*java, "-Dorg.lwjgl.util.DebugAllocator=true", "org.helioviewer.jhv.layers.FramesTest"], check=True, timeout=60)
     print("Running J2KReaderTest without native libraries", flush=True)
     subprocess.run([*java, "org.helioviewer.jhv.source.J2KReaderTest"], check=True, timeout=60)
     if platform.system() != "Windows":
@@ -83,14 +83,14 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         print("Running J2KReaderTest (single image and movie)", flush=True)
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.source.J2KReaderTest", *libraries, uri, movie],
                        check=True, timeout=360)
-        subprocess.run([*java, "-Xmx512m", "-Djhv.test.timeoutSeconds=480",
-                        "-Djhv.test.cleaner=" + str(args.cleaner).lower(),
-                        "org.helioviewer.jhv.layers.FrameDecoderTest", *libraries, movie],
-                       check=True, timeout=510)
-
         callisto = "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?sourceId=5000&date=2026-09-09T00:00:00Z"
         print("Retrieving " + callisto, flush=True)
         with urlopen(callisto, timeout=60) as response:
             (work / "callisto.jp2").write_bytes(response.read())
+        subprocess.run([*java, "-Xmx512m", "-Djhv.test.timeoutSeconds=480",
+                        "-Djhv.test.cleaner=" + str(args.cleaner).lower(),
+                        "org.helioviewer.jhv.layers.FrameDecoderTest", *libraries, movie, uri, str(work / "callisto.jp2")],
+                       check=True, timeout=510)
+
         subprocess.run([*java, "-Xmx512m", "org.helioviewer.jhv.timelines.radio.CallistoTest",
                         *libraries, str(work / "callisto.jp2")], check=True, timeout=180)

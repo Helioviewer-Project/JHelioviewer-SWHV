@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
 // The real timeline, decoder and reader thread on a JPIP movie, headless.
-// Arguments: Kakadu library, bridge library, JPIP URI of a movie.
+// Arguments: Kakadu library, bridge library, movie JPIP URI, image JPIP URI, local JP2 file.
 public final class FrameDecoderTest {
 
     private static final LinkedBlockingQueue<ImageData> images = new LinkedBlockingQueue<>();
@@ -86,11 +87,14 @@ public final class FrameDecoderTest {
         AppInit.loadSpice();
         System.load(arguments[0]);
         System.load(arguments[1]);
+        checkLocal(Path.of(arguments[4]));
+        checkCompletedReader(URI.create(arguments[3]));
         URI uri = URI.create(arguments[2]);
         if (Boolean.getBoolean("jhv.test.cleaner"))
             checkReaper(uri);
         J2KFixture.Responses responses = J2KFixture.capture(uri);
         J2KFixture.checkDraining(responses);
+        checkStalledClose(responses);
         checkRetriesAndKeys(responses);
 
         // Paused, first shown at its coarsest level, which opening already made complete: the movie still downloads.
@@ -356,6 +360,112 @@ public final class FrameDecoderTest {
         Method stop = readerClass.getDeclaredMethod("stop");
         stop.setAccessible(true);
         stop.invoke(reader);
+    }
+
+    private static void checkLocal(Path file) throws Exception {
+        Opened opened = open(file.toUri());
+        try {
+            if (!opened.frames.isComplete() || opened.frames.isDownloading())
+                throw new AssertionError("Local timeline is incomplete or downloading");
+            show(opened, 0, 0, false);
+            checkPixels(opened);
+        } finally {
+            close(opened);
+        }
+        awaitClosed(opened.source);
+        System.out.println("PASS: local file opens through the layer loader, delivers pixels and closes its native source");
+    }
+
+    private static void checkCompletedReader(URI uri) throws Exception {
+        Opened opened = open(uri);
+        try {
+            Object reader = field(J2KSource.class, opened.source, "reader");
+            Thread thread = (Thread) field(readerClass, reader, "myThread");
+            show(opened, 0, 0, true);
+            thread.join(120000);
+            if (thread.isAlive() || !opened.frames.isComplete() || opened.frames.isDownloading())
+                throw new AssertionError("Full-resolution download did not complete and stop its reader");
+            // After reader exit the completed image must still be usable, including another cache-hit delivery.
+            show(opened, 0, 0, true);
+            checkPixels(opened);
+            show(opened, 0, 0, true);
+            checkPixels(opened);
+        } finally {
+            close(opened);
+        }
+        awaitClosed(opened.source);
+        System.out.println("PASS: full-resolution reader exits and its timeline still delivers cached pixels");
+    }
+
+    private static void checkPixels(Opened opened) throws Exception {
+        ResolutionSet.Level size = opened.source.level(0, 0);
+        ImageData image = images.poll(60, TimeUnit.SECONDS);
+        if (image == null)
+            throw new AssertionError("Decoded image was not delivered");
+        try {
+            byte[] expected = opened.source.decodeRegion(0, 0, 0, 0, size.width(), size.height());
+            ByteBuffer pixels = ((ByteBuffer) image.imageBuffer().buffer).duplicate();
+            byte[] actual = new byte[pixels.remaining()];
+            pixels.get(actual);
+            if (image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height() || !Arrays.equals(expected, actual))
+                throw new AssertionError("Layer delivery differs from its source's complete-level pixels");
+        } finally {
+            EventQueue.invokeAndWait(image.image()::release);
+        }
+    }
+
+    private static void awaitClosed(J2KSource source) throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (true) {
+            try {
+                source.xml(0);
+            } catch (CancellationException expected) {
+                return;
+            }
+            if (System.nanoTime() > deadline)
+                throw new AssertionError("Timeline removal left the native source open");
+            Thread.sleep(5);
+        }
+    }
+
+    private static void checkStalledClose(J2KFixture.Responses responses) throws Exception {
+        CountDownLatch stalled = new CountDownLatch(1);
+        try (ServerSocket listener = new ServerSocket(0, 16, InetAddress.getByName("127.0.0.1"));
+                ExecutorService server = Executors.newVirtualThreadPerTaskExecutor()) {
+            listener.setSoTimeout(10000);
+            Future<?> served = server.submit(() -> {
+                try (Socket connection = listener.accept()) {
+                    connection.setSoTimeout(10000);
+                    BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+                    for (int i = 0; i < responses.opening().size(); i++) {
+                        J2KFixture.readRequest(input);
+                        J2KFixture.reply(connection, i == 0, responses.opening().get(i));
+                    }
+                    J2KFixture.readRequest(input);
+                    stalled.countDown(); // Leave the frame response pending until timeline removal closes TCP.
+                    if (input.read() != -1)
+                        throw new AssertionError("Closing a stalled reader sent another request");
+                }
+                return null;
+            });
+            Opened opened = open(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/stalled"));
+            try {
+                Object reader = field(J2KSource.class, opened.source, "reader");
+                Thread thread = (Thread) field(readerClass, reader, "myThread");
+                EventQueue.invokeAndWait(() -> opened.source.request(0, responses.level(), true));
+                if (!stalled.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Reader did not request the stalled frame");
+                close(opened);
+                thread.join(5000);
+                if (thread.isAlive())
+                    throw new AssertionError("Timeline removal left a stalled reader alive");
+                awaitClosed(opened.source);
+                served.get(5, TimeUnit.SECONDS);
+            } finally {
+                close(opened);
+            }
+        }
+        System.out.println("PASS: removing a stalled timeline closes TCP, stops its reader and closes its native source");
     }
 
     private static void checkRetriesAndKeys(J2KFixture.Responses responses) throws Exception {

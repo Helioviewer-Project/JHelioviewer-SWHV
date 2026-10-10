@@ -13,6 +13,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -97,7 +98,7 @@ public final class J2KFixture {
     }
 
     public static void checkDraining(Responses responses) throws Exception {
-        CountDownLatch sent = new CountDownLatch(1), release = new CountDownLatch(1);
+        CountDownLatch sent = new CountDownLatch(1), release = new CountDownLatch(1), decoding = new CountDownLatch(1);
         J2KSource source = new J2KSource(null);
         J2KReader reader = null;
         try (ServerSocket listener = new ServerSocket(0, 16, InetAddress.getByName("127.0.0.1"));
@@ -136,11 +137,26 @@ public final class J2KFixture {
                 Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.levels(0).getLevel(responses.level), false));
                 if (!sent.await(5, TimeUnit.SECONDS))
                     throw new AssertionError("Reader did not pipeline two requests");
+                ResolutionSet.Level coarse = source.level(0, Integer.MAX_VALUE);
+                byte[] expected = source.decodeRegion(0, coarse.level(), 0, 0, coarse.width(), coarse.height());
+                Future<?> pixels = tasks.submit(() -> {
+                    decoding.countDown();
+                    do {
+                        if (!Arrays.equals(expected, source.decodeRegion(0, coarse.level(), 0, 0, coarse.width(), coarse.height())))
+                            throw new AssertionError("Complete-level pixels changed during ingestion");
+                    } while (!pump.isDone());
+                    return null;
+                });
+                if (!decoding.await(5, TimeUnit.SECONDS))
+                    throw new AssertionError("Concurrent decode did not start");
                 reader.signal(params);
                 release.countDown();
                 if (pump.get(5, TimeUnit.SECONDS) || !Boolean.TRUE.equals(source.getFrameStatus(0, responses.level))
                         || !Boolean.TRUE.equals(source.getFrameStatus(1, responses.level)) || source.geometry(2) != null)
                     throw new AssertionError("Reader did not drain both responses before yielding to newer work");
+                pixels.get(5, TimeUnit.SECONDS);
+                if (!Arrays.equals(expected, source.decodeRegion(0, coarse.level(), 0, 0, coarse.width(), coarse.height())))
+                    throw new AssertionError("Complete-level pixels changed after ingestion");
             } finally {
                 release.countDown();
                 if (reader != null)
@@ -150,7 +166,7 @@ public final class J2KFixture {
         } finally {
             source.close();
         }
-        System.out.println("PASS: a real signal after two sends drains both responses without fetching the next frame");
+        System.out.println("PASS: a real signal drains both responses, and complete-level pixels stay unchanged during ingestion");
     }
 
     public static Boolean frameStatus(J2KSource source, int frame, int level) {

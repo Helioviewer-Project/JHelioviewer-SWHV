@@ -174,8 +174,6 @@ public final class J2KReaderTest {
                     throw new AssertionError("Missing metadata for frame " + frame);
                 result[frame] = xml;
             }
-            if (reader != null)
-                retries.setInt(reader, 12);
             int index = frames;
             for (int level : levels) {
                 ResolutionSet.Level size = reader == null ? new ResolutionSet.Level(0, 4096, 4096) : source.levels(0).getLevel(level);
@@ -192,6 +190,9 @@ public final class J2KReaderTest {
                         source.update(frame);
                     }
                 } else {
+                    // A later cached pass has nothing left to restore; every fetching pass must reset failures.
+                    if (mode != Mode.CACHED || index == frames)
+                        retries.setInt(reader, 12);
                     J2KParams.Read params = new J2KParams.Read(new J2KParams.Decode(0, level), false);
                     if (!(boolean) readFrames.invoke(reader, params, size, false))
                         throw new AssertionError("Prefetch interrupted unexpectedly");

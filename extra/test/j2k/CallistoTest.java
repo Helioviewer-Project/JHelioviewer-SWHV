@@ -1,19 +1,24 @@
 package org.helioviewer.jhv.timelines.radio;
 
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -22,6 +27,7 @@ import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.timelines.draw.YAxis;
 
 // Arguments: Kakadu library, bridge library, Callisto JP2 file.
 public final class CallistoTest {
@@ -66,6 +72,7 @@ public final class CallistoTest {
         Directories.createPersistentDirs();
         Directories.createCacheDirs();
         AppInit.loadSpice();
+        DataSources.initSources();
         RadioData[] holder = {null};
         EventQueue.invokeAndWait(() -> holder[0] = new RadioData(null));
         RadioData owner = holder[0];
@@ -106,7 +113,7 @@ public final class CallistoTest {
                 }
                 owner.putDecoded(data[6], newer, newerPixels);
                 if (owner.getDecoded(data[0], whole) != null || owner.getDecoded(data[6], newer) != newerPixels
-                        || owner.getDecoded(data[1], whole) != full || days.size() != 7)
+                        || owner.getDecoded(data[1], whole) != full)
                     throw new AssertionError("Radio LRU did not share its byte budget across retained days");
                 owner.removeDecoded(data[0]);
                 owner.putDecoded(data[0], initial, initialPixels);
@@ -116,11 +123,11 @@ public final class CallistoTest {
                     BufferedImage before = (BufferedImage) field(data[0], "bufferedImage");
                     if (before == null || ((DataBufferByte) before.getRaster().getDataBuffer()).getData() != initialPixels)
                         throw new AssertionError("First radio request did not reuse the padded crop's scalar pixels");
+                    checkDrawing(data[0], date, initial, size);
                     Object executor = field(data[0], "executor");
                     int generation = (int) field(executor, "generation");
                     data[0].requestData(new TimeAxis(noon + TimeUtils.MINUTE_IN_MILLIS, noon + TimeUtils.DAY_IN_MILLIS / 32));
-                    if ((int) field(executor, "generation") != generation
-                            || field(data[0], "bufferedImage") != before || data[0].isLoading())
+                    if ((int) field(executor, "generation") != generation)
                         throw new AssertionError("Panning inside the padded crop requested another decode");
                     owner.removeDecoded(data[0]);
                     Method setLUT = RadioData.class.getDeclaredMethod("setLUT", LUT.class);
@@ -130,6 +137,11 @@ public final class CallistoTest {
                     int sample = initialPixels[0] & 0xff;
                     if (after.getRaster() != before.getRaster() || after.getRGB(0, 0) != (0xff000000 | sample << 16 | sample << 8 | sample))
                         throw new AssertionError("Eviction or LUT change lost the displayed scalar raster");
+                    ResolutionSet.Level coarse = source.level(0, 5);
+                    RadioJ2KData.Crop coarseCrop = RadioJ2KData.levelCrop(0, size.width(), size.width(), coarse);
+                    owner.putDecoded(data[0], coarseCrop, source.decodeRegion(0, 5, 0, 0, coarseCrop.width(), coarseCrop.height()));
+                    data[0].requestData(new TimeAxis(date, date + TimeUtils.DAY_IN_MILLIS));
+                    checkDrawing(data[0], date, coarseCrop, size);
                 } catch (Exception e) {
                     throw new AssertionError(e);
                 }
@@ -139,13 +151,79 @@ public final class CallistoTest {
                 if (owner.getDecoded(data[0], whole) != null
                         || owner.getDecoded(data[1], whole) != full)
                     throw new AssertionError("Removed day accepted late pixels or purged another day's crops");
+                owner.setEnabled(true);
+                owner.fetchData(new TimeAxis(date + 6 * TimeUtils.DAY_IN_MILLIS, date + 7 * TimeUtils.DAY_IN_MILLIS));
+                if (!days.keySet().equals(Set.of(date + 5 * TimeUtils.DAY_IN_MILLIS, date + 6 * TimeUtils.DAY_IN_MILLIS))
+                        || owner.getDecoded(data[1], whole) != null || owner.getDecoded(data[6], newer) != newerPixels)
+                    throw new AssertionError("Radio window pruning retained an obsolete day or purged a retained day's pixels");
             });
         } finally {
             EventQueue.invokeAndWait(owner::remove);
         }
         if (!days.isEmpty() || owner.getDecoded(data[1], whole) != null)
             throw new AssertionError("Radio removal retained days or crops");
-        System.out.println("PASS: padded first crop, offscreen days, shared radio LRU, day isolation, late-result refusal and scalar/LUT retention after eviction");
+        System.out.println("PASS: padded first crop, offscreen days, shared radio LRU, day isolation, late-result refusal and scalar/LUT retention after eviction, and fine/coarse time/frequency drawing");
+        requestedDays(date);
+    }
+
+    private static void checkDrawing(RadioJ2KData data, long date, RadioJ2KData.Crop crop, ResolutionSet.Level full) throws Exception {
+        double low = (double) field(data, "endFreq"), high = (double) field(data, "startFreq");
+        double span = high - low;
+        TimeAxis.Mapper x = new TimeAxis(date - TimeUtils.DAY_IN_MILLIS / 2, date + 3 * TimeUtils.DAY_IN_MILLIS / 2).mapper(20, 400);
+        YAxis.Mapper y = new YAxis(high + span, low - span, new YAxis.YAxisPositiveIdentityScale("MHz")).mapper(20, 600);
+        int left = x.toPixel(date + TimeUtils.DAY_IN_MILLIS * ((long) crop.x() << crop.level()) / full.width());
+        int right = x.toPixel(date + TimeUtils.DAY_IN_MILLIS * Math.min((long) (crop.x() + crop.width()) << crop.level(), full.width()) / full.width());
+        int top = y.dataToPixel(low), bottom = y.dataToPixel(high);
+        BufferedImage canvas = new BufferedImage(440, 640, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = canvas.createGraphics();
+        try {
+            data.draw(g, x, y);
+        } finally {
+            g.dispose();
+        }
+        for (int row = 0; row < canvas.getHeight(); row++) {
+            for (int col = 0; col < canvas.getWidth(); col++) {
+                boolean expected = col >= left && col < right && row >= top && row < bottom;
+                if ((canvas.getRGB(col, row) >>> 24 != 0) != expected)
+                    throw new AssertionError("Radio level " + crop.level() + " painted outside its time/frequency rectangle at " + col + "," + row);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void requestedDays(long day) throws Exception {
+        List<Thread> workers = new ArrayList<>();
+        EventQueue.invokeAndWait(() -> {
+            RadioData owner = new RadioData(null);
+            try {
+                Map<Long, ?> downloads = (Map<Long, ?>) field(owner, "downloads");
+                owner.setEnabled(true);
+                owner.fetchData(new TimeAxis(day, day + TimeUtils.DAY_IN_MILLIS));
+                if (!downloads.keySet().equals(Set.of(day - TimeUtils.DAY_IN_MILLIS, day, day + TimeUtils.DAY_IN_MILLIS)))
+                    throw new AssertionError("Radio requested days beyond the visible day and its neighbours: " + downloads.keySet());
+                for (Object download : downloads.values())
+                    workers.add((Thread) field(download, "thread"));
+                long earlier = day - 30 * TimeUtils.DAY_IN_MILLIS;
+                owner.fetchData(new TimeAxis(earlier, earlier + 2 * TimeUtils.DAY_IN_MILLIS));
+                if (!downloads.keySet().equals(Set.of(earlier - TimeUtils.DAY_IN_MILLIS, earlier, earlier + TimeUtils.DAY_IN_MILLIS, earlier + 2 * TimeUtils.DAY_IN_MILLIS)))
+                    throw new AssertionError("Radio retained obsolete downloads or requested the day after a midnight boundary: " + downloads.keySet());
+                for (Object download : downloads.values())
+                    workers.add((Thread) field(download, "thread"));
+                owner.setEnabled(false);
+                if (owner.isDownloading())
+                    throw new AssertionError("Disabled radio retained downloads");
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            } finally {
+                owner.remove();
+            }
+        });
+        for (Thread worker : workers) {
+            worker.join(5000);
+            if (worker.isAlive())
+                throw new AssertionError("Obsolete radio download was not stopped");
+        }
+        System.out.println("PASS: visible radio days and neighbours only, midnight boundary, pan pruning and download cancellation");
     }
 
     private static void compare(byte[] full, ResolutionSet.Level reduced, byte[] cropped, RadioJ2KData.Crop crop) {

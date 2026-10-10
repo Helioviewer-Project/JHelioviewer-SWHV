@@ -10,7 +10,7 @@ python3 extra/test/j2k/run_j2k_tests.py
 
 The default suite uses loopback servers and needs no external network or JPEG 2000
 native library. It also runs two timeline checks that need no network: `FramesTest`
-for frame selection and synthesis, and `ImageRequestSettingsTest` for the request interval
+for frame selection, synthesis and decoder delivery, and `ImageRequestSettingsTest` for the request interval
 and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
 
 - Decode scheduling: repeated keys reuse running work or a result awaiting its EDT callback,
@@ -24,6 +24,9 @@ and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
   Retaining or releasing an already released image must throw with Java assertions disabled.
   Native image writers clear every pixel, transfer ownership at finish, and release their input
   immediately if filtering fails.
+  `FramesTest` runs the real decoder with an in-memory source: a replaced timeline's running
+  result is freed; queued cache-hit deliveries are skipped after replacement, a filter change
+  or disposal. Closing the timeline frees the cached pixels without GC.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
   read after a timeout in chunk framing or payload.
@@ -47,6 +50,9 @@ and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
 - Reader continuation: progressing byte-limited responses continue, stalled byte- or
   quality-limited responses stop, unexpected EOR reasons fail, and interruption prevents
   another request. These checks supply response summaries without invoking the native parser.
+- Retry pause: no pause before the first retry, a pause before each later retry.
+  The check calls `J2KReader.pauseBeforeRetry` on an interrupted thread, without timing
+  assertions; it tests the helper's decision, not the reader loop.
 
 Compilation and each default test process have a 60-second timeout.
 
@@ -82,6 +88,12 @@ client refuses (the frame is fetched and stored again). The pump is invoked dire
 GUI view, while its worker remains idle. Completed or restored frames must reset
 the reader's consecutive failure count within the pass.
 
+The already downloaded Callisto file is also opened through `ImageLayerLoader` as a local
+image timeline: it must be complete without downloading, deliver its source's full-resolution
+pixels, and close its native source after removal. This tests the local integration path,
+not solar metadata correctness. The single AIA image is downloaded through the running reader
+at level 0; the reader must exit, and two subsequent displays must still deliver correct pixels.
+
 The same movie is then opened as a real timeline with its decoder, headless, with its reader thread. Paused and
 first shown at its coarsest level, which opening already completed, the movie must still
 download; a finer level of the shown frame must be fetched and delivered by the reader's
@@ -99,9 +111,13 @@ these checks require `--live` to obtain the captures. The server holds both repl
 until the prefetch pump has sent two requests.
 The real `signal()` method queues newer work, then both replies are released: the pump must
 consume them and yield without requesting a third frame. Its worker stays unstarted for this check;
-the test does not replace the signal queue. The same captures drive the retry and refusal checks.
-Two failed passes must recover, with a pause before the second retry. There is no upper
-elapsed-time assertion on the first retry: scheduling stalls are not reader-imposed pauses.
+the test does not replace the signal queue. Repeated decodes of the complete coarse level must
+match before, during and after ingestion of the finer responses. A separate check leaves a frame
+response unanswered, removes the timeline, and requires TCP, the reader and the native source
+to close within bounded waits. The same captures drive the retry and refusal checks.
+Two failed passes must recover, with a measured pause before the second retry. The offline
+check covers the first retry's no-pause decision; the live check has no upper elapsed-time
+assertion on that retry because scheduling stalls are not reader-imposed pauses.
 Fourteen consecutive failed passes must exhaust retries and log the cause once,
 even when every pass accepts byte-limited data before failing. A conflicting response must stop
 the reader and purge this source's disk entries while preserving an unrelated entry. Equal-length
@@ -113,13 +129,16 @@ The live suite also downloads a Callisto JP2 through the ROB API and checks hori
 crops at the origin, interior, and right edge against a full-image decode. It exercises
 all six Callisto resolution levels (0 through 5), including nonaligned requested regions.
 Full-image hashes are printed for comparison when changing the decoder. These checks cover
-crop/full-image consistency, not independent pixel correctness, RGB composition or
-timeline drawing. The Callisto test process has a 180-second timeout.
+crop/full-image consistency, not independent pixel correctness or RGB composition. The Callisto test process has a 180-second timeout.
 The same fixture checks the shared radio crop cache under its 438 MiB byte budget:
 values are soft so GC can reclaim unused crops
 under memory pressure, and eviction follows recency across seven days.
 Removing a day purges only its crops, and removed days cannot accept late decode results.
-Displayed scalar pixels survive eviction and LUT changes. Immutable fixture arrays are reused
+Displayed scalar pixels survive eviction and LUT changes. Fine and coarse crops are drawn
+into a software image; every painted pixel must lie in the expected time/frequency rectangle.
+A one-day view requests that day and its neighbours; a two-day view ending at midnight
+requests those two days and their neighbours. Panning to an earlier month drops the old
+requests, and disabling the layer clears the new ones; their download threads must stop. Immutable fixture arrays are reused
 across day entries to exercise cache weights without allocating 438 MiB of pixels.
 
 `run_native_test.sh` requires at least one JP2/JPX file argument, `KDU_VENDOR` to
