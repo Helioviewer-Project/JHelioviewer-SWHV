@@ -1,12 +1,13 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+
+import org.helioviewer.jhv.thread.UiThread;
 
 import okio.BufferedSource;
 
@@ -42,14 +43,14 @@ public interface NetClient extends AutoCloseable {
     }
 
     static NetClient of(URI uri, boolean allowError, NetCache cache) throws IOException {
-        if (EventQueue.isDispatchThread())
+        if (UiThread.isUiThread())
             throw new IOException("Don't do that");
 
         return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError, cache);
     }
 
     static NetClient post(URI uri, String contentType, byte[] body, boolean allowError, NetCache cache) throws IOException {
-        if (EventQueue.isDispatchThread())
+        if (UiThread.isUiThread())
             throw new IOException("Don't do that");
         if ("file".equals(uri.getScheme()))
             throw new IOException("POST not supported for file URIs");

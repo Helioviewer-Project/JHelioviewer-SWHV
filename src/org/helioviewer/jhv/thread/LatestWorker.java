@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.thread;
 
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -17,7 +16,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 
 // Runs one task at a time, retaining only the latest pending request.
-// Callbacks run on the EDT, including stale results with fresh == false.
+// Callbacks run on the UI thread, including stale results with fresh == false.
 public final class LatestWorker<T> {
 
     private static final class Request<T> {
@@ -48,7 +47,7 @@ public final class LatestWorker<T> {
 
     private Request<T> pending;
     private Future<?> scheduled;
-    // Keyed tasks remain reusable until their result or failure is delivered on the EDT.
+    // Keyed tasks remain reusable until their result or failure is delivered on the UI thread.
     private final List<Request<T>> outstanding = new ArrayList<>();
 
     private int generation;
@@ -113,9 +112,9 @@ public final class LatestWorker<T> {
 
         try {
             T result = request.task.call();
-            EventQueue.invokeLater(() -> complete(request, result, null));
+            UiThread.post(() -> complete(request, result, null));
         } catch (Throwable t) {
-            EventQueue.invokeLater(() -> complete(request, null, t));
+            UiThread.post(() -> complete(request, null, t));
         } finally {
             synchronized (this) {
                 scheduled = null;

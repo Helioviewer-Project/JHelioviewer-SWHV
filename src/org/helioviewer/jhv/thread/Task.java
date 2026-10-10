@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.thread;
 
-import java.awt.EventQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -16,7 +15,7 @@ import org.helioviewer.jhv.app.Message;
 
 public final class Task {
 
-    // Work runs on the supplied executor; success and failure callbacks run on the EDT.
+    // Work runs on the supplied executor; success and failure callbacks run on the UI thread.
     public static <T> Future<T> submit(@Nonnull Executor executor, @Nonnull Callable<T> task,
                                        @Nonnull Consumer<T> onSuccess, @Nonnull Consumer<Throwable> onFailure) {
         FutureTask<T> futureTask = new FutureTask<>(task) {
@@ -24,12 +23,12 @@ public final class Task {
             protected void done() {
                 try {
                     T result = get();
-                    EventQueue.invokeLater(() -> onSuccess.accept(result));
+                    UiThread.post(() -> onSuccess.accept(result));
                 } catch (ExecutionException e) {
                     Throwable cause = e.getCause();
-                    EventQueue.invokeLater(() -> onFailure.accept(cause));
+                    UiThread.post(() -> onFailure.accept(cause));
                 } catch (InterruptedException | CancellationException e) {
-                    EventQueue.invokeLater(() -> onFailure.accept(e));
+                    UiThread.post(() -> onFailure.accept(e));
                 }
             }
         };

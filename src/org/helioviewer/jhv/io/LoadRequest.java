@@ -9,8 +9,8 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandImporter;
 
@@ -83,7 +83,7 @@ class LoadRequest {
             int len = ji.length();
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
-                EDTQueue.invokeAndWait(() -> ImageLayer.create().load(req));
+                UiThread.postAndWait(() -> ImageLayer.create().load(req));
             }
         }
 

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.thread.EDTQueue;
+import org.helioviewer.jhv.thread.UiThread;
 
 // The layer's load-finished future, headless, through the real registry.
 // Arguments: a FITS file, a file that is not an image.
@@ -32,32 +32,32 @@ public final class LayerLoadTest {
         URI fits = Path.of(arguments[0]).toUri(), bogus = Path.of(arguments[1]).toUri();
 
         // A load that succeeds completes true, and a wait asked afterward completes at once.
-        ImageLayer layer = EDTQueue.invokeAndWait(ImageLayer::create);
-        CompletableFuture<Boolean> finished = EDTQueue.invokeAndWait(() -> {
+        ImageLayer layer = UiThread.postAndWait(ImageLayer::create);
+        CompletableFuture<Boolean> finished = UiThread.postAndWait(() -> {
             layer.load(List.of(fits));
             return layer.whenLoadFinished();
         });
         if (!finished.get(60, TimeUnit.SECONDS))
             throw new AssertionError("Successful load did not complete true");
-        if (!EDTQueue.invokeAndWait(layer::whenLoadFinished).get(5, TimeUnit.SECONDS))
+        if (!UiThread.postAndWait(layer::whenLoadFinished).get(5, TimeUnit.SECONDS))
             throw new AssertionError("Finished layer did not complete at once");
         System.out.println("PASS: a successful load completes true, a finished layer at once");
 
         // A failed first load removes the layer and completes false.
-        ImageLayer failing = EDTQueue.invokeAndWait(ImageLayer::create);
-        finished = EDTQueue.invokeAndWait(() -> {
+        ImageLayer failing = UiThread.postAndWait(ImageLayer::create);
+        finished = UiThread.postAndWait(() -> {
             failing.load(List.of(bogus));
             return failing.whenLoadFinished();
         });
         if (finished.get(60, TimeUnit.SECONDS))
             throw new AssertionError("Failed first load completed true");
-        if (EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(failing)))
+        if (UiThread.postAndWait(() -> Layers.getImageLayers().contains(failing)))
             throw new AssertionError("Failed first load did not remove the layer");
         System.out.println("PASS: a failed first load completes false after removal");
 
         // Removing a layer with a pending wait completes it false.
-        ImageLayer removed = EDTQueue.invokeAndWait(ImageLayer::create);
-        finished = EDTQueue.invokeAndWait(() -> {
+        ImageLayer removed = UiThread.postAndWait(ImageLayer::create);
+        finished = UiThread.postAndWait(() -> {
             removed.load(List.of(fits));
             return removed.whenLoadFinished();
         });
@@ -71,7 +71,7 @@ public final class LayerLoadTest {
             throw new AssertionError("Load.image of a FITS file did not complete true");
         if (Load.image(bogus).get(60, TimeUnit.SECONDS))
             throw new AssertionError("Load.image of an unreadable file did not complete false");
-        EDTQueue.invokeAndWait(() -> {
+        UiThread.postAndWait(() -> {
             CompletableFuture<Boolean> emptyLoad = Load.image(List.of());
             if (!emptyLoad.isDone() || emptyLoad.join())
                 throw new AssertionError("Empty image input queued a layer load instead of returning false immediately");
