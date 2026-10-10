@@ -20,7 +20,7 @@ public final class TimelineLayers {
     public interface Listener {
         default void layersAdded(int firstRow, int lastRow) {}
 
-        default void layerRemoved(int row) {}
+        default void layerRemoved(int row, TimelineLayer layer) {}
 
         default void layersReplaced() {}
 
@@ -128,7 +128,7 @@ public final class TimelineLayers {
 
         tl.remove();
         layers.remove(row);
-        listeners.forEach(listener -> listener.layerRemoved(row));
+        listeners.forEach(listener -> listener.layerRemoved(row, tl));
         DrawController.layoutChanged();
     }
 

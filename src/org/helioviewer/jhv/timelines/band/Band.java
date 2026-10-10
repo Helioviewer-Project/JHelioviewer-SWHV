@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.LongUnaryOperator;
 
 import javax.annotation.Nullable;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
@@ -57,7 +56,6 @@ public final class Band extends TimelineLayer {
 
     private final BandType bandType;
     private final boolean fullResolution;
-    private final BandOptions optionsPanel = new BandOptions(this);
 
     private final YAxis yAxis;
     private final int[] warnPixels;
@@ -92,7 +90,7 @@ public final class Band extends TimelineLayer {
         return fullResolution;
     }
 
-    JSONObject toJson() {
+    public JSONObject toJson() {
         TimeAxis timeAxis = DrawController.selectedAxis;
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
@@ -189,7 +187,7 @@ public final class Band extends TimelineLayer {
         return graphColor;
     }
 
-    void setDataColor(Color c) {
+    public void setDataColor(Color c) {
         graphColor = c;
         DrawController.drawRequest();
         notifyStateChanged();
@@ -216,11 +214,6 @@ public final class Band extends TimelineLayer {
     @Override
     public boolean isDownloading() {
         return BandDownloads.isActive(this);
-    }
-
-    @Override
-    public JPanel getOptionsPanel() {
-        return optionsPanel;
     }
 
     @Override
@@ -510,7 +503,11 @@ public final class Band extends TimelineLayer {
         return propagationModel.getObservationTime(ts);
     }
 
-    void setPropagationModel(PropagationModel _propagationModel) {
+    public void setPropagationDelay(double days) {
+        setPropagationModel(new PropagationModel.Delay(days));
+    }
+
+    private void setPropagationModel(PropagationModel _propagationModel) {
         propagationModel = _propagationModel;
         TimeAxis timeAxis = DrawController.selectedAxis;
         updateData(propagationModel.getObservationTime(timeAxis.start()), propagationModel.getObservationTime(timeAxis.end()));

@@ -273,7 +273,7 @@ public final class TimelinePanel extends JPanel {
 
     private void setOptionsPanel(@Nullable TimelineLayer timeline) {
         optionsPanelWrapper.removeAll();
-        JPanel optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
+        JPanel optionsPanel = timeline == null ? null : TimelineOptions.getOptionsPanel(timeline);
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, timeline.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);

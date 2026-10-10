@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.gui;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 
 @SuppressWarnings("serial")
@@ -44,7 +45,7 @@ final class TimelineTableModel extends AbstractTableModel implements TimelineLay
     }
 
     @Override
-    public void layerRemoved(int row) {
+    public void layerRemoved(int row, TimelineLayer layer) {
         fireTableRowsDeleted(row, row);
     }
 

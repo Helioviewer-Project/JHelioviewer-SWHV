@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventListener;
@@ -151,12 +150,6 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     @Override
     public boolean isDownloading() {
         return false;
-    }
-
-    @Nullable
-    @Override
-    public JPanel getOptionsPanel() {
-        return null;
     }
 
     @Override

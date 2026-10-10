@@ -79,7 +79,7 @@ public class BandType {
         jo.put("bandType", json);
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 

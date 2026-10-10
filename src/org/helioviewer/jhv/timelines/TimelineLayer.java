@@ -6,7 +6,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.annotation.Nullable;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -45,9 +44,6 @@ public abstract class TimelineLayer {
     public abstract boolean isDownloading();
 
     public abstract boolean hasData();
-
-    @Nullable
-    public abstract JPanel getOptionsPanel();
 
     public abstract boolean isDeletable();
 

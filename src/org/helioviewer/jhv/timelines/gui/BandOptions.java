@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.timelines.band;
+package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -20,6 +20,7 @@ import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.timelines.band.Band;
 
 import org.json.JSONObject;
 
@@ -56,7 +57,7 @@ class BandOptions extends JPanel {
         propagationField.setColumns(10);
         propagationField.addPropertyChangeListener("value", e -> {
             double value = (Double) propagationField.getValue();
-            band.setPropagationModel(new PropagationModel.Delay(value));
+            band.setPropagationDelay(value);
         });
         add(propagationField, c);
 

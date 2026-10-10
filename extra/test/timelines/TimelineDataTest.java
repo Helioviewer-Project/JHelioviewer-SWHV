@@ -502,7 +502,7 @@ public final class TimelineDataTest {
                 }
 
                 @Override
-                public void layerRemoved(int row) {
+                public void layerRemoved(int row, TimelineLayer layer) {
                     events.add(new int[]{row, -1});
                 }
 
