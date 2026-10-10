@@ -36,6 +36,8 @@ import org.json.JSONObject;
 
 public final class State {
 
+    private static int loadSerial;
+
     public static void save(String dir, String file) {
         JSONObject json = toJson();
 
@@ -152,7 +154,7 @@ public final class State {
         Timelines.getLayers().restore(newList);
     }
 
-    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context, ViewState.ModeData modeData) {
+    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context, ViewState.ModeData modeData, int serial) {
         ArrayList<Layer> restoredLayers = new ArrayList<>();
 
         JSONArray layers = data.optJSONArray("layers");
@@ -199,13 +201,13 @@ public final class State {
         Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
-        Callback callback = new Callback(context, newLayers, masterLayer, time, modeData);
+        Callback callback = new Callback(context, newLayers, masterLayer, time, modeData, serial);
         CompletableFuture.allOf(newLayers.keySet().stream().map(ImageLayer::whenLoadFinished).toArray(CompletableFuture[]::new))
                 .thenRun(() -> EventQueue.invokeLater(callback::onSuccess));
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
-                            @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData) {
+                            @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData, int serial) {
 
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData); // this applies projection again
@@ -214,6 +216,10 @@ public final class State {
         }
 
         void onSuccess() {
+            if (serial != loadSerial) {
+                Commands.notifyLoadStateFinished(context, false, "Superseded by a newer state load.");
+                return;
+            }
             for (ImageLayer layer : Layers.getImageLayers()) {
                 Boolean enabled = newLayers.get(layer);
                 if (enabled != null) // user may have loaded a new layer in the meanwhile
@@ -228,6 +234,7 @@ public final class State {
     }
 
     public static void load(@Nullable Commands.OperationContext context, JSONObject jo) {
+        int serial = ++loadSerial;
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
             ViewState.setProjection(modeData.projection()); // to be set before viewpoint
@@ -240,7 +247,7 @@ public final class State {
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
-            loadLayers(jo, context, modeData);
+            loadLayers(jo, context, modeData, serial);
         } catch (Exception e) {
             Log.error(e);
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
