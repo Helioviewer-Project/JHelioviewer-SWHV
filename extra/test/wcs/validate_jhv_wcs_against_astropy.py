@@ -149,16 +149,13 @@ def header_observed_date(header) -> str:
     )
     if observed_date is None:
         raise ValueError("Missing DATE-OBS-style keyword")
-    observed_date = str(observed_date)
-    if str(header.get("INSTRUME", "")) == "LASCO":
-        observed_time = header.get("TIME_OBS") or header.get("TIME-OBS")
-        if observed_time is None:
-            raise ValueError("LASCO header missing TIME_OBS/TIME-OBS")
-        observed_date = observed_date.replace("/", "-") + "T" + str(observed_time)
+    observed_date = str(observed_date).replace("/", "-")
     if observed_date.endswith("Z"):
         observed_date = observed_date[:-1]
     if len(observed_date) == 10:
-        observed_date += "T00:00:00"
+        observed_date += "T" + str(
+            header.get("TIME_OBS") or header.get("TIME-OBS") or "00:00:00"
+        )
     return observed_date
 
 

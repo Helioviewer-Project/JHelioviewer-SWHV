@@ -27,6 +27,37 @@ from test_wcs_rendering import (
 
 
 class ValidationTest(unittest.TestCase):
+    def test_observation_date_and_time(self):
+        cases = [
+            ({"DATE-OBS": "2026-03-01", "TIME-OBS": "23:14"}, "2026-03-01T23:14"),
+            (
+                {"DATE-OBS": "2012/08/31", "TIME_OBS": "17:34:11.34", "TIME-OBS": "01:00:00"},
+                "2012-08-31T17:34:11.34",
+            ),
+            (
+                {"INSTRUME": "LASCO", "DATE-OBS": "2012-08-31T17:34:11.34Z", "TIME_OBS": "01:00:00"},
+                "2012-08-31T17:34:11.34",
+            ),
+            ({"INSTRUME": "LASCO", "DATE-OBS": "2012-08-31"}, "2012-08-31T00:00:00"),
+            (
+                {
+                    "DATE-AVG": "2026-03-01T12:00:00",
+                    "DATE_AVG": "2026-03-02",
+                    "DATE_OBS": "2026-03-03",
+                    "DATE-OBS": "2026-03-04",
+                },
+                "2026-03-01T12:00:00",
+            ),
+            (
+                {"DATE_AVG": "2026-03-02", "DATE_OBS": "2026-03-03", "DATE-OBS": "2026-03-04"},
+                "2026-03-02T00:00:00",
+            ),
+            ({"DATE_OBS": "2026-03-03", "DATE-OBS": "2026-03-04"}, "2026-03-03T00:00:00"),
+        ]
+        for header, expected in cases:
+            with self.subTest(header=header):
+                self.assertEqual(cpu.header_observed_date(header), expected)
+
     def setUp(self):
         self.output = tempfile.TemporaryDirectory()
         self.addCleanup(self.output.cleanup)

@@ -200,19 +200,17 @@ public final class FitsMetaData extends CommonMetaData {
         }
     }
 
-    private JHVTime retrieveTime(MetaDataContainer m) {
+    private static JHVTime retrieveTime(MetaDataContainer m) {
         String observedDate = m.getString("DATE-AVG").
                 or(() -> m.getString("DATE_AVG")).
                 or(() -> m.getString("DATE_OBS")). // try first, DATE-OBS unusable for MDI and early EIT
                         orElseGet(() -> m.getRequiredString("DATE-OBS"));
-        if (instrument.equals("LASCO")) {
-            String observedTime = m.getString("TIME_OBS").orElseGet(() -> m.getRequiredString("TIME-OBS"));
-            observedDate = observedDate.replace('/', '-') + 'T' + observedTime;
-        }
+        observedDate = observedDate.replace('/', '-');
         if (observedDate.endsWith("Z")) // MDI & EIT
             observedDate = observedDate.substring(0, observedDate.length() - 1);
-        if (observedDate.length() == 10) // date-only metadata, assume midnight
-            observedDate += "T00:00:00";
+        if (observedDate.length() == 10)
+            observedDate += 'T' + m.getString("TIME_OBS").
+                    or(() -> m.getString("TIME-OBS")).orElse("00:00:00");
 
         return new JHVTime(observedDate);
     }
