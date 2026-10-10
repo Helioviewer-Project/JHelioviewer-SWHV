@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
@@ -116,7 +115,7 @@ public final class Frames implements Source.Listener {
     private record Closer(int serial, List<Source> sources) implements Runnable {
         @Override
         public void run() {
-            ImageBufferCache.invalidateOwners(Set.of(serial));
+            ImageBufferCache.invalidateOwner(serial);
             if (sources.isEmpty())
                 return;
             // Stopping a reader may wait.
@@ -138,7 +137,7 @@ public final class Frames implements Source.Listener {
     }
 
     public void clearCache() {
-        ImageBufferCache.invalidateOwners(Set.of(serial));
+        ImageBufferCache.invalidateOwner(serial);
     }
 
     // The cache owner of this timeline's decoded images.

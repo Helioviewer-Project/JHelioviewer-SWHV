@@ -207,7 +207,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
-        syncButton.addActionListener(e -> loadLayersSpan());
+        syncButton.addActionListener(e -> ImageLayers.syncLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
         addLayerPanel.add(addLayerButton, BorderLayout.LINE_START);
@@ -248,10 +248,6 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         if (req != null)
             imageDialog.selectDataset(req.server(), req.sourceId());
         imageDialog.showDialog(true);
-    }
-
-    private static void loadLayersSpan() {
-        ImageLayers.syncLayersSpan();
     }
 
     private static class RecordButton extends JideToggleButton {

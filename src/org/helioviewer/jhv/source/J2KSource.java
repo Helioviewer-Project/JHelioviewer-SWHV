@@ -87,11 +87,6 @@ public final class J2KSource implements Source {
         return client;
     }
 
-    // Acquire the input before allocating output. The caller closes the job after decoding.
-    J2KNative.Decode beginDecode(int frame, int level) throws IOException {
-        return client.beginDecode(frame, level);
-    }
-
     // Initializes the frame array in the local constructor or JPIP reader constructor,
     // after metadata arrives and before the source is exposed to its view.
     void loadFrames() throws IOException {
@@ -163,17 +158,6 @@ public final class J2KSource implements Source {
         }
     }
 
-    @Nullable
-    @Override
-    public ClipSet clipSet() {
-        return null;
-    }
-
-    @Override
-    public boolean usesFITSParameters() {
-        return false;
-    }
-
     // Null while the frame's header is unknown.
     @Nullable
     ResolutionSet geometry(int frame) {
@@ -220,7 +204,7 @@ public final class J2KSource implements Source {
             return;
         boolean missing = levels(frame).getCompleteLevel(level).level() != level;
         if ((missing || currentLevel == NO_LEVEL) && (priority || level < currentLevel)) {
-            reader.signal(new J2KParams.Read(new J2KParams.Decode(frame, level), priority));
+            reader.signal(new J2KReader.Read(frame, level, priority));
             currentLevel = level;
         }
     }
@@ -271,7 +255,7 @@ public final class J2KSource implements Source {
     @Override
     public ImageBuffer decode(int frame, int level, ImageFilter filter,
                               @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws IOException {
-        try (J2KNative.Decode job = beginDecode(frame, level)) {
+        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
             ResolutionSet set = levels(frame);
             ResolutionSet.Level resolution = set.getLevel(level);
             boolean gray = set.numComps == 1;
@@ -284,7 +268,7 @@ public final class J2KSource implements Source {
 
     // Gray8 or RGBA rows of a region of a complete level; runs on a decode worker.
     public byte[] decodeRegion(int frame, int level, int x, int y, int width, int height) throws IOException {
-        try (J2KNative.Decode job = beginDecode(frame, level)) {
+        try (J2KNative.Decode job = client.beginDecode(frame, level)) {
             ByteBuffer direct = MemoryUtil.memAlloc(width * height * levels(frame).numComps);
             try {
                 decode(job, x, y, width, height, direct);

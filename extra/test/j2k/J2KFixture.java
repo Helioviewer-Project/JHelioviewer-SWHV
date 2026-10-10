@@ -130,8 +130,8 @@ public final class J2KFixture {
                 Field keys = J2KReader.class.getDeclaredField("cacheKey");
                 keys.setAccessible(true);
                 keys.set(reader, new String[3]);
-                J2KParams.Read params = new J2KParams.Read(new J2KParams.Decode(0, responses.level), false);
-                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
+                J2KReader.Read params = new J2KReader.Read(0, responses.level, false);
+                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ResolutionSet.Level.class, boolean.class);
                 readFrames.setAccessible(true);
                 J2KReader current = reader;
                 Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.levels(0).getLevel(responses.level), false));

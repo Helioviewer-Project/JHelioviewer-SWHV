@@ -67,7 +67,7 @@ public final class ImageRenderingTest {
             }
             ImageBuffer image = ImageBuffer.fromShorts(TEXTURE_SIZE, TEXTURE_SIZE, samples, ImageFilter.NONE);
             ImageBuffer prior = ImageBuffer.fromShorts(TEXTURE_SIZE, TEXTURE_SIZE, previous, ImageFilter.NONE);
-            ImageBuffer odd = ImageBuffer.fromBytes(13, 11, ImageBuffer.Format.Gray8, new byte[13 * 11]);
+            ImageBuffer odd = ImageBuffer.fromBytes(13, 11, new byte[13 * 11]);
             texture.upload(odd);
             lut.upload2D(GLTexture.Format.RGBA8, 256, 1, GL.NEAREST, LUT.gray().rgba());
             texture.upload(odd);

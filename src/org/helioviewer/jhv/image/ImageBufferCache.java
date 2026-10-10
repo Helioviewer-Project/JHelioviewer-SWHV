@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.image;
 
 import java.awt.EventQueue;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -39,13 +38,12 @@ public final class ImageBufferCache {
         cache.put(key, image);
     }
 
-    public static void invalidateIf(Predicate<Key> predicate) {
+    static void invalidateIf(Predicate<Key> predicate) {
         cache.asMap().keySet().removeIf(predicate);
     }
 
-    public static void invalidateOwners(Set<Object> owners) {
-        if (!owners.isEmpty())
-            invalidateIf(key -> owners.contains(key.owner()));
+    public static void invalidateOwner(Object owner) {
+        invalidateIf(key -> owner.equals(key.owner()));
     }
 
     private ImageBufferCache() {}

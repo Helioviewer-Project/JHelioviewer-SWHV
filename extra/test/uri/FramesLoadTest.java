@@ -71,15 +71,17 @@ public final class FramesLoadTest {
         }
         System.out.println("PASS: zip expanded alongside a file");
 
-        result = ImageLayerLoader.open(null, List.of(a, bogus, b));
+        result = ImageLayerLoader.open(null, List.of(a, bogus, b, a));
         frames = result.frames();
         try {
-            if (frames.size() != 2 || result.warnings().size() != 1)
-                throw new AssertionError("Unreadable file was not skipped with a warning: " + frames.size() + " " + result.warnings());
+            if (frames.size() != 2 || result.warnings().size() != 2
+                    || !result.warnings().getFirst().contains(Path.of(arguments[4]).getFileName().toString())
+                    || !result.warnings().getLast().startsWith("Skipped 1 frame"))
+                throw new AssertionError("File failures must precede duplicate-frame warnings: " + frames.size() + " " + result.warnings());
         } finally {
             EventQueue.invokeAndWait(frames::close);
         }
-        System.out.println("PASS: unreadable file skipped with a warning in a multi-file load");
+        System.out.println("PASS: unreadable file skipped; file warnings precede duplicate-frame warnings");
 
         try {
             ImageLayerLoader.open(null, List.of(bogus)).frames().close();

@@ -30,15 +30,13 @@ public final class ImageBuffer {
 
     private final Cleaner.Cleanable cleanable;
 
-    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data) {
-        return fromBytes(width, height, format, data, ImageFilter.NONE);
+    public static ImageBuffer fromBytes(int width, int height, byte[] data) {
+        return fromBytes(width, height, data, ImageFilter.NONE);
     }
 
-    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter filter) {
-        if (format == Format.Gray16F)
-            throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        if (keepsOriginalPixels(format, filter))
-            return new ImageBuffer(width, height, format, allocateFrom(data));
+    public static ImageBuffer fromBytes(int width, int height, byte[] data, ImageFilter filter) {
+        if (filter.isNone())
+            return new ImageBuffer(width, height, Format.Gray8, allocateFrom(data));
         return fromFloats(width, height, filter.apply(ByteBuffer.wrap(data), width, height));
     }
 

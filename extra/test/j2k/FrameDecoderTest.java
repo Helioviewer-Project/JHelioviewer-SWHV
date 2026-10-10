@@ -147,7 +147,7 @@ public final class FrameDecoderTest {
                         ImageProcessingSettings.FITSParameters.class, ClipSet.Range.class);
         constructor.setAccessible(true);
         ImageBufferCache.Key key = (ImageBufferCache.Key) constructor.newInstance(opened.frames.serial(), 0, 0, ImageFilter.Type.None, null, null);
-        DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null);
+        DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(8, 8, new byte[64]), null);
         ImageBufferCache.put(key, image);
         EventQueue.invokeAndWait(opened.decoder::dispose);
         return new Abandoned(new WeakReference<>(opened.frames), client.invoke(opened.source), key, image);

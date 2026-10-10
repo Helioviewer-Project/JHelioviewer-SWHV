@@ -138,7 +138,7 @@ public final class J2KReaderTest {
         J2KReader reader = null;
         JPIPSocket socket = null;
         try {
-            Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KParams.Read.class, ResolutionSet.Level.class, boolean.class);
+            Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ResolutionSet.Level.class, boolean.class);
             readFrames.setAccessible(true);
             Field retries = J2KReader.class.getDeclaredField("retries");
             retries.setAccessible(true);
@@ -193,7 +193,7 @@ public final class J2KReaderTest {
                     // A later cached pass has nothing left to restore; every fetching pass must reset failures.
                     if (mode != Mode.CACHED || index == frames)
                         retries.setInt(reader, 12);
-                    J2KParams.Read params = new J2KParams.Read(new J2KParams.Decode(0, level), false);
+                    J2KReader.Read params = new J2KReader.Read(0, level, false);
                     if (!(boolean) readFrames.invoke(reader, params, size, false))
                         throw new AssertionError("Prefetch interrupted unexpectedly");
                     if (retries.getInt(reader) != 0)

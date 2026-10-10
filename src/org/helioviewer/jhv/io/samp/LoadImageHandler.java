@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.thread.AppThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -42,14 +41,8 @@ final class LoadImageHandler {
         };
     }
 
-    // The reply goes out off the EDT, which completes the load future.
     private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<Boolean> future) {
-        future.whenComplete((success, t) -> AppThread.create(() -> {
-            if (t != null)
-                context.complete(false, message(t), null);
-            else
-                context.complete(success, success ? "Image loaded." : "Image load failed.", null);
-        }, "JHV-WaitImageLoad").start());
+        future.thenAccept(success -> context.complete(success, success ? "Image loaded." : "Image load failed.", null));
     }
 
     private static String message(Throwable t) {

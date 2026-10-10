@@ -31,9 +31,13 @@ public interface Source {
     LUT lut();
 
     @Nullable
-    ClipSet clipSet();
+    default ClipSet clipSet() {
+        return null;
+    }
 
-    boolean usesFITSParameters();
+    default boolean usesFITSParameters() {
+        return false;
+    }
 
     // Runs on a decode worker. A source ignores the arguments it has no use for.
     ImageBuffer decode(int frame, int level, ImageFilter filter,

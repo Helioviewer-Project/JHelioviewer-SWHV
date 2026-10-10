@@ -16,15 +16,11 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
     private BufferBacking backing;
     private final BackendKind backendKind;
 
-    private AbstractOwnedDataBuffer(int type, int size, int numBanks, BufferBacking _backing, BackendKind _backendKind) {
-        super(type, size, numBanks);
+    private AbstractOwnedDataBuffer(int type, int size, BufferBacking _backing, BackendKind _backendKind) {
+        super(type, size);
         backing = _backing;
         buffer = _backing.buffer();
         backendKind = _backendKind;
-    }
-
-    final Buffer getBuffer() {
-        return requireBuffer();
     }
 
     final void free() {
@@ -65,29 +61,21 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
 
     @FunctionalInterface
     interface BackingFactory {
-        BufferBacking create(int type, int size, int numBanks) throws IOException;
+        BufferBacking create(int type, int size) throws IOException;
     }
 
-    static DataBuffer create(int type, int size, int numBanks, BackendKind backendKind, BackingFactory backingFactory) {
-        try {
-            return createOrThrow(type, size, numBanks, backendKind, backingFactory);
-        } catch (IOException e) {
-            throw new IllegalStateException("Unexpected I/O creating " + backendKind + " buffer", e);
-        }
-    }
-
-    static DataBuffer createOrThrow(int type, int size, int numBanks, BackendKind backendKind, BackingFactory backingFactory) throws IOException {
+    static DataBuffer createOrThrow(int type, int size, BackendKind backendKind, BackingFactory backingFactory) throws IOException {
         return switch (type) {
-            case DataBuffer.TYPE_BYTE -> new ByteDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_BYTE, size, numBanks), backendKind);
-            case DataBuffer.TYPE_USHORT -> new UShortDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_USHORT, size, numBanks), backendKind);
-            case DataBuffer.TYPE_INT -> new IntDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_INT, size, numBanks), backendKind);
+            case DataBuffer.TYPE_BYTE -> new ByteDataBuffer(size, backingFactory.create(DataBuffer.TYPE_BYTE, size), backendKind);
+            case DataBuffer.TYPE_USHORT -> new UShortDataBuffer(size, backingFactory.create(DataBuffer.TYPE_USHORT, size), backendKind);
+            case DataBuffer.TYPE_INT -> new IntDataBuffer(size, backingFactory.create(DataBuffer.TYPE_INT, size), backendKind);
             default -> throw new IllegalArgumentException("Unsupported data type: " + type);
         };
     }
 
     static ByteBuffer getByteBuffer(DataBuffer buffer, BackendKind backendKind) {
         if (buffer instanceof ByteDataBuffer byteDataBuffer && byteDataBuffer.isKind(backendKind))
-            return (ByteBuffer) byteDataBuffer.getBuffer();
+            return byteDataBuffer.byteBuffer();
         throw new IncompatibleClassChangeError("Not a " + backendKind + " byte backed image");
     }
 
@@ -107,49 +95,49 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
     }
 
     private static final class ByteDataBuffer extends AbstractOwnedDataBuffer {
-        private ByteDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(DataBuffer.TYPE_BYTE, size, numBanks, backing, backendKind);
+        private ByteDataBuffer(int size, BufferBacking backing, BackendKind backendKind) {
+            super(DataBuffer.TYPE_BYTE, size, backing, backendKind);
         }
 
         @Override
-        public final int getElem(int bank, int i) {
+        public int getElem(int bank, int i) {
             return byteBuffer().get(bank * size + i) & 0xff;
         }
 
         @Override
-        public final void setElem(int bank, int i, int val) {
+        public void setElem(int bank, int i, int val) {
             byteBuffer().put(bank * size + i, (byte) val);
         }
     }
 
     private static final class UShortDataBuffer extends AbstractOwnedDataBuffer {
-        private UShortDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(DataBuffer.TYPE_USHORT, size, numBanks, backing, backendKind);
+        private UShortDataBuffer(int size, BufferBacking backing, BackendKind backendKind) {
+            super(DataBuffer.TYPE_USHORT, size, backing, backendKind);
         }
 
         @Override
-        public final int getElem(int bank, int i) {
+        public int getElem(int bank, int i) {
             return shortBuffer().get(bank * size + i) & 0xffff;
         }
 
         @Override
-        public final void setElem(int bank, int i, int val) {
+        public void setElem(int bank, int i, int val) {
             shortBuffer().put(bank * size + i, (short) val);
         }
     }
 
     private static final class IntDataBuffer extends AbstractOwnedDataBuffer {
-        private IntDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(DataBuffer.TYPE_INT, size, numBanks, backing, backendKind);
+        private IntDataBuffer(int size, BufferBacking backing, BackendKind backendKind) {
+            super(DataBuffer.TYPE_INT, size, backing, backendKind);
         }
 
         @Override
-        public final int getElem(int bank, int i) {
+        public int getElem(int bank, int i) {
             return intBuffer().get(bank * size + i);
         }
 
         @Override
-        public final void setElem(int bank, int i, int val) {
+        public void setElem(int bank, int i, int val) {
             intBuffer().put(bank * size + i, val);
         }
     }

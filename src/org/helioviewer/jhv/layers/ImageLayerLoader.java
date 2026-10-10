@@ -53,10 +53,10 @@ final class ImageLayerLoader {
     void load(APIRequest req) {
         load(() -> {
             APIRequest.Response response = req.resolve();
-            List<String> warnings = new ArrayList<>();
+            Result result = open(req, List.of(response.uri()));
             if (response.message() != null)
-                warnings.add(response.message());
-            return open(req, List.of(response.uri()), warnings);
+                result.warnings().addFirst(response.message());
+            return result;
         });
     }
 
@@ -139,18 +139,14 @@ final class ImageLayerLoader {
     // A source and its frames in file order.
     private record Opened(Source source, DataUri dataUri, List<Frames.Frame> frames) {}
 
-    static Result open(@Nullable APIRequest request, List<URI> uris) throws Exception {
-        return open(request, uris, new ArrayList<>());
-    }
-
     // The loader owns every source it opens until the timeline does. Warnings are reported together after the load.
-    private static Result open(@Nullable APIRequest request, List<URI> uris, List<String> warnings) throws Exception {
-        List<String> failures = new ArrayList<>();
+    static Result open(@Nullable APIRequest request, List<URI> uris) throws Exception {
+        List<String> warnings = new ArrayList<>();
         List<Opened> opened = new ArrayList<>();
         try {
-            opened.addAll(openMany(request, uris, failures));
+            opened.addAll(openMany(request, uris, warnings));
             if (opened.isEmpty())
-                throw new Exception(failures.isEmpty() ? "No image files found." : String.join("\n", failures));
+                throw new Exception(warnings.isEmpty() ? "No image files found." : String.join("\n", warnings));
 
             List<Frames.Frame> all = new ArrayList<>();
             for (Opened o : opened)
@@ -166,7 +162,6 @@ final class ImageLayerLoader {
                 else
                     kept.add(frame);
             }
-            warnings.addAll(failures);
             if (!dropped.isEmpty()) {
                 warnings.add("Skipped " + dropped.size() + " frame(s) with a time already present:\n" + String.join("\n", dropped));
                 Set<Source> retained = new HashSet<>();
@@ -192,9 +187,9 @@ final class ImageLayerLoader {
     }
 
     // Several URIs tolerate failures of some; one URI fails the load.
-    private static List<Opened> openMany(@Nullable APIRequest request, List<URI> uris, List<String> failures) throws Exception {
+    private static List<Opened> openMany(@Nullable APIRequest request, List<URI> uris, List<String> warnings) throws Exception {
         if (uris.size() == 1)
-            return openUri(request, uris.getFirst(), failures);
+            return openUri(request, uris.getFirst(), warnings);
         Thread worker = Thread.currentThread();
         // Keep JPIP initialization on the interruptible loader thread.
         boolean jpip = uris.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
@@ -202,21 +197,21 @@ final class ImageLayerLoader {
             if (worker.isInterrupted())
                 return Stream.empty();
             try {
-                return openUri(request, uri, failures).stream();
+                return openUri(request, uri, warnings).stream();
             } catch (Exception e) {
                 Log.warn(uri.toString(), e);
-                synchronized (failures) {
-                    failures.add(e.getMessage());
+                synchronized (warnings) {
+                    warnings.add(e.getMessage());
                 }
                 return Stream.empty();
             }
         }).toList();
     }
 
-    private static List<Opened> openUri(@Nullable APIRequest request, URI uri, List<String> failures) throws Exception {
+    private static List<Opened> openUri(@Nullable APIRequest request, URI uri, List<String> warnings) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         if (dataUri.format() == DataUri.Format.ZIP)
-            return openMany(null, FileUtils.unZip(dataUri.uri()), failures);
+            return openMany(null, FileUtils.unZip(dataUri.uri()), warnings);
 
         Source source = null;
         try {

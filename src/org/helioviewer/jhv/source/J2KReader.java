@@ -15,12 +15,14 @@ import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
 class J2KReader implements Runnable {
 
+    record Read(int frame, int level, boolean priority) {}
+
     private static final int FAILED = Integer.MAX_VALUE;
 
     // A request in flight; own tells whether it was sized by the frame's own header.
     private record Sent(int frame, boolean own) {}
 
-    private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Read> signalQueue = new ArrayBlockingQueue<>(1);
     private final URI uri;
     private final J2KSource source;
     private final J2KNative client;
@@ -83,14 +85,14 @@ class J2KReader implements Runnable {
         }
     }
 
-    synchronized void signal(J2KParams.Read params) {
+    synchronized void signal(Read params) {
         if (isAbolished) // ignore new work when we're closing down
             return;
         signalQueue.poll(); // latest wins
         signalQueue.offer(params);
     }
 
-    private synchronized void queueIfEmpty(J2KParams.Read params) {
+    private synchronized void queueIfEmpty(Read params) {
         if (!isAbolished)
             signalQueue.offer(params); // newer pending work takes precedence
     }
@@ -274,14 +276,13 @@ class J2KReader implements Runnable {
         return true;
     }
 
-    private boolean readFrames(J2KParams.Read params, ResolutionSet.Level wanted, boolean singleFrame) throws IOException {
-        J2KParams.Decode decode = params.decodeParams();
+    private boolean readFrames(Read params, ResolutionSet.Level wanted, boolean singleFrame) throws IOException {
         ArrayDeque<Integer> remaining = new ArrayDeque<>();
         if (singleFrame) {
-            remaining.add(decode.frame());
+            remaining.add(params.frame());
         } else {
             int partial = source.getPartialUntil();
-            int first = partial < cacheKey.length - 1 ? partial : decode.frame();
+            int first = partial < cacheKey.length - 1 ? partial : params.frame();
             for (int i = 0; i < cacheKey.length; i++)
                 remaining.add((first + i) % cacheKey.length);
         }
@@ -323,7 +324,7 @@ class J2KReader implements Runnable {
     @Override
     public void run() {
         while (!isAbolished) {
-            J2KParams.Read params;
+            Read params;
             // wait for signal
             try {
                 params = signalQueue.take();
@@ -331,8 +332,7 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            J2KParams.Decode decode = params.decodeParams();
-            ResolutionSet.Level wanted = source.levels(decode.frame()).getLevel(decode.level());
+            ResolutionSet.Level wanted = source.levels(params.frame()).getLevel(params.level());
 
             source.setDownloading(true);
 
@@ -353,7 +353,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && finished && !isSettled(wanted.width(), wanted.height())) {
-                    queueIfEmpty(new J2KParams.Read(decode, false));
+                    queueIfEmpty(new Read(params.frame(), params.level(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;

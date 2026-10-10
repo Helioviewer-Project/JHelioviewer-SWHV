@@ -20,17 +20,17 @@ public class NativeImageFactory {
 
     private static BufferedImage createCompatible(int width, int height, int type) {
         return CompatibleImageUtils.createCompatibleImage(width, height, type,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+                (dataType, size) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static BufferedImage createRGBAPremultipliedImage(int width, int height) {
         return CompatibleImageUtils.createRGBAPremultipliedImage(width, height,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+                (dataType, size) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static BufferedImage createRGBImage(int width, int height) {
         return CompatibleImageUtils.createRGBImage(width, height,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+                (dataType, size) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {

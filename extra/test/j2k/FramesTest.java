@@ -44,8 +44,6 @@ public final class FramesTest {
         @Override public String xml(int frame) { return null; }
         @Override public ResolutionSet levels(int frame) { throw new UnsupportedOperationException(); }
         @Override public LUT lut() { return null; }
-        @Override public ClipSet clipSet() { return null; }
-        @Override public boolean usesFITSParameters() { return false; }
         @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) throws Exception {
             throw new UnsupportedOperationException();
         }
@@ -123,7 +121,7 @@ public final class FramesTest {
         Stub source = new Stub(1) {
             @Override public ResolutionSet levels(int frame) { return levels; }
             @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) throws Exception {
-                ImageBuffer image = ImageBuffer.fromBytes(2, 2, ImageBuffer.Format.Gray8, new byte[]{1, 2, 3, 4});
+                ImageBuffer image = ImageBuffer.fromBytes(2, 2, new byte[]{1, 2, 3, 4});
                 pixels.set(image);
                 if (decodes.incrementAndGet() == 1) {
                     started.countDown();
@@ -223,7 +221,7 @@ public final class FramesTest {
                 requests.incrementAndGet();
             }
             @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) {
-                return ImageBuffer.fromBytes(2, 2, ImageBuffer.Format.Gray8, new byte[]{(byte) frame, 2, 3, 4});
+                return ImageBuffer.fromBytes(2, 2, new byte[]{(byte) frame, 2, 3, 4});
             }
         };
         source.ready[0] = true;

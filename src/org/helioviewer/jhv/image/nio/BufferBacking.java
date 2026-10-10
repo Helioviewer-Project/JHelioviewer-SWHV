@@ -27,9 +27,9 @@ final class BufferBacking {
         tempPath = _tempPath;
     }
 
-    static BufferBacking allocate(int type, int size, int numBanks) {
+    static BufferBacking allocate(int type, int size) {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        long length = ((long) size) * componentSize * numBanks;
+        long length = ((long) size) * componentSize;
 
         Arena arena = Arena.ofShared();
         try {
@@ -41,9 +41,9 @@ final class BufferBacking {
         }
     }
 
-    static BufferBacking mapFile(int type, int size, int numBanks) throws IOException {
+    static BufferBacking mapFile(int type, int size) throws IOException {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
-        long length = ((long) size) * componentSize * numBanks;
+        long length = ((long) size) * componentSize;
 
         Path tempPath = Files.createTempFile(Directories.exportCacheDir.toPath(), "mbuf", null);
         Arena arena = Arena.ofShared();

@@ -20,10 +20,6 @@ public final class EDTTimer {
         timer.setDelay(delay);
     }
 
-    public void setInitialDelay(int initialDelay) {
-        timer.setInitialDelay(initialDelay);
-    }
-
     public void setRepeats(boolean repeats) {
         timer.setRepeats(repeats);
     }

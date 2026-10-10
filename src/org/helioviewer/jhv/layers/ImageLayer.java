@@ -112,19 +112,16 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     public void load(APIRequest req) {
         if (removed)
             return;
-        if (req.equals(request)) {
+        if (req.equals(request))
             loader.cancelLoad();
-            Layers.fireLayerUpdated(this);
-            settleLoad();
-            return;
-        }
-
-        loader.load(req);
+        else
+            loader.load(req);
         Layers.fireLayerUpdated(this); // give feedback asap
+        settleLoad();
     }
 
     // Re-requests a remote layer over another span; a local layer has nothing to reload.
-    public void reload(long start, long end, int cadence) {
+    void reload(long start, long end, int cadence) {
         if (request != null)
             load(request.withSpan(start, end, cadence));
     }
@@ -419,16 +416,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         return request;
     }
 
-    public boolean isComplete() {
-        return frames.isComplete();
-    }
-
-    // Snapshot: null when unavailable, false when partial, true when complete.
-    @Nullable
-    public Boolean frameCompletion(int frame) {
-        return frames.completion(frame);
-    }
-
     public long getStartTime() {
         return request == null ? frames.first().milli : request.startTime(); // for locked timelines
     }
@@ -437,7 +424,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         return request == null ? frames.last().milli : request.endTime(); // for locked timelines
     }
 
-    public boolean isLoadFinished() {
+    private boolean isLoadFinished() {
         return !loader.isLoading() && frames.completion(frames.size() - 1) != null;
     }
 

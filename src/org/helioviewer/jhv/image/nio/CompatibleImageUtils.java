@@ -15,7 +15,7 @@ final class CompatibleImageUtils {
 
     @FunctionalInterface
     interface DataBufferFactory {
-        DataBuffer create(int type, int size, int numBanks) throws IOException;
+        DataBuffer create(int type, int size) throws IOException;
     }
 
     static BufferedImage createCompatibleImage(int width, int height, int type, DataBufferFactory dataBufferFactory) {
@@ -30,10 +30,7 @@ final class CompatibleImageUtils {
         BufferedImage temp = new BufferedImage(1, 1, type);
         SampleModel sampleModel = temp.getSampleModel().createCompatibleSampleModel(width, height);
         ColorModel colorModel = temp.getColorModel();
-        DataBuffer buffer = dataBufferFactory.create(
-                sampleModel.getTransferType(),
-                width * height * sampleModel.getNumDataElements(),
-                1);
+        DataBuffer buffer = dataBufferFactory.create(sampleModel.getTransferType(), width * height * sampleModel.getNumDataElements());
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), colorModel.isAlphaPremultiplied(), null);
     }
 
@@ -59,7 +56,7 @@ final class CompatibleImageUtils {
                 4,
                 4 * width,
                 new int[]{0, 1, 2, 3});
-        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 4 * width * height, 1);
+        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 4 * width * height);
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), true, null);
     }
 
@@ -85,7 +82,7 @@ final class CompatibleImageUtils {
                 3,
                 3 * width,
                 new int[]{0, 1, 2});
-        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 3 * width * height, 1);
+        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 3 * width * height);
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), false, null);
     }
 

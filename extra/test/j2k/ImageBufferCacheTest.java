@@ -204,8 +204,6 @@ public final class ImageBufferCacheTest {
                 @Override public String xml(int frame) { return null; }
                 @Override public ResolutionSet levels(int frame) { throw new UnsupportedOperationException(); }
                 @Override public LUT lut() { return null; }
-                @Override public ClipSet clipSet() { return null; }
-                @Override public boolean usesFITSParameters() { return false; }
                 @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) {
                     throw new UnsupportedOperationException();
                 }
@@ -225,7 +223,7 @@ public final class ImageBufferCacheTest {
         Object id = new Object();
         for (int i = 0; i < count * 3; i++)
             ImageBufferCache.put(new OwnedKey(id, i, visits),
-                    new DecodedImage(ImageBuffer.fromBytes(8, 8, ImageBuffer.Format.Gray8, new byte[64]), null));
+                    new DecodedImage(ImageBuffer.fromBytes(8, 8, new byte[64]), null));
         OwnedKey other = new OwnedKey(new Object(), 0, visits);
         DecodedImage retained = image();
         ImageBufferCache.put(other, retained);
@@ -245,7 +243,7 @@ public final class ImageBufferCacheTest {
     }
 
     private static DecodedImage image() {
-        return new DecodedImage(ImageBuffer.fromBytes(256, 256, ImageBuffer.Format.Gray8, new byte[256 * 256]), null);
+        return new DecodedImage(ImageBuffer.fromBytes(256, 256, new byte[256 * 256]), null);
     }
 
     private static void writeBuffers() throws Exception {
@@ -406,7 +404,7 @@ public final class ImageBufferCacheTest {
 
     private static void weightedLRU() throws Exception {
         DecodedImage first = image(), second = image(), third = image();
-        DecodedImage large = new DecodedImage(ImageBuffer.fromBytes(512, 256, ImageBuffer.Format.Gray8, new byte[512 * 256]), null);
+        DecodedImage large = new DecodedImage(ImageBuffer.fromBytes(512, 256, new byte[512 * 256]), null);
         Cache<ImageBufferCache.Key, DecodedImage> cache = ImageBufferCache.createCache(3L * first.imageBuffer().byteSize());
         EventQueue.invokeAndWait(() -> {
             cache.put(new TestKey("level", 0), first);
@@ -453,7 +451,7 @@ public final class ImageBufferCacheTest {
                         TestKey key = new TestKey("new", frame);
                         if (cache.getIfPresent(key) == null) {
                             misses++;
-                            DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(side, side, ImageBuffer.Format.Gray8, new byte[side * side]), null);
+                            DecodedImage image = new DecodedImage(ImageBuffer.fromBytes(side, side, new byte[side * side]), null);
                             images.add(image);
                             cache.put(key, image);
                         }

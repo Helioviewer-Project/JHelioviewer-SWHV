@@ -10,7 +10,7 @@ public class MappedImageFactory {
 
     public static BufferedImage createRGBImage(int width, int height) throws IOException {
         return CompatibleImageUtils.createRGBImageOrThrow(width, height,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, numBanks, BACKEND_KIND, BufferBacking::mapFile));
+                (dataType, size) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, BACKEND_KIND, BufferBacking::mapFile));
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
