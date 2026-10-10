@@ -236,7 +236,7 @@ public class Player {
 
         Frames frames = Layers.getActiveImageLayer().frames();
         int activeFrame = frames.current();
-        boolean last = frames.time(activeFrame).equals(playbackLastTime);
+        boolean last = dateTime.equals(playbackLastTime) && frames.time(activeFrame).equals(playbackLastTime);
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
         ExportMovie.playbackFrameReady(last);
