@@ -24,7 +24,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 public final class Layers {
 
     public interface Listener {
-        default void layerAdded(int index, Layer layer) {}
+        default void layerAdded(int index) {}
 
         default void layerRemoved(int index, Layer layer) {}
 
@@ -132,7 +132,7 @@ public final class Layers {
         cacheLayer(layer);
 
         int row = layers.indexOf(layer);
-        listeners.forEach(listener -> listener.layerAdded(row, layer));
+        listeners.forEach(listener -> listener.layerAdded(row));
         DisplayController.display(); // e.g., PFSS layer
     }
 

@@ -98,7 +98,7 @@ class TableRowTransferHandler extends TransferHandler {
                 int rowFrom = Integer.parseInt((String) obj);
                 if (rowFrom != -1 && rowFrom != index) {
                     Layer moved = (Layer) grid.getModel().getValueAt(rowFrom, 0);
-                    ((Reorderable) grid.getModel()).reorder(rowFrom, index);
+                    ((LayersTableModel) grid.getModel()).reorder(rowFrom, index);
                     int row = Layers.getLayers().indexOf(moved);
                     grid.setRowSelectionInterval(row, row); // the model change cleared the selection
                     grid.repaint(); // multiple rows involved

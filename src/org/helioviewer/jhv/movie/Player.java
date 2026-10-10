@@ -22,7 +22,7 @@ public class Player {
     }
 
     public interface Listener {
-        void frameChanged(int frame, boolean last);
+        void frameChanged(int frame);
     }
 
     public interface StatusListener {
@@ -207,7 +207,7 @@ public class Player {
         return lastTimestamp;
     }
 
-    public static boolean isAvailable() {
+    private static boolean isAvailable() {
         return Layers.getActiveImageLayer().frames().size() > 1;
     }
 
@@ -235,7 +235,7 @@ public class Player {
         int activeFrame = frames.current();
         boolean last = dateTime.equals(playbackLastTime) && frames.time(activeFrame).equals(playbackLastTime);
 
-        frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
+        frameListeners.forEach(listener -> listener.frameChanged(activeFrame));
         ExportMovie.playbackFrameReady(last);
     }
 
@@ -252,17 +252,9 @@ public class Player {
         }
     }
 
-    public static void removePlaybackRangeListener(PlaybackRangeListener listener) {
-        playbackRangeListeners.remove(listener);
-    }
-
     public static void addFrameListener(Listener listener) {
         if (!frameListeners.contains(listener))
             frameListeners.add(listener);
-    }
-
-    public static void removeFrameListener(Listener listener) {
-        frameListeners.remove(listener);
     }
 
     public static void addStatusListener(StatusListener listener) {
@@ -270,10 +262,6 @@ public class Player {
             statusListeners.add(listener);
             listener.movieStatusChanged();
         }
-    }
-
-    public static void removeStatusListener(StatusListener listener) {
-        statusListeners.remove(listener);
     }
 
     public static void addTimeListener(TimeListener.Change listener) {
@@ -301,7 +289,6 @@ public class Player {
     public static void setDesiredRelativeSpeed(int fps) {
         movieTimer.setTask(Player::relativeTimeAdvance);
         movieTimer.setDelay(1000 / fps);
-        deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {

@@ -391,7 +391,7 @@ public final class ViewState {
         if (firstFrame != null || lastFrame != null) {
             int mergedFirstFrame = firstFrame == null ? current.firstFrame() : firstFrame;
             int mergedLastFrame = lastFrame == null ? current.lastFrame() : lastFrame;
-            setPlaybackRange(mergedFirstFrame, mergedLastFrame);
+            Player.setPlaybackRange(mergedFirstFrame, mergedLastFrame);
         }
     }
 
@@ -418,10 +418,6 @@ public final class ViewState {
             @Nullable String speedUnit) {
         applyRecordingUpdateRaw(mode, size);
         applyPlaybackUpdateRaw(advanceMode, speed, speedUnit, null, null);
-    }
-
-    public static void setPlaybackRange(int firstFrame, int lastFrame) {
-        Player.setPlaybackRange(firstFrame, lastFrame);
     }
 
     private static @Nullable Integer parseInteger(@Nullable String value, String name) {
@@ -516,10 +512,6 @@ public final class ViewState {
             modeListeners.add(listener);
     }
 
-    public static void removeModeListener(ModeListener listener) {
-        modeListeners.remove(listener);
-    }
-
     public static void addPlaybackConfigListener(PlaybackConfigListener listener) {
         if (!playbackConfigListeners.contains(listener)) {
             playbackConfigListeners.add(listener);
@@ -527,19 +519,11 @@ public final class ViewState {
         }
     }
 
-    public static void removePlaybackConfigListener(PlaybackConfigListener listener) {
-        playbackConfigListeners.remove(listener);
-    }
-
     public static void addRecordingConfigListener(RecordingConfigListener listener) {
         if (!recordingConfigListeners.contains(listener)) {
             recordingConfigListeners.add(listener);
             listener.recordingConfigChanged();
         }
-    }
-
-    public static void removeRecordingConfigListener(RecordingConfigListener listener) {
-        recordingConfigListeners.remove(listener);
     }
 
     private static void notifyModeListeners() {

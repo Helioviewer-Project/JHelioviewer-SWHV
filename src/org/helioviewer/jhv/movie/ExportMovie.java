@@ -108,10 +108,6 @@ public final class ExportMovie {
         }
     }
 
-    public static void removeStatusListener(StatusListener listener) {
-        statusListeners.remove(listener);
-    }
-
     private static void notifyStatusChanged() {
         statusListeners.forEach(StatusListener::recordingStatusChanged);
     }

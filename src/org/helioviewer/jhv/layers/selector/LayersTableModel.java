@@ -6,7 +6,7 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
-final class LayersTableModel extends AbstractTableModel implements Layers.Listener, Reorderable {
+final class LayersTableModel extends AbstractTableModel implements Layers.Listener {
 
     LayersTableModel() {
         Layers.addListener(this);
@@ -27,14 +27,13 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
         return Layers.getLayers().get(row);
     }
 
-    @Override
-    public void reorder(int fromIndex, int toIndex) {
+    void reorder(int fromIndex, int toIndex) {
         Layers.reorderImageLayer(fromIndex, toIndex);
         fireTableDataChanged();
     }
 
     @Override
-    public void layerAdded(int index, Layer layer) {
+    public void layerAdded(int index) {
         fireTableRowsInserted(index, index);
     }
 

@@ -72,7 +72,7 @@ public final class Commands {
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
-        ViewState.setPlaybackRange(firstFrame, lastFrame);
+        Player.setPlaybackRange(firstFrame, lastFrame);
     }
 
     public static void play() {

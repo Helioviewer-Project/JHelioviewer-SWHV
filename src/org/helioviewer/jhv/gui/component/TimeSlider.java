@@ -52,7 +52,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     private final FrameNumberPanel frameNumberPanel;
     private boolean dirty;
     private boolean wasPlaying;
-    private boolean allowSetFrame = true;
     private int dragAnchorValue;
     private int dragRangeMin;
     private int dragRangeMax;
@@ -98,10 +97,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         return frameNumberPanel;
     }
 
-    void setAllowFrame(boolean _allowSetFrame) {
-        allowSetFrame = _allowSetFrame;
-    }
-
     @Override
     public void setMaximum(int maximum) {
         super.setMaximum(maximum);
@@ -142,15 +137,12 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setValue(int n) {
         super.setValue(n);
-        if (allowSetFrame)
-            Commands.seekFrame(n);
+        Commands.seekFrame(n);
     }
 
     @Override
-    public void frameChanged(int frame, boolean last) {
-        setAllowFrame(false);
-        setValue(frame);
-        setAllowFrame(true);
+    public void frameChanged(int frame) {
+        super.setValue(frame);
     }
 
     @Override
@@ -270,7 +262,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void movieStatusChanged() {
-        int maximum = Player.isAvailable() ? Player.getMaximumFrameNumber() : 0;
+        int maximum = Player.getMaximumFrameNumber();
         if (getMaximum() != maximum)
             setMaximum(maximum);
     }
