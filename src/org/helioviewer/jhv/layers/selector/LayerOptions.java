@@ -19,11 +19,11 @@ import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
+// Options panels per layer, created on demand and dropped with the layer. Plugins register providers.
 public final class LayerOptions implements Layers.Listener {
 
     private static final Map<Class<? extends Layer>, Function<Layer, Component>> providers = new HashMap<>();
-    private static final IdentityHashMap<Layer, Component> panels = new IdentityHashMap<>();
-    private static final LayerOptions listener = new LayerOptions();
+    private final IdentityHashMap<Layer, Component> panels = new IdentityHashMap<>();
 
     static {
         register(ConnectionLayer.class, layer -> new ConnectionLayerOptions((ConnectionLayer) layer));
@@ -33,7 +33,10 @@ public final class LayerOptions implements Layers.Listener {
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
         register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel((ViewpointLayer) layer));
-        Layers.addListener(listener);
+    }
+
+    LayerOptions() {
+        Layers.addListener(this);
     }
 
     public static void register(Class<? extends Layer> type, Function<Layer, Component> provider) {
@@ -45,7 +48,7 @@ public final class LayerOptions implements Layers.Listener {
     }
 
     @Nullable
-    public static Component getOptionsPanel(Layer layer) {
+    Component getOptionsPanel(Layer layer) {
         Component panel = panels.get(layer);
         if (panel == null) {
             panel = createOptionsPanel(layer);
@@ -77,5 +80,4 @@ public final class LayerOptions implements Layers.Listener {
             panel.refresh(layer);
     }
 
-    private LayerOptions() {}
 }

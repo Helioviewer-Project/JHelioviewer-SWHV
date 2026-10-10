@@ -53,6 +53,7 @@ public final class LayersPanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
+    private final LayerOptions options = new LayerOptions();
     private final JPanel optionsPanelWrapper;
 
     private static class LayersTable extends JTable implements Interfaces.LazyComponent {
@@ -280,7 +281,7 @@ public final class LayersPanel extends JPanel {
 
     public void setOptionsPanel(@Nullable Layer layer) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = layer == null ? null : LayerOptions.getOptionsPanel(layer);
+        Component optionsPanel = layer == null ? null : options.getOptionsPanel(layer);
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
