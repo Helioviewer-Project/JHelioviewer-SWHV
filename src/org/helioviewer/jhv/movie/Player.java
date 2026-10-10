@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.Frames;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.thread.EDTTimer;
+import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -153,7 +153,7 @@ public class Player {
             syncTime(next);
     }
 
-    private static final EDTTimer movieTimer = new EDTTimer(1000 / FPS_RELATIVE_DEFAULT, Player::relativeTimeAdvance);
+    private static final UiTimer movieTimer = new UiTimer(1000 / FPS_RELATIVE_DEFAULT, Player::relativeTimeAdvance);
 
     public static boolean isPlaying() {
         return movieTimer.isRunning();

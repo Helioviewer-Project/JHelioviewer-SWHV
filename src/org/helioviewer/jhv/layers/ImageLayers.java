@@ -10,7 +10,7 @@ import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.thread.EDTTimer;
+import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
@@ -144,7 +144,7 @@ public final class ImageLayers {
         diffRotationMode = b;
     }
 
-    private static final EDTTimer refreshTimer = new EDTTimer(15 * (int) TimeUtils.MINUTE_IN_MILLIS, ImageLayers::refreshLayersSpan);
+    private static final UiTimer refreshTimer = new UiTimer(15 * (int) TimeUtils.MINUTE_IN_MILLIS, ImageLayers::refreshLayersSpan);
 
     public static boolean getRefreshMode() {
         return refreshTimer.isRunning();

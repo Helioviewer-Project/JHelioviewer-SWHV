@@ -12,7 +12,7 @@ import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.thread.EDTTimer;
+import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -41,7 +41,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static long currentTime;
 
     private static boolean locked;
-    private static final EDTTimer layersUpdater = new EDTTimer(1000 / 2, DrawController::syncLockedLayers);
+    private static final UiTimer layersUpdater = new UiTimer(1000 / 2, DrawController::syncLockedLayers);
 
     static {
         layersUpdater.setRepeats(false);
