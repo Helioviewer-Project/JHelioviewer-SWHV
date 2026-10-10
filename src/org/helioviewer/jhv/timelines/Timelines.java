@@ -20,19 +20,14 @@ import org.json.JSONObject;
 
 public class Timelines implements Interfaces.MainContentPanelPlugin {
 
-    private static final TimelineLayers layers = new TimelineLayers();
     public static final DrawController dc = new DrawController(); // sucks
-    public static final TimelineDialog td = new TimelineDialog(layers);
+    public static final TimelineDialog td = new TimelineDialog();
     private final List<JComponent> pluginPanes = new ArrayList<>();
     private final PlotPanel plotOne = new PlotPanel();
-    private static final TimelinePanel timelinePanel = new TimelinePanel(layers);
+    private static final TimelinePanel timelinePanel = new TimelinePanel();
 
     public Timelines() {
-        layers.add(new RadioData(null));
-    }
-
-    public static TimelineLayers getLayers() {
-        return layers;
+        TimelineLayers.add(new RadioData(null));
     }
 
     public static void requestCatalog() {

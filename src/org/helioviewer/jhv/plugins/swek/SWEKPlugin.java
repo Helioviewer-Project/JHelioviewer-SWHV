@@ -7,7 +7,7 @@ import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
-import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
 
@@ -50,13 +50,13 @@ public class SWEKPlugin extends Plugin {
 
         LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
         popupController.install();
-        Timelines.getLayers().add(etl);
+        TimelineLayers.add(etl);
     }
 
     @Override
     public void uninstallGUI() {
         SWEKDownloader.removeFilterListener();
-        Timelines.getLayers().remove(etl);
+        TimelineLayers.remove(etl);
         popupController.uninstall();
         popupController.setLayer(null);
         LayerOptions.unregister(SWEKLayer.class);

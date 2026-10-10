@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
@@ -16,21 +15,33 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.radio.RadioData;
 
-@SuppressWarnings("serial")
-public class TimelineLayers extends AbstractTableModel {
+public final class TimelineLayers {
 
-    public static final int ENABLED_COLUMN = 0;
-    public static final int TITLE_COLUMN = 1;
-    public static final int LOADING_COLUMN = 2;
-    public static final int APPEARANCE_COLUMN = 3;
-    public static final int REMOVE_COLUMN = 4;
-    public static final int COLUMN_COUNT = 5;
+    public interface Listener {
+        default void layersAdded(int firstRow, int lastRow) {}
+
+        default void layerRemoved(int row) {}
+
+        default void layersReplaced() {}
+
+        default void layersUpdated(int firstRow, int lastRow) {}
+    }
 
     private static final ArrayList<TimelineLayer> layers = new ArrayList<>();
     private static final List<TimelineLayer> extLayers = Collections.unmodifiableList(layers);
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
 
     public static List<TimelineLayer> get() {
         return extLayers;
+    }
+
+    public static void addListener(Listener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
+    }
+
+    public static void removeListener(Listener listener) {
+        listeners.remove(listener);
     }
 
     public static void fetchData(TimeAxis timeAxis) {
@@ -47,13 +58,13 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
-    private void updateRow(TimelineLayer layer) {
+    private static void updateRow(TimelineLayer layer) {
         int row = layers.indexOf(layer);
         if (row >= 0)
-            fireTableRowsUpdated(row, row);
+            listeners.forEach(listener -> listener.layersUpdated(row, row));
     }
 
-    public void updateRows(Collection<? extends TimelineLayer> changedLayers) {
+    public static void updateRows(Collection<? extends TimelineLayer> changedLayers) {
         int firstRow = layers.size();
         int lastRow = -1;
         for (TimelineLayer layer : changedLayers) {
@@ -63,15 +74,18 @@ public class TimelineLayers extends AbstractTableModel {
                 lastRow = Math.max(lastRow, row);
             }
         }
-        if (lastRow >= 0)
-            fireTableRowsUpdated(firstRow, lastRow);
+        if (lastRow >= 0) {
+            int first = firstRow;
+            int last = lastRow;
+            listeners.forEach(listener -> listener.layersUpdated(first, last));
+        }
     }
 
-    public List<Band> addBands(List<BandType> bandTypes) {
+    public static List<Band> addBands(List<BandType> bandTypes) {
         return addBands(bandTypes, false);
     }
 
-    public List<Band> addBands(List<BandType> bandTypes, boolean fullResolution) {
+    public static List<Band> addBands(List<BandType> bandTypes, boolean fullResolution) {
         int firstRow = layers.size();
         ArrayList<Band> bands = new ArrayList<>(bandTypes.size());
         ArrayList<Band> added = new ArrayList<>();
@@ -86,14 +100,15 @@ public class TimelineLayers extends AbstractTableModel {
             bands.add(band);
         }
         if (!added.isEmpty()) {
-            fireTableRowsInserted(firstRow, layers.size() - 1);
+            int lastRow = layers.size() - 1;
+            listeners.forEach(listener -> listener.layersAdded(firstRow, lastRow));
             DrawController.layoutChanged();
             added.forEach(layer -> layer.fetchData(DrawController.selectedAxis));
         }
         return bands;
     }
 
-    public void add(TimelineLayer tl) {
+    public static void add(TimelineLayer tl) {
         if (containsLayer(layers, tl))
             return;
         layers.add(tl);
@@ -101,23 +116,23 @@ public class TimelineLayers extends AbstractTableModel {
         configureLayer(tl);
 
         int row = layers.size() - 1;
-        fireTableRowsInserted(row, row);
+        listeners.forEach(listener -> listener.layersAdded(row, row));
         DrawController.layoutChanged();
         tl.fetchData(DrawController.selectedAxis);
     }
 
-    public void remove(TimelineLayer tl) {
+    public static void remove(TimelineLayer tl) {
         int row = layers.indexOf(tl);
         if (row == -1)
             return;
 
         tl.remove();
         layers.remove(row);
-        fireTableRowsDeleted(row, row);
+        listeners.forEach(listener -> listener.layerRemoved(row));
         DrawController.layoutChanged();
     }
 
-    public void restore(List<TimelineLayer> newLayers) {
+    public static void restore(List<TimelineLayer> newLayers) {
         ArrayList<TimelineLayer> restoredLayers = new ArrayList<>();
         for (TimelineLayer newLayer : newLayers) {
             TimelineLayer layer = reuseBand(newLayer);
@@ -144,7 +159,7 @@ public class TimelineLayers extends AbstractTableModel {
         return restored;
     }
 
-    public void replaceBands(List<BandType> bandTypes) {
+    public static void replaceBands(List<BandType> bandTypes) {
         ArrayList<TimelineLayer> replacement = new ArrayList<>();
         HashMap<BandType, Band> existingBands = new HashMap<>();
         for (TimelineLayer layer : layers) {
@@ -161,7 +176,7 @@ public class TimelineLayers extends AbstractTableModel {
         replaceAll(replacement);
     }
 
-    private void replaceAll(List<TimelineLayer> replacement) {
+    private static void replaceAll(List<TimelineLayer> replacement) {
         HashSet<TimelineLayer> retained = new HashSet<>(replacement);
         for (TimelineLayer layer : layers) {
             if (!retained.contains(layer))
@@ -169,33 +184,13 @@ public class TimelineLayers extends AbstractTableModel {
         }
         layers.clear();
         layers.addAll(replacement);
-        replacement.forEach(this::configureLayer);
-        fireTableDataChanged();
+        replacement.forEach(TimelineLayers::configureLayer);
+        listeners.forEach(Listener::layersReplaced);
         DrawController.layoutChanged();
         fetchData(DrawController.selectedAxis);
     }
 
-    public void updateCell(int row, int col) {
-        if (row >= 0) // negative row breaks model
-            fireTableCellUpdated(row, col);
-    }
-
-    @Override
-    public int getRowCount() {
-        return layers.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COLUMN_COUNT;
-    }
-
-    @Override
-    public Object getValueAt(int row, int col) {
-        return layers.get(row);
-    }
-
-    private void configureLayer(TimelineLayer layer) {
+    private static void configureLayer(TimelineLayer layer) {
         layer.setOnStateChanged(() -> updateRow(layer));
     }
 
@@ -218,5 +213,7 @@ public class TimelineLayers extends AbstractTableModel {
         }
         return null;
     }
+
+    private TimelineLayers() {}
 
 }

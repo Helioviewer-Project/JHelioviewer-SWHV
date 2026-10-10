@@ -42,7 +42,6 @@ import com.jidesoft.swing.SearchableUtils;
 @SuppressWarnings("serial")
 public final class TimelineDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
-    private final TimelineLayers layers;
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Timelines");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(root);
     private final JTree tree = new JTree(treeModel);
@@ -53,14 +52,13 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
             List<BandType> bandTypes = selectedBandTypes();
             if (bandTypes.isEmpty())
                 return;
-            layers.addBands(bandTypes, fullResolution.isSelected());
+            TimelineLayers.addBands(bandTypes, fullResolution.isSelected());
             setVisible(false);
         }
     };
 
-    public TimelineDialog(TimelineLayers _layers) {
+    public TimelineDialog() {
         super(MainFrame.get(), "New Timeline Layer", false);
-        layers = _layers;
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setResizable(false);
         setType(Window.Type.UTILITY);

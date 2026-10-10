@@ -30,7 +30,6 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.Timelines;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -152,7 +151,7 @@ public final class State {
                 }
             }
         }
-        Timelines.getLayers().restore(newList);
+        TimelineLayers.restore(newList);
     }
 
     private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context, ViewState.ModeData modeData, int serial) {

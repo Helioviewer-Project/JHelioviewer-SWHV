@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongUnaryOperator;
 
 import javax.imageio.ImageIO;
-import javax.swing.event.TableModelEvent;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.Directories;
@@ -402,10 +401,9 @@ public final class TimelineDataTest {
 
     private static void checkSavedState() throws Exception {
         EventQueue.invokeAndWait(() -> {
-            TimelineLayers layers = new TimelineLayers();
             try {
                 BandType type = new BandType(new JSONObject().put("name", "saved"));
-                Band original = layers.addBands(List.of(type), true).getFirst();
+                Band original = TimelineLayers.addBands(List.of(type), true).getFirst();
                 original.addToCache(new float[]{12, 34}, new long[]{START, START + 100});
                 Object cache = field(Band.class, original, "bandCache");
                 JSONObject state = new JSONObject();
@@ -414,14 +412,14 @@ public final class TimelineDataTest {
                 Band restored = (Band) Band.deserialize(new JSONObject(state.toString()));
                 check(restored.isFullResolution(), "Restored state loses full resolution");
                 restored.setDataColor(Color.RED);
-                layers.restore(List.of(restored));
+                TimelineLayers.restore(List.of(restored));
                 check(TimelineLayers.get().getFirst() == original, "Matching resolution discards the existing band");
                 check(field(Band.class, original, "bandCache") == cache && original.hasData(), "Matching resolution discards cached data");
                 check(original.getDataColor().equals(Color.RED), "Reusing a band loses restored appearance");
 
                 state.put("fullResolution", false);
                 Band standard = (Band) Band.deserialize(state);
-                layers.restore(List.of(standard));
+                TimelineLayers.restore(List.of(standard));
                 check(TimelineLayers.get().getFirst() == standard && !standard.isFullResolution(), "Different resolution reuses the old band");
                 check(!original.hasData() && !standard.hasData(), "Different resolution retains the old cache");
                 JSONObject standardState = new JSONObject();
@@ -430,25 +428,25 @@ public final class TimelineDataTest {
                 state.remove("fullResolution");
                 Band oldState = (Band) Band.deserialize(state);
                 check(!oldState.isFullResolution(), "State without a resolution setting changes the default");
-                layers.restore(List.of(oldState));
+                TimelineLayers.restore(List.of(oldState));
                 check(TimelineLayers.get().getFirst() == standard, "Default state does not reuse standard-resolution data");
 
                 state.put("fullResolution", true);
                 Band full = (Band) Band.deserialize(state);
-                layers.restore(List.of(full));
-                check(TimelineLayers.get().getFirst() == full && layers.getRowCount() == 2, "Restoring full resolution duplicates the layer");
+                TimelineLayers.restore(List.of(full));
+                check(TimelineLayers.get().getFirst() == full && TimelineLayers.get().size() == 2, "Restoring full resolution duplicates the layer");
                 check(TimelineLayers.get().getLast() instanceof RadioData && !TimelineLayers.get().getLast().isEnabled(), "State without Callisto loses its disabled default");
 
                 RadioData radio = new RadioData(null);
-                layers.restore(List.of(full, radio));
-                check(TimelineLayers.get().getLast() == radio && layers.getRowCount() == 2, "Explicit Callisto entry is replaced or duplicated");
-                layers.restore(List.of());
-                check(layers.getRowCount() == 1 && TimelineLayers.get().getFirst() instanceof RadioData && !TimelineLayers.get().getFirst().isEnabled(), "Empty state loses disabled Callisto");
+                TimelineLayers.restore(List.of(full, radio));
+                check(TimelineLayers.get().getLast() == radio && TimelineLayers.get().size() == 2, "Explicit Callisto entry is replaced or duplicated");
+                TimelineLayers.restore(List.of());
+                check(TimelineLayers.get().size() == 1 && TimelineLayers.get().getFirst() instanceof RadioData && !TimelineLayers.get().getFirst().isEnabled(), "Empty state loses disabled Callisto");
             } catch (Exception e) {
                 throw new AssertionError(e);
             } finally {
                 for (TimelineLayer layer : List.copyOf(TimelineLayers.get()))
-                    layers.remove(layer);
+                    TimelineLayers.remove(layer);
             }
         });
     }
@@ -492,31 +490,46 @@ public final class TimelineDataTest {
 
     private static void checkLayerCreation() throws Exception {
         EventQueue.invokeAndWait(() -> {
-            TimelineLayers layers = new TimelineLayers();
             BandType first = new BandType(new JSONObject().put("name", "first"));
             BandType second = new BandType(new JSONObject().put("name", "second"));
             BandType third = new BandType(new JSONObject().put("name", "third"));
-            Band existing = layers.addBands(List.of(first)).getFirst();
-            List<TableModelEvent> events = new ArrayList<>();
-            layers.addTableModelListener(events::add);
+            Band existing = TimelineLayers.addBands(List.of(first)).getFirst();
+            List<int[]> events = new ArrayList<>();
+            TimelineLayers.Listener listener = new TimelineLayers.Listener() {
+                @Override
+                public void layersAdded(int firstRow, int lastRow) {
+                    events.add(new int[]{firstRow, lastRow});
+                }
+
+                @Override
+                public void layerRemoved(int row) {
+                    events.add(new int[]{row, -1});
+                }
+
+                @Override
+                public void layersReplaced() {
+                    events.add(new int[]{-1, -1});
+                }
+            };
+            TimelineLayers.addListener(listener);
             try {
-                List<Band> added = layers.addBands(List.of(first, second, second, third, first), true);
-                check(layers.getRowCount() == 3, "Existing selection adds another row");
+                List<Band> added = TimelineLayers.addBands(List.of(first, second, second, third, first), true);
+                check(TimelineLayers.get().size() == 3, "Existing selection adds another row");
                 check(added.equals(List.of(existing, added.get(1), added.get(1), added.get(3), existing)),
                         "Overlapping selections lose their order or create duplicate bands");
                 check(added.get(0) == existing && !existing.isFullResolution(), "Existing layer was changed");
                 check(added.get(1).isFullResolution() && added.get(3).isFullResolution(), "New layers lost the selection setting");
-                check(events.size() == 1 && events.getFirst().getType() == TableModelEvent.INSERT
-                        && events.getFirst().getFirstRow() == 1 && events.getFirst().getLastRow() == 2,
+                check(events.size() == 1 && events.getFirst()[0] == 1 && events.getFirst()[1] == 2,
                         "Adding layers does not report exactly the newly inserted rows");
                 events.clear();
-                check(layers.addBands(List.of(second), false).getFirst() == added.get(1), "Re-adding replaces a layer");
-                check(added.get(1).isFullResolution() && layers.getRowCount() == 3, "Re-adding changes resolution or row count");
-                check(layers.addBands(List.of(), true).isEmpty(), "Empty selection returns bands");
-                check(events.isEmpty(), "Existing or empty selections notify a table change");
+                check(TimelineLayers.addBands(List.of(second), false).getFirst() == added.get(1), "Re-adding replaces a layer");
+                check(added.get(1).isFullResolution() && TimelineLayers.get().size() == 3, "Re-adding changes resolution or row count");
+                check(TimelineLayers.addBands(List.of(), true).isEmpty(), "Empty selection returns bands");
+                check(events.isEmpty(), "Existing or empty selections notify a layer change");
             } finally {
+                TimelineLayers.removeListener(listener);
                 for (TimelineLayer layer : List.copyOf(TimelineLayers.get()))
-                    layers.remove(layer);
+                    TimelineLayers.remove(layer);
             }
         });
     }

@@ -9,7 +9,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import org.json.JSONArray;
@@ -49,8 +48,7 @@ public final class BandImporter {
         if (data.isEmpty())
             return;
 
-        TimelineLayers layers = Timelines.getLayers();
-        List<Band> bands = layers.addBands(data.stream().map(BandData::bandType).toList(), fullResolution);
+        List<Band> bands = TimelineLayers.addBands(data.stream().map(BandData::bandType).toList(), fullResolution);
         List<Band> changedBands = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
             BandData bandData = data.get(i);
@@ -58,7 +56,7 @@ public final class BandImporter {
             if (band.addToCache(bandData.values(), bandData.dates()))
                 changedBands.add(band);
         }
-        layers.updateRows(changedBands);
+        TimelineLayers.updateRows(changedBands);
     }
 
     private record BandLoad(JSONObject jo) implements Callable<List<BandData>> {
