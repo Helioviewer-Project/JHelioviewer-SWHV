@@ -121,15 +121,10 @@ public class Player {
         return movieEnd;
     }
 
-    public static void timeRangeChanged() {
+    private static void timeRangeChanged() {
         ImageLayer layer = Layers.getActiveImageLayer();
-        if (layer.isLoadingForTimespan()) {
-            movieStart = lastTimestamp.milli;
-            movieEnd = lastTimestamp.milli;
-        } else {
-            movieStart = layer.getStartTime();
-            movieEnd = layer.getEndTime();
-        }
+        movieStart = layer.getStartTime();
+        movieEnd = layer.getEndTime();
         timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
     }
 

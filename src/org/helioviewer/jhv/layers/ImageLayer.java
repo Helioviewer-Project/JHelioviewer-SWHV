@@ -427,10 +427,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         return frames.completion(frame);
     }
 
-    public boolean isLoadingForTimespan() {
-        return loader.isLoading();
-    }
-
     public long getStartTime() {
         return request == null ? frames.first().milli : request.startTime(); // for locked timelines
     }
