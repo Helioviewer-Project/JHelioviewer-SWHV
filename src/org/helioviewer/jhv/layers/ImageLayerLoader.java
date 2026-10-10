@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -34,7 +33,6 @@ import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.time.JHVTime;
 
-
 final class ImageLayerLoader {
 
     // baseName names the single source of a request load; warnings are for the user.
@@ -45,7 +43,7 @@ final class ImageLayerLoader {
 
     // Owned by the EDT, including results queued after the worker has exited.
     private Thread loadThread;
-    private Future<?> downloadFuture;
+    private DownloadLayer download;
 
     ImageLayerLoader(@Nonnull Consumer<Result> _onLoaded, @Nonnull Runnable _onLoadFailed) {
         onLoaded = _onLoaded;
@@ -68,6 +66,7 @@ final class ImageLayerLoader {
     }
 
     private void load(Callable<Result> task) {
+        detachDownload();
         cancelLoad();
         Thread nextLoad = Thread.ofVirtual().name("Image-Load").unstarted(() -> {
             Thread worker = Thread.currentThread();
@@ -88,8 +87,11 @@ final class ImageLayerLoader {
     }
 
     void startDownload(APIRequest req, String baseName, DownloadLayer.Progress progress, Consumer<Path> onDownloaded) {
-        cancelDownload();
-        downloadFuture = DownloadLayer.submit(req, baseName, progress, onDownloaded);
+        detachDownload();
+        download = new DownloadLayer(req, baseName, progress, onDownloaded);
+        // The displayed movie may already be awaiting a replacement.
+        if (isLoading())
+            download.detach();
     }
 
     void cancelLoad() {
@@ -100,15 +102,20 @@ final class ImageLayerLoader {
     }
 
     void cancelDownload() {
-        if (downloadFuture != null) {
-            downloadFuture.cancel(true);
-            downloadFuture = null;
+        if (download != null) {
+            download.cancel();
+            download = null;
         }
+    }
+
+    private void detachDownload() {
+        if (download != null)
+            download.detach();
     }
 
     void abolish() {
         cancelLoad();
-        cancelDownload();
+        detachDownload();
     }
 
     private void finishLoad(Thread worker, @Nullable Result result, @Nullable Throwable error) {

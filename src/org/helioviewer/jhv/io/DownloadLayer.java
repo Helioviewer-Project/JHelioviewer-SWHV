@@ -22,7 +22,7 @@ import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class DownloadLayer {
+public final class DownloadLayer {
 
     public interface Progress {
         void progress(int percent);
@@ -32,13 +32,26 @@ public class DownloadLayer {
         void done();
     }
 
-    @Nullable
-    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull String baseName, @Nonnull Progress progress, @Nonnull Consumer<Path> onDownloaded) {
+    // Owned by the EDT. Detaching the layer leaves the file download running.
+    private final Future<Path> task;
+    private @Nullable Consumer<Path> onDownloaded;
+
+    public DownloadLayer(@Nonnull APIRequest req, @Nonnull String baseName, @Nonnull Progress progress, @Nonnull Consumer<Path> _onDownloaded) {
+        onDownloaded = _onDownloaded;
         Path dstPath = Path.of(Directories.DOWNLOADS.getPath(), baseName);
-        return Task.submitBackground(baseName,
+        task = Task.submitBackground(
                 new LayerDownload(req, progress, dstPath),
-                result -> onSuccess(onDownloaded, progress, result),
-                (logContext, t) -> onFailure(progress, t));
+                result -> onSuccess(progress, result),
+                t -> onFailure(progress, t));
+    }
+
+    public void detach() {
+        onDownloaded = null;
+    }
+
+    public void cancel() {
+        detach();
+        task.cancel(true);
     }
 
     private static final int BUFSIZ = 1024 * 1024;
@@ -82,13 +95,17 @@ public class DownloadLayer {
         }
     }
 
-    private static void onSuccess(Consumer<Path> onDownloaded, Progress progress, Path result) {
+    private void onSuccess(Progress progress, Path result) {
         progress.done();
-        onDownloaded.accept(result);
         progress.success(result.toString());
+        Consumer<Path> callback = onDownloaded;
+        detach();
+        if (callback != null)
+            callback.accept(result);
     }
 
-    private static void onFailure(Progress progress, Throwable t) {
+    private void onFailure(Progress progress, Throwable t) {
+        detach();
         progress.done();
         if (AppThread.isInterrupted(t)) {
             Log.warn(t);

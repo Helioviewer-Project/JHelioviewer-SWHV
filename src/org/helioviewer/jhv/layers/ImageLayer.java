@@ -159,7 +159,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     private void loaded(ImageLayerLoader.Result result) {
         boolean firstLoad = !loaded;
         loaded = true;
-        loader.cancelDownload();
         request = result.request();
         baseName = result.baseName();
         setFrames(result.frames());
