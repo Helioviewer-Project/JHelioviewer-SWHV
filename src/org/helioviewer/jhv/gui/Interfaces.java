@@ -20,9 +20,5 @@ public final class Interfaces {
         void showDialog();
     }
 
-    public interface StatusReceiver {
-        void setStatus(String status);
-    }
-
     private Interfaces() {}
 }

@@ -5,12 +5,9 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.event.EventListener;
-import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.JHVTime;
@@ -21,26 +18,30 @@ import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
 
-public final class DrawController implements Interfaces.LazyComponent, Interfaces.StatusReceiver, EventListener.Highlight, TimeListener.Change {
+public final class DrawController implements EventListener.Highlight, TimeListener.Change {
 
     public interface Listener {
-        void drawRequest();
+        default void drawRequest() {}
 
-        void drawMovieLineRequest();
+        default void drawMovieLineRequest() {}
 
         default void layoutChanged() {}
+
+        // Lock, stacking or status text changed.
+        default void optionsChanged() {}
     }
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
     public static final TimeAxis availableAxis = new TimeAxis(0, 0);
 
-    private static final DrawControllerOptions optionsPanel = new DrawControllerOptions();
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
     private static final GraphGeometry geometry = new GraphGeometry();
     private static long currentTime;
 
     private static boolean locked;
+    @Nullable
+    private static String status;
     private static final UiTimer layersUpdater = new UiTimer(1000 / 2, DrawController::syncLockedLayers);
 
     static {
@@ -57,7 +58,6 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     public DrawController() {
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
-        UITimer.register(this);
     }
 
     public static void saveState(JSONObject jo) {
@@ -77,12 +77,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             long end = TimeUtils.optParse(js.optString("endTime"), t);
             setSelectedInterval(start, end);
         }
-        optionsPanel.setLocked(jo.optBoolean("locked", false));
-        optionsPanel.setStacked(jo.optBoolean("stacked", false));
-    }
-
-    public static JPanel getOptionsPanel() {
-        return optionsPanel;
+        setLocked(jo.optBoolean("locked", false));
+        setStacked(jo.optBoolean("stacked", false));
     }
 
     public static void addDrawListener(Listener listener) {
@@ -238,15 +234,35 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         return geometry;
     }
 
-    static void setLocked(boolean _locked) {
+    public static boolean isLocked() {
+        return locked;
+    }
+
+    public static void setLocked(boolean _locked) {
+        if (locked == _locked)
+            return;
         locked = _locked;
         if (locked) // force sync
             timeRangeChanged();
+        listeners.forEach(Listener::optionsChanged);
     }
 
-    static void setStacked(boolean _stacked) {
+    public static void setStacked(boolean _stacked) {
+        if (geometry.isStacked() == _stacked)
+            return;
         geometry.setStacked(_stacked);
         layoutChanged();
+        listeners.forEach(Listener::optionsChanged);
+    }
+
+    @Nullable
+    public static String getStatus() {
+        return status;
+    }
+
+    public static void setStatus(@Nullable String _status) {
+        status = _status;
+        listeners.forEach(Listener::optionsChanged);
     }
 
     @Override
@@ -292,24 +308,16 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         drawRequest();
     }
 
-    @Override
-    public void setStatus(String status) {
-        optionsPanel.setStatus(status);
-    }
-
     public static void drawRequest() {
         toDraw = true;
     }
 
-    private static boolean stopped = true; // until the graph pane is showing
     private static boolean toDraw;
     private static boolean drawMovieLine;
+    // Coalesces draw requests while the graph pane is showing.
+    private static final UiTimer drawTimer = new UiTimer(1000 / 10, DrawController::flushDrawRequests);
 
-    @Override
-    public void lazyRepaint() {
-        if (stopped)
-            return;
-
+    private static void flushDrawRequests() {
         if (toDraw) {
             toDraw = false;
             listeners.forEach(Listener::drawRequest);
@@ -321,11 +329,11 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void start() {
-        stopped = false;
+        drawTimer.start();
     }
 
     public static void stop() {
-        stopped = true;
+        drawTimer.stop();
     }
 
 }

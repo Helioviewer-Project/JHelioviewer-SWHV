@@ -172,7 +172,7 @@ public final class TimelinePanel extends JPanel {
 
         JPanel rightButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         rightButtonPanel.add(predefinedCombo);
-        rightButtonPanel.add(DrawController.getOptionsPanel());
+        rightButtonPanel.add(new DrawControllerOptions());
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(leftButtonPanel, BorderLayout.LINE_START);
@@ -274,7 +274,7 @@ public final class TimelinePanel extends JPanel {
 
     private void setOptionsPanel(@Nullable TimelineLayer timeline) {
         optionsPanelWrapper.removeAll();
-        JPanel optionsPanel = timeline == null ? null : TimelineOptions.getOptionsPanel(timeline);
+        JPanel optionsPanel = timeline == null ? null : options.getOptionsPanel(timeline);
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, timeline.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);

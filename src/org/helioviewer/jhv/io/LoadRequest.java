@@ -11,8 +11,8 @@ import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.thread.UiThread;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandImporter;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ class LoadRequest {
         if (uriList.isEmpty())
             return;
         Task.submitBackground("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
-        Timelines.dc.setStatus("Loading...");
+        DrawController.setStatus("Loading...");
     }
 
     private record LoadRequestURI(URI uri) implements Callable<Void> {
@@ -68,11 +68,11 @@ class LoadRequest {
     }
 
     private static void onSuccessCDF(Void ignoredResult) {
-        Timelines.dc.setStatus(null);
+        DrawController.setStatus(null);
     }
 
     private static void onFailureCDF(String logContext, Throwable t) {
-        Timelines.dc.setStatus(null);
+        DrawController.setStatus(null);
         Log.error(logContext, t);
         Message.err("Error getting the data", t.getMessage());
     }
