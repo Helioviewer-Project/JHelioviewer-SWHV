@@ -147,8 +147,8 @@ public class Player {
 
     private static void absoluteTimeAdvance() {
         JHVTime next = nextTime(advanceMode, lastTimestamp,
-                time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
-                time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
+                time -> new JHVTime(Math.clamp(time.milli - deltaT, playbackFirstTime.milli, playbackLastTime.milli)),
+                time -> new JHVTime(Math.clamp(time.milli + deltaT, playbackFirstTime.milli, playbackLastTime.milli)));
 
         if (next == null)
             pause();
