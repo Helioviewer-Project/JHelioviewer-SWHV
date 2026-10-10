@@ -1,22 +1,22 @@
 package org.helioviewer.jhv.plugins.swek;
 
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.HashMap;
 
 import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.gui.IconBank;
-
 public final class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
+    private static final ImageIcon blank = new ImageIcon(new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB));
 
     @Nonnull
     public static ImageIcon getIcon(String iconName) {
         ImageIcon icon = iconBank.get(iconName);
         icon = icon == null ? iconBank.get("Other") : icon;
-        return icon == null ? IconBank.getBlank() : icon;
+        return icon == null ? blank : icon;
     }
 
     private static ImageIcon getImageIcon(String path) throws Exception {

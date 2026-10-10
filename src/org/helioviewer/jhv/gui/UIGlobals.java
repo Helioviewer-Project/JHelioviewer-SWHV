@@ -22,6 +22,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.movie.ExportMovie;
 
 public final class UIGlobals {
 
@@ -105,6 +106,7 @@ public final class UIGlobals {
                 TL_TEXT_BACKGROUND_COLOR = backColor;
 
                 TL_MOVIE_FRAME_COLOR = foreColor;
+                ExportMovie.setMovieLineColor(foreColor);
                 TL_MOVIE_INTERVAL_COLOR = backColor;
             }
             case Light -> {
@@ -119,6 +121,7 @@ public final class UIGlobals {
                 TL_TEXT_BACKGROUND_COLOR = Color.GRAY;
 
                 TL_MOVIE_FRAME_COLOR = Color.BLACK;
+                ExportMovie.setMovieLineColor(Color.BLACK);
                 TL_MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
             }
         }

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.movie;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -87,6 +88,12 @@ public final class ExportMovie {
     public static void renderedFrame() {
         if (recordingSession != null)
             recordingSession.renderedFrame();
+    }
+
+    static Color movieLineColor = Color.BLACK;
+
+    public static void setMovieLineColor(Color color) {
+        movieLineColor = color;
     }
 
     public static void setMainCanvasVisible(boolean visible) {
