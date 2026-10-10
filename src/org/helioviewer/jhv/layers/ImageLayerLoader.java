@@ -258,9 +258,10 @@ final class ImageLayerLoader {
                     throw new Exception("Missing XML metadata");
                 m = new FitsMetaData(new XMLMetaDataContainer(xml), dataUri.sourceUri());
             } catch (Exception e) {
+                if (count > 1)
+                    throw new Exception("Frame " + i + " has no usable Helioviewer metadata: " + e.getMessage(), e);
                 xml = Frames.EMPTY_METAXML;
-                // A JPIP frame's own size may not be known yet.
-                ResolutionSet.Level level = source.levels(source.displayable(i) ? i : 0).getLevel(0);
+                ResolutionSet.Level level = source.levels(0).getLevel(0);
                 m = new BasicMetaData(level.width(), level.height(), dataUri.baseName(), dataUri.sourceUri());
                 Log.warn("Helioviewer metadata missing for " + dataUri.baseName() + " frame " + i, e);
             }

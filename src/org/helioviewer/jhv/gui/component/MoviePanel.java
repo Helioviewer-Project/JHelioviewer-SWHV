@@ -45,7 +45,6 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
     private final ImageRequestSettings settings = ImageRequestSettings.instance();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final SamplingPanel samplingPanel = new SamplingPanel();
     private final ImageDialog imageDialog;
     private ImageLayer layerToReplace;
 
@@ -192,6 +191,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         samplingConstraints.gridx = 0;
         samplingConstraints.weightx = 1;
         samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
+        SamplingPanel samplingPanel = new SamplingPanel();
         timeSelectorPanel.add(samplingPanel, samplingConstraints);
 
         add(sliderPanel);

@@ -97,7 +97,7 @@ public final class ImageRequestSettings {
     }
 
     public boolean singleFrame() {
-        return sampling instanceof FrameCount count && count.frames() == 1;
+        return sampling instanceof FrameCount(int frames) && frames == 1;
     }
 
     // A single frame is requested at the start.
