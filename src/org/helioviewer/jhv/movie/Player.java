@@ -45,6 +45,8 @@ public class Player {
     @Nullable
     private static JHVTime nextTime(AdvanceMode mode, JHVTime time,
                                     Function<JHVTime, JHVTime> lowerTime, Function<JHVTime, JHVTime> higherTime) {
+        if (playbackFirstTime.milli == playbackLastTime.milli)
+            return null;
         JHVTime next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
