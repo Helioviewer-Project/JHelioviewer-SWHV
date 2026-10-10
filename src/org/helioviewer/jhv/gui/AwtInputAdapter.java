@@ -25,6 +25,9 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener, 
                 e.getButton(),
                 e.getClickCount(),
                 e.isShiftDown(),
+                e.isAltDown(),
+                e.isControlDown(),
+                e.isMetaDown(),
                 e.isPopupTrigger());
     }
 
