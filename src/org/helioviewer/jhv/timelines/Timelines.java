@@ -1,73 +1,65 @@
 package org.helioviewer.jhv.timelines;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JComponent;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.event.EventCache;
-import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
-import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
-import org.helioviewer.jhv.timelines.gui.TimelineDialog;
-import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 import org.helioviewer.jhv.timelines.radio.RadioData;
 
 import org.json.JSONObject;
 
-public class Timelines implements Interfaces.MainContentPanelPlugin {
+// Timelines model: layers, draw controller and the HAPI catalog, without any UI.
+public final class Timelines {
 
-    public static final DrawController dc = new DrawController(); // sucks
-    public static final TimelineDialog td = new TimelineDialog();
-    private final List<JComponent> pluginPanes = new ArrayList<>();
-    private final PlotPanel plotOne = new PlotPanel();
-    private static final TimelinePanel timelinePanel = new TimelinePanel();
+    public interface Listener {
+        void catalogLoaded(BandReaderHapi.CatalogData catalogData);
+    }
 
-    public Timelines() {
-        TimelineLayers.add(new RadioData(null));
+    private static final DrawController dc = new DrawController();
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
+    private static RadioData radio;
+    @Nullable
+    private static BandReaderHapi.CatalogData catalog;
+
+    public static void install() {
+        if (radio == null)
+            radio = new RadioData(null);
+        TimelineLayers.add(radio);
+        Player.addTimeListener(dc);
+        EventCache.addHighlightListener(dc);
+        requestCatalog();
+    }
+
+    public static void uninstall() {
+        EventCache.removeHighlightListener(dc);
+        Player.removeTimeListener(dc);
+    }
+
+    // Replays the last catalog to a late listener.
+    public static void addListener(Listener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+            if (catalog != null)
+                listener.catalogLoaded(catalog);
+        }
+    }
+
+    public static void removeListener(Listener listener) {
+        listeners.remove(listener);
     }
 
     public static void requestCatalog() {
-        BandReaderHapi.requestCatalog(Timelines::catalogsLoaded);
+        BandReaderHapi.requestCatalog(Timelines::catalogLoaded);
     }
 
-    private static void catalogsLoaded(BandReaderHapi.CatalogData catalogData) {
-        td.setCatalogs(catalogData.datasets());
+    private static void catalogLoaded(BandReaderHapi.CatalogData catalogData) {
+        catalog = catalogData;
         TimelineLayers.fetchBands();
-        timelinePanel.setPredefinedGroups(catalogData.predefinedGroups());
-    }
-
-    public void installTimelines() {
-        pluginPanes.add(plotOne);
-        MainFrame.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
-        MainFrame.getLeftContentPane().revalidate();
-        MainFrame.getMainContentPanel().addPlugin(this);
-
-        Player.addTimeListener(dc);
-        EventCache.addHighlightListener(dc);
-    }
-
-    public void uninstallTimelines() {
-        EventCache.removeHighlightListener(dc);
-        Player.removeTimeListener(dc);
-
-        MainFrame.getMainContentPanel().removePlugin(this);
-        MainFrame.getLeftContentPane().remove(timelinePanel);
-        MainFrame.getLeftContentPane().revalidate();
-        pluginPanes.remove(plotOne);
-    }
-
-    @Override
-    public String getTabName() {
-        return "Timelines";
-    }
-
-    @Override
-    public List<JComponent> getVisualInterfaces() {
-        return pluginPanes;
+        listeners.forEach(listener -> listener.catalogLoaded(catalogData));
     }
 
     public static void saveState(JSONObject jo) {
@@ -77,5 +69,7 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
     public static void loadState(JSONObject jo) {
         DrawController.loadState(jo);
     }
+
+    private Timelines() {}
 
 }

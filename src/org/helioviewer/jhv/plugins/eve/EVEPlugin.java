@@ -1,50 +1,39 @@
 package org.helioviewer.jhv.plugins.eve;
 
-import javax.swing.JMenuItem;
-
-import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.gui.TimelineActions;
+import org.helioviewer.jhv.timelines.gui.TimelinesGUI;
 
 import org.json.JSONObject;
 
 public class EVEPlugin extends Plugin {
 
-    private Timelines timelines;
-    private JMenuItem newItem;
-    private JMenuItem openItem;
+    private TimelinesGUI gui;
 
     public EVEPlugin() {
         super("Timelines", "Visualize 1D and 2D time series");
     }
 
     @Override
-    public void install() {}
+    public void install() {
+        Timelines.install();
+    }
 
     @Override
-    public void uninstall() {}
+    public void uninstall() {
+        Timelines.uninstall();
+    }
 
     @Override
     public void installGUI() {
-        if (timelines == null)
-            timelines = new Timelines();
-        timelines.installTimelines();
-        newItem = new JMenuItem(new TimelineActions.NewLayer());
-        openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
-        MainFrame.getMenuBar().getMenu(0).add(newItem, 5);
-        MainFrame.getMenuBar().getMenu(0).add(openItem, 6);
-
-        Timelines.requestCatalog();
+        if (gui == null)
+            gui = new TimelinesGUI();
+        gui.install();
     }
 
     @Override
     public void uninstallGUI() {
-        MainFrame.getMenuBar().getMenu(0).remove(openItem);
-        MainFrame.getMenuBar().getMenu(0).remove(newItem);
-        openItem = null;
-        newItem = null;
-        timelines.uninstallTimelines();
+        gui.uninstall();
     }
 
     @Override

@@ -14,20 +14,22 @@ import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")
 public class TimelineActions {
 
     public static class NewLayer extends Actions.AbstractKeyAction {
 
-        public NewLayer() {
+        private final TimelineDialog dialog;
+
+        public NewLayer(TimelineDialog _dialog) {
             super("New Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_N, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            dialog = _dialog;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Timelines.td.showDialog();
+            dialog.showDialog();
         }
 
     }

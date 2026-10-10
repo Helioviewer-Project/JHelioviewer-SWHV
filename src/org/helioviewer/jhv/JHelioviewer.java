@@ -99,7 +99,7 @@ public class JHelioviewer {
             UIGlobals.setLaf();
             JFrame frame = MainFrame.prepare();
 
-            loadPlugins(true);
+            loadPlugins();
 
             frame.pack();
             MainFrame.stabilizeLeftPaneWidth();
@@ -120,18 +120,17 @@ public class JHelioviewer {
             AnglePbuffer renderer = new AnglePbuffer();
             DisplayController.setRenderRequestHandler(renderer::requestRender);
 
-            loadPlugins(false);
+            loadPlugins();
 
             startInitialization(false);
         });
         uiThread.run();
     }
 
-    private static void loadPlugins(boolean loadTimelines) {
+    private static void loadPlugins() {
         try {
             Log.info("Load enabled plugins");
-            if (loadTimelines)
-                PluginManager.addPlugin(new EVEPlugin());
+            PluginManager.addPlugin(new EVEPlugin());
             PluginManager.addPlugin(new SWEKPlugin());
             PluginManager.addPlugin(new PfssPlugin());
         } catch (Exception e) {

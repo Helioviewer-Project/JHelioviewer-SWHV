@@ -8,7 +8,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -114,7 +113,7 @@ public final class TimelinePanel extends JPanel {
 
     }
 
-    public TimelinePanel() {
+    TimelinePanel(TimelineDialog dialog) {
         TimelineTableModel model = new TimelineTableModel();
         setLayout(new GridBagLayout());
 
@@ -132,7 +131,7 @@ public final class TimelinePanel extends JPanel {
         jsp.getViewport().setBackground(grid.getBackground());
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
-        addLayerButton.addActionListener(e -> new TimelineActions.NewLayer().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
+        addLayerButton.addActionListener(e -> dialog.showDialog());
 
         predefinedCombo = new JComboBox<>();
         predefinedCombo.setToolTipText("Predefined plot");
