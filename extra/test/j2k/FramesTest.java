@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,6 +63,7 @@ public final class FramesTest {
         selection();
         synthesis();
         delivery();
+        arrivals();
         System.out.println("PASS: nearest selectable frame by time, equal synthetic endpoints give one frame");
     }
 
@@ -113,12 +115,7 @@ public final class FramesTest {
     }
 
     private static void delivery() throws Exception {
-        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ResolutionSet.Level[].class, int.class);
-        constructor.setAccessible(true);
-        ResolutionSet levels = constructor.newInstance(new ResolutionSet.Level[]{new ResolutionSet.Level(0, 2, 2)}, 1);
-        Method complete = ResolutionSet.class.getDeclaredMethod("setCompleteLevels", int.class);
-        complete.setAccessible(true);
-        complete.invoke(levels, 1);
+        ResolutionSet levels = completeLevels();
         CountDownLatch started = new CountDownLatch(1), finish = new CountDownLatch(1), delivered = new CountDownLatch(1);
         AtomicReference<ImageBuffer> pixels = new AtomicReference<>();
         AtomicInteger decodes = new AtomicInteger();
@@ -193,6 +190,87 @@ public final class FramesTest {
         }
         awaitReleased(pixels.get());
         System.out.println("PASS: decoder releases replaced results, skips stale queued deliveries and frees cached pixels on close");
+    }
+
+    private static void arrivals() throws Exception {
+        ResolutionSet levels = completeLevels();
+        AtomicInteger requests = new AtomicInteger();
+        Stub source = new Stub(3) {
+            @Override public ResolutionSet levels(int frame) { return levels; }
+            @Override public Boolean completion(int frame) { return ready[frame] ? Boolean.TRUE : null; }
+            @Override public void request(int frame, int level, boolean priority) {
+                if (priority)
+                    throw new AssertionError("Arrival changed playback's request priority");
+                requests.incrementAndGet();
+            }
+            @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) {
+                return ImageBuffer.fromBytes(2, 2, ImageBuffer.Format.Gray8, new byte[]{(byte) frame, 2, 3, 4});
+            }
+        };
+        source.ready[0] = true;
+        BasicMetaData metadata = new BasicMetaData(2, 2, "Arrival test");
+        List<Frames.Frame> list = new ArrayList<>();
+        for (int i = 0; i < 3; i++)
+            list.add(new Frames.Frame(new JHVTime(1_800_000_000_000L + i * 60_000L), metadata, Frames.EMPTY_METAXML, source, i));
+        Frames frames = new Frames(list);
+        CountDownLatch[] shown = {new CountDownLatch(1), new CountDownLatch(1), new CountDownLatch(1)};
+        ImageLayer layer = new ImageLayer(frames) {
+            @Override public void handleData(ImageData data) {
+                shown[data.frame().index()].countDown();
+            }
+        };
+        int[] notifiedSelection = {-1};
+        try {
+            EventQueue.invokeAndWait(() -> {
+                Layers.addListener(new Layers.Listener() {
+                    @Override public void completionUpdated(ImageLayer changed) {
+                        if (changed == layer)
+                            notifiedSelection[0] = changed.frames().current();
+                    }
+                });
+                layer.setVisible(0);
+                layer.decode(metadata.getViewpoint(), Double.POSITIVE_INFINITY, false);
+            });
+            if (!shown[0].await(5, TimeUnit.SECONDS))
+                throw new AssertionError("Initial frame was not delivered");
+            EventQueue.invokeAndWait(() -> {
+                frames.select(frames.time(1));
+                source.ready[1] = true;
+                layer.frameReady(frames, source, 1);
+                if (notifiedSelection[0] != 1)
+                    throw new AssertionError("Completion listeners saw the selection before catch-up");
+            });
+            if (!shown[1].await(5, TimeUnit.SECONDS))
+                throw new AssertionError("Visible layer did not show the requested frame when it arrived");
+            EventQueue.invokeAndWait(() -> {
+                layer.setVisible(-1);
+                frames.select(frames.time(2));
+                CompletableFuture<Boolean> finished = layer.whenLoadFinished();
+                if (finished.isDone())
+                    throw new AssertionError("Load finished before the last frame arrived");
+                source.ready[2] = true;
+                layer.frameReady(frames, source, 2);
+                if (requests.get() != 2 || frames.current() != 2 || notifiedSelection[0] != 2 || !finished.isDone() || !finished.join())
+                    throw new AssertionError("Hidden arrival decoded, failed to select or left its load unfinished");
+                layer.setVisible(0);
+                layer.decode(metadata.getViewpoint(), Double.POSITIVE_INFINITY, false);
+            });
+            if (!shown[2].await(5, TimeUnit.SECONDS))
+                throw new AssertionError("Re-shown layer did not deliver its current frame");
+        } finally {
+            EventQueue.invokeAndWait(layer::detach);
+        }
+        System.out.println("PASS: arrivals publish catch-up before notification; hidden layers settle without decoding and resume when shown");
+    }
+
+    private static ResolutionSet completeLevels() throws Exception {
+        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ResolutionSet.Level[].class, int.class);
+        constructor.setAccessible(true);
+        ResolutionSet levels = constructor.newInstance(new ResolutionSet.Level[]{new ResolutionSet.Level(0, 2, 2)}, 1);
+        Method complete = ResolutionSet.class.getDeclaredMethod("setCompleteLevels", int.class);
+        complete.setAccessible(true);
+        complete.invoke(levels, 1);
+        return levels;
     }
 
     private static boolean allocated(ImageBuffer image) {

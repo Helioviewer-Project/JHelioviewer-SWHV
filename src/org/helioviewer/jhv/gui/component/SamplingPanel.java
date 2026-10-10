@@ -7,6 +7,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.text.DefaultFormatter;
 
 import org.helioviewer.jhv.io.ImageRequestSettings;
 
@@ -71,6 +72,7 @@ public final class SamplingPanel extends JPanel implements ImageRequestSettings.
         JHVSpinner.NumberEditor editor = (JHVSpinner.NumberEditor) spinner.getEditor();
         editor.getTextField().setColumns(6);
         editor.getFormat().setGroupingUsed(false);
+        ((DefaultFormatter) editor.getTextField().getFormatter()).setCommitsOnValidEdit(true);
     }
 
     private static int spinnerValue(JHVSpinner spinner) {

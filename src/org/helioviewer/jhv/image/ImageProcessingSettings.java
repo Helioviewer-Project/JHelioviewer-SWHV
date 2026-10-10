@@ -168,9 +168,9 @@ public final class ImageProcessingSettings {
         if (gamma == newGamma)
             return;
         gamma = newGamma;
+        scalingMode = ScalingMode.Gamma;
         notifyFITSListeners();
-        if (scalingMode == ScalingMode.Gamma)
-            onChange.run();
+        onChange.run();
     }
 
     public void setBeta(double value) {
@@ -178,9 +178,9 @@ public final class ImageProcessingSettings {
         if (beta == newBeta)
             return;
         beta = newBeta;
+        scalingMode = ScalingMode.Beta;
         notifyFITSListeners();
-        if (scalingMode == ScalingMode.Beta)
-            onChange.run();
+        onChange.run();
     }
 
     public void setAlpha(double value) {
@@ -188,9 +188,9 @@ public final class ImageProcessingSettings {
         if (alpha == newAlpha)
             return;
         alpha = newAlpha;
+        scalingMode = ScalingMode.Alpha;
         notifyFITSListeners();
-        if (scalingMode == ScalingMode.Alpha)
-            onChange.run();
+        onChange.run();
     }
 
     public void addFITSListener(FITSListener listener) {

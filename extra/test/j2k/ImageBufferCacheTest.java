@@ -34,6 +34,7 @@ import com.google.common.cache.Cache;
 public final class ImageBufferCacheTest {
 
     public static void main(String[] arguments) throws Exception {
+        EventQueue.invokeAndWait(ImageBufferCacheTest::fitsScaling);
         decodeRequests();
         releasedImage();
         writeBuffers();
@@ -47,6 +48,27 @@ public final class ImageBufferCacheTest {
     }
 
     private record TestKey(Object owner, int frame) implements ImageBufferCache.Key {}
+
+    private static void fitsScaling() {
+        int[] notifications = {0, 0};
+        ImageProcessingSettings settings = new ImageProcessingSettings(() -> notifications[1]++);
+        settings.addFITSListener(() -> notifications[0]++);
+        // Each edit starts from a different active mode; repeating the value must be a no-op.
+        for (ImageProcessingSettings.ScalingMode mode : List.of(ImageProcessingSettings.ScalingMode.Beta,
+                ImageProcessingSettings.ScalingMode.Alpha, ImageProcessingSettings.ScalingMode.Gamma)) {
+            for (int repeat = 0; repeat < 2; repeat++) {
+                switch (mode) {
+                    case Gamma -> settings.setGamma(0.5);
+                    case Beta -> settings.setBeta(0.125);
+                    case Alpha -> settings.setAlpha(100);
+                }
+                if (settings.fitsParameters().scalingMode() != mode || notifications[0] != 1 || notifications[1] != 1)
+                    throw new AssertionError("Scaling edit did not select " + mode + " with one notification and refresh");
+            }
+            notifications[0] = notifications[1] = 0;
+        }
+        System.out.println("PASS: FITS scaling edits select their mode and refresh once; unchanged values do nothing");
+    }
 
     private static void decodeRequests() throws Exception {
         ArrayBlockingQueue<String> delivered = new ArrayBlockingQueue<>(16);

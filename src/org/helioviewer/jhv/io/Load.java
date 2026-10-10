@@ -32,6 +32,8 @@ public final class Load {
     // A new layer over the files, directories expanded by its loader. Completes once the load has finished,
     // with whether the layer is still registered; a load that found nothing removes it.
     public static CompletableFuture<Boolean> image(@Nonnull List<URI> uris, @Nullable JSONObject imageParams) {
+        if (uris.isEmpty())
+            return CompletableFuture.completedFuture(false);
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         EventQueue.invokeLater(() -> { // layers belong to the EDT; callers come from any thread
             ImageLayer layer = ImageLayer.create();

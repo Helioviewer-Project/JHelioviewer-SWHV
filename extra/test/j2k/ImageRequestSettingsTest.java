@@ -1,14 +1,19 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+
+import org.helioviewer.jhv.gui.component.SamplingPanel;
 import org.helioviewer.jhv.time.TimeUtils;
 
 // The request settings' normalization, notifications and sampling rules.
 public final class ImageRequestSettingsTest {
 
-    public static void main(String[] arguments) {
+    public static void main(String[] arguments) throws Exception {
         long start = 1_800_000_000_000L, end = start + 60 * TimeUtils.MINUTE_IN_MILLIS;
         ImageRequestSettings settings = new ImageRequestSettings(start, end);
         List<String> events = new ArrayList<>();
@@ -87,6 +92,30 @@ public final class ImageRequestSettingsTest {
                 || latest.cadence() != APIRequest.CADENCE_ALL || !latest.endingAt(now).equals(latest))
             throw new AssertionError("Latest interval expanded the normalized span again: " + latest);
         System.out.println("PASS: latest intervals preserve movie duration, single images and sampling");
+        EventQueue.invokeAndWait(() -> {
+            ImageRequestSettings shared = ImageRequestSettings.instance();
+            ImageRequestSettings.Sampling original = shared.sampling();
+            try {
+                shared.setSampling(new ImageRequestSettings.TimeStep(1800));
+                SamplingPanel panel = new SamplingPanel();
+                JSpinner cadence = (JSpinner) panel.getComponent(1);
+                JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) cadence.getEditor();
+                editor.getTextField().setText("31");
+                if (shared.cadence() != 1860)
+                    throw new AssertionError("Typed cadence was not applied without Enter or a focus change");
+                editor.getTextField().setText("10001");
+                if (shared.cadence() != 1860)
+                    throw new AssertionError("Out-of-range cadence changed the request");
+                ((JRadioButton) panel.getComponent(3)).doClick();
+                JSpinner count = (JSpinner) panel.getComponent(4);
+                ((JSpinner.DefaultEditor) count.getEditor()).getTextField().setText("123");
+                if (!shared.sampling().equals(new ImageRequestSettings.FrameCount(123)))
+                    throw new AssertionError("Typed frame count was not applied without Enter or a focus change");
+            } finally {
+                shared.setSampling(original);
+            }
+        });
+        System.out.println("PASS: typed sampling edits reach the request immediately, invalid edits keep the last valid value");
     }
 
     private ImageRequestSettingsTest() {}

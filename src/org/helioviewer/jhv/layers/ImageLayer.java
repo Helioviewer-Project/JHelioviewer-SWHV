@@ -382,13 +382,15 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     public void frameReady(Frames _frames, Source source, int frame) {
         if (_frames != frames)
             return;
-        Layers.fireCompletionUpdated(this);
         boolean moved = frames.select(frames.requested());
-        Frames.Frame current = frames.get(frames.current());
-        if (moved)
-            decoder.redecode(frames, true);
-        else if (current.source() == source && current.index() == frame)
-            decoder.redecode(frames, false);
+        Layers.fireCompletionUpdated(this);
+        if (isVisibleIdx() != -1) {
+            Frames.Frame current = frames.get(frames.current());
+            if (moved)
+                decoder.redecode(frames, true);
+            else if (current.source() == source && current.index() == frame)
+                decoder.redecode(frames, false);
+        }
         settleLoad();
     }
 

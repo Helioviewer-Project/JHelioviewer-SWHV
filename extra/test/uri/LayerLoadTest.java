@@ -71,8 +71,12 @@ public final class LayerLoadTest {
             throw new AssertionError("Load.image of a FITS file did not complete true");
         if (Load.image(bogus).get(60, TimeUnit.SECONDS))
             throw new AssertionError("Load.image of an unreadable file did not complete false");
-        if (Load.image(List.of()).get(60, TimeUnit.SECONDS))
-            throw new AssertionError("Load.image of nothing completed true");
+        EDTQueue.invokeAndWait(() -> {
+            CompletableFuture<Boolean> emptyLoad = Load.image(List.of());
+            if (!emptyLoad.isDone() || emptyLoad.join())
+                throw new AssertionError("Empty image input queued a layer load instead of returning false immediately");
+            return null;
+        });
         Path empty = Files.createTempDirectory("jhv-empty");
         try {
             if (Load.image(empty.toUri()).get(60, TimeUnit.SECONDS))

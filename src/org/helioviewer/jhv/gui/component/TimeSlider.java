@@ -256,8 +256,10 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void completionUpdated(ImageLayer layer) {
-        if (layer == Layers.getActiveImageLayer())
+        if (layer == Layers.getActiveImageLayer()) {
+            super.setValue(layer.frames().current());
             repaint();
+        }
     }
 
     @Override
@@ -265,6 +267,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         int maximum = Player.getMaximumFrameNumber();
         if (getMaximum() != maximum)
             setMaximum(maximum);
+        repaint();
     }
 
     private static final class FrameNumberPanel extends JComponent {
