@@ -76,6 +76,17 @@ public final class ImageRequestSettingsTest {
         } catch (IllegalArgumentException expected) {
         }
         System.out.println("PASS: time step, every frame and frame count cadences, single image at the start, requests");
+
+        long now = end + TimeUtils.DAY_IN_MILLIS;
+        if (!movie.endingAt(now).equals(new APIRequest("ROB", 10, now - (end - start), now, 60))
+                || !single.endingAt(now).equals(new APIRequest("ROB", 10, now, now, 3600)))
+            throw new AssertionError("Latest interval changed duration, sampling or source");
+        APIRequest expanded = new APIRequest("ROB", 10, start, start + TimeUtils.MINUTE_IN_MILLIS, APIRequest.CADENCE_ALL);
+        APIRequest latest = expanded.endingAt(now);
+        if (latest.startTime() != now - (expanded.endTime() - expanded.startTime()) || latest.endTime() != now
+                || latest.cadence() != APIRequest.CADENCE_ALL || !latest.endingAt(now).equals(latest))
+            throw new AssertionError("Latest interval expanded the normalized span again: " + latest);
+        System.out.println("PASS: latest intervals preserve movie duration, single images and sampling");
     }
 
     private ImageRequestSettingsTest() {}

@@ -33,6 +33,10 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         return new APIRequest(server, sourceId, start, end, _cadence);
     }
 
+    public APIRequest endingAt(long end) {
+        return withSpan(end - (endTime - startTime), end, cadence);
+    }
+
     public String toFileRequest() throws Exception {
         DataSources.Server source = DataSources.getServer(server);
         if (source == null)

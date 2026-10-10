@@ -18,6 +18,7 @@ import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -175,6 +176,7 @@ public final class State {
 
         HashMap<ImageLayer, Boolean> newLayers = new HashMap<>();
         ImageLayer masterLayer = null;
+        long now = System.currentTimeMillis();
 
         JSONArray imageLayers = data.optJSONArray("imageLayers");
         if (imageLayers != null) {
@@ -185,7 +187,10 @@ public final class State {
                         continue;
 
                     try {
-                        ImageLayer layer = ImageLayer.createDetached(jd);
+                        APIRequest request = APIRequest.fromJson(jd.getJSONObject("APIRequest"));
+                        if (modeData.refresh())
+                            request = request.endingAt(now);
+                        ImageLayer layer = ImageLayer.createDetached(jd, request);
                         restoredLayers.add(layer);
                         newLayers.put(layer, jo.optBoolean("enabled", false));
                         if (jo.optBoolean("master", false))
@@ -237,6 +242,7 @@ public final class State {
         int serial = ++loadSerial;
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
+            ViewState.setRefresh(false); // no periodic reload may replace a layer while restoration waits for it
             ViewState.setProjection(modeData.projection()); // to be set before viewpoint
 
             if (PluginManager.isActive(EVEPlugin.class))

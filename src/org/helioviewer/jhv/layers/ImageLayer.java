@@ -54,10 +54,10 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     // Only for state restore, which batches layer registration.
-    public static ImageLayer createDetached(JSONObject jo) {
+    public static ImageLayer createDetached(JSONObject jo, APIRequest _request) {
         ImageLayer imageLayer = new ImageLayer(Frames.placeholder());
         imageLayer.applyImageParams(jo.optJSONObject("imageParams"));
-        imageLayer.load(APIRequest.fromJson(jo.getJSONObject("APIRequest")));
+        imageLayer.load(_request);
         return imageLayer;
     }
 

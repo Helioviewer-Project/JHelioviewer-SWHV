@@ -144,34 +144,25 @@ public final class ImageLayers {
         diffRotationMode = b;
     }
 
-    private static final EDTTimer refreshTimer;
-    private static final int timerDelay = 15 * (int) TimeUtils.MINUTE_IN_MILLIS;
-
-    static {
-        refreshTimer = new EDTTimer(timerDelay, ImageLayers::refreshLayersSpan);
-        refreshTimer.setInitialDelay(0);
-    }
-
-    private static boolean refreshMode;
+    private static final EDTTimer refreshTimer = new EDTTimer(15 * (int) TimeUtils.MINUTE_IN_MILLIS, ImageLayers::refreshLayersSpan);
 
     public static boolean getRefreshMode() {
-        return refreshMode;
+        return refreshTimer.isRunning();
     }
 
     public static void setRefreshMode(boolean b) {
-        refreshMode = b;
-        if (refreshMode)
+        if (b)
             refreshTimer.start();
         else
             refreshTimer.stop();
     }
 
-    private static void refreshLayersSpan() {
+    public static void refreshLayersSpan() {
         long now = System.currentTimeMillis();
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
             if (req != null)
-                layer.reload(now - (req.endTime() - req.startTime()), now, req.cadence());
+                layer.load(req.endingAt(now));
         }
     }
 

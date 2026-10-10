@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
@@ -45,8 +46,18 @@ public final class Commands {
             @Nullable String refresh,
             @Nullable String showCorona,
             @Nullable String differentialRotation) {
+        boolean wasRefresh = ViewState.isRefresh();
         ViewState.applyModeUpdateRaw(projection, annotationMode, multiview, tracking, refresh, showCorona,
                 differentialRotation);
+        if (!wasRefresh && ViewState.isRefresh())
+            ImageLayers.refreshLayersSpan();
+    }
+
+    public static void setRefresh(boolean refresh) {
+        boolean wasRefresh = ViewState.isRefresh();
+        ViewState.setRefresh(refresh);
+        if (!wasRefresh && refresh)
+            ImageLayers.refreshLayersSpan();
     }
 
     public static void setPlayback(@Nullable PlaybackInput input) {

@@ -23,6 +23,7 @@ import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.annotation.Annotations;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
@@ -254,7 +255,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
         refreshButton = toolToggleButton(REFRESH);
         refreshButton.setSelected(ViewState.isRefresh());
-        refreshButton.addItemListener(e -> ViewState.setRefresh(refreshButton.isSelected()));
+        refreshButton.addActionListener(e -> Commands.setRefresh(refreshButton.isSelected()));
         addButton(refreshButton);
 
         addSeparator(dim);
