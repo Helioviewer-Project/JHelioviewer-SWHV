@@ -1,8 +1,11 @@
 package org.helioviewer.jhv.plugins.swek;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.event.SWEKDownloader;
+import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
@@ -16,6 +19,7 @@ public class SWEKPlugin extends Plugin {
     private static SWEKPlugin instance;
     private static SWEKLayer layer;
     private EventTimelineLayer etl;
+    private List<SWEKGroup> groups = List.of();
     private SWEKTreePane swekPanel;
     private SWEKPopupController popupController;
 
@@ -26,22 +30,28 @@ public class SWEKPlugin extends Plugin {
 
     @Override
     public void install() {
+        groups = SWEKConfig.load();
         layer = new SWEKLayer(null);
         layer.setEnabled(true);
         Layers.add(layer);
+        SWEKDownloader.installFilterListener();
+        etl = new EventTimelineLayer();
+        TimelineLayers.add(etl);
     }
 
     @Override
     public void uninstall() {
+        TimelineLayers.remove(etl);
+        etl = null;
+        SWEKDownloader.removeFilterListener();
         Layers.remove(layer);
         layer = null;
+        groups = List.of();
     }
 
     @Override
     public void installGUI() {
-        SWEKDownloader.installFilterListener();
-        etl = new EventTimelineLayer();
-        swekPanel = new SWEKTreePane(SWEKConfig.load());
+        swekPanel = new SWEKTreePane(groups);
         popupController = new SWEKPopupController();
         bindLayer();
 
@@ -50,13 +60,10 @@ public class SWEKPlugin extends Plugin {
 
         LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
         popupController.install();
-        TimelineLayers.add(etl);
     }
 
     @Override
     public void uninstallGUI() {
-        SWEKDownloader.removeFilterListener();
-        TimelineLayers.remove(etl);
         popupController.uninstall();
         popupController.setLayer(null);
         LayerOptions.unregister(SWEKLayer.class);
@@ -65,7 +72,6 @@ public class SWEKPlugin extends Plugin {
         MainFrame.getLeftContentPane().revalidate();
         swekPanel = null;
         popupController = null;
-        etl = null;
     }
 
     @Override
