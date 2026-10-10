@@ -38,6 +38,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.helioviewer.jhv.app.AppInit;
+import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.ClipSet;
@@ -57,6 +58,7 @@ import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
+import org.helioviewer.jhv.time.JHVTime;
 
 // The real timeline, decoder and reader thread on a JPIP movie, headless.
 // Arguments: Kakadu library, bridge library, movie JPIP URI, image JPIP URI, local JP2 file.
@@ -472,11 +474,14 @@ public final class FrameDecoderTest {
         checkFrameOrder(responses, false);
         checkFrameOrder(responses, true);
         JPIPCacheManager.init();
+        DisplaySettings.TimeMode timeMode = DisplaySettings.getTimeMode();
         try {
+            DisplaySettings.setTimeMode(DisplaySettings.TimeMode.Sun);
             checkFaults(responses, 2, false);
             checkFaults(responses, 14, false);
             checkFaults(responses, 0, true);
         } finally {
+            DisplaySettings.setTimeMode(timeMode);
             Method close = JPIPCacheManager.class.getDeclaredMethod("close");
             close.setAccessible(true);
             close.invoke(null);
@@ -563,11 +568,15 @@ public final class FrameDecoderTest {
                     throw new AssertionError("Disk keys do not cover the timeline");
                 for (int i = 0; i < keys.length; i++) {
                     MetaData metadata = frames.get(i).metaData();
-                    String expected = metadata instanceof FitsMetaData ? "10+" + metadata.getViewpoint().time.milli : null;
+                    String expected = metadata instanceof FitsMetaData fits ? "10+" + fits.getCacheTimestamp() : null;
                     if (!Objects.equals(keys[i], expected))
                         throw new AssertionError("Disk key uses a sorted position or a fallback time at frame " + i);
                     if (keys[i] != null)
                         JPIPCacheManager.remove(keys[i]); // Each fault case must download, not restore the preceding case.
+                }
+                for (int i = 0; i < responses.dates().length; i++) {
+                    if (!keys[i].equals("10+" + new JHVTime(responses.dates()[i]).milli))
+                        throw new AssertionError("Time-reference preference changed the metadata disk key");
                 }
                 if (refuse) {
                     for (String key : keys) {

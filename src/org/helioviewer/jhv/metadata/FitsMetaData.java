@@ -24,6 +24,7 @@ public final class FitsMetaData extends CommonMetaData {
     private String detector = "";
     private String measurement = "";
     private String observatory = "";
+    private final long cacheTimestamp;
 
     private double referenceX = 0;
     private double referenceY = 0;
@@ -38,7 +39,9 @@ public final class FitsMetaData extends CommonMetaData {
         observatory = observatory.trim().intern();
         displayName = displayName.trim().intern();
 
-        viewpoint = retrievePosition(m, retrieveTime(m));
+        JHVTime observationTime = retrieveTime(m);
+        cacheTimestamp = observationTime.milli;
+        viewpoint = retrievePosition(m, observationTime);
         retrievePixelParameters(m);
 
         retrieveOcculterRadii(m);
@@ -48,6 +51,10 @@ public final class FitsMetaData extends CommonMetaData {
 
         if (instrument.equals("Euhforia"))
             calculateDepth = true;
+    }
+
+    public long getCacheTimestamp() {
+        return cacheTimestamp;
     }
 
     private void retrieveSector(MetaDataContainer m) {

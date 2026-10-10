@@ -232,8 +232,8 @@ final class ImageLayerLoader {
             if (request != null) {
                 for (int i = 0; i < cacheKey.length; i++) {
                     Frames.Frame frame = frames.get(i);
-                    if (frame.metaData() instanceof FitsMetaData)
-                        cacheKey[i] = request.sourceId() + "+" + frame.time().milli;
+                    if (frame.metaData() instanceof FitsMetaData metadata)
+                        cacheKey[i] = request.sourceId() + "+" + metadata.getCacheTimestamp();
                 }
             }
             source.start(cacheKey);
