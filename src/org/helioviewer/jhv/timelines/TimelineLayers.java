@@ -123,6 +123,11 @@ public class TimelineLayers extends AbstractTableModel {
             TimelineLayer layer = reuseBand(newLayer);
             addUnique(restoredLayers, layer);
         }
+        // Band and Callisto rows come from the state; plugin rows belong to their active plugin.
+        for (TimelineLayer layer : layers) {
+            if (!(layer instanceof Band) && !(layer instanceof RadioData))
+                addUnique(restoredLayers, layer);
+        }
         if (restoredLayers.stream().noneMatch(layer -> layer instanceof RadioData))
             restoredLayers.add(new RadioData(null));
         replaceAll(restoredLayers);
