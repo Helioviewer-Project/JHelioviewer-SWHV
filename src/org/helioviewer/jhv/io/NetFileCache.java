@@ -19,8 +19,6 @@ public class NetFileCache {
     private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
             build(uri -> {
                 String scheme = uri.getScheme().toLowerCase();
-                if ("jpip".equals(scheme) || "jpips".equals(scheme))
-                    return new DataUri(uri, uri, null);
                 if ("file".equals(scheme)) {
                     File file = new File(uri.getPath()); // for files with authority (//localhost) and Windows
                     return new DataUri(uri, uri, file);
@@ -49,6 +47,9 @@ public class NetFileCache {
 
     public static DataUri get(@Nonnull URI uri) throws IOException {
         try {
+            String scheme = uri.getScheme().toLowerCase();
+            if ("jpip".equals(scheme) || "jpips".equals(scheme))
+                return new DataUri(uri, uri, null);
             return cache.get(uri);
         } catch (Exception e) {
             throw new IOException(e);
