@@ -49,6 +49,7 @@ public final class TimelinePanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
+    private final TimelineOptions options = new TimelineOptions();
     private final JPanel optionsPanelWrapper;
     private final JComboBox<String> predefinedCombo;
     private Map<String, List<BandType>> predefinedGroups = Map.of();
