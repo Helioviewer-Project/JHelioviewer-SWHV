@@ -7,18 +7,16 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
 
-public final class DrawController implements EventListener.Highlight, TimeListener.Change {
+public final class DrawController {
 
     public interface Listener {
         default void drawRequest() {}
@@ -55,7 +53,7 @@ public final class DrawController implements EventListener.Highlight, TimeListen
         ImageLayers.syncLayersSpan(start, end);
     }
 
-    public DrawController() {
+    static {
         long t = System.currentTimeMillis();
         setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
     }
@@ -265,8 +263,7 @@ public final class DrawController implements EventListener.Highlight, TimeListen
         listeners.forEach(Listener::optionsChanged);
     }
 
-    @Override
-    public void timeChanged(long milli) {
+    public static void timeChanged(long milli) {
         currentTime = milli;
         drawMovieLine = true;
     }
@@ -285,8 +282,7 @@ public final class DrawController implements EventListener.Highlight, TimeListen
         Commands.seekTime(new JHVTime(geometry.xMapper(selectedAxis).toValue(point.x)));
     }
 
-    @Override
-    public void highlightChanged() {
+    public static void highlightChanged() {
         drawRequest();
     }
 
@@ -335,5 +331,7 @@ public final class DrawController implements EventListener.Highlight, TimeListen
     public static void stop() {
         drawTimer.stop();
     }
+
+    private DrawController() {}
 
 }

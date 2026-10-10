@@ -2,6 +2,8 @@ package org.helioviewer.jhv.display;
 
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -29,8 +31,11 @@ public final class DisplayController {
     private static final ViewpointState viewpointModel = new ViewpointState(UpdateViewpoint.observer);
     private static final ViewpointState miniViewpointState = new ViewpointState(UpdateViewpoint.earthAt1au);
 
-    private static boolean missingHandlerLogged;
-    private static Consumer<Position> renderRequestHandler = _ -> missingRenderRequestHandler();
+    @Nullable
+    private static Consumer<Position> renderRequestHandler;
+    // Latest request made before a handler was installed; replayed on installation.
+    @Nullable
+    private static Position pendingViewpoint;
 
     public static void render() {
         Position viewpoint = viewpointModel.getViewpoint();
@@ -47,18 +52,19 @@ public final class DisplayController {
     }
 
     public static void display(Position viewpoint) {
-        renderRequestHandler.accept(viewpoint);
+        if (renderRequestHandler == null)
+            pendingViewpoint = viewpoint;
+        else
+            renderRequestHandler.accept(viewpoint);
     }
 
     public static void setRenderRequestHandler(Consumer<Position> _renderRequestHandler) {
         renderRequestHandler = _renderRequestHandler;
-    }
-
-    private static void missingRenderRequestHandler() {
-        if (missingHandlerLogged)
-            return;
-        missingHandlerLogged = true;
-        Log.warn("No render request handler installed");
+        Position viewpoint = pendingViewpoint;
+        if (viewpoint != null) {
+            pendingViewpoint = null;
+            renderRequestHandler.accept(viewpoint);
+        }
     }
 
     public static UpdateViewpoint getViewpointUpdate() {

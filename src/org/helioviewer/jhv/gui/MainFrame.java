@@ -238,8 +238,7 @@ public final class MainFrame {
         canvas.addKeyListener(awtInputAdapter);
         canvas.addFocusListener(awtInputAdapter);
         renderHost.attachCanvas(canvas);
-        // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
-        canvas.requestRender();
+        // Replays the render requested while no handler existed, which creates the ANGLE surface at once.
         DisplayController.setRenderRequestHandler(canvas::requestRender);
     }
 

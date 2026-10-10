@@ -29,7 +29,6 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
-import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -46,8 +45,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     private Point dragTargetPosition;
 
     private BufferedImage screenImage;
-    private final ExportMovie.TimelineFrameSource recordingSource =
-            () -> screenImage == null ? null : new ExportMovie.TimelineFrame(screenImage, DrawController.getMovieLinePosition());
+    private final ExportMovie.TimelineFrameSource recordingSource = this::recordingFrame;
 
     private final TimelineLabelPainter labelPainter = new TimelineLabelPainter();
     private final List<TimelineLayer> layers = TimelineLayers.get();
@@ -117,6 +115,17 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
+    // Movie line in image pixels: the image is the graph drawn at the device scale.
+    @Nullable
+    private ExportMovie.TimelineFrame recordingFrame() {
+        if (screenImage == null)
+            return null;
+        int movieLinePosition = DrawController.getMovieLinePosition();
+        if (movieLinePosition >= 0)
+            movieLinePosition = (int) (movieLinePosition * screenImage.getWidth() / (double) DrawController.getGeometry().size().width + .5);
+        return new ExportMovie.TimelineFrame(screenImage, movieLinePosition);
+    }
+
     private void redrawGraph(Graphics2D target, GraphGeometry geometry) {
         Rectangle graphSize = geometry.size();
         AffineTransform targetTransform = target.getTransform();
@@ -140,7 +149,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private void drawChart(Graphics2D g, GraphGeometry geometry, TimeAxis timeAxis) {
         Rectangle graphArea = geometry.area();
-        g.setFont(DrawConstants.font);
+        g.setFont(TimelineLabelPainter.font);
         // Radio fills its plot area. Put the grid over it, then paint foreground data.
         for (TimelineLayer layer : layers) {
             if (layer instanceof RadioData && layer.isEnabled()) {

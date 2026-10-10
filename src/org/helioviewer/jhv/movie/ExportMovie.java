@@ -29,6 +29,7 @@ public final class ExportMovie {
         TimelineFrame getFrame();
     }
 
+    // movieLinePosition in image pixels, -1 when not shown.
     public record TimelineFrame(BufferedImage image, int movieLinePosition) {}
 
     private static final int MACROBLOCK = 8;

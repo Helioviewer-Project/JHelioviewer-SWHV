@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,6 +24,15 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 
 final class TimelineLabelPainter {
 
+    static final Font font = UIGlobals.uiFontSmall;
+    static final Font fontBold = UIGlobals.uiFontSmallBold;
+
+    // Layers without a colour of their own use the label colour.
+    private static Color dataColor(TimelineLayer layer) {
+        Color color = layer.getDataColor();
+        return color == null ? UIGlobals.TL_LABEL_TEXT_COLOR : color;
+    }
+
     private final Stroke boldStroke = new BasicStroke(2);
     private final Stroke thinStroke = new BasicStroke(0.5f);
 
@@ -30,7 +40,7 @@ final class TimelineLabelPainter {
         Stroke stroke = g.getStroke();
         try {
             g.setStroke(thinStroke);
-            g.setFont(DrawConstants.font);
+            g.setFont(font);
             if (geometry.isStacked()) {
                 drawStackedLabels(g, geometry, xAxis);
             } else {
@@ -43,7 +53,7 @@ final class TimelineLabelPainter {
     }
 
     void drawMouseValues(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, Point mousePosition, List<TimelineLayer> layers) {
-        g.setFont(DrawConstants.font);
+        g.setFont(font);
         Rectangle graphArea = geometry.area();
         if (mousePosition == null || !graphArea.contains(mousePosition))
             return;
@@ -66,7 +76,7 @@ final class TimelineLabelPainter {
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
                 currWidth += drawString(g, fontMetrics, ", ", x + currWidth, y);
 
-                g.setColor(tl.getDataColor());
+                g.setColor(dataColor(tl));
                 currWidth += drawString(g, fontMetrics, value, x + currWidth, y);
             }
         }
@@ -108,7 +118,7 @@ final class TimelineLabelPainter {
         Rectangle stripArea = layout.area();
         int axisX = stripArea.x;
 
-        g.setColor(layout.layer().getDataColor());
+        g.setColor(dataColor(layout.layer()));
         YAxis yAxis = layout.yAxis();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, stripArea);
         YAxis.Ticks ticks = yAxis.ticks(yMapper);
@@ -188,7 +198,7 @@ final class TimelineLabelPainter {
                 g.drawLine(x, graphArea.y, x, geometry.graphBottom() + 3);
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
             } else {
-                g.setColor(tl.getDataColor());
+                g.setColor(dataColor(tl));
             }
             drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate), tickTextHeight);
             previousDate = tickValue;
@@ -225,7 +235,7 @@ final class TimelineLabelPainter {
             axisX += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
         }
 
-        g.setColor(layout.layer().getDataColor());
+        g.setColor(dataColor(layout.layer()));
         YAxis yAxis = layout.yAxis();
         boolean highlight = yAxis.isHighlighted();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis);
@@ -247,7 +257,7 @@ final class TimelineLabelPainter {
         Stroke stroke = g.getStroke();
         if (highlight) {
             g.setStroke(boldStroke);
-            g.setFont(DrawConstants.fontBold);
+            g.setFont(fontBold);
         }
 
         Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
@@ -259,7 +269,7 @@ final class TimelineLabelPainter {
 
         if (highlight) {
             g.setStroke(stroke);
-            g.setFont(DrawConstants.font);
+            g.setFont(font);
         }
     }
 
@@ -267,7 +277,7 @@ final class TimelineLabelPainter {
         String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yMapper.scaledToPixel(tick);
         if (needTxt && highlight)
-            g.setFont(DrawConstants.fontBold);
+            g.setFont(fontBold);
 
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         if (leftSide == -1) {
@@ -280,7 +290,7 @@ final class TimelineLabelPainter {
             int xText = leftSide == -1 ? axisX - 6 - (int) bounds.getWidth() : axisX;
             g.drawString(tickText, xText, y + (int) (bounds.getHeight() / 2));
             if (highlight)
-                g.setFont(DrawConstants.font);
+                g.setFont(font);
         }
     }
 

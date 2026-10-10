@@ -1,10 +1,8 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import java.awt.Font;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.math.MathUtils;
 
 public class DrawConstants {
@@ -31,9 +29,6 @@ public class DrawConstants {
     public static final DateTimeFormatter YEAR_ONLY_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy");
 
     public static final int EVENT_OFFSET = 3;
-
-    public static final Font font = UIGlobals.uiFontSmall;
-    public static final Font fontBold = UIGlobals.uiFontSmallBold;
 
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 

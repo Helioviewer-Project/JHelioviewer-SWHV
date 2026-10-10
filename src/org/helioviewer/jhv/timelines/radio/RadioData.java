@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
@@ -240,9 +239,10 @@ public final class RadioData extends TimelineLayer {
         return "Callisto Radiogram";
     }
 
+    @Nullable
     @Override
     public Color getDataColor() {
-        return UIGlobals.foreColor;
+        return null;
     }
 
     @Override
