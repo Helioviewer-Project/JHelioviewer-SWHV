@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.gui.component;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,43 +18,13 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.app.Settings;
+import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.DataSourcesParser;
+import org.helioviewer.jhv.io.DataSourcesParser.Item;
+import org.helioviewer.jhv.io.DataSourcesParser.SourceItem;
 
 @SuppressWarnings("serial")
 public final class DataSourcesTree extends JTree {
-
-    public static class Item {
-
-        final String name;
-        final String description;
-
-        public Item(String _name, String _description) {
-            name = _name;
-            description = _description;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
-
-    public static class SourceItem extends Item {
-
-        public final String server;
-        public final int sourceId;
-        public final long start;
-        public final long end;
-
-        public SourceItem(String _server, String _name, String _description, int _sourceId, long _start, long _end) {
-            super(_name, _description);
-            server = _server;
-            sourceId = _sourceId;
-            start = _start;
-            end = _end;
-        }
-
-    }
 
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
@@ -105,18 +75,21 @@ public final class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    private static void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
-        tgt.removeAllChildren();
-        while (src.getChildCount() > 0)
-            tgt.add((DefaultMutableTreeNode) src.getFirstChild());
+    private static DefaultMutableTreeNode toTreeNode(DataSourcesParser.Node node) {
+        DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node.item(), !(node.item() instanceof SourceItem));
+        for (DataSourcesParser.Node child : node.children())
+            treeNode.add(toTreeNode(child));
+        return treeNode;
     }
 
     @Nullable
     public SourceItem setParsedData(DataSourcesParser parser) {
-        String server = parser.getRoot().toString();
+        String server = parser.getServer();
         DefaultMutableTreeNode node = nodes.get(server);
         if (node != null) {
-            reattach(node, parser.getRoot());
+            node.removeAllChildren();
+            for (DataSourcesParser.Node child : parser.getNodes())
+                node.add(toTreeNode(child));
             ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
         }
 

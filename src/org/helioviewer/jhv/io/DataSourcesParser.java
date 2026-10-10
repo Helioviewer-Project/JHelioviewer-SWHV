@@ -1,31 +1,75 @@
 package org.helioviewer.jhv.io;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.TreeSet;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;
 
+// Datasets of one server as a two-level tree: groups with their datasets flattened beneath.
 public class DataSourcesParser {
 
+    public static class Item {
+
+        public final String name;
+        public final String description;
+
+        public Item(String _name, String _description) {
+            name = _name;
+            description = _description;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+    }
+
+    public static class SourceItem extends Item {
+
+        public final String server;
+        public final int sourceId;
+        public final long start;
+        public final long end;
+
+        public SourceItem(String _server, String _name, String _description, int _sourceId, long _start, long _end) {
+            super(_name, _description);
+            server = _server;
+            sourceId = _sourceId;
+            start = _start;
+            end = _end;
+        }
+
+    }
+
+    public record Node(Item item, List<Node> children) {}
+
     private final String server;
-    private final DefaultMutableTreeNode rootNode;
-    private DataSourcesTree.SourceItem defaultItem;
+    private final ArrayList<Node> nodes = new ArrayList<>();
+    private SourceItem defaultItem;
 
     DataSourcesParser(String _server, JSONObject json) {
         server = _server;
-        rootNode = new DefaultMutableTreeNode(server);
-        parse(rootNode, json, null);
+        parse(nodes, "", json, null);
     }
 
-    DefaultMutableTreeNode getRoot() {
-        return rootNode;
+    public String getServer() {
+        return server;
     }
 
-    DataSourcesTree.SourceItem getDefault() {
+    public List<Node> getNodes() {
+        return Collections.unmodifiableList(nodes);
+    }
+
+    @Nullable
+    public SourceItem getDefault() {
         return defaultItem;
     }
 
@@ -37,7 +81,7 @@ public class DataSourcesParser {
         return str1 + ' ' + str2;
     }
 
-    private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) {
+    private void parse(List<Node> siblings, String group, JSONObject root, @Nullable String str) {
         TreeSet<String> sorted = new TreeSet<>(NaturalSort.comparator);
         sorted.addAll(root.keySet());
 
@@ -52,21 +96,20 @@ public class DataSourcesParser {
                 int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
-                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name), json.getString("description"), sourceId, start, end);
-                DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
-                parentNode.add(treeNode);
+                SourceItem item = new SourceItem(server, mergeNames(str, name), json.getString("description"), sourceId, start, end);
+                siblings.add(new Node(item, List.of()));
 
-                DataSources.insertDataset(sourceId, server, parentNode.toString(), item.toString());
+                DataSources.insertDataset(sourceId, server, group, item.toString());
                 if (json.optBoolean("default", false))
                     defaultItem = item;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
-                    DataSourcesTree.Item item = new DataSourcesTree.Item(name.replace('_', '-'), json.getString("description"));
-                    DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item);
-                    parentNode.add(treeNode);
-                    parse(treeNode, json.getJSONObject("children"), "");
+                    Item item = new Item(name.replace('_', '-'), json.getString("description"));
+                    ArrayList<Node> children = new ArrayList<>();
+                    siblings.add(new Node(item, children));
+                    parse(children, item.name, json.getJSONObject("children"), "");
                 } else
-                    parse(parentNode, json.getJSONObject("children"), mergeNames(str, name));
+                    parse(siblings, group, json.getJSONObject("children"), mergeNames(str, name));
             }
         }
     }

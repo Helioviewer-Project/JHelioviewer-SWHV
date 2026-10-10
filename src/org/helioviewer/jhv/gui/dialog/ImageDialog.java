@@ -20,10 +20,10 @@ import javax.swing.tree.TreeSelectionModel;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.component.DataSourcesTree;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
-import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -35,7 +35,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     public interface Handler {
         void setDefaultTimeRange(long start, long end);
 
-        void loadDatasets(List<DataSourcesTree.SourceItem> items);
+        void loadDatasets(List<DataSourcesParser.SourceItem> items);
     }
 
     private final Handler handler;
@@ -57,7 +57,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         sourcesTree.addTreeSelectionListener(e -> selectionChanged());
         selectionChanged();
         availabilityButton.addActionListener(e -> {
-            List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
+            List<DataSourcesParser.SourceItem> items = sourcesTree.getSelectedItems();
             String url = items.size() == 1 ? getAvailabilityURL(items.getFirst()) : null;
             if (url != null)
                 DesktopIntegration.openURL(url);
@@ -127,8 +127,8 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     }
 
     private void selectionChanged() {
-        List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
-        DataSourcesTree.SourceItem item = items.size() == 1 ? items.getFirst() : null;
+        List<DataSourcesParser.SourceItem> items = sourcesTree.getSelectedItems();
+        DataSourcesParser.SourceItem item = items.size() == 1 ? items.getFirst() : null;
         load.setEnabled(!items.isEmpty());
         availabilityButton.setEnabled(getAvailabilityURL(item) != null);
         String text = item != null ? "Extent: " + TimeUtils.formatShort(item.start) + " - " + TimeUtils.formatShort(item.end)
@@ -137,7 +137,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     }
 
     @Nullable
-    private static String getAvailabilityURL(@Nullable DataSourcesTree.SourceItem item) {
+    private static String getAvailabilityURL(@Nullable DataSourcesParser.SourceItem item) {
         if (item == null) return null;
 
         DataSources.Server server = DataSources.getServer(item.server);
@@ -147,13 +147,13 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
 
     @Override
     public void setupSources(DataSourcesParser parser) {
-        DataSourcesTree.SourceItem item = sourcesTree.setParsedData(parser);
+        DataSourcesParser.SourceItem item = sourcesTree.setParsedData(parser);
         if (item != null)
             handler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
     }
 
     private void loadSelectedDatasets() {
-        List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
+        List<DataSourcesParser.SourceItem> items = sourcesTree.getSelectedItems();
         if (items.isEmpty())
             return;
         setVisible(false);

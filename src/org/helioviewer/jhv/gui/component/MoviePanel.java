@@ -25,7 +25,7 @@ import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.DataSourcesTree;
+import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -228,10 +228,10 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
     }
 
     @Override
-    public void loadDatasets(List<DataSourcesTree.SourceItem> items) {
+    public void loadDatasets(List<DataSourcesParser.SourceItem> items) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
-        for (DataSourcesTree.SourceItem item : items) {
+        for (DataSourcesParser.SourceItem item : items) {
             ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
             imageLayer.load(settings.request(item.server, item.sourceId));
         }
