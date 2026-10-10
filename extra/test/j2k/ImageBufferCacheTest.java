@@ -98,13 +98,13 @@ public final class ImageBufferCacheTest {
                 worker.submit("failure", executions::incrementAndGet, decodeCallback(delivered, "retry"));
                 awaitDecode(delivered, "retry:true");
 
+                // A cache hit invalidates delivery, but returning to the same key reuses its decode.
                 EventQueue.invokeAndWait(() -> {
                     worker.submit("invalidated", executions::incrementAndGet, decodeCallback(delivered, "invalidated"));
                     finishTasks(executor);
                     worker.invalidate();
                     worker.submit("invalidated", executions::incrementAndGet, decodeCallback(delivered, "after invalidation"));
                 });
-                awaitDecode(delivered, "invalidated:false");
                 awaitDecode(delivered, "after invalidation:true");
 
                 EventQueue.invokeAndWait(() -> {
@@ -121,7 +121,7 @@ public final class ImageBufferCacheTest {
                     throw new AssertionError("Disposed worker accepted a decode");
                 } catch (RejectedExecutionException expected) {
                 }
-                if (executions.get() != 10 || !delivered.isEmpty())
+                if (executions.get() != 9 || !delivered.isEmpty())
                     throw new AssertionError("Unexpected decode or callback count");
             } finally {
                 release.countDown();

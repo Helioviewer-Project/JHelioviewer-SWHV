@@ -144,7 +144,6 @@ public final class LatestWorker<T> {
     public synchronized void invalidate() {
         generation++;
         pending = null;
-        outstanding.clear();
     }
 
     // Permanently disables this worker, interrupts its task, and shuts down an owned executor.
