@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -23,6 +24,7 @@ import org.lwjgl.system.MemoryUtil;
 public final class J2KSource implements Source {
 
     private static final int NO_LEVEL = 10000;
+    private static final Pattern BARE_AMPERSAND = Pattern.compile("&(?!(?:amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)");
 
     private final J2KNative client;
     // An entry exists once the frame's header is known.
@@ -146,7 +148,7 @@ public final class J2KSource implements Source {
     @Override
     public String xml(int frame) throws IOException {
         String xml = client.xml(frame);
-        return xml == null ? null : xml.trim().replace("&", "&amp;");
+        return xml == null ? null : BARE_AMPERSAND.matcher(xml.trim()).replaceAll("&amp;");
     }
 
     @Nullable
