@@ -42,11 +42,9 @@ public final class ImageBuffer {
         return fromFloats(width, height, filter.apply(ByteBuffer.wrap(data), width, height));
     }
 
-    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
-        if (format != Format.Gray16F)
-            throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        if (keepsOriginalPixels(format, filter))
-            return new ImageBuffer(width, height, format, allocateFrom(data));
+    public static ImageBuffer fromShorts(int width, int height, short[] data, ImageFilter filter) {
+        if (filter.isNone())
+            return new ImageBuffer(width, height, Format.Gray16F, allocateFrom(data));
         return fromFloats(width, height, filter.apply(ShortBuffer.wrap(data), width, height));
     }
 

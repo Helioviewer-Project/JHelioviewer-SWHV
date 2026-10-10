@@ -2,8 +2,6 @@ package org.helioviewer.jhv.image.nio;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 public class NativeImageFactory {
 
@@ -20,34 +18,23 @@ public class NativeImageFactory {
         }
     }
 
-    public static BufferedImage createCompatible(int width, int height, int type) {
-        return CompatibleImageUtils.createCompatibleImage(
-                width, height, type,
+    private static BufferedImage createCompatible(int width, int height, int type) {
+        return CompatibleImageUtils.createCompatibleImage(width, height, type,
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static BufferedImage createRGBAPremultipliedImage(int width, int height) {
-        return CompatibleImageUtils.createRGBAPremultipliedImage(
-                width, height,
+        return CompatibleImageUtils.createRGBAPremultipliedImage(width, height,
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static BufferedImage createRGBImage(int width, int height) {
-        return CompatibleImageUtils.createRGBImage(
-                width, height,
+        return CompatibleImageUtils.createRGBImage(width, height,
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
         return AbstractOwnedDataBuffer.getByteBuffer(bi, BACKEND_KIND);
-    }
-
-    public static ShortBuffer getShortBuffer(BufferedImage bi) {
-        return AbstractOwnedDataBuffer.getShortBuffer(bi, BACKEND_KIND);
-    }
-
-    public static IntBuffer getIntBuffer(BufferedImage bi) {
-        return AbstractOwnedDataBuffer.getIntBuffer(bi, BACKEND_KIND);
     }
 
     public static void free(BufferedImage bi) {

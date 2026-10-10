@@ -128,12 +128,10 @@ public final class RasterSource implements Source {
 
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
-                return ImageBuffer.fromBytes(w, h, ImageBuffer.Format.Gray8,
-                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filter);
+                return ImageBuffer.fromBytes(w, h, ImageBuffer.Format.Gray8, ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filter);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
-                return ImageBuffer.fromShorts(w, h, ImageBuffer.Format.Gray16F,
-                        toHalfFloatInPlace(((DataBufferUShort) image.getRaster().getDataBuffer()).getData()), filter);
+                return ImageBuffer.fromShorts(w, h, toHalfFloatInPlace(((DataBufferUShort) image.getRaster().getDataBuffer()).getData()), filter);
             }
             default -> {
                 BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);

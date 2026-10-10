@@ -78,10 +78,9 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
 
     static DataBuffer createOrThrow(int type, int size, int numBanks, BackendKind backendKind, BackingFactory backingFactory) throws IOException {
         return switch (type) {
-            case DataBuffer.TYPE_BYTE -> new OwnedByteDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_BYTE, size, numBanks), backendKind);
-            case DataBuffer.TYPE_USHORT ->
-                    new OwnedUShortDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_USHORT, size, numBanks), backendKind);
-            case DataBuffer.TYPE_INT -> new OwnedIntDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_INT, size, numBanks), backendKind);
+            case DataBuffer.TYPE_BYTE -> new ByteDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_BYTE, size, numBanks), backendKind);
+            case DataBuffer.TYPE_USHORT -> new UShortDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_USHORT, size, numBanks), backendKind);
+            case DataBuffer.TYPE_INT -> new IntDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_INT, size, numBanks), backendKind);
             default -> throw new IllegalArgumentException("Unsupported data type: " + type);
         };
     }
@@ -96,26 +95,6 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         return getByteBuffer(image.getRaster().getDataBuffer(), backendKind);
     }
 
-    static ShortBuffer getShortBuffer(DataBuffer buffer, BackendKind backendKind) {
-        if (buffer instanceof UShortDataBuffer shortDataBuffer && shortDataBuffer.isKind(backendKind))
-            return (ShortBuffer) shortDataBuffer.getBuffer();
-        throw new IncompatibleClassChangeError("Not a " + backendKind + " short backed image");
-    }
-
-    static ShortBuffer getShortBuffer(BufferedImage image, BackendKind backendKind) {
-        return getShortBuffer(image.getRaster().getDataBuffer(), backendKind);
-    }
-
-    static IntBuffer getIntBuffer(DataBuffer buffer, BackendKind backendKind) {
-        if (buffer instanceof IntDataBuffer intDataBuffer && intDataBuffer.isKind(backendKind))
-            return (IntBuffer) intDataBuffer.getBuffer();
-        throw new IncompatibleClassChangeError("Not a " + backendKind + " int backed image");
-    }
-
-    static IntBuffer getIntBuffer(BufferedImage image, BackendKind backendKind) {
-        return getIntBuffer(image.getRaster().getDataBuffer(), backendKind);
-    }
-
     static void free(DataBuffer buffer, BackendKind backendKind) {
         if (buffer instanceof AbstractOwnedDataBuffer ownedDataBuffer && ownedDataBuffer.isKind(backendKind))
             ownedDataBuffer.free();
@@ -127,7 +106,7 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         free(image.getRaster().getDataBuffer(), backendKind);
     }
 
-    private abstract static class ByteDataBuffer extends AbstractOwnedDataBuffer {
+    private static final class ByteDataBuffer extends AbstractOwnedDataBuffer {
         private ByteDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
             super(DataBuffer.TYPE_BYTE, size, numBanks, backing, backendKind);
         }
@@ -143,7 +122,7 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         }
     }
 
-    private abstract static class UShortDataBuffer extends AbstractOwnedDataBuffer {
+    private static final class UShortDataBuffer extends AbstractOwnedDataBuffer {
         private UShortDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
             super(DataBuffer.TYPE_USHORT, size, numBanks, backing, backendKind);
         }
@@ -159,7 +138,7 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         }
     }
 
-    private abstract static class IntDataBuffer extends AbstractOwnedDataBuffer {
+    private static final class IntDataBuffer extends AbstractOwnedDataBuffer {
         private IntDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
             super(DataBuffer.TYPE_INT, size, numBanks, backing, backendKind);
         }
@@ -172,24 +151,6 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         @Override
         public final void setElem(int bank, int i, int val) {
             intBuffer().put(bank * size + i, val);
-        }
-    }
-
-    private static final class OwnedByteDataBuffer extends ByteDataBuffer {
-        private OwnedByteDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(size, numBanks, backing, backendKind);
-        }
-    }
-
-    private static final class OwnedUShortDataBuffer extends UShortDataBuffer {
-        private OwnedUShortDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(size, numBanks, backing, backendKind);
-        }
-    }
-
-    private static final class OwnedIntDataBuffer extends IntDataBuffer {
-        private OwnedIntDataBuffer(int size, int numBanks, BufferBacking backing, BackendKind backendKind) {
-            super(size, numBanks, backing, backendKind);
         }
     }
 

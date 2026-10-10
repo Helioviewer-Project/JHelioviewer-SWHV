@@ -388,10 +388,6 @@ public final class GL {
         GLES30.glTexImage2D(target, level, internalFormat, width, height, border, inputFormat, inputType, buffer);
     }
 
-    public static void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int inputFormat, int inputType, ShortBuffer buffer) {
-        GLES30.glTexImage2D(target, level, internalFormat, width, height, border, inputFormat, inputType, buffer);
-    }
-
     public static void glTexParameteri(int target, int pname, int value) {
         GLES30.glTexParameteri(target, pname, value);
     }
