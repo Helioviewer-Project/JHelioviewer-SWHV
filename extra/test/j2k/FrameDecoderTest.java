@@ -271,12 +271,21 @@ public final class FrameDecoderTest {
                 ResolutionSet.Level size = opened.source.level(frame, 4);
                 show(opened, frame, 4, false);
                 ImageData image = images.poll(60, TimeUnit.SECONDS);
-                if (image == null || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
-                    throw new AssertionError("Complete frame " + frame + " was not delivered at its level");
-                MessageDigest hash = MessageDigest.getInstance("SHA-256");
-                hash.update(((ByteBuffer) image.imageBuffer().buffer).duplicate());
-                hashes[frame] = HexFormat.of().formatHex(hash.digest());
-                EventQueue.invokeAndWait(image.image()::release);
+                if (image == null)
+                    throw new AssertionError("Complete frame " + frame + " was not delivered");
+                try {
+                    if (image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
+                        throw new AssertionError("Complete frame " + frame + " was not delivered at its level");
+                    byte[] expected = opened.source.decodeRegion(frame, size.level(), 0, 0, size.width(), size.height());
+                    ByteBuffer pixels = ((ByteBuffer) image.imageBuffer().buffer).duplicate();
+                    if (!pixels.equals(ByteBuffer.wrap(expected)))
+                        throw new AssertionError("Delivered pixels do not belong to source frame " + frame);
+                    MessageDigest hash = MessageDigest.getInstance("SHA-256");
+                    hash.update(pixels);
+                    hashes[frame] = HexFormat.of().formatHex(hash.digest());
+                } finally {
+                    EventQueue.invokeAndWait(image.image()::release);
+                }
             }
             return hashes;
         } finally {

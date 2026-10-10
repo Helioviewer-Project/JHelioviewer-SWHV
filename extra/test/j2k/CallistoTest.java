@@ -160,7 +160,7 @@ public final class CallistoTest {
         } finally {
             EventQueue.invokeAndWait(owner::remove);
         }
-        if (!days.isEmpty() || owner.getDecoded(data[1], whole) != null)
+        if (!days.isEmpty() || owner.getDecoded(data[6], newer) != null)
             throw new AssertionError("Radio removal retained days or crops");
         System.out.println("PASS: padded first crop, offscreen days, shared radio LRU, day isolation, late-result refusal and scalar/LUT retention after eviction, and fine/coarse time/frequency drawing");
         requestedDays(date);

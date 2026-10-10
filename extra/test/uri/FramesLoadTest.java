@@ -3,17 +3,22 @@ package org.helioviewer.jhv.layers;
 import java.awt.EventQueue;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.CRC32;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.source.ResolutionSet;
+
+import org.lwjgl.system.MemoryUtil;
 
 // Multi-file, duplicate, zip and failure loads through the layer loader, headless, on local FITS fixtures.
 // Arguments: three FITS files with distinct times, a zip of two of them, a file that is not an image.
@@ -40,7 +45,7 @@ public final class FramesLoadTest {
                 if (frames.time(i).milli <= frames.time(i - 1).milli)
                     throw new AssertionError("Frames not sorted by time");
             }
-            decodeFirst(frames);
+            decodeAll(frames);
         } finally {
             EventQueue.invokeAndWait(frames::close);
         }
@@ -97,24 +102,36 @@ public final class FramesLoadTest {
         System.exit(0);
     }
 
-    private static void decodeFirst(Frames frames) throws Exception {
+    private static void decodeAll(Frames frames) throws Exception {
         FrameDecoder decoder = new FrameDecoder(new ImageProcessingSettings(() -> {}), image -> {
             image.image().retain();
             images.add(image);
         });
         try {
-            Frames.Frame first = frames.get(0);
-            ResolutionSet.Level size = first.source().levels(0).getLevel(0);
-            double scale = size.height() / first.metaData().getPhysicalRegion().height;
-            EventQueue.invokeAndWait(() -> {
-                decoder.reset(frames.serial());
-                frames.select(frames.first());
-                decoder.decode(frames, first.metaData().getViewpoint(), scale, true);
-            });
-            ImageData image = images.poll(60, TimeUnit.SECONDS);
-            if (image == null || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
-                throw new AssertionError("First frame was not decoded at its size");
-            EventQueue.invokeAndWait(image.image()::release);
+            EventQueue.invokeAndWait(() -> decoder.reset(frames.serial()));
+            Set<Long> checksums = new HashSet<>();
+            for (int i = 0; i < frames.size(); i++) {
+                Frames.Frame frame = frames.get(i);
+                ResolutionSet.Level size = frame.source().levels(frame.index()).getLevel(0);
+                double scale = size.height() / frame.metaData().getPhysicalRegion().height;
+                EventQueue.invokeAndWait(() -> {
+                    frames.select(frame.time());
+                    decoder.decode(frames, frame.metaData().getViewpoint(), scale, true);
+                });
+                ImageData image = images.poll(60, TimeUnit.SECONDS);
+                if (image == null)
+                    throw new AssertionError("Frame " + i + " was not delivered");
+                try {
+                    if (image.frame() != frame || image.imageBuffer().width != size.width() || image.imageBuffer().height != size.height())
+                        throw new AssertionError("Frame " + i + " was not decoded at its size");
+                    CRC32 checksum = new CRC32();
+                    checksum.update(MemoryUtil.memByteBuffer(MemoryUtil.memAddress(image.imageBuffer().buffer), image.imageBuffer().byteSize()));
+                    if (!checksums.add(checksum.getValue()))
+                        throw new AssertionError("Distinct FITS fixtures delivered identical pixels for frame " + i);
+                } finally {
+                    EventQueue.invokeAndWait(image.image()::release);
+                }
+            }
         } finally {
             EventQueue.invokeAndWait(decoder::dispose);
         }

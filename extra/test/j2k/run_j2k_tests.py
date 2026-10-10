@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     if platform.system() == "Windows" and not temporary.isascii():
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
-    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "ImageRequestSettingsTest.java"]
+    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "ImageRequestSettingsTest.java", "../uri/FramesLoadTest.java", "../uri/LayerLoadTest.java"]
     if args.live:
         sources.extend(["J2KFixture.java", "FrameDecoderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
@@ -48,6 +48,23 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     subprocess.run([*java, "org.helioviewer.jhv.io.ImageRequestSettingsTest"], check=True, timeout=60)
     print("Running FramesTest", flush=True)
     subprocess.run([*java, "-Dorg.lwjgl.util.DebugAllocator=true", "org.helioviewer.jhv.layers.FramesTest"], check=True, timeout=60)
+    fits = work / "fits"
+    fits.mkdir()
+    inputs = []
+    for name in ["psp_L3_wispr_20231227T150508_V1_1211.fits", "psp_L3_wispr_20231227T150704_V1_2222.fits", "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"]:
+        path = fits / name
+        path.write_bytes((root / "extra/test/data" / name).read_bytes())
+        inputs.append(str(path))
+    bogus = fits / "not-an-image.txt"
+    bogus.write_text("Not an image\n")
+    archive = work / "two.zip"
+    with zipfile.ZipFile(archive, "w") as zip_file:
+        for path in inputs[:2]:
+            zip_file.write(path, Path(path).name)
+    print("Running FramesLoadTest", flush=True)
+    subprocess.run([*java, "org.helioviewer.jhv.layers.FramesLoadTest", *inputs, str(archive), str(bogus)], check=True, timeout=60)
+    print("Running LayerLoadTest", flush=True)
+    subprocess.run([*java, "org.helioviewer.jhv.layers.LayerLoadTest", inputs[0], str(bogus)], check=True, timeout=60)
     print("Running J2KReaderTest without native libraries", flush=True)
     subprocess.run([*java, "org.helioviewer.jhv.source.J2KReaderTest"], check=True, timeout=60)
     if platform.system() != "Windows":

@@ -97,18 +97,18 @@ Without this variable, the runners use the bundled library as before.
 ## Timeline load check
 
 `FramesLoadTest` runs the image layer loader headless on local FITS fixtures: three files sorted
-into one timeline and the first frame decoded, a repeated file dropped with one warning, a zip
+into one timeline and every frame decoded with distinct pixels, a repeated file dropped with one warning, a zip
 expanded alongside a file, an unreadable file skipped with a warning in a multi-file load and
-failing a single-file load, and a single file keeping its base name. Compile it against
-`bin:resources` plus `lib/*.jar` and run it with a temporary `user.home`:
+failing a single-file load, and a single file keeping its base name. Both loader tests run
+in the default JPEG 2000 test suite, using committed FITS inputs copied to a temporary
+directory and a ZIP created there. From the repository root:
 
 ```sh
-java -Djava.awt.headless=true -Duser.home=/tmp/jhv-frames --enable-native-access=ALL-UNNAMED \
-  -cp "<test classes>:bin:resources:lib/*" org.helioviewer.jhv.layers.FramesLoadTest \
-  a.fits b.fits c.fits two.zip not-an-image
+ant compile
+python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 `LayerLoadTest` checks the layer's load-finished future through the real registry, headless:
 a successful FITS load completes true and a finished layer answers at once, a failed first load
 removes the layer and completes false, and removing a layer with a pending wait completes it
-false. Run it like `FramesLoadTest`, with a FITS file and a file that is not an image.
+false. It also checks empty and directory inputs and interrupted directory enumeration.

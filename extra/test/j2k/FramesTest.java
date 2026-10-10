@@ -62,7 +62,8 @@ public final class FramesTest {
         AppInit.loadSpice(); // synthetic frames carry an Earth viewpoint
         selection();
         synthesis();
-        delivery();
+        delivery(false);
+        delivery(true);
         arrivals();
         System.out.println("PASS: nearest selectable frame by time, equal synthetic endpoints give one frame");
     }
@@ -114,7 +115,7 @@ public final class FramesTest {
         span.close();
     }
 
-    private static void delivery() throws Exception {
+    private static void delivery(boolean dispose) throws Exception {
         ResolutionSet levels = completeLevels();
         CountDownLatch started = new CountDownLatch(1), finish = new CountDownLatch(1), delivered = new CountDownLatch(1);
         AtomicReference<ImageBuffer> pixels = new AtomicReference<>();
@@ -126,8 +127,15 @@ public final class FramesTest {
                 pixels.set(image);
                 if (decodes.incrementAndGet() == 1) {
                     started.countDown();
-                    if (!finish.await(5, TimeUnit.SECONDS))
-                        throw new AssertionError("Test did not release the blocked decode");
+                    // A native decode may return pixels even after disposal interrupts its worker.
+                    for (;;) {
+                        try {
+                            if (!finish.await(5, TimeUnit.SECONDS))
+                                throw new AssertionError("Test did not release the blocked decode");
+                            break;
+                        } catch (InterruptedException ignore) {
+                        }
+                    }
                 }
                 return image;
             }
@@ -151,12 +159,23 @@ public final class FramesTest {
             if (!started.await(5, TimeUnit.SECONDS) || !allocated(pixels.get()))
                 throw new AssertionError("Decode did not allocate its pixels; enable native allocator tracking");
             ImageBuffer stale = pixels.get();
-            EventQueue.invokeAndWait(() -> decoder.reset(-1));
+            EventQueue.invokeAndWait(() -> {
+                if (dispose)
+                    decoder.dispose();
+                else
+                    decoder.reset(-1);
+            });
             finish.countDown();
             awaitReleased(stale);
             EventQueue.invokeAndWait(() -> {
                 if (deliveries[0] != 0)
-                    throw new AssertionError("Replaced timeline delivered its running decode");
+                    throw new AssertionError("Cancelled decoder delivered its running decode");
+            });
+            if (dispose) {
+                System.out.println("PASS: disposal during decode releases the returned pixels without delivery");
+                return;
+            }
+            EventQueue.invokeAndWait(() -> {
                 decoder.reset(frames.serial());
                 decoder.decode(frames, metadata.getViewpoint(), Double.POSITIVE_INFINITY, false);
             });

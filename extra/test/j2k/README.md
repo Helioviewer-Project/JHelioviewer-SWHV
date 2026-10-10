@@ -9,9 +9,10 @@ python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 The default suite uses loopback servers and needs no external network or JPEG 2000
-native library. It also runs two timeline checks that need no network: `FramesTest`
-for frame selection, synthesis and decoder delivery, and `ImageRequestSettingsTest` for the request interval
-and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
+native library. It also checks frame selection, synthesis and decoder delivery (`FramesTest`),
+request intervals and sampling (`ImageRequestSettingsTest`), and local FITS loading
+(`FramesLoadTest` and `LayerLoadTest`). The runner copies committed FITS inputs and creates
+a ZIP in its temporary directory. Image-memory checks use the bundled LWJGL native allocator:
 
 - Decode scheduling: repeated keys reuse running work or a result awaiting its EDT callback,
   with the latest delivery context. Checks cover A-B-A, failure/retry, invalidation,
@@ -25,7 +26,8 @@ and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
   Native image writers clear every pixel, transfer ownership at finish, and release their input
   immediately if filtering fails.
   `FramesTest` runs the real decoder with an in-memory source: a replaced timeline's running
-  result is freed; queued cache-hit deliveries are skipped after replacement, a filter change
+  result is freed, including when disposal interrupts a decode that still returns pixels;
+  queued cache-hit deliveries are skipped after replacement, a filter change
   or disposal. Closing the timeline frees the cached pixels without GC.
 - HTTP streams: fixed-length and chunked bodies, response boundaries,
   zero-length reads at EOF, premature EOF, draining a chunked body on close, and no second
@@ -53,6 +55,9 @@ and sampling rules. Image-memory checks use the bundled LWJGL native allocator:
 - Retry pause: no pause before the first retry, a pause before each later retry.
   The check calls `J2KReader.pauseBeforeRetry` on an interrupted thread, without timing
   assertions; it tests the helper's decision, not the reader loop.
+- Local loading: all three distinct FITS frames are delivered at their own dimensions with
+  distinct pixels; duplicate timestamps, ZIP expansion, unreadable files, directory loads,
+  readiness futures and cancellation are checked through the real loader and layer registry.
 
 Compilation and each default test process have a 60-second timeout.
 
@@ -100,7 +105,8 @@ download; a finer level of the shown frame must be fetched and delivered by the 
 refresh. With the player in its playing state, the test selects frames explicitly and
 downloads the whole movie at a coarse level twice, once with the connection aborted
 after a third of the frames; the reader must reconnect and the pixels of
-every frame must be equal.
+every delivered frame must match a direct decode of that source frame at the same level,
+and match between the two runs.
 Reader refreshes must use the latest viewpoint and requested resolution after zooming out,
 even when a finer window finishes late. A refresh after the decoder has moved to another
 timeline must deliver nothing.
