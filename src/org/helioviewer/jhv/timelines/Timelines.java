@@ -24,14 +24,12 @@ public final class Timelines {
     private static final TimeListener.Change timeListener = DrawController::timeChanged;
     private static final EventListener.Highlight highlightListener = DrawController::highlightChanged;
     private static final ArrayList<Listener> listeners = new ArrayList<>();
-    private static RadioData radio;
     @Nullable
     private static BandReaderHapi.CatalogData catalog;
 
     public static void install() {
-        if (radio == null)
-            radio = new RadioData(null);
-        TimelineLayers.add(radio);
+        if (TimelineLayers.get().stream().noneMatch(layer -> layer instanceof RadioData))
+            TimelineLayers.add(new RadioData(null));
         Player.addTimeListener(timeListener);
         EventCache.addHighlightListener(highlightListener);
         requestCatalog();
