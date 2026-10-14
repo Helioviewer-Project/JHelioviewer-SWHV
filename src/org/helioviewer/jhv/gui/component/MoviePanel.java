@@ -254,7 +254,6 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         RecordButton(float fontSize) {
             super(Buttons.record);
             setFont(Buttons.getMaterialFont(fontSize));
-            setForeground(Color.decode("#800000"));
             setToolTipText("Record movie");
             addActionListener(Actions.RECORD);
         }
@@ -305,6 +304,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         boolean recording = ExportMovie.isRecording();
         if (recordButton.isSelected() != recording)
             recordButton.setSelected(recording);
+        recordButton.setForeground(recording ? Color.RED : new Color(0x800000));
         ComponentUtils.setEnabled(modePanel, !recording);
         ComponentUtils.setEnabled(recordPanel, !recording);
     }

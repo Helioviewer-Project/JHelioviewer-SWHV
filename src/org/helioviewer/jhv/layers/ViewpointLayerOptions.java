@@ -46,7 +46,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             joEquatorial = jo.optJSONObject("equatorial");
         }
         locationOptions = new ViewpointLayerOptionsExpert(joLocation, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
+        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, SpaceObject.SUN, Frame.SOLO_HEEQ, false);
         locationOptions.setChangeListener(() -> optionStateChanged(CameraMode.Location));
         equatorialOptions.setChangeListener(() -> optionStateChanged(CameraMode.Heliosphere));
 

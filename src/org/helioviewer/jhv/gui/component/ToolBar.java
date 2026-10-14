@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
@@ -24,7 +25,6 @@ import javax.swing.JToolBar;
 import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
@@ -72,6 +72,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
     private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate View 90°", "Rotate view 90°");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
+    private final ButtonText SIDEBAR = new ButtonText(Buttons.sidebar, "Sidebar", "Hide sidebar");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
     private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom-Fit", "Zoom to fit");
     private final ButtonText ZOOMIN = new ButtonText(Buttons.zoomIn, "Zoom In", "Zoom in");
@@ -99,7 +100,10 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         return b;
     }
 
-    public ToolBar() {
+    private final JComponent sidebar;
+
+    public ToolBar(JComponent _sidebar) {
+        sidebar = _sidebar;
         setLayout(new FlowLayout(FlowLayout.LEADING, 1, 3));
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getBackground().brighter()));
         setRollover(true);
@@ -113,6 +117,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     }
 
     private JideToggleButton coronaButton;
+    private JideToggleButton sidebarButton;
     private JideToggleButton diffRotationButton;
     private JideToggleButton multiviewButton;
     private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
@@ -125,9 +130,12 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private void createNewToolBar() {
         annotationItems.clear();
         projectionItems.clear();
-        if (Platform.isMacOS()) {
-            add(Box.createHorizontalStrut(90), 0);
-        }
+        sidebarButton = toolToggleButton(SIDEBAR);
+        sidebarButton.setSelected(sidebar.isVisible());
+        sidebarButton.setToolTipText(sidebar.isVisible() ? "Hide sidebar" : "Show sidebar");
+        sidebarButton.addActionListener(e -> setSidebarVisible(sidebarButton.isSelected()));
+        addButton(sidebarButton);
+        add(Box.createHorizontalStrut(32));
 
         Interaction.Mode interactionMode = InputController.getMode();
         try {
@@ -371,6 +379,20 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
     public boolean isTextVisible() {
         return displayMode == DisplayMode.ICONANDTEXT;
+    }
+
+    public boolean isSidebarVisible() {
+        return sidebar.isVisible();
+    }
+
+    public void setSidebarVisible(boolean visible) {
+        boolean previous = sidebar.isVisible();
+        sidebar.setVisible(visible);
+        sidebarButton.setSelected(visible);
+        sidebarButton.setToolTipText(visible ? "Hide sidebar" : "Show sidebar");
+        sidebar.getParent().revalidate();
+        sidebar.getParent().repaint();
+        firePropertyChange("sidebarVisible", previous, visible);
     }
 
     public void setTextVisible(boolean visible) {

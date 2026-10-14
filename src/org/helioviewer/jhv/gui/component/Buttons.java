@@ -93,6 +93,7 @@ public class Buttons {
     public static final String rotate = toolBar(MaterialDesign.ROTATE_3D);
     public static final String rotate90 = toolBar(MaterialDesign.ROTATE_90);
     public static final String samp = toolBar(MaterialDesign.SHARE_VARIANT);
+    public static final String sidebar = toolBar(MaterialDesign.SIDEBAR);
     public static final String track = toolBar(MaterialDesign.CROSSHAIRS_GPS);
     public static final String zoomFit = toolBar(MaterialDesign.CROP_LANDSCAPE);
     public static final String zoomIn = toolBar(MaterialDesign.MAGNIFY_PLUS);

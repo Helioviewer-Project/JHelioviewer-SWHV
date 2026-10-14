@@ -7,8 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nonnull;
 
-// Periodic task on the UI thread with javax.swing.Timer semantics: at most one
-// tick is queued at a time, and stop() drops a tick that is already queued.
+// Coalesces ticks until the UI-thread callback finishes; stop() cancels queued ticks.
 // Driven from the UI thread; only tick() runs on the scheduler thread.
 public final class UiTimer {
 
@@ -74,7 +73,7 @@ public final class UiTimer {
     private void schedule() {
         if (scheduled != null)
             scheduled.cancel(false);
-        scheduled = scheduler.scheduleAtFixedRate(this::tick, delay, delay, TimeUnit.MILLISECONDS);
+        scheduled = scheduler.scheduleWithFixedDelay(this::tick, delay, delay, TimeUnit.MILLISECONDS);
     }
 
     // Scheduler thread: coalesce into one queued tick.
@@ -87,12 +86,15 @@ public final class UiTimer {
 
     // UI thread: run unless stopped or restarted after the tick was queued.
     private void fire(int gen) {
-        pending.set(false);
-        if (gen != generation || !running)
-            return;
-        if (!repeats)
-            stop();
-        task.run();
+        try {
+            if (gen != generation || !running)
+                return;
+            if (!repeats)
+                stop();
+            task.run();
+        } finally {
+            pending.set(false);
+        }
     }
 
 }

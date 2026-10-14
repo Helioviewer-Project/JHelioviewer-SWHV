@@ -1,10 +1,13 @@
 package org.helioviewer.jhv.gui.component;
 
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Platform;
@@ -77,16 +80,34 @@ public final class MenuBar extends JMenuBar {
 
         viewMenu.addSeparator();
 
-        JCheckBoxMenuItem showToolbar = new JCheckBoxMenuItem("Show Toolbar", toolBar.isVisible());
-        showToolbar.addItemListener(e -> toolBar.setToolbarVisible(showToolbar.getState()));
+        JMenuItem showSidebar = new JMenuItem(toolBar.isSidebarVisible() ? "Hide Sidebar" : "Show Sidebar");
+        if (Platform.isMacOS())
+            showSidebar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, DesktopIntegration.menuShortcutMask | InputEvent.CTRL_DOWN_MASK));
+        showSidebar.addActionListener(e -> toolBar.setSidebarVisible(!toolBar.isSidebarVisible()));
+        toolBar.addPropertyChangeListener("sidebarVisible", e -> showSidebar.setText(toolBar.isSidebarVisible() ? "Hide Sidebar" : "Show Sidebar"));
+        viewMenu.add(showSidebar);
+
+        JMenuItem showToolbar = new JMenuItem(toolBar.isVisible() ? "Hide Toolbar" : "Show Toolbar");
+        showToolbar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+        showToolbar.addActionListener(e -> {
+            toolBar.setToolbarVisible(!toolBar.isVisible());
+            showToolbar.setText(toolBar.isVisible() ? "Hide Toolbar" : "Show Toolbar");
+        });
         viewMenu.add(showToolbar);
 
-        JCheckBoxMenuItem showToolbarText = new JCheckBoxMenuItem("Show Toolbar Text", toolBar.isTextVisible());
-        showToolbarText.addItemListener(e -> toolBar.setTextVisible(showToolbarText.getState()));
+        JMenuItem showToolbarText = new JMenuItem(toolBar.isTextVisible() ? "Hide Toolbar Text" : "Show Toolbar Text");
+        showToolbarText.addActionListener(e -> {
+            toolBar.setTextVisible(!toolBar.isTextVisible());
+            showToolbarText.setText(toolBar.isTextVisible() ? "Hide Toolbar Text" : "Show Toolbar Text");
+        });
         viewMenu.add(showToolbarText);
 
-        JCheckBoxMenuItem showStatusBar = new JCheckBoxMenuItem("Show Status Bar", statusPanel.isVisible());
-        showStatusBar.addItemListener(e -> statusPanel.setStatusBarVisible(showStatusBar.getState()));
+        JMenuItem showStatusBar = new JMenuItem(statusPanel.isVisible() ? "Hide Status Bar" : "Show Status Bar");
+        showStatusBar.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, DesktopIntegration.menuShortcutMask));
+        showStatusBar.addActionListener(e -> {
+            statusPanel.setStatusBarVisible(!statusPanel.isVisible());
+            showStatusBar.setText(statusPanel.isVisible() ? "Hide Status Bar" : "Show Status Bar");
+        });
         viewMenu.add(showStatusBar);
 
         viewMenu.addSeparator();
@@ -124,8 +145,6 @@ public final class MenuBar extends JMenuBar {
         Actions.ShowDialog aboutAction = new Actions.ShowDialog("About JHelioviewer...", new AboutDialog());
         if (Platform.isMacOS()) {
             DesktopIntegration.setAboutHandler(e -> aboutAction.actionPerformed(null));
-        } else {
-            helpMenu.add(aboutAction);
         }
 
         helpMenu.add(new Actions.OpenURLinBrowser("Open User Manual", AppInfo.documentationURL));
@@ -135,13 +154,17 @@ public final class MenuBar extends JMenuBar {
         helpMenu.addSeparator();
         helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()));
         helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", AppInfo.bugURL));
+        if (!Platform.isMacOS()) {
+            helpMenu.addSeparator();
+            helpMenu.add(aboutAction);
+        }
 
         add(helpMenu);
     }
 
     private static String interactionHelp() {
         String shortcut = "⌘ / Ctrl";
-        return "<div style='width:480px'>" + """
+        return """
                 <b>Image canvas</b>
                 Click the canvas to give it keyboard focus.
                 <b>Double-click</b> — reset the view. <b>Right-click</b> — copy the displayed time and cursor coordinates.
@@ -179,11 +202,11 @@ public final class MenuBar extends JMenuBar {
                 Where multiple selection is allowed:
                 <b>%1$s + Up / Down</b> — add the previous / next match to the selection.
                 <b>%1$s + A</b> — select all matches for the current search.
-                """.formatted(shortcut) + "</div>";
+                """.formatted(shortcut);
     }
 
     private static String timelineHelp() {
-        return "<div style='width:500px'>" + """
+        return """
                 <b>Plot and movie time</b>
                 <b>Click an empty part of the plot</b> — seek the movie to that time.
                 <b>Drag the vertical movie-time marker</b> — scrub through movie frames.
@@ -216,7 +239,7 @@ public final class MenuBar extends JMenuBar {
                 <b>Stack layers vertically</b> — give each layer its own plot and value scale; scroll the panel when plots do not fit.
                 Select a layer to show its options. Its visibility icon shows or hides it; its remove icon removes it when allowed.
                 For datasets with level colors, click the color swatch to switch between multicolor and single-color rendering.
-                """ + "</div>";
+                """;
     }
 
 }

@@ -2,13 +2,8 @@ package org.helioviewer.jhv.gui.component;
 
 import javax.swing.JTextPane;
 
-import org.helioviewer.jhv.gui.UIGlobals;
-
 @SuppressWarnings("serial")
 public final class HTMLPane extends JTextPane {
-
-    private static final String pre = String.format("<html><span style='font-size:%dpt'><font face='%s'>", UIGlobals.uiFont.getSize(), UIGlobals.uiFont.getFontName());
-    private static final String post = "</font></span></html>";
 
     public HTMLPane() {
         setContentType("text/html");
@@ -18,7 +13,7 @@ public final class HTMLPane extends JTextPane {
 
     @Override
     public void setText(String text) {
-        super.setText(text == null ? null : pre + text.replace("\n", "<br/>") + post); // may receive null
+        super.setText(text == null ? null : "<html><body>" + text.replace("\n", "<br/>") + "</body></html>"); // may receive null
         setCaretPosition(0);
     }
 

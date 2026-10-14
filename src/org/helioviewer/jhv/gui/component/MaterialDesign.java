@@ -38,6 +38,7 @@ enum MaterialDesign {
     ROTATE_90("mdi-rotate-90", '\uf6a9'),
     SHAPE_POLYGON_PLUS("mdi-shape-polygon-plus", '\uf65e'),
     SHARE_VARIANT("mdi-share-variant", '\uf497'),
+    SIDEBAR("jhv-sidebar", '\ue000'), // JHV outline added to the bundled icon font.
     SKIP_BACKWARD("mdi-skip-backward", '\uf4ab'),
     SKIP_FORWARD("mdi-skip-forward", '\uf4ac'),
     // SLACK("mdi-slack", '\uf4b1'),

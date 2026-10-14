@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -14,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -112,10 +110,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         selectionChanged();
         if (!isVisible()) {
             pack();
-            JPanel layersPanel = MainFrame.getLayersPanel();
-            Point location = new Point(layersPanel.getWidth(), 0);
-            SwingUtilities.convertPointToScreen(location, layersPanel);
-            setLocation(location);
+            setLocation(MainFrame.getRenderComponent().getLocationOnScreen());
             setVisible(true);
         } else {
             toFront();

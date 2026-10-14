@@ -1,0 +1,6 @@
+<!-- Source for the JHV sidebar glyph at U+E000 in materialdesignicons-webfont.ttf. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g transform="translate(0 448) scale(1 -1)">
+    <path d="M32 0H416Q448 0 448 32V320Q448 352 416 352H32Q0 352 0 320V32Q0 0 32 0Z M40 32Q32 32 32 40V312Q32 320 40 320H408Q416 320 416 312V40Q416 32 408 32Z M128 32H160V320H128Z"/>
+  </g>
+</svg>

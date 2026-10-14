@@ -7,15 +7,12 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.app.AppInfo;
@@ -23,8 +20,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.component.Buttons;
-import org.helioviewer.jhv.gui.component.CollapsiblePaneButton;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;
 import org.helioviewer.jhv.gui.component.MoviePanel;
@@ -44,8 +39,6 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
-
-import com.formdev.flatlaf.FlatClientProperties;
 
 public final class MainFrame {
 
@@ -142,11 +135,7 @@ public final class MainFrame {
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        CollapsiblePaneButton sidebarCollapseHandle = createSidebarCollapseHandle(centerPanel);
-        JPanel westPanel = new JPanel(new BorderLayout());
-        westPanel.add(leftPaneHost, BorderLayout.CENTER);
-        westPanel.add(sidebarCollapseHandle, BorderLayout.LINE_END);
-        centerPanel.add(westPanel, BorderLayout.WEST);
+        centerPanel.add(leftPaneHost, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         ViewpointStatusPanel viewpointStatus = new ViewpointStatusPanel();
@@ -159,28 +148,10 @@ public final class MainFrame {
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
         statusPanel.addPlugin(viewpointStatus, StatusPanel.Alignment.RIGHT);
 
-        ToolBar toolBar = new ToolBar();
+        ToolBar toolBar = new ToolBar(leftPaneHost);
 
         menuBar = new MenuBar(toolBar, statusPanel);
         mainFrame.setJMenuBar(menuBar);
-
-        if (Platform.isMacOS()) {
-            JPanel titleBarInset = new JPanel();
-            titleBarInset.putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT_BUTTONS_PLACEHOLDER, "mac vertical");
-            titleBarInset.setVisible(!toolBar.isVisible());
-            toolBar.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentShown(ComponentEvent e) {
-                    titleBarInset.setVisible(false);
-                }
-
-                @Override
-                public void componentHidden(ComponentEvent e) {
-                    titleBarInset.setVisible(true);
-                }
-            });
-            leftPaneHost.add(titleBarInset, BorderLayout.NORTH);
-        }
 
         JPanel toolBarPanel = new JPanel(new BorderLayout());
         toolBarPanel.add(toolBar, BorderLayout.CENTER);
@@ -194,24 +165,6 @@ public final class MainFrame {
         // Prewarm ANGLE off the EDT, then return here via attachAndRender() to attach the real render canvas.
         startAngleWarmup();
         return mainFrame;
-    }
-
-    private static CollapsiblePaneButton createSidebarCollapseHandle(JPanel centerPanel) {
-        CollapsiblePaneButton handle = new CollapsiblePaneButton(SwingConstants.VERTICAL);
-        handle.setSelected(true);
-        handle.setFont(UIGlobals.uiFontSmallBold);
-        handle.setHorizontalAlignment(SwingConstants.CENTER);
-        handle.setText(Buttons.collapseLeft);
-        handle.addActionListener(e -> {
-            boolean collapsed = leftPaneHost.isVisible();
-            leftPaneHost.setVisible(!collapsed);
-            handle.setSelected(true);
-            handle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
-            centerPanel.revalidate();
-            mainFrame.validate();
-            centerPanel.repaint();
-        });
-        return handle;
     }
 
     private static void startAngleWarmup() {
@@ -266,14 +219,6 @@ public final class MainFrame {
             }
         });
 
-        if (Platform.isMacOS()) {
-            frame.getRootPane().putClientProperty("apple.awt.fullWindowContent", true);
-            frame.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
-            frame.getRootPane().putClientProperty("apple.awt.windowTitleVisible", false);
-            frame.getRootPane().putClientProperty(com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING,
-                    com.formdev.flatlaf.FlatClientProperties.MACOS_WINDOW_BUTTONS_SPACING_MEDIUM);
-        }
-
         Dimension maxSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize();
         Dimension minSize = new Dimension(800, 600);
         minSize.width = Math.min(minSize.width, maxSize.width);
@@ -327,7 +272,7 @@ public final class MainFrame {
         leftPane.revalidate();
 
         int scrollbarWidth = leftScrollPane.getVerticalScrollBar().getPreferredSize().width;
-        leftPaneHost.setFixedWidth(contentWidth + scrollbarWidth);
+        leftPaneHost.setFixedWidth(Math.max(contentWidth, leftPane.getPreferredSize().width) + scrollbarWidth);
         leftPaneHost.revalidate();
     }
 
