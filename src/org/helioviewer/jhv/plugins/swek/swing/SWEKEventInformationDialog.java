@@ -3,11 +3,13 @@ package org.helioviewer.jhv.plugins.swek.swing;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,6 +21,7 @@ import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.component.CollapsiblePane;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
@@ -31,10 +34,10 @@ final class SWEKEventInformationDialog extends JDialog {
     private final SWEKSwingUI ui;
     private JPanel allTablePanel;
 
-    private DataCollapsiblePanel standardParameters;
-    private DataCollapsiblePanel allParameters;
-    private DataCollapsiblePanel relatedEventsPanel;
-    private DataCollapsiblePanel otherRelatedEventsPanel;
+    private CollapsiblePane standardParameters;
+    private CollapsiblePane allParameters;
+    private CollapsiblePane relatedEventsPanel;
+    private CollapsiblePane otherRelatedEventsPanel;
 
     private SolarEvent event;
 
@@ -105,10 +108,20 @@ final class SWEKEventInformationDialog extends JDialog {
 
     private void initParameterCollapsiblePanels(boolean standardExpanded, boolean allExpanded) {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
-        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, standardExpanded, this::repack);
+        standardParameters = createCollapsiblePane("Standard Parameters", standardParameterPanel, standardExpanded);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
-        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, allExpanded, this::repack);
+        allParameters = createCollapsiblePane("All Parameters", allEventsPanel, allExpanded);
+    }
+
+    private CollapsiblePane createCollapsiblePane(String title, JComponent managed, boolean startExpanded) {
+        return new CollapsiblePane(title, managed, startExpanded) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                super.actionPerformed(e);
+                repack();
+            }
+        };
     }
 
     private void setCollapsiblePanels() {
@@ -141,14 +154,14 @@ final class SWEKEventInformationDialog extends JDialog {
         }
     }
 
-    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(RelatedEvents related, List<SolarEvent> relations) {
+    private CollapsiblePane createRelatedEventsCollapsiblePane(RelatedEvents related, List<SolarEvent> relations) {
         JPanel eventPanels = new JPanel();
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         relations.forEach(ev -> eventPanels.add(createEventPanel(related, ev)));
-        return new DataCollapsiblePanel("Related Events", new JScrollPane(eventPanels), false, this::repack);
+        return createCollapsiblePane("Related Events", new JScrollPane(eventPanels), false);
     }
 
-    private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(List<SolarEvent> events) {
+    private CollapsiblePane createOtherRelatedEventsCollapsiblePane(List<SolarEvent> events) {
         JPanel eventPanels = new JPanel();
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         Colors.Data colors = new Colors.Data();
@@ -158,7 +171,7 @@ final class SWEKEventInformationDialog extends JDialog {
                 relatedEvents = new RelatedEvents(relatedEvent, colors.getNextColor());
             eventPanels.add(createEventPanel(relatedEvents, relatedEvent));
         }
-        return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, this::repack);
+        return createCollapsiblePane("Other Related Events", new JScrollPane(eventPanels), false);
     }
 
     private JPanel createEventPanel(RelatedEvents related, SolarEvent event) {

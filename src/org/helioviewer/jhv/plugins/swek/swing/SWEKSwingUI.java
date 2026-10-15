@@ -2,6 +2,8 @@ package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,6 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
@@ -41,7 +47,23 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
         treePane = new SWEKTreePane(session, this);
         MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", treePane, true);
         MainFrame.getLeftContentPane().revalidate();
-        LayerOptions.register(SWEKLayer.class, selectedLayer -> new SWEKLayerOptionsPanel((SWEKLayer) selectedLayer));
+        LayerOptions.register(SWEKLayer.class, selectedLayer -> createLayerOptions((SWEKLayer) selectedLayer));
+    }
+
+    private static JPanel createLayerOptions(SWEKLayer layer) {
+        JCheckBox check = new JCheckBox("Icons", layer.isIcons());
+        check.setHorizontalTextPosition(SwingConstants.LEFT);
+        check.addActionListener(e -> layer.setIcons(check.isSelected()));
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.CENTER;
+        c.weightx = 1.;
+        c.weighty = 1.;
+        c.gridy = 0;
+        c.gridx = 0;
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.add(check, c);
+        return panel;
     }
 
     public void close() {
