@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.event;
+package org.helioviewer.jhv.astronomy;
 
 public class GOESLevel {
 

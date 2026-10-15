@@ -16,7 +16,6 @@ import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.event.EventGeometry;
-import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSession;
@@ -41,7 +40,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
 // has to be public for state
-public final class SWEKLayer extends AbstractLayer implements EventListener.Handle, TimeListener.Range {
+public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listener, TimeListener.Range {
     record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
 
     private static final int DIVPOINTS = 10;
@@ -57,7 +56,6 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     private static final float[][] texCoord = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
 
     private final SWEKSession session;
-    private final EventListener.Highlight highlightListener = DisplayController::display;
     private SWEKContext swekContext;
     private boolean icons = true;
 
@@ -430,15 +428,13 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         super.setEnabled(_enabled);
 
         if (enabled) {
-            session.registerHandler(this);
-            session.addHighlightListener(highlightListener);
+            session.addListener(this);
             Player.addTimeRangeListener(this); // calls timeRangeChanged, which requests the events
         } else {
             invalidateActiveEvents();
             session.highlight(null);
             Player.removeTimeRangeListener(this);
-            session.unregisterHandler(this);
-            session.removeHighlightListener(highlightListener);
+            session.removeListener(this);
         }
         SWEKPlugin.layerStateChanged(this);
     }
@@ -463,6 +459,11 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     public void timeRangeChanged(long start, long end) {
         invalidateActiveEvents();
         session.requestForInterval(start, end);
+    }
+
+    @Override
+    public void highlightChanged() {
+        DisplayController.display();
     }
 
     @Override

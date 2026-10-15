@@ -11,7 +11,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
@@ -26,10 +25,9 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.json.JSONObject;
 
 // has to be public for state
-public final class EventTimelineLayer extends TimelineLayer implements EventListener.Handle {
+public final class EventTimelineLayer extends TimelineLayer implements SWEKSession.Listener {
 
     private final SWEKSession session;
-    private final EventListener.Highlight highlightListener = DrawController::highlightChanged;
     private SWEKDialogs dialogs;
     private EventPlotConfiguration eventUnderMouse;
     private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
@@ -65,15 +63,18 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         if (enabled) {
             registerAndRefresh();
         } else {
-            session.unregisterHandler(this);
-            session.removeHighlightListener(highlightListener);
+            session.removeListener(this);
         }
     }
 
     private void registerAndRefresh() {
-        session.registerHandler(this);
-        session.addHighlightListener(highlightListener);
+        session.addListener(this);
         cacheUpdated();
+    }
+
+    @Override
+    public void highlightChanged() {
+        DrawController.highlightChanged();
     }
 
     @Override

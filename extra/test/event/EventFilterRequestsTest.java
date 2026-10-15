@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.event.EventDatabase;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
-import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;

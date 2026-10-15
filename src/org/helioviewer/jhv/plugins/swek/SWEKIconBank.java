@@ -7,13 +7,15 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
-public final class SWEKIconBank {
+import org.helioviewer.jhv.app.Log;
+
+final class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
     private static final ImageIcon blank = new ImageIcon(new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB));
 
     @Nonnull
-    public static ImageIcon getIcon(String iconName) {
+    static ImageIcon getIcon(String iconName) {
         ImageIcon icon = iconBank.get(iconName);
         icon = icon == null ? iconBank.get("Other") : icon;
         return icon == null ? blank : icon;
@@ -26,7 +28,7 @@ public final class SWEKIconBank {
         return new ImageIcon(url);
     }
 
-    static void init() {
+    static {
         try {
             iconBank.put("ActiveRegion", getImageIcon("/images/EventIcons/ar_icon.png"));
             iconBank.put("CoronalDimming", getImageIcon("/images/EventIcons/cd_icon.png"));
@@ -50,7 +52,7 @@ public final class SWEKIconBank {
             iconBank.put("Comesep", getImageIcon("/images/EventIcons/comesep.png"));
             iconBank.put("RHESSI", getImageIcon("/images/EventIcons/rhessi.png"));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 

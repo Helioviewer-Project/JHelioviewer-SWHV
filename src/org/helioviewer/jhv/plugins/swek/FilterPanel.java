@@ -7,7 +7,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.event.GOESLevel;
+import org.helioviewer.jhv.astronomy.GOESLevel;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.gui.component.JHVSpinner;
 
@@ -29,6 +29,7 @@ class FilterPanel extends JPanel {
         filterDialog = _filterDialog;
         spinner = _spinner;
         parameter = _parameter;
+        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());

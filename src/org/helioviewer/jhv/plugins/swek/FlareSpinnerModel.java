@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek;
 
 import javax.swing.AbstractSpinnerModel;
 
-import org.helioviewer.jhv.event.GOESLevel;
+import org.helioviewer.jhv.astronomy.GOESLevel;
 
 @SuppressWarnings("serial")
 class FlareSpinnerModel extends AbstractSpinnerModel {

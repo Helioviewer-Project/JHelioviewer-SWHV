@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.event.GOESLevel;
+import org.helioviewer.jhv.astronomy.GOESLevel;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;

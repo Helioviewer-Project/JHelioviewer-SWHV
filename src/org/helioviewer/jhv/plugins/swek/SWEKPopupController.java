@@ -25,7 +25,7 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLRenderer;
 
-class SWEKPopupController implements InputMouseListener {
+class SWEKPopupController implements InputMouseListener, SWEKSession.Listener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -81,11 +81,23 @@ class SWEKPopupController implements InputMouseListener {
         mouseTracking = shouldTrackMouse;
         if (mouseTracking) {
             InputController.addListener(this);
+            session.addListener(this);
         } else {
             InputController.removeListener(this);
+            session.removeListener(this);
             resetHover();
         }
     }
+
+    @Override
+    public void cacheUpdated() {
+        RelatedEvents hovered = swekContext.mouseOverEvents();
+        if (hovered != null && session.getRelatedEvents(hovered.getClosestTo(swekContext.mouseOverTime()).getUniqueID()) != hovered)
+            resetHover();
+    }
+
+    @Override
+    public void highlightChanged() {}
 
     private static Component component() {
         return MainFrame.getRenderComponent();

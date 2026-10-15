@@ -15,9 +15,9 @@ import java.util.function.LongUnaryOperator;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.GOESLevel;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;

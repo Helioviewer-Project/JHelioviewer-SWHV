@@ -104,13 +104,19 @@ public final class EventCacheTest {
             SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Requests", ""), "requests", "requests", source, "requests", List.of());
             boolean[] expectedActive = {true};
             int[] notifications = new int[1];
-            EventListener.Handle listener = () -> {
-                check(session.isSupplierActive(supplier) == expectedActive[0], "activation updated before cache notification");
-                if (!expectedActive[0])
-                    check(session.getRelatedEvents(301) == null, "deactivation removes observations before notification");
-                notifications[0]++;
+            SWEKSession.Listener listener = new SWEKSession.Listener() {
+                @Override
+                public void cacheUpdated() {
+                    check(session.isSupplierActive(supplier) == expectedActive[0], "activation updated before cache notification");
+                    if (!expectedActive[0])
+                        check(session.getRelatedEvents(301) == null, "deactivation removes observations before notification");
+                    notifications[0]++;
+                }
+
+                @Override
+                public void highlightChanged() {}
             };
-            session.registerHandler(listener);
+            session.addListener(listener);
             try {
                 check(!session.isSupplierActive(supplier), "supplier initially inactive");
                 session.setSupplierActive(supplier, true);
@@ -121,7 +127,7 @@ public final class EventCacheTest {
                 session.setSupplierActive(supplier, false);
                 check(notifications[0] == 3, "activation, publication, and deactivation each notify once");
             } finally {
-                session.unregisterHandler(listener);
+                session.removeListener(listener);
             }
         });
     }
@@ -212,14 +218,20 @@ public final class EventCacheTest {
         RelatedEvents highlighted = session.getRelatedEvents(201);
         session.highlight(highlighted);
         int[] notifications = new int[1];
-        EventListener.Handle listener = () -> {
-            check(!highlighted.isHighlighted(), "split clears detached highlight before cache notification");
-            check(session.getRelatedEvents(201) != session.getRelatedEvents(202), "notification sees finished split");
-            notifications[0]++;
+        SWEKSession.Listener listener = new SWEKSession.Listener() {
+            @Override
+            public void cacheUpdated() {
+                check(!highlighted.isHighlighted(), "split clears detached highlight before cache notification");
+                check(session.getRelatedEvents(201) != session.getRelatedEvents(202), "notification sees finished split");
+                notifications[0]++;
+            }
+
+            @Override
+            public void highlightChanged() {}
         };
-        session.registerHandler(listener);
+        session.addListener(listener);
         session.replaceEvents(new EventBatch(2, List.of(left), List.of()));
-        session.unregisterHandler(listener);
+        session.removeListener(listener);
         check(notifications[0] == 1, "batch publishes one cache notification");
         session.removeSupplier(null);
     }
@@ -254,20 +266,23 @@ public final class EventCacheTest {
         RelatedEvents group = session.getRelatedEvents(100);
         session.highlight(group);
         int[] notifications = new int[2];
-        EventListener.Highlight highlightListener = () -> {
-            check(!group.isHighlighted(), "highlight cleared before notification");
-            check(session.getRelatedEvents(100) == group, "highlight notification precedes group removal");
-            notifications[0]++;
+        SWEKSession.Listener listener = new SWEKSession.Listener() {
+            @Override
+            public void highlightChanged() {
+                check(!group.isHighlighted(), "highlight cleared before notification");
+                check(session.getRelatedEvents(100) == group, "highlight notification precedes group removal");
+                notifications[0]++;
+            }
+
+            @Override
+            public void cacheUpdated() {
+                check(session.getRelatedEvents(100) == null, "cache notification follows group removal");
+                notifications[1]++;
+            }
         };
-        EventListener.Handle cacheListener = () -> {
-            check(session.getRelatedEvents(100) == null, "cache notification follows group removal");
-            notifications[1]++;
-        };
-        session.addHighlightListener(highlightListener);
-        session.registerHandler(cacheListener);
+        session.addListener(listener);
         session.removeSupplier(supplier);
-        session.removeHighlightListener(highlightListener);
-        session.unregisterHandler(cacheListener);
+        session.removeListener(listener);
         check(notifications[0] == 1 && notifications[1] == 1, "one notification of each kind");
 
         RelatedEvents detached = new RelatedEvents(event);
@@ -380,7 +395,7 @@ public final class EventCacheTest {
         AtomicInteger callbacks = new AtomicInteger();
         EventQueue.invokeAndWait(() -> current.setGroupChangedCallback(_ -> callbacks.incrementAndGet()));
         oldHandler.release.countDown();
-        Field poolField = SWEKDownloader.class.getDeclaredField("downloadPool");
+        Field poolField = SWEKSession.class.getDeclaredField("downloadPool");
         poolField.setAccessible(true);
         ThreadPoolExecutor pool = (ThreadPoolExecutor) poolField.get(null);
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
@@ -496,7 +511,13 @@ public final class EventCacheTest {
         IllegalStateException failure = new IllegalStateException("deliberate cache listener failure");
         CountDownLatch reported = new CountDownLatch(1);
         Thread.UncaughtExceptionHandler[] previous = new Thread.UncaughtExceptionHandler[1];
-        EventListener.Handle listener = () -> { throw failure; };
+        SWEKSession.Listener listener = new SWEKSession.Listener() {
+            @Override
+            public void cacheUpdated() { throw failure; }
+
+            @Override
+            public void highlightChanged() {}
+        };
         EventQueue.invokeAndWait(() -> {
             session.setSupplierActive(supplier, true);
             previous[0] = Thread.currentThread().getUncaughtExceptionHandler();
@@ -504,7 +525,7 @@ public final class EventCacheTest {
                 if (error == failure) reported.countDown();
                 else previous[0].uncaughtException(thread, error);
             });
-            session.registerHandler(listener);
+            session.addListener(listener);
         });
         try {
             CountDownLatch idle = request(group, start, end);
@@ -516,7 +537,7 @@ public final class EventCacheTest {
             });
         } finally {
             EventQueue.invokeAndWait(() -> {
-                session.unregisterHandler(listener);
+                session.removeListener(listener);
                 Thread.currentThread().setUncaughtExceptionHandler(previous[0]);
                 session.setSupplierActive(supplier, false);
                 session.setGroupChangedCallback(_ -> {});

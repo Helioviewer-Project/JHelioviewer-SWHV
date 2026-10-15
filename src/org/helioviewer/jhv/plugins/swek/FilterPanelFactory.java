@@ -26,22 +26,19 @@ class FilterPanelFactory {
         return spinnerFormat.toString();
     }
 
-    private static JHVSpinner generateFlareSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+    private static JHVSpinner generateFlareSpinner(SWEK.Parameter parameter) {
         SWEK.ParameterFilter filter = parameter.filter();
-        JHVSpinner spinner = new JHVSpinner(new FlareSpinnerModel(
+        return new JHVSpinner(new FlareSpinnerModel(
                 filter.startValue(), filter.min(), filter.max(), filter.stepSize()));
-        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
-        return spinner;
     }
 
-    private static JHVSpinner generateMinOrMaxSpinner(FilterDialog filterDialog, SWEK.Parameter parameter) {
+    private static JHVSpinner generateMinOrMaxSpinner(SWEK.Parameter parameter) {
         SWEK.ParameterFilter filter = parameter.filter();
         double min = filter.min();
         double max = filter.max();
 
         JHVSpinner spinner = new JHVSpinner(filter.startValue(), min, max, filter.stepSize());
         spinner.setEditor(new JHVSpinner.NumberEditor(spinner, getSpinnerFormat(min, max)));
-        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
         return spinner;
     }
 
@@ -53,15 +50,15 @@ class FilterPanelFactory {
                 String filterType = filter.type().toLowerCase();
                 switch (filterType) {
                     case "doublemaxfilter" ->
-                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
                     case "doubleminfilter" ->
-                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
                     case "doubleminmaxfilter" -> {
-                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
-                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
+                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
                     }
                     case "flarefilter" ->
-                            panels.add(new FilterPanel(p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateFlareSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
                     default -> {}
                 }
             }

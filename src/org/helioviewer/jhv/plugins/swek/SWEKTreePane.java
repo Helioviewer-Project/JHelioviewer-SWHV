@@ -51,7 +51,6 @@ final class SWEKTreePane extends JPanel {
         super(new BorderLayout());
         session = _session;
         dialogs = _dialogs;
-        SWEKIconBank.init();
         treeModel = createTreeModel(session.catalog().getGroups());
 
         tree = new JTree(treeModel);
