@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources;
+package org.helioviewer.jhv.event.sources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.util.Set;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.SolarEvent;
@@ -30,7 +29,7 @@ public class HEKHandler extends SWEKHandler {
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
 
     @Override
-    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         // Missing pagination metadata must not turn a partial response into cached coverage.
         boolean overmax = eventJSON.getBoolean("overmax");
         JSONArray results = eventJSON.getJSONArray("result");
@@ -43,7 +42,7 @@ public class HEKHandler extends SWEKHandler {
                 if (!isSupplierEvent(result, supplier))
                     continue;
 
-                SWEKHandler.RemoteEvent event = parseRemoteEvent(result, supplier);
+                SWEKHandler.RemoteEvent event = parseRemoteEvent(result, supplier, indexedParameters);
                 event2dbList.add(event);
                 acceptedUids.add(event.uid());
             } catch (JSONException | DateTimeException e) {
@@ -53,7 +52,7 @@ public class HEKHandler extends SWEKHandler {
         return new RemotePage(overmax, event2dbList, parseAssociations(eventJSON, acceptedUids));
     }
 
-    private static SWEKHandler.RemoteEvent parseRemoteEvent(JSONObject result, SWEKSupplier supplier) throws IOException {
+    private static SWEKHandler.RemoteEvent parseRemoteEvent(JSONObject result, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws IOException {
         addGoesValue(result);
 
         long start = TimeUtils.parse(result.getString("event_starttime"));
@@ -69,7 +68,7 @@ public class HEKHandler extends SWEKHandler {
             throw new IOException("HEK event has an empty archive ID");
 
         HashMap<String, Number> indexedValues = new HashMap<>();
-        for (Map.Entry<String, SWEK.NumericType> field : SWEKCatalog.indexedParameters(supplier).entrySet()) {
+        for (Map.Entry<String, SWEK.NumericType> field : indexedParameters.entrySet()) {
             String fieldName = field.getKey();
             String lfieldName = fieldName.toLowerCase();
             if (result.isNull(lfieldName))

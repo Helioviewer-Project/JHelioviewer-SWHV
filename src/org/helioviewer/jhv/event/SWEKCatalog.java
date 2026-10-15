@@ -9,40 +9,49 @@ import java.util.TreeMap;
 
 public final class SWEKCatalog {
 
-    private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
-    private static final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
-    private static final HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> indexedParametersBySupplier = new HashMap<>();
-    private static List<SWEK.Relation> relations = List.of();
+    private final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
+    private final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
+    private final HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> indexedParametersBySupplier = new HashMap<>();
+    private final List<SWEK.Relation> relations;
+    private final List<SWEKGroup> groups;
+    private final int configHash;
 
-    private SWEKCatalog() {
+    public SWEKCatalog(int _configHash, List<SWEKSupplier> definitions, List<SWEK.Relation> _relations) {
+        configHash = _configHash;
+        relations = List.copyOf(_relations);
+        List<SWEKGroup> groupOrder = new ArrayList<>();
+        for (SWEKSupplier supplier : definitions) {
+            if (suppliers.putIfAbsent(supplier.id(), supplier) != null)
+                throw new IllegalArgumentException("Duplicate supplier ID: " + supplier.id());
+            if (!suppliersByGroup.containsKey(supplier.group()))
+                groupOrder.add(supplier.group());
+            suppliersByGroup.computeIfAbsent(supplier.group(), _ -> new ArrayList<>()).add(supplier);
+        }
+        groups = List.copyOf(groupOrder);
+        suppliersByGroup.replaceAll((group, values) -> List.copyOf(values));
+        indexRelations();
     }
 
-    public static void add(SWEKSupplier supplier) {
-        if (suppliers.putIfAbsent(supplier.id(), supplier) != null)
-            throw new IllegalArgumentException("Duplicate supplier ID: " + supplier.id());
-        suppliersByGroup.computeIfAbsent(supplier.group(), _ -> new ArrayList<>()).add(supplier);
+    public List<SWEKGroup> getGroups() {
+        return groups;
     }
 
-    public static void clear() {
-        suppliers.clear();
-        suppliersByGroup.clear();
-        indexedParametersBySupplier.clear();
-        relations = List.of();
+    int configHash() {
+        return configHash;
     }
 
-    public static SWEKSupplier getSupplier(String id) {
+    public SWEKSupplier getSupplier(String id) {
         return suppliers.get(id);
     }
 
-    public static List<SWEKSupplier> getSuppliers(SWEKGroup group) {
+    public List<SWEKSupplier> getSuppliers(SWEKGroup group) {
         return suppliersByGroup.getOrDefault(group, List.of());
     }
 
-    public static void setRelations(List<SWEK.Relation> definitions) {
-        HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> fields = new HashMap<>();
+    private void indexRelations() {
         for (SWEKSupplier supplier : suppliers.values())
-            fields.put(supplier, createIndexedParameters(supplier, definitions));
-        for (SWEK.Relation relation : definitions) {
+            indexedParametersBySupplier.put(supplier, createIndexedParameters(supplier, relations));
+        for (SWEK.Relation relation : relations) {
             for (SWEKSupplier from : getSuppliers(relation.group())) {
                 for (SWEKSupplier with : getSuppliers(relation.relatedWith())) {
                     for (SWEK.RelatedOn field : relation.relatedOnList()) {
@@ -52,16 +61,13 @@ public final class SWEKCatalog {
                 }
             }
         }
-        relations = List.copyOf(definitions);
-        indexedParametersBySupplier.clear();
-        indexedParametersBySupplier.putAll(fields);
     }
 
-    public static List<SWEK.Relation> getRelations() {
+    public List<SWEK.Relation> getRelations() {
         return relations;
     }
 
-    public static Map<String, SWEK.NumericType> indexedParameters(SWEKSupplier supplier) {
+    public Map<String, SWEK.NumericType> indexedParameters(SWEKSupplier supplier) {
         return indexedParametersBySupplier.getOrDefault(supplier, Map.of());
     }
 

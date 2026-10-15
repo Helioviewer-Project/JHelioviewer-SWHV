@@ -250,6 +250,10 @@ public final class Layers {
             listeners.add(listener);
     }
 
+    public static void removeListener(Listener listener) {
+        listeners.remove(listener);
+    }
+
     public static void dispose() {
         removeLayers();
         for (Layer layer : layers) {

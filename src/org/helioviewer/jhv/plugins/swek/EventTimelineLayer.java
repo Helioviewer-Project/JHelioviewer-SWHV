@@ -11,12 +11,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
-import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.RelatedEvents;
-import org.helioviewer.jhv.event.SWEKDownloader;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
-import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -30,12 +28,20 @@ import org.json.JSONObject;
 // has to be public for state
 public final class EventTimelineLayer extends TimelineLayer implements EventListener.Handle {
 
+    private final SWEKSession session;
+    private final EventListener.Highlight highlightListener = DrawController::highlightChanged;
+    private SWEKDialogs dialogs;
     private EventPlotConfiguration eventUnderMouse;
     private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
     private List<RelatedEvents> visibleEvents = Collections.emptyList();
 
-    EventTimelineLayer() {
+    EventTimelineLayer(SWEKSession _session) {
+        session = _session;
         registerAndRefresh();
+    }
+
+    void setDialogs(SWEKDialogs _dialogs) {
+        dialogs = _dialogs;
     }
 
     @Nullable
@@ -48,8 +54,8 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        visibleEvents = EventCache.getEvents(selectedAxis.start(), selectedAxis.end());
-        SWEKDownloader.requestForInterval(selectedAxis.start(), selectedAxis.end());
+        visibleEvents = session.getEvents(selectedAxis.start(), selectedAxis.end());
+        session.requestForInterval(selectedAxis.start(), selectedAxis.end());
     }
 
     @Override
@@ -59,12 +65,14 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         if (enabled) {
             registerAndRefresh();
         } else {
-            EventCache.unregisterHandler(this);
+            session.unregisterHandler(this);
+            session.removeHighlightListener(highlightListener);
         }
     }
 
     private void registerAndRefresh() {
-        EventCache.registerHandler(this);
+        session.registerHandler(this);
+        session.addHighlightListener(highlightListener);
         cacheUpdated();
     }
 
@@ -85,7 +93,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         List<RelatedEvents> events = visibleEvents;
         if (events.isEmpty()) {
             if (mousePosition != null) {
-                EventCache.highlight(null);
+                session.highlight(null);
             }
             return;
         }
@@ -124,16 +132,20 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         if (mousePosition != null) {
             if (eventUnderMouse != null) {
                 drawEvent(graphArea, eventUnderMouse, g, mousePosition);
-                EventCache.highlight(eventUnderMouse.event);
+                session.highlight(eventUnderMouse.event);
             } else {
-                EventCache.highlight(null);
+                session.highlight(null);
             }
         }
     }
 
     @Override
     public void remove() {
-        EventCache.unregisterHandler(this);
+        setEnabled(false);
+        visibleEvents = List.of();
+        eventPlots.clear();
+        eventUnderMouse = null;
+        dialogs = null;
     }
 
     @Override
@@ -248,7 +260,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
 
         boolean changed = current != eventUnderMouse;
         eventUnderMouse = current;
-        EventCache.highlight(current == null ? null : current.event);
+        session.highlight(current == null ? null : current.event);
         // Event details depend on the time beneath the pointer.
         return changed || current != null;
     }
@@ -256,12 +268,13 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
-        if (eventUnderMouse == null)
+        if (eventUnderMouse == null || dialogs == null)
             return null;
 
         RelatedEvents event = eventUnderMouse.event;
         return (location, timestamp) -> {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(timestamp));
+            SWEKEventInformationDialog dialog = dialogs.createInformation(event, event.getClosestTo(timestamp));
+            if (dialog == null) return;
             dialog.pack();
             dialog.setLocation(location);
             dialog.setVisible(true);

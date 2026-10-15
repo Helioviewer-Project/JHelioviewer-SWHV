@@ -19,12 +19,12 @@ public abstract class SWEKHandler {
 
     public record RemotePage(boolean overmax, List<RemoteEvent> events, List<SolarEvent.LinkRef> associations) {}
 
-    RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page) throws Exception {
+    RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, page));
-        return parseRemotePage(eventJSON, supplier);
+        return parseRemotePage(eventJSON, supplier, indexedParameters);
     }
 
-    protected abstract RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
+    protected abstract RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception;
 
     protected abstract URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception;
 

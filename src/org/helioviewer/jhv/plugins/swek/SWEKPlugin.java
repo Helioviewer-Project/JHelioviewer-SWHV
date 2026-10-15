@@ -1,15 +1,14 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.event.SWEKCatalog;
-import org.helioviewer.jhv.event.SWEKDownloader;
-import org.helioviewer.jhv.event.SWEKGroup;
-import org.helioviewer.jhv.event.filter.FilterManager;
+import org.helioviewer.jhv.event.SWEKConfig;
+import org.helioviewer.jhv.event.SWEKSession;
+import org.helioviewer.jhv.event.sources.HEKHandler;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
@@ -17,12 +16,13 @@ import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
 
-public class SWEKPlugin extends Plugin {
+public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     private static SWEKPlugin instance;
-    private static SWEKLayer layer;
+    private SWEKLayer layer;
     private EventTimelineLayer etl;
-    private List<SWEKGroup> groups = List.of();
+    private SWEKSession session;
+    private SWEKDialogs dialogs;
     private SWEKTreePane swekPanel;
     private SWEKPopupController popupController;
 
@@ -33,34 +33,35 @@ public class SWEKPlugin extends Plugin {
 
     @Override
     public void install() {
-        groups = SWEKConfig.load();
-        layer = new SWEKLayer(null);
+        session = new SWEKSession(SWEKConfig.load(Map.of("HEK", new HEKHandler())));
+        layer = new SWEKLayer(session);
         layer.setEnabled(true);
         Layers.add(layer);
-        SWEKDownloader.installFilterListener();
-        etl = new EventTimelineLayer();
+        Layers.addListener(this);
+        etl = new EventTimelineLayer(session);
         TimelineLayers.add(etl);
     }
 
     @Override
     public void uninstall() {
+        Layers.removeListener(this);
         TimelineLayers.remove(etl);
         etl = null;
-        SWEKDownloader.removeFilterListener();
-        layer.setEnabled(false);
-        Layers.remove(layer);
+        if (layer != null) {
+            layer.detach();
+            Layers.remove(layer);
+        }
         layer = null;
-        SWEKDownloader.clear();
-        FilterManager.clear();
-        SWEKCatalog.clear();
-        EventDatabase.clearStoredIntervals();
-        groups = List.of();
+        session.close();
+        session = null;
     }
 
     @Override
     public void installGUI() {
-        swekPanel = new SWEKTreePane(groups);
-        popupController = new SWEKPopupController();
+        dialogs = new SWEKDialogs(session);
+        etl.setDialogs(dialogs);
+        swekPanel = new SWEKTreePane(session, dialogs);
+        popupController = new SWEKPopupController(session, dialogs);
         bindLayer();
 
         MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
@@ -75,6 +76,9 @@ public class SWEKPlugin extends Plugin {
         popupController.uninstall();
         popupController.setLayer(null);
         LayerOptions.unregister(SWEKLayer.class);
+        etl.setDialogs(null);
+        dialogs.close();
+        dialogs = null;
 
         MainFrame.getLeftContentPane().remove(swekPanel);
         MainFrame.getLeftContentPane().revalidate();
@@ -92,19 +96,45 @@ public class SWEKPlugin extends Plugin {
         // functionality to be restored later
     }
 
-    static void restoreLayer(SWEKLayer _layer) {
-        layer = _layer;
+    static SWEKSession sessionForRestore() {
+        if (instance == null || instance.session == null)
+            throw new IllegalStateException("SWEK plugin is inactive");
+        return instance.session;
+    }
+
+    static void restoreLayer(SWEKLayer restored) {
+        if (instance.layer != null)
+            instance.layer.detach();
+        instance.layer = restored;
         instance.bindLayer();
     }
 
-    static void layerStateChanged(SWEKLayer _layer) {
-        if (layer == _layer)
+    static void layerStateChanged(SWEKLayer changed) {
+        if (instance != null && instance.layer == changed)
             instance.bindLayer();
     }
 
     @Nullable
     static EventTimelineLayer getTimelineLayer() {
         return instance == null ? null : instance.etl;
+    }
+
+    @Override
+    public void layerRemoved(int index, Layer removed) {
+        detachMissingLayer();
+    }
+
+    @Override
+    public void layersCleared() {
+        detachMissingLayer();
+    }
+
+    private void detachMissingLayer() {
+        if (layer != null && !Layers.getLayers().contains(layer)) {
+            layer.detach();
+            layer = null;
+            bindLayer();
+        }
     }
 
     private void bindLayer() {

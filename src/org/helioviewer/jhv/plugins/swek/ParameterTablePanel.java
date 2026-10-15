@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.event.info;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;

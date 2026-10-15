@@ -10,11 +10,10 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.RelatedEvents;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
-import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.AwtInputAdapter;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.input.InputController;
@@ -31,6 +30,14 @@ class SWEKPopupController implements InputMouseListener {
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
+
+    private final SWEKSession session;
+    private final SWEKDialogs dialogs;
+
+    SWEKPopupController(SWEKSession _session, SWEKDialogs _dialogs) {
+        session = _session;
+        dialogs = _dialogs;
+    }
 
     private final SWEKContext swekContext = new SWEKContext();
     private SWEKLayer layer;
@@ -124,7 +131,8 @@ class SWEKPopupController implements InputMouseListener {
         RelatedEvents mouseOverEvents = swekContext.mouseOverEvents();
         if (mouseOverEvents != null) {
             Component canvas = component();
-            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverEvents, mouseOverEvents.getClosestTo(swekContext.mouseOverTime()));
+            SWEKEventInformationDialog hekPopUp = dialogs.createInformation(mouseOverEvents, mouseOverEvents.getClosestTo(swekContext.mouseOverTime()));
+            if (hekPopUp == null) return;
             hekPopUp.pack();
             hekPopUp.setLocation(calcWindowPosition(canvas, AwtInputAdapter.toAwtPoint(e), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
@@ -140,7 +148,7 @@ class SWEKPopupController implements InputMouseListener {
 
     void resetHover() {
         swekContext.clearHover();
-        EventCache.highlight(null);
+        session.highlight(null);
         component().setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
 
@@ -165,7 +173,7 @@ class SWEKPopupController implements InputMouseListener {
 
         swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverEvents);
         Component canvas = component();
-        EventCache.highlight(mouseOverEvents);
+        session.highlight(mouseOverEvents);
         Cursor cursor = canvas.getCursor();
         if (helpCursor != cursor)
             lastCursor = cursor;

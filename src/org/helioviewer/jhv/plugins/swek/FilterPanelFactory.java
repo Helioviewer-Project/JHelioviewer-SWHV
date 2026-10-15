@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.event.filter;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -53,15 +53,15 @@ class FilterPanelFactory {
                 String filterType = filter.type().toLowerCase();
                 switch (filterType) {
                     case "doublemaxfilter" ->
-                            panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
                     case "doubleminfilter" ->
-                            panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
                     case "doubleminmaxfilter" -> {
-                        panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
-                        panels.add(new FilterPanel(supplier, p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
+                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(filterDialog, p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
                     }
                     case "flarefilter" ->
-                            panels.add(new FilterPanel(supplier, p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
+                            panels.add(new FilterPanel(p, generateFlareSpinner(filterDialog, p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
                     default -> {}
                 }
             }

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.event.filter;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.component.JHVSpinner;
 
 @SuppressWarnings("serial")
@@ -21,17 +20,15 @@ class FilterPanel extends JPanel {
     private boolean enabled = false;
 
     private final SWEK.Parameter parameter;
-    private final SWEKSupplier supplier;
 
     private final FilterDialog filterDialog;
     private final SWEK.Operand operand;
 
-    FilterPanel(SWEKSupplier _supplier, SWEK.Parameter _parameter, JHVSpinner _spinner, FilterDialog _filterDialog, SWEK.Operand _operand) {
+    FilterPanel(SWEK.Parameter _parameter, JHVSpinner _spinner, FilterDialog _filterDialog, SWEK.Operand _operand) {
         operand = _operand;
         filterDialog = _filterDialog;
         spinner = _spinner;
         parameter = _parameter;
-        supplier = _supplier;
 
         JCheckBox enableButton = new JCheckBox();
         enableButton.addActionListener(e -> toggleEnabled());
@@ -51,13 +48,13 @@ class FilterPanel extends JPanel {
         add(spinner, c);
     }
 
-    void addFilter() {
+    SWEK.Param filter() {
         if (enabled) {
             Object oval = spinner.getValue();
             double value = oval instanceof String str ? GOESLevel.getFloatValue(str) : ((Number) oval).doubleValue();
-            SWEK.Param param = new SWEK.Param(parameter.name(), value, operand);
-            FilterManager.addFilter(supplier, param);
+            return new SWEK.Param(parameter.name(), value, operand);
         }
+        return null;
     }
 
     private void toggleEnabled() {

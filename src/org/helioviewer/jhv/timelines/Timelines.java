@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.event.EventCache;
-import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -22,7 +20,6 @@ public final class Timelines {
     }
 
     private static final TimeListener.Change timeListener = DrawController::timeChanged;
-    private static final EventListener.Highlight highlightListener = DrawController::highlightChanged;
     private static final ArrayList<Listener> listeners = new ArrayList<>();
     @Nullable
     private static BandReaderHapi.CatalogData catalog;
@@ -31,12 +28,10 @@ public final class Timelines {
         if (TimelineLayers.get().stream().noneMatch(layer -> layer instanceof RadioData))
             TimelineLayers.add(new RadioData(null));
         Player.addTimeListener(timeListener);
-        EventCache.addHighlightListener(highlightListener);
         requestCatalog();
     }
 
     public static void uninstall() {
-        EventCache.removeHighlightListener(highlightListener);
         Player.removeTimeListener(timeListener);
     }
 

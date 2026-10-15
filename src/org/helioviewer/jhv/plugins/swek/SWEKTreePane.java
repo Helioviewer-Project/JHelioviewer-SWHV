@@ -9,7 +9,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +26,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.jhv.event.SWEKCatalog;
-import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SWEKSupplier;
-import org.helioviewer.jhv.event.filter.FilterDialog;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 
 import com.jidesoft.swing.JideButton;
@@ -46,13 +43,16 @@ final class SWEKTreePane extends JPanel {
     private final IdentityHashMap<SWEKGroup, Component> groupComponents = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKGroup, DefaultMutableTreeNode> groupNodes = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
-    private final List<FilterDialog> filterDialogs = new ArrayList<>();
+    private final SWEKSession session;
+    private final SWEKDialogs dialogs;
     private final Timer loadingTimer;
 
-    SWEKTreePane(List<SWEKGroup> groups) {
+    SWEKTreePane(SWEKSession _session, SWEKDialogs _dialogs) {
         super(new BorderLayout());
+        session = _session;
+        dialogs = _dialogs;
         SWEKIconBank.init();
-        treeModel = createTreeModel(groups);
+        treeModel = createTreeModel(session.catalog().getGroups());
 
         tree = new JTree(treeModel);
         tree.setRootVisible(false);
@@ -77,7 +77,7 @@ final class SWEKTreePane extends JPanel {
         for (SWEKGroup group : groups) {
             DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group);
             groupNodes.put(group, groupNode);
-            for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(group)) {
+            for (SWEKSupplier supplier : session.catalog().getSuppliers(group)) {
                 groupNode.add(new DefaultMutableTreeNode(supplier));
             }
             root.add(groupNode);
@@ -94,7 +94,7 @@ final class SWEKTreePane extends JPanel {
     private void repaintBusyGroups() {
         boolean anyBusy = false;
         for (Map.Entry<SWEKGroup, DefaultMutableTreeNode> entry : groupNodes.entrySet()) {
-            if (SWEKDownloader.isGroupBusy(entry.getKey())) {
+            if (session.isGroupBusy(entry.getKey())) {
                 anyBusy = true;
                 repaintGroup(entry.getValue());
             }
@@ -113,16 +113,16 @@ final class SWEKTreePane extends JPanel {
     private Component componentFor(Object value) {
         Component component = null;
         if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKGroup group) {
-            boolean busy = SWEKDownloader.isGroupBusy(group);
+            boolean busy = session.isGroupBusy(group);
             if (busy && !loadingTimer.isRunning())
                 loadingTimer.start();
-            component = groupComponents.computeIfAbsent(group, SWEKTreePane::createGroupComponent);
+            component = groupComponents.computeIfAbsent(group, this::createGroupComponent);
             if (component instanceof JPanel panel && panel.getComponentCount() > 1)
                 panel.getComponent(1).setVisible(busy);
         } else if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKSupplier supplier) {
             component = supplierComponents.computeIfAbsent(supplier, this::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
-                checkBox.setSelected(SWEKDownloader.isSupplierActive(supplier));
+                checkBox.setSelected(session.isSupplierActive(supplier));
         }
 
         if (component != null)
@@ -130,7 +130,7 @@ final class SWEKTreePane extends JPanel {
         return component;
     }
 
-    private static Component createGroupComponent(SWEKGroup group) {
+    private Component createGroupComponent(SWEKGroup group) {
         JLabel label = new JLabel(group.getName());
         int size = label.getPreferredSize().height;
         ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
@@ -138,7 +138,7 @@ final class SWEKTreePane extends JPanel {
 
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.setOpaque(false);
-        busyIndicator.setVisible(SWEKDownloader.isGroupBusy(group));
+        busyIndicator.setVisible(session.isGroupBusy(group));
         busyIndicator.setPreferredSize(new Dimension(size, size));
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -153,23 +153,19 @@ final class SWEKTreePane extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        JCheckBox checkBox = new JCheckBox(supplier.displayName(), SWEKDownloader.isSupplierActive(supplier));
-        checkBox.addActionListener(e -> SWEKDownloader.setSupplierActive(supplier, checkBox.isSelected()));
+        JCheckBox checkBox = new JCheckBox(supplier.displayName(), session.isSupplierActive(supplier));
+        checkBox.addActionListener(e -> session.setSupplierActive(supplier, checkBox.isSelected()));
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);
         panel.add(checkBox, BorderLayout.LINE_START);
 
         if (supplier.containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog(supplier);
-            filterDialogs.add(filterDialog);
             JideButton filterButton = new JideButton("Filter");
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Point pressedLocation = e.getLocationOnScreen();
-                    Point windowLocation = new Point(pressedLocation.x, pressedLocation.y - filterDialog.getSize().height);
-                    filterDialog.setLocation(windowLocation);
-                    filterDialog.setVisible(true);
+                    dialogs.showFilter(supplier, pressedLocation);
                 }
             });
             panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, filterButton.getPreferredSize().height));
@@ -189,14 +185,13 @@ final class SWEKTreePane extends JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
-        SWEKDownloader.setGroupChangedCallback(this::groupBusyChanged);
+        session.setGroupChangedCallback(this::groupBusyChanged);
     }
 
     @Override
     public void removeNotify() {
-        SWEKDownloader.clearGroupChangedCallback();
+        session.setGroupChangedCallback(_ -> {});
         loadingTimer.stop();
-        filterDialogs.forEach(FilterDialog::dispose);
         super.removeNotify();
     }
 

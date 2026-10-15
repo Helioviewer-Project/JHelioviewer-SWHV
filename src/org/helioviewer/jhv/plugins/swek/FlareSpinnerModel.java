@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.event.filter;
+package org.helioviewer.jhv.plugins.swek;
 
 import javax.swing.AbstractSpinnerModel;
 

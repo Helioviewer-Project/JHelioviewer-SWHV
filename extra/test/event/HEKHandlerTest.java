@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources;
+package org.helioviewer.jhv.event.sources;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +31,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class HEKHandlerTest {
+    private static SWEKCatalog catalog = new SWEKCatalog(0, List.of(), List.of());
+    private static final class Handler extends HEKHandler {
+        RemotePage read(JSONObject json, SWEKSupplier supplier) throws Exception {
+            return parseRemotePage(json, supplier, catalog.indexedParameters(supplier));
+        }
+    }
 
     private static JSONObject fixture;
 
@@ -49,10 +55,10 @@ public final class HEKHandlerTest {
     }
 
     private static void checkResponses() throws Exception {
-        HEKHandler handler = new HEKHandler();
+        Handler handler = new Handler();
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "NOAA SWPC",
                 new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of());
-        SWEKHandler.RemotePage page = handler.parseRemotePage(fixture, supplier);
+        SWEKHandler.RemotePage page = handler.read(fixture, supplier);
         check(page.events().size() == 1, "defensive supplier filtering");
         SWEKHandler.RemoteEvent remote = page.events().getFirst();
         check(remote.start() == TimeUtils.parse("2024-05-10T00:10:00"), "UTC start");
@@ -63,23 +69,23 @@ public final class HEKHandlerTest {
         }
         check(Math.abs(swpc.getDouble("jhv_goesflux") - 1.3e-5) < 1e-12, "GOES class to flux");
         JSONObject bad = new JSONObject(swpc.toString()).put("event_endtime", "bad");
-        expectFailure(() -> handler.parseRemotePage(new JSONObject().put("overmax", false)
+        expectFailure(() -> handler.read(new JSONObject().put("overmax", false)
                 .put("result", new JSONArray().put(bad)), supplier), IOException.class, "bad required event data fails page");
-        expectFailure(() -> handler.parseRemotePage(new JSONObject().put("result", new JSONArray()), supplier),
+        expectFailure(() -> handler.read(new JSONObject().put("result", new JSONArray()), supplier),
                 JSONException.class, "missing pagination metadata fails page");
         for (String field : List.of("kb_archivid", "frm_name", "event_starttime", "event_endtime")) {
             JSONObject missing = new JSONObject(swpc.toString());
             missing.remove(field);
-            expectFailure(() -> handler.parseRemotePage(new JSONObject().put("overmax", false)
+            expectFailure(() -> handler.read(new JSONObject().put("overmax", false)
                     .put("result", new JSONArray().put(missing)), supplier), IOException.class, "missing required field: " + field);
         }
         JSONObject blankId = new JSONObject(swpc.toString()).put("kb_archivid", " ");
-        expectFailure(() -> handler.parseRemotePage(new JSONObject().put("overmax", false)
+        expectFailure(() -> handler.read(new JSONObject().put("overmax", false)
                 .put("result", new JSONArray().put(blankId)), supplier), IOException.class, "blank ID");
 
         SWEKSupplier spocaSupplier = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA",
                 supplier.source(), "test_spoca", List.of());
-        SWEKHandler.RemotePage spocaPage = handler.parseRemotePage(fixture, spocaSupplier);
+        SWEKHandler.RemotePage spocaPage = handler.read(fixture, spocaSupplier);
         check(spocaPage.events().size() == 1 && !spocaPage.associations().isEmpty(), "live association to unloaded neighbor retained");
     }
 
@@ -97,7 +103,7 @@ public final class HEKHandlerTest {
     }
 
     private static void checkQueries() throws Exception {
-        HEKHandler handler = new HEKHandler();
+        Handler handler = new Handler();
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "NOAA SWPC",
                 new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of());
         long start = TimeUtils.parse("2024-05-10T00:00:00");
@@ -117,7 +123,7 @@ public final class HEKHandlerTest {
 
     }
 
-    private static final HEKHandler indexHandler = new HEKHandler();
+    private static final Handler indexHandler = new Handler();
 
     private static void checkIndexedValues() throws Exception {
         SWEK.Source source = new SWEK.Source("HEK", List.of(), indexHandler, Map.of(
@@ -128,8 +134,7 @@ public final class HEKHandlerTest {
         SWEKSupplier cactus = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus (Computer Aided CME Tracking)", "CACTus", source, "test_cactus", List.of(
                 new SWEK.Parameter("CME_RadialLinVel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, ""), false)));
         SWEKSupplier spoca = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA", source, "test_spoca", List.of());
-        for (SWEKSupplier supplier : List.of(swpc, cactus, spoca)) SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelations(List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
+        catalog = new SWEKCatalog(0, List.of(swpc, cactus, spoca), List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
 
         Map<String, Number> values = read(swpc, new JSONObject().put("fl_goescls", "M1.0").put("ar_noaanum", 13664).put("cme_radiallinvel", 679));
         check(Math.abs(values.get("JHV_GOESFlux").doubleValue() - 1e-5) < 1e-12 && values.get("ar_noaanum").doubleValue() == 13664, "GOES conversion and NOAA identity");
@@ -155,10 +160,10 @@ public final class HEKHandlerTest {
     private static Map<String, Number> read(SWEKSupplier supplier, JSONObject fields) throws Exception {
         JSONObject event = new JSONObject(fields.toString()).put("kb_archivid", "test-event").put("frm_name", supplier.supplierName())
                 .put("event_starttime", "2024-05-10T00:00:00").put("event_endtime", "2024-05-10T01:00:00");
-        return indexHandler.parseRemotePage(new JSONObject().put("overmax", false).put("result", new JSONArray().put(event)), supplier).events().getFirst().indexedValues();
+        return indexHandler.read(new JSONObject().put("overmax", false).put("result", new JSONArray().put(event)), supplier).events().getFirst().indexedValues();
     }
 
-    private static final HEKHandler handler = new HEKHandler();
+    private static final Handler handler = new Handler();
     private static final SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "SWPC", new SWEK.Source("HEK", List.of(), handler, Map.of()), "test", List.of());
     private static final String BOX = "POLYGON((0 0,1 0,1 1,0 0))";
 
@@ -203,7 +208,7 @@ public final class HEKHandlerTest {
     }
 
     private static void checkCMEParameters() {
-        HEKHandler handler = new HEKHandler();
+        Handler handler = new Handler();
         SWEK.Source source = new SWEK.Source("HEK", List.of(), handler, Map.of());
         for (boolean visible : List.of(false, true)) {
             SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus", "CACTus", source, "cactus", List.of(

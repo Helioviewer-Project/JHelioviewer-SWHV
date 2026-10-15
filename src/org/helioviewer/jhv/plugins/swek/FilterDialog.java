@@ -1,24 +1,29 @@
-package org.helioviewer.jhv.event.filter;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.GridLayout;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.gui.MainFrame;
 
 @SuppressWarnings("serial")
-public final class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
+final class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {
 
     private final JButton applyButton = new JButton("Apply");
 
-    public FilterDialog(SWEKSupplier supplier) {
+    FilterDialog(SWEKSession session, SWEKSupplier supplier) {
+        super(MainFrame.get());
         setUndecorated(true);
         addFocusListener(this);
         addWindowFocusListener(this);
@@ -28,10 +33,12 @@ public final class FilterDialog extends JDialog implements FocusListener, Window
         filterPanels.forEach(filterPanel::add);
 
         applyButton.addActionListener(e -> {
-            FilterManager.removeFilters(supplier);
-            filterPanels.forEach(FilterPanel::addFilter);
-
-            FilterManager.fireFilters(supplier);
+            List<SWEK.Param> selected = new ArrayList<>();
+            for (FilterPanel panel : filterPanels) {
+                SWEK.Param value = panel.filter();
+                if (value != null) selected.add(value);
+            }
+            session.setFilters(supplier, selected);
             applyButton.setEnabled(false);
         });
         filterPanel.add(applyButton);

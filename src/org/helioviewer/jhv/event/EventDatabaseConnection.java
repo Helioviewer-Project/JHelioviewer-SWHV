@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.database;
+package org.helioviewer.jhv.event;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,12 +16,25 @@ import org.helioviewer.jhv.io.Directories;
 final class EventDatabaseConnection {
 
     private static final int CURRENT_VERSION_SCHEMA = 12;
-    private static Connection connection;
+    private Connection connection;
+    private final int configHash;
 
-    private EventDatabaseConnection() {
+    EventDatabaseConnection(int _configHash) {
+        configHash = _configHash;
     }
 
-    private static void createSchema(Connection database) throws Exception {
+    void close() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (Exception e) {
+                Log.error(e);
+            }
+            connection = null;
+        }
+    }
+
+    private void createSchema(Connection database) throws Exception {
         try (Statement statement = database.createStatement()) {
             statement.setQueryTimeout(30);
             statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, supplier TEXT, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
@@ -41,19 +54,19 @@ final class EventDatabaseConnection {
         try (PreparedStatement pstatement = database.prepareStatement("INSERT INTO version(version, hash) VALUES(?, ?)")) {
             pstatement.setQueryTimeout(30);
             pstatement.setInt(1, CURRENT_VERSION_SCHEMA);
-            pstatement.setInt(2, EventDatabase.config_hash);
+            pstatement.setInt(2, configHash);
             pstatement.executeUpdate();
         }
     }
 
     @Nonnull
-    static Connection getConnection() throws Exception {
+    Connection getConnection() throws Exception {
         if (connection == null)
             connection = openConnection();
         return connection;
     }
 
-    private static Connection openConnection() throws Exception {
+    private Connection openConnection() throws Exception {
         Path path = Path.of(Directories.CACHE.getPath(), "events.db");
         boolean exists = Files.exists(path);
         Connection database = DriverManager.getConnection("jdbc:sqlite:" + path);
@@ -78,12 +91,12 @@ final class EventDatabaseConnection {
         }
     }
 
-    private static boolean hasCurrentSchema(Connection database) {
+    private boolean hasCurrentSchema(Connection database) {
         try (PreparedStatement statement = database.prepareStatement("SELECT version, hash from version LIMIT 1")) {
             statement.setQueryTimeout(30);
             try (ResultSet result = statement.executeQuery()) {
                 return result.next() && result.getInt(1) == CURRENT_VERSION_SCHEMA
-                        && result.getInt(2) == EventDatabase.config_hash;
+                        && result.getInt(2) == configHash;
             }
         } catch (Exception e) {
             Log.warn("Could not read version table, database might be corrupted or outdated: " + e.getMessage());

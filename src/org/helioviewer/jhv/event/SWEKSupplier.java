@@ -24,7 +24,7 @@ public final class SWEKSupplier {
         source = _source;
         id = _id;
         isCactus = displayName == "CACTus" && "HEK".equals(source.name());
-        parameterList = _parameterList;
+        parameterList = List.copyOf(_parameterList);
         parametersByName = indexParameters(parameterList, source.generalParameters());
         containsParameterFilter = checkFilters(parameterList);
     }

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.event;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -12,46 +12,36 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKCatalog;
-import org.helioviewer.jhv.event.SWEKGroup;
-import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
-//import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
-//import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
-import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-class SWEKConfig {
+public final class SWEKConfig {
 
-    static List<SWEKGroup> load() {
-        SWEKCatalog.clear();
+    private SWEKConfig() {}
+
+    public static SWEKCatalog load(Map<String, SWEKHandler> handlers) {
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
-            EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
-            Map<String, SWEK.Source> sources = parseSources(jo);
+            int configHash = Arrays.hashCode(jo.toString().toCharArray());
+            Map<String, SWEK.Source> sources = parseSources(jo, handlers);
             HashMap<String, SWEKGroup> groupsByName = new HashMap<>();
-            List<SWEKGroup> groups = new ArrayList<>();
-
-            parseGroups(jo, sources, groupsByName, groups);
-            SWEKCatalog.setRelations(parseRelations(jo, groupsByName));
-            return groups;
+            List<SWEKSupplier> suppliers = new ArrayList<>();
+            parseGroups(jo, sources, groupsByName, suppliers);
+            return new SWEKCatalog(configHash, suppliers, parseRelations(jo, groupsByName));
         } catch (Exception e) {
-            SWEKCatalog.clear();
             Log.error(e);
-            return List.of();
+            return new SWEKCatalog(0, List.of(), List.of());
         }
     }
 
-    private static Map<String, SWEK.Source> parseSources(JSONObject obj) {
+    private static Map<String, SWEK.Source> parseSources(JSONObject obj, Map<String, SWEKHandler> handlers) {
         HashMap<String, SWEK.Source> sources = new HashMap<>();
         JSONArray sourcesArray = obj.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
-            SWEK.Source source = parseSource(sourcesArray.getJSONObject(i));
+            SWEK.Source source = parseSource(sourcesArray.getJSONObject(i), handlers);
             if (source != null)
                 sources.put(source.name(), source);
         }
@@ -59,15 +49,10 @@ class SWEKConfig {
     }
 
     @Nullable
-    private static SWEK.Source parseSource(JSONObject obj) {
+    private static SWEK.Source parseSource(JSONObject obj, Map<String, SWEKHandler> handlers) {
         String name = obj.getString("name");
-        //if ("COMESEP".equals(name))
-        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler(), Map.of());
-        //if ("FHNW".equals(name))
-        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler(), Map.of());
-        if ("HEK".equals(name))
-            return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler(), parseNumericParameters(obj));
-        return null;
+        SWEKHandler handler = handlers.get(name);
+        return handler == null ? null : new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), handler, parseNumericParameters(obj));
     }
 
     private static Map<String, SWEK.NumericType> parseNumericParameters(JSONObject source) {
@@ -99,13 +84,13 @@ class SWEKConfig {
         return parameters;
     }
 
-    private static void parseGroups(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
+    private static void parseGroups(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKSupplier> suppliers) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++)
-            addGroup(eventJSONArray.getJSONObject(i), sources, groupsByName, groups);
+            addGroup(eventJSONArray.getJSONObject(i), sources, groupsByName, suppliers);
     }
 
-    private static void addGroup(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
+    private static void addGroup(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKSupplier> suppliers) {
         List<SWEK.Parameter> defaultParameters = parseParameters(obj.getJSONArray("parameter_list"));
         SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseEventIconKey(obj));
 
@@ -121,13 +106,12 @@ class SWEKConfig {
 
             List<SWEK.Parameter> parameters = parseSupplierParameters(supplier, defaultParameters);
             SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("id"), parameters);
-            SWEKCatalog.add(supplierObj);
+            suppliers.add(supplierObj);
         }
-        if (SWEKCatalog.getSuppliers(group).isEmpty())
+        if (suppliers.stream().noneMatch(supplier -> supplier.group() == group))
             return;
 
         groupsByName.put(group.getName(), group);
-        groups.add(group);
     }
 
     private static String parseEventIconKey(JSONObject obj) {

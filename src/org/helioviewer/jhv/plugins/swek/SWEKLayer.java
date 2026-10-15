@@ -15,12 +15,11 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.RelatedEvents;
-import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
@@ -57,6 +56,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
 
     private static final float[][] texCoord = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
 
+    private final SWEKSession session;
+    private final EventListener.Highlight highlightListener = DisplayController::display;
     private SWEKContext swekContext;
     private boolean icons = true;
 
@@ -71,11 +72,19 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     private long cachedEventsTime = Long.MIN_VALUE;
     private List<ActiveEvent> cachedActiveEvents = List.of();
 
+    SWEKLayer(SWEKSession _session) {
+        session = _session;
+    }
+
     public SWEKLayer(JSONObject jo) {
-        if (jo != null) {
-            icons = jo.optBoolean("icons", icons);
-            SWEKPlugin.restoreLayer(this);
-        }
+        this(SWEKPlugin.sessionForRestore());
+        icons = jo.optBoolean("icons", icons);
+        SWEKPlugin.restoreLayer(this);
+    }
+
+    void detach() {
+        setEnabled(false);
+        swekContext = null;
     }
 
     void setContext(SWEKContext _swekContext) {
@@ -329,7 +338,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     List<ActiveEvent> activeEvents(long time) {
         if (time != cachedEventsTime) {
             List<ActiveEvent> active = new ArrayList<>();
-            for (RelatedEvents relatedEvents : EventCache.getEvents(time, time))
+            for (RelatedEvents relatedEvents : session.getEvents(time, time))
                 active.add(new ActiveEvent(relatedEvents, relatedEvents.getClosestTo(time)));
             cachedActiveEvents = active;
             cachedEventsTime = time;
@@ -421,13 +430,15 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         super.setEnabled(_enabled);
 
         if (enabled) {
-            EventCache.registerHandler(this);
+            session.registerHandler(this);
+            session.addHighlightListener(highlightListener);
             Player.addTimeRangeListener(this); // calls timeRangeChanged, which requests the events
         } else {
             invalidateActiveEvents();
-            EventCache.highlight(null);
+            session.highlight(null);
             Player.removeTimeRangeListener(this);
-            EventCache.unregisterHandler(this);
+            session.unregisterHandler(this);
+            session.removeHighlightListener(highlightListener);
         }
         SWEKPlugin.layerStateChanged(this);
     }
@@ -451,7 +462,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     @Override
     public void timeRangeChanged(long start, long end) {
         invalidateActiveEvents();
-        SWEKDownloader.requestForInterval(start, end);
+        session.requestForInterval(start, end);
     }
 
     @Override
@@ -459,7 +470,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         if (!enabled)
             return;
         invalidateActiveEvents();
-        SWEKDownloader.requestForInterval(Player.getStartTime(), Player.getEndTime());
+        session.requestForInterval(Player.getStartTime(), Player.getEndTime());
         DisplayController.display();
     }
 

@@ -1,10 +1,9 @@
-package org.helioviewer.jhv.event.info;
+package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
@@ -16,18 +15,20 @@ import javax.swing.WindowConstants;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.RelatedEvents;
+import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
 // Popup displaying information about a HEK event.
 // This panel is a JDialog so it can appear above the heavyweight render surface.
 @SuppressWarnings("serial")
-public final class SWEKEventInformationDialog extends JDialog {
+final class SWEKEventInformationDialog extends JDialog {
 
+    private final SWEKSession session;
+    private final SWEKDialogs dialogs;
     private JPanel allTablePanel;
 
     private DataCollapsiblePanel standardParameters;
@@ -37,11 +38,13 @@ public final class SWEKEventInformationDialog extends JDialog {
 
     private SolarEvent event;
 
-    public SWEKEventInformationDialog(RelatedEvents related, SolarEvent _event) {
+    SWEKEventInformationDialog(SWEKDialogs _dialogs, RelatedEvents related, SolarEvent _event) {
         super(MainFrame.get(), _event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+        dialogs = _dialogs;
+        session = dialogs.session;
         event = _event;
 
         initAllTablePanel();
@@ -61,7 +64,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         eventDescriptionConstraint.anchor = GridBagConstraints.LINE_START;
         eventDescriptionConstraint.fill = GridBagConstraints.BOTH;
 
-        add(new EventDescriptionPanel(related, event), eventDescriptionConstraint);
+        add(new EventDescriptionPanel(session, related, event), eventDescriptionConstraint);
 
         GridBagConstraints allTablePanelConstraint = new GridBagConstraints();
         allTablePanelConstraint.gridx = 0;
@@ -73,17 +76,11 @@ public final class SWEKEventInformationDialog extends JDialog {
 
         add(allTablePanel, allTablePanelConstraint);
 
-        Task.submitBackground("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
+        int eventId = event.getUniqueID();
+        Task.submitBackground("event-info", () -> session.getEventDetails(eventId), this::onSuccessDatabase, this::onFailureDatabase);
     }
 
-    private record DatabaseCallable(SolarEvent event) implements Callable<EventDatabase.EventDetails> {
-        @Override
-        public EventDatabase.EventDetails call() throws Exception {
-            return EventDatabase.getEventDetails(event.getUniqueID());
-        }
-    }
-
-    private void onSuccessDatabase(@Nonnull EventDatabase.EventDetails details) {
+    private void onSuccessDatabase(@Nonnull SWEKSession.EventDetails details) {
         if (!isDisplayable()) // closed (disposed) before the result arrived, pack() would recreate the native peer
             return;
 
@@ -98,8 +95,8 @@ public final class SWEKEventInformationDialog extends JDialog {
         repaint();
     }
 
-    private static void onFailureDatabase(String ignoredLogContext, Throwable t) {
-        Log.error(t);
+    private void onFailureDatabase(String ignoredLogContext, Throwable t) {
+        if (isDisplayable() && !AppThread.isInterrupted(t)) Log.error(t);
     }
 
     private void initAllTablePanel() {
@@ -157,7 +154,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         Colors.Data colors = new Colors.Data();
         for (SolarEvent relatedEvent : events) {
-            RelatedEvents relatedEvents = EventCache.getRelatedEvents(relatedEvent.getUniqueID());
+            RelatedEvents relatedEvents = session.getRelatedEvents(relatedEvent.getUniqueID());
             if (relatedEvents == null)
                 relatedEvents = new RelatedEvents(relatedEvent, colors.getNextColor());
             eventPanels.add(createEventPanel(relatedEvents, relatedEvent));
@@ -165,10 +162,11 @@ public final class SWEKEventInformationDialog extends JDialog {
         return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, this::repack);
     }
 
-    private static JPanel createEventPanel(RelatedEvents related, SolarEvent event) {
+    private JPanel createEventPanel(RelatedEvents related, SolarEvent event) {
         JButton detailsButton = new JButton("Details");
         detailsButton.addActionListener(e -> {
-            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(related, event);
+            SWEKEventInformationDialog dialog = dialogs.createInformation(related, event);
+            if (dialog == null) return;
             dialog.pack();
             dialog.setVisible(true);
         });
@@ -182,7 +180,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         c.anchor = GridBagConstraints.CENTER;
         c.weightx = 1;
         c.weighty = 1;
-        eventAndButtonPanel.add(new EventDescriptionPanel(related, event), c);
+        eventAndButtonPanel.add(new EventDescriptionPanel(session, related, event), c);
 
         c.gridy = 1;
         c.fill = GridBagConstraints.NONE;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources;
+package org.helioviewer.jhv.event.sources;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.EventMetadata;
+import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.SolarEvent;
@@ -26,7 +27,7 @@ public class FHNWHandler extends SWEKHandler {
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
 
     @Override
-    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         JSONArray params = eventJSON.getJSONArray("columns");
         int plen = params.length();
         JSONArray events = eventJSON.getJSONArray("data");

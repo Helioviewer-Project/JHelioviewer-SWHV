@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.database;
+package org.helioviewer.jhv.event;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,30 +11,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.event.EventBatch;
-import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKCatalog;
-import org.helioviewer.jhv.event.SWEKGroup;
-import org.helioviewer.jhv.event.SWEKHandler;
-import org.helioviewer.jhv.event.SWEKSupplier;
-import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 
-public class EventDatabase {
+final class EventDatabase {
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
     private static long batchSequence;
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
-    public static int config_hash;
+    private final SWEKCatalog catalog;
+    private final EventDatabaseConnection connection;
+    private volatile boolean closed;
+
+    EventDatabase(SWEKCatalog _catalog) {
+        catalog = _catalog;
+        connection = new EventDatabaseConnection(catalog.configHash());
+    }
 
     private static final String INSERT_EVENT = "INSERT INTO events(uid) VALUES(?)";
     private static final String UPSERT_EVENT =
@@ -62,14 +63,26 @@ public class EventDatabase {
     private static final String SELECT_EVENT =
             "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
                     "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id=?";
-    private static final HashMap<String, PreparedStatement> statements = new HashMap<>();
-    private static final HashMap<SWEKSupplier, RequestCache> storedIntervals = new HashMap<>();
+    private final HashMap<String, PreparedStatement> statements = new HashMap<>();
+    private final HashMap<SWEKSupplier, RequestCache> storedIntervals = new HashMap<>();
 
-    public static void clearStoredIntervals() {
-        executor.execute(storedIntervals::clear);
+    void close() {
+        if (closed) return;
+        closed = true;
+        // Reject new work immediately; release JDBC resources after queued operations.
+        executor.execute(() -> {
+            for (PreparedStatement statement : statements.values()) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    Log.error(e);
+                }
+            }
+            statements.clear();
+            storedIntervals.clear();
+            connection.close();
+        });
     }
-
-    public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
     private record StoredEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
@@ -77,7 +90,8 @@ public class EventDatabase {
 
     private record StoredBatch(long sequence, List<StoredEvent> events, List<SolarEvent.Link> associations) {}
 
-    public static boolean storeRemotePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) {
+    boolean storeRemotePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) {
+        if (closed) return false;
         try {
             executor.submit(() -> {
                 storePage(remotePage, supplier);
@@ -85,30 +99,31 @@ public class EventDatabase {
             }).get();
             return true;
         } catch (Exception e) {
-            Log.error("Could not store event page", e);
+            if (!closed) Log.error("Could not store event page", e);
             return false;
         }
     }
 
-    private static void storePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) throws Exception {
-        Connection connection = EventDatabaseConnection.getConnection();
+    private void storePage(SWEKHandler.RemotePage remotePage, SWEKSupplier supplier) throws Exception {
+        if (closed) throw new CancellationException("SWEK session closed");
+        Connection database = connection.getConnection();
         try {
             storeEvents(remotePage.events(), supplier);
             storeAssociations(remotePage.associations());
-            connection.commit();
+            database.commit();
         } catch (Exception e) {
-            connection.rollback();
+            database.rollback();
             throw e;
         }
     }
 
-    private static void storeEvents(List<SWEKHandler.RemoteEvent> remoteEvents, SWEKSupplier supplier) throws Exception {
+    private void storeEvents(List<SWEKHandler.RemoteEvent> remoteEvents, SWEKSupplier supplier) throws Exception {
         int typeId = findOrInsertEventTypeId(supplier);
 
         PreparedStatement statement = getPreparedStatement(UPSERT_EVENT);
         PreparedStatement delete = getPreparedStatement(DELETE_PARAMETERS);
         PreparedStatement parameter = getPreparedStatement(INSERT_PARAMETER);
-        Set<String> fields = SWEKCatalog.indexedParameters(supplier).keySet();
+        Set<String> fields = catalog.indexedParameters(supplier).keySet();
 
         for (SWEKHandler.RemoteEvent remoteEvent : remoteEvents) {
             statement.setInt(1, typeId);
@@ -142,7 +157,7 @@ public class EventDatabase {
         }
     }
 
-    private static void storeAssociations(List<SolarEvent.LinkRef> links) throws Exception {
+    private void storeAssociations(List<SolarEvent.LinkRef> links) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
 
         for (SolarEvent.LinkRef link : links) {
@@ -152,7 +167,7 @@ public class EventDatabase {
         }
     }
 
-    private static void insertAssociation(PreparedStatement statement, int id0, int id1) throws SQLException {
+    private void insertAssociation(PreparedStatement statement, int id0, int id1) throws SQLException {
         if (id0 == id1)
             return;
 
@@ -161,13 +176,13 @@ public class EventDatabase {
         statement.executeUpdate();
     }
 
-    public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+    EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         StoredBatch batch = executor.submit(() -> new StoredBatch(++batchSequence,
                 queryEvents(start, end, type, params), queryAssociations(start, end, type))).get();
         return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
     }
 
-    private static List<StoredEvent> queryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+    private List<StoredEvent> queryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         List<StoredEvent> eventList = new ArrayList<>();
         int typeId = findEventTypeId(type);
         if (typeId == -1)
@@ -176,7 +191,7 @@ public class EventDatabase {
         StringBuilder joins = new StringBuilder();
         for (int i = 0; i < params.size(); i++) {
             SWEK.Param param = params.get(i);
-            if (!SWEKCatalog.indexedParameters(type).containsKey(param.name()))
+            if (!catalog.indexedParameters(type).containsKey(param.name()))
                 throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
             String alias = "p" + i;
             joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
@@ -203,7 +218,7 @@ public class EventDatabase {
         return eventList;
     }
 
-    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
+    private List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
         List<SolarEvent.Link> links = new ArrayList<>();
         int typeId = findEventTypeId(type);
         if (typeId == -1)
@@ -236,9 +251,9 @@ public class EventDatabase {
         return links;
     }
 
-    private static List<SWEK.RelatedOn> associationParameters(SWEKGroup group) {
+    private List<SWEK.RelatedOn> associationParameters(SWEKGroup group) {
         List<SWEK.RelatedOn> parameters = new ArrayList<>();
-        for (SWEK.Relation relation : SWEKCatalog.getRelations()) {
+        for (SWEK.Relation relation : catalog.getRelations()) {
             if (relation.group() != group || relation.relatedWith() != group)
                 continue;
             for (SWEK.RelatedOn field : relation.relatedOnList()) {
@@ -250,29 +265,29 @@ public class EventDatabase {
         return parameters;
     }
 
-    public static EventDetails getEventDetails(int id) throws Exception {
+    SWEKSession.EventDetails getEventDetails(int id) throws Exception {
         StoredDetails details = executor.submit(() -> {
             StoredEvent event = queryEvent(id);
             return new StoredDetails(event, collectRelationEvents(id, event.type()));
         }).get();
-        return new EventDetails(parseJSON(details.event(), true), parseEvents(details.relatedEvents(), true));
+        return new SWEKSession.EventDetails(parseJSON(details.event(), true), parseEvents(details.relatedEvents(), true));
     }
 
-    private static StoredEvent queryEvent(int id) throws Exception {
+    private StoredEvent queryEvent(int id) throws Exception {
         PreparedStatement statement = getPreparedStatement(SELECT_EVENT);
         statement.setInt(1, id);
         try (ResultSet result = statement.executeQuery()) {
             if (!result.next())
                 throw new SQLException("Event not found: " + id);
-            return readStoredEvent(result, SWEKCatalog.getSupplier(result.getString(5)));
+            return readStoredEvent(result, catalog.getSupplier(result.getString(5)));
         }
     }
 
-    private static List<StoredEvent> collectRelationEvents(int id, SWEKSupplier supplier) {
+    private List<StoredEvent> collectRelationEvents(int id, SWEKSupplier supplier) {
         SWEKGroup group = supplier.group();
         List<StoredEvent> storedEvents = new ArrayList<>();
 
-        for (SWEK.Relation relation : SWEKCatalog.getRelations()) {
+        for (SWEK.Relation relation : catalog.getRelations()) {
             if (relation.group() == group) {
                 for (SWEK.RelatedOn parameters : relation.relatedOnList()) {
                     addRelationEvents(storedEvents, id, supplier, relation.relatedWith(),
@@ -293,9 +308,9 @@ public class EventDatabase {
         return storedEvents;
     }
 
-    private static void addRelationEvents(List<StoredEvent> storedEvents, int id, SWEKSupplier supplier,
+    private void addRelationEvents(List<StoredEvent> storedEvents, int id, SWEKSupplier supplier,
                                           SWEKGroup relatedGroup, String eventParameter, String relatedParameter) {
-        for (SWEKSupplier relatedSupplier : SWEKCatalog.getSuppliers(relatedGroup)) {
+        for (SWEKSupplier relatedSupplier : catalog.getSuppliers(relatedGroup)) {
             if (relatedSupplier == supplier)
                 continue;
 
@@ -307,7 +322,7 @@ public class EventDatabase {
         }
     }
 
-    private static List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
+    private List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
                                                          String leftParameter, String rightParameter) throws Exception {
         List<StoredEvent> ret = new ArrayList<>();
         int rightTypeId = findEventTypeId(rightType);
@@ -332,7 +347,8 @@ public class EventDatabase {
         return ret;
     }
 
-    public static boolean addStoredInterval(long start, long end, SWEKSupplier type) {
+    boolean addStoredInterval(long start, long end, SWEKSupplier type) {
+        if (closed) return false;
         try {
             executor.submit(() -> {
                 storeInterval(start, end, type);
@@ -340,15 +356,15 @@ public class EventDatabase {
             }).get();
             return true;
         } catch (Exception e) {
-            Log.error("Could not store event date range", e);
+            if (!closed) Log.error("Could not store event date range", e);
             return false;
         }
     }
 
-    private static void storeInterval(long start, long end, SWEKSupplier type) throws Exception {
+    private void storeInterval(long start, long end, SWEKSupplier type) throws Exception {
         RequestCache typedCache = getStoredIntervals(type);
         int typeId = findOrInsertEventTypeId(type);
-        Connection connection = EventDatabaseConnection.getConnection();
+        Connection database = connection.getConnection();
         typedCache.adaptRequestCache(start, end);
         try {
             PreparedStatement delete = getPreparedStatement(DELETE_DATERANGES);
@@ -362,24 +378,25 @@ public class EventDatabase {
                 pstatement.setLong(3, interval.end());
                 pstatement.executeUpdate();
             }
-            connection.commit();
+            database.commit();
         } catch (Exception e) {
-            connection.rollback();
+            database.rollback();
             storedIntervals.remove(type);
             throw e;
         }
     }
 
-    public static boolean isStored(long start, long end, SWEKSupplier type) {
+    boolean isStored(long start, long end, SWEKSupplier type) {
+        if (closed) return false;
         try {
             return executor.submit(() -> containsInterval(start, end, type)).get();
         } catch (Exception e) {
-            Log.error(e);
+            if (!closed) Log.error(e);
             return false;
         }
     }
 
-    private static boolean containsInterval(long start, long end, SWEKSupplier type) throws Exception {
+    private boolean containsInterval(long start, long end, SWEKSupplier type) throws Exception {
         for (Interval interval : getStoredIntervals(type).getAllRequestIntervals()) {
             if (interval.start() > start)
                 return false;
@@ -389,7 +406,7 @@ public class EventDatabase {
         return false;
     }
 
-    private static RequestCache getStoredIntervals(SWEKSupplier type) throws Exception {
+    private RequestCache getStoredIntervals(SWEKSupplier type) throws Exception {
         RequestCache typedCache = storedIntervals.get(type);
         if (typedCache != null)
             return typedCache;
@@ -397,8 +414,7 @@ public class EventDatabase {
         typedCache = new RequestCache();
         int typeId = findEventTypeId(type);
         if (typeId == -1) {
-            if (SWEKCatalog.getSupplier(type.id()) == type)
-                storedIntervals.put(type, typedCache);
+            storedIntervals.put(type, typedCache);
             return typedCache;
         }
 
@@ -417,13 +433,11 @@ public class EventDatabase {
                     typedCache.adaptRequestCache(beginDate, endDate);
             }
         }
-        // A cancelled worker may finish after the plugin's catalog was replaced.
-        if (SWEKCatalog.getSupplier(type.id()) == type)
-            storedIntervals.put(type, typedCache);
+        storedIntervals.put(type, typedCache);
         return typedCache;
     }
 
-    private static long getLastEvent(int typeId) throws Exception {
+    private long getLastEvent(int typeId) throws Exception {
         long last_timestamp = Long.MIN_VALUE;
         PreparedStatement pstatement = getPreparedStatement(SELECT_LAST_EVENT);
         pstatement.setInt(1, typeId);
@@ -435,7 +449,7 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    private static int findOrInsertEventTypeId(SWEKSupplier supplier) throws Exception {
+    private int findOrInsertEventTypeId(SWEKSupplier supplier) throws Exception {
         int typeId = findEventTypeId(supplier);
         if (typeId == -1) {
             PreparedStatement statement = getPreparedStatement(INSERT_EVENT_TYPE);
@@ -449,7 +463,7 @@ public class EventDatabase {
         return typeId;
     }
 
-    private static int findEventTypeId(SWEKSupplier supplier) throws Exception {
+    private int findEventTypeId(SWEKSupplier supplier) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
         pstatement.setString(1, supplier.group().getName());
         pstatement.setString(2, supplier.id());
@@ -459,7 +473,7 @@ public class EventDatabase {
         }
     }
 
-    private static int findOrInsertEventId(String uid) throws Exception {
+    private int findOrInsertEventId(String uid) throws Exception {
         int id = findEventId(uid);
         if (id == -1) {
             PreparedStatement statement = getPreparedStatement(INSERT_EVENT);
@@ -472,7 +486,7 @@ public class EventDatabase {
         return id;
     }
 
-    private static int findEventId(String uid) throws Exception {
+    private int findEventId(String uid) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_ID_FROM_UID);
         pstatement.setString(1, uid);
 
@@ -481,27 +495,29 @@ public class EventDatabase {
         }
     }
 
-    private static PreparedStatement getPreparedStatement(String statement) throws Exception {
+    private PreparedStatement getPreparedStatement(String statement) throws Exception {
+        if (closed)
+            throw new CancellationException("SWEK session closed");
         PreparedStatement pstat = statements.get(statement);
         if (pstat == null) {
-            pstat = EventDatabaseConnection.getConnection().prepareStatement(statement);
+            pstat = connection.getConnection().prepareStatement(statement);
             pstat.setQueryTimeout(30);
             statements.put(statement, pstat);
         }
         return pstat;
     }
 
-    private static StoredEvent readStoredEvent(ResultSet result, SWEKSupplier supplier) throws SQLException {
+    private StoredEvent readStoredEvent(ResultSet result, SWEKSupplier supplier) throws SQLException {
         return new StoredEvent(result.getBytes(4), supplier, result.getInt(1), result.getLong(2), result.getLong(3));
     }
 
-    private static SolarEvent parseJSON(StoredEvent storedEvent, boolean full) throws Exception {
+    private SolarEvent parseJSON(StoredEvent storedEvent, boolean full) throws Exception {
         try (InputStream bais = new ByteArrayInputStream(storedEvent.json); InputStream is = new GZIPInputStream(bais)) {
             return storedEvent.type.source().handler().parseEventJSON(JSONUtils.get(is), storedEvent.type, storedEvent.id, storedEvent.start, storedEvent.end, full);
         }
     }
 
-    private static List<SolarEvent> parseEvents(List<StoredEvent> storedEvents, boolean full) {
+    private List<SolarEvent> parseEvents(List<StoredEvent> storedEvents, boolean full) {
         HashSet<Integer> ids = new HashSet<>();
         List<SolarEvent> events = new ArrayList<>();
         for (int i = 0; i < storedEvents.size(); i++) {

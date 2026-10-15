@@ -2,8 +2,8 @@ package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -22,7 +22,6 @@ import javax.annotation.Nullable;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
-import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -223,7 +222,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     @Override
     public void mouseExited(MouseEvent e) {
-        EventCache.highlight(null);
+        highlightChanged(null);
         mousePosition = null;
         if (!DrawController.getGeometry().isStacked() && DrawController.setYAxisHighlight(null)) {
             drawRequest();

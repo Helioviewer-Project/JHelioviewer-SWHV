@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek.sources;
+package org.helioviewer.jhv.event.sources;
 
 import java.text.DecimalFormat;
 import java.util.HashSet;

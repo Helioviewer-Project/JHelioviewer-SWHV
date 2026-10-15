@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
-import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -23,6 +24,8 @@ import org.helioviewer.jhv.time.RequestCache;
 import org.json.JSONObject;
 
 public final class EventCacheTest {
+    private static SWEKSession session = new SWEKSession(new SWEKCatalog(0, List.of(), List.of()));
+    private static EventDatabase database = EventDatabaseTest.database(session);
 
     public static void main(String[] args) throws Exception {
         switch (args[0]) {
@@ -36,12 +39,12 @@ public final class EventCacheTest {
         System.out.println("EventCacheTest " + args[0] + " passed");
     }
 
-    public static void checkLoadedEvents(List<SolarEvent> events) {
-        EventCache.replaceEvents(new EventBatch(1, events, List.of()));
+    public static void checkLoadedEvents(SWEKSession source, List<SolarEvent> events) {
+        source.replaceEvents(new EventBatch(1, events, List.of()));
         for (SolarEvent event : events) {
-            RelatedEvents group = EventCache.getRelatedEvents(event.getUniqueID());
-            check(EventCache.getEvents(event.start, event.start).contains(group), "loaded event visible at start");
-            check(EventCache.getEvents(event.end, event.end).contains(group), "loaded event visible at end");
+            RelatedEvents group = source.getRelatedEvents(event.getUniqueID());
+            check(source.getEvents(event.start, event.start).contains(group), "loaded event visible at start");
+            check(source.getEvents(event.end, event.end).contains(group), "loaded event visible at end");
             check(group.getClosestTo(event.start) == event, "canvas representative");
             check(group.getIntervals().equals(List.of(new Interval(event.start, event.end))), "singleton timeline interval");
         }
@@ -102,23 +105,23 @@ public final class EventCacheTest {
             boolean[] expectedActive = {true};
             int[] notifications = new int[1];
             EventListener.Handle listener = () -> {
-                check(SWEKDownloader.isSupplierActive(supplier) == expectedActive[0], "activation updated before cache notification");
+                check(session.isSupplierActive(supplier) == expectedActive[0], "activation updated before cache notification");
                 if (!expectedActive[0])
-                    check(EventCache.getRelatedEvents(301) == null, "deactivation removes observations before notification");
+                    check(session.getRelatedEvents(301) == null, "deactivation removes observations before notification");
                 notifications[0]++;
             };
-            EventCache.registerHandler(listener);
+            session.registerHandler(listener);
             try {
-                check(!SWEKDownloader.isSupplierActive(supplier), "supplier initially inactive");
-                SWEKDownloader.setSupplierActive(supplier, true);
-                EventCache.replaceEvents(new EventBatch(1, List.of(new SolarEvent(supplier, 301, 100, 200)), List.of()));
-                SWEKDownloader.requestForInterval(Long.MAX_VALUE - 1, Long.MAX_VALUE);
-                check(!SWEKDownloader.isGroupBusy(supplier.group()), "future-only interval schedules no work");
+                check(!session.isSupplierActive(supplier), "supplier initially inactive");
+                session.setSupplierActive(supplier, true);
+                session.replaceEvents(new EventBatch(1, List.of(new SolarEvent(supplier, 301, 100, 200)), List.of()));
+                session.requestForInterval(Long.MAX_VALUE - 1, Long.MAX_VALUE);
+                check(!session.isGroupBusy(supplier.group()), "future-only interval schedules no work");
                 expectedActive[0] = false;
-                SWEKDownloader.setSupplierActive(supplier, false);
+                session.setSupplierActive(supplier, false);
                 check(notifications[0] == 3, "activation, publication, and deactivation each notify once");
             } finally {
-                EventCache.unregisterHandler(listener);
+                session.unregisterHandler(listener);
             }
         });
     }
@@ -205,20 +208,20 @@ public final class EventCacheTest {
         check(removedPending.getRelatedEvents(1) != removedPending.getRelatedEvents(2), "obsolete pending link stays removed when endpoint arrives late");
 
         SolarEvent left = new SolarEvent(null, 201, 100, 200), right = new SolarEvent(null, 202, 300, 400);
-        EventCache.replaceEvents(new EventBatch(1, List.of(left, right), List.of(new SolarEvent.Link(201, 202))));
-        RelatedEvents highlighted = EventCache.getRelatedEvents(201);
-        EventCache.highlight(highlighted);
+        session.replaceEvents(new EventBatch(1, List.of(left, right), List.of(new SolarEvent.Link(201, 202))));
+        RelatedEvents highlighted = session.getRelatedEvents(201);
+        session.highlight(highlighted);
         int[] notifications = new int[1];
         EventListener.Handle listener = () -> {
             check(!highlighted.isHighlighted(), "split clears detached highlight before cache notification");
-            check(EventCache.getRelatedEvents(201) != EventCache.getRelatedEvents(202), "notification sees finished split");
+            check(session.getRelatedEvents(201) != session.getRelatedEvents(202), "notification sees finished split");
             notifications[0]++;
         };
-        EventCache.registerHandler(listener);
-        EventCache.replaceEvents(new EventBatch(2, List.of(left), List.of()));
-        EventCache.unregisterHandler(listener);
+        session.registerHandler(listener);
+        session.replaceEvents(new EventBatch(2, List.of(left), List.of()));
+        session.unregisterHandler(listener);
         check(notifications[0] == 1, "batch publishes one cache notification");
-        EventCache.removeSupplier(null);
+        session.removeSupplier(null);
     }
 
     private static void checkPendingLinkRemoval() {
@@ -247,32 +250,32 @@ public final class EventCacheTest {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
         SWEKSupplier supplier = new SWEKSupplier(null, "notifications", "notifications", source, "notifications", List.of());
         SolarEvent event = new SolarEvent(supplier, 100, 100, 200);
-        EventCache.replaceEvents(new EventBatch(1, List.of(event), List.of()));
-        RelatedEvents group = EventCache.getRelatedEvents(100);
-        EventCache.highlight(group);
+        session.replaceEvents(new EventBatch(1, List.of(event), List.of()));
+        RelatedEvents group = session.getRelatedEvents(100);
+        session.highlight(group);
         int[] notifications = new int[2];
         EventListener.Highlight highlightListener = () -> {
             check(!group.isHighlighted(), "highlight cleared before notification");
-            check(EventCache.getRelatedEvents(100) == group, "highlight notification precedes group removal");
+            check(session.getRelatedEvents(100) == group, "highlight notification precedes group removal");
             notifications[0]++;
         };
         EventListener.Handle cacheListener = () -> {
-            check(EventCache.getRelatedEvents(100) == null, "cache notification follows group removal");
+            check(session.getRelatedEvents(100) == null, "cache notification follows group removal");
             notifications[1]++;
         };
-        EventCache.addHighlightListener(highlightListener);
-        EventCache.registerHandler(cacheListener);
-        EventCache.removeSupplier(supplier);
-        EventCache.removeHighlightListener(highlightListener);
-        EventCache.unregisterHandler(cacheListener);
+        session.addHighlightListener(highlightListener);
+        session.registerHandler(cacheListener);
+        session.removeSupplier(supplier);
+        session.removeHighlightListener(highlightListener);
+        session.unregisterHandler(cacheListener);
         check(notifications[0] == 1 && notifications[1] == 1, "one notification of each kind");
 
         RelatedEvents detached = new RelatedEvents(event);
-        EventCache.highlight(detached);
-        EventCache.replaceEvents(new EventBatch(1, List.of(event), List.of()));
-        EventCache.removeSupplier(supplier);
+        session.highlight(detached);
+        session.replaceEvents(new EventBatch(1, List.of(event), List.of()));
+        session.removeSupplier(supplier);
         check(detached.isHighlighted(), "detached detail group is not mistaken for cached group");
-        EventCache.highlight(null);
+        session.highlight(null);
     }
 
     private static void checkGroupOwnership() {
@@ -322,73 +325,112 @@ public final class EventCacheTest {
         ControlledHandler retryHandler = new ControlledHandler(false);
         SWEKSupplier retry = supplier(group, "retry", retryHandler);
         long start = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(3), end = start + 1;
-        EventQueue.invokeAndWait(() -> SWEKDownloader.setSupplierActive(retry, true));
+        EventQueue.invokeAndWait(() -> session.setSupplierActive(retry, true));
         await(request(group, start, end), "failed request finishes");
         check(retryHandler.calls.get() == 1, "one padded request");
         await(request(group, start, end), "failed interval can be retried");
         check(retryHandler.calls.get() == 2, "retry fetched the failed interval");
         EventQueue.invokeAndWait(() -> {
-            SWEKDownloader.requestForInterval(start, end);
-            check(!SWEKDownloader.isGroupBusy(group), "completed interval is not scheduled again");
-            SWEKDownloader.setSupplierActive(retry, false);
+            session.requestForInterval(start, end);
+            check(!session.isGroupBusy(group), "completed interval is not scheduled again");
+            session.setSupplierActive(retry, false);
         });
         check(retryHandler.calls.get() == 2, "completed request remains covered");
 
         ControlledHandler delayedHandler = new ControlledHandler(true);
         SWEKSupplier delayed = supplier(group, "delayed", delayedHandler);
-        EventQueue.invokeAndWait(() -> SWEKDownloader.setSupplierActive(delayed, true));
+        EventQueue.invokeAndWait(() -> session.setSupplierActive(delayed, true));
         request(group, start, end);
         await(delayedHandler.entered, "first worker is fetching");
         EventQueue.invokeAndWait(() -> {
-            check(SWEKDownloader.isGroupBusy(group), "blocked worker marks group busy");
-            SWEKDownloader.setSupplierActive(delayed, false);
-            check(!SWEKDownloader.isGroupBusy(group), "cancelled supplier is no longer busy");
-            SWEKDownloader.setSupplierActive(delayed, true);
+            check(session.isGroupBusy(group), "blocked worker marks group busy");
+            session.setSupplierActive(delayed, false);
+            check(!session.isGroupBusy(group), "cancelled supplier is no longer busy");
+            session.setSupplierActive(delayed, true);
         });
         delayedHandler.release.countDown();
         await(request(group, start, end), "reactivated supplier finishes new request");
         EventQueue.invokeAndWait(() -> {
-            check(SWEKDownloader.isSupplierActive(delayed), "old worker does not deactivate new state");
-            SWEKDownloader.requestForInterval(start, end);
-            check(!SWEKDownloader.isGroupBusy(group), "new state retains completed coverage");
-            SWEKDownloader.setSupplierActive(delayed, false);
-            SWEKDownloader.clearGroupChangedCallback();
+            check(session.isSupplierActive(delayed), "old worker does not deactivate new state");
+            session.requestForInterval(start, end);
+            check(!session.isGroupBusy(group), "new state retains completed coverage");
+            session.setSupplierActive(delayed, false);
+            session.setGroupChangedCallback(_ -> {});
         });
         check(delayedHandler.calls.get() == 2, "reactivation creates exactly one replacement request");
         checkPublicationFailure(group, start, end);
         checkSupplierCancellation(group);
         checkPagination(group, start, end);
+        checkSessionReplacement(group, start, end);
+    }
+
+    private static void checkSessionReplacement(SWEKGroup group, long start, long end) throws Exception {
+        ControlledHandler oldHandler = new ControlledHandler(true, false);
+        SWEKSupplier oldSupplier = supplier(group, "session-replacement", oldHandler);
+        SWEKSession old = session;
+        EventDatabase oldDatabase = database;
+        EventQueue.invokeAndWait(() -> old.setSupplierActive(oldSupplier, true));
+        request(group, start, end);
+        await(oldHandler.entered, "old session request is fetching");
+        EventQueue.invokeAndWait(old::close);
+
+        ControlledHandler replacementHandler = new ControlledHandler(false, false);
+        SWEKSupplier replacement = supplier(new SWEKGroup("Replacement", ""), oldSupplier.id(), replacementHandler);
+        SWEKSession current = session;
+        AtomicInteger callbacks = new AtomicInteger();
+        EventQueue.invokeAndWait(() -> current.setGroupChangedCallback(_ -> callbacks.incrementAndGet()));
+        oldHandler.release.countDown();
+        Field poolField = SWEKDownloader.class.getDeclaredField("downloadPool");
+        poolField.setAccessible(true);
+        ThreadPoolExecutor pool = (ThreadPoolExecutor) poolField.get(null);
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (pool.getActiveCount() != 0 && System.nanoTime() < deadline)
+            Thread.sleep(10);
+        check(pool.getActiveCount() == 0, "old worker finishes after session close");
+        EventQueue.invokeAndWait(() -> {});
+        check(callbacks.get() == 0, "old completion cannot notify the replacement session");
+        check(!database.isStored(start, end, replacement), "cancelled old request cannot publish stored coverage");
+        check(!oldDatabase.addStoredInterval(start, end, oldSupplier), "closed store rejects later writes");
+        EventQueue.invokeAndWait(() -> {
+            old.replaceEvents(new EventBatch(Long.MAX_VALUE, List.of(new SolarEvent(oldSupplier, 999, start, end)), List.of()));
+            check(old.getEvents(start, end).isEmpty(), "closed session rejects queued publication");
+            check(current.catalog().getSupplier(oldSupplier.id()) == replacement, "replacement retains its own supplier identity");
+            current.setSupplierActive(replacement, true);
+        });
+        await(request(replacement.group(), start, end), "replacement session downloads independently");
+        check(replacementHandler.calls.get() == 1, "replacement performs its own request");
+        EventQueue.invokeAndWait(current::close);
     }
 
     private static void checkPagination(SWEKGroup group, long start, long end) throws Exception {
         PaginatedHandler handler = new PaginatedHandler();
         SWEKSupplier supplier = supplier(group, "paginated", handler);
-        EventQueue.invokeAndWait(() -> SWEKDownloader.setSupplierActive(supplier, true));
+        EventQueue.invokeAndWait(() -> session.setSupplierActive(supplier, true));
         try {
             await(request(group, start, end), "second page failure finishes request");
             check(handler.pages.equals(List.of(0, 1)), "downloader advances to the second page");
-            check(!EventDatabase.isStored(start, end, supplier), "failed second page must not complete interval coverage");
-            List<SolarEvent> partial = EventDatabase.loadEvents(start, end, supplier, List.of()).events();
+            check(!database.isStored(start, end, supplier), "failed second page must not complete interval coverage");
+            List<SolarEvent> partial = database.loadEvents(start, end, supplier, List.of()).events();
             check(partial.size() == 1, "first page was stored before the second page failed");
             int firstId = partial.getFirst().getUniqueID();
 
             await(request(group, start, end), "retry completes both pages");
             check(handler.pages.equals(List.of(0, 1, 0, 1)), "retry restarts pagination and stops at the final page");
-            check(EventDatabase.isStored(start, end, supplier), "successful final page completes interval coverage");
-            List<SolarEvent> loaded = EventDatabase.loadEvents(start, end, supplier, List.of()).events();
+            check(database.isStored(start, end, supplier), "successful final page completes interval coverage");
+            List<SolarEvent> loaded = database.loadEvents(start, end, supplier, List.of()).events();
             check(loaded.size() == 2, "retry retains both events without duplicating the first page");
             check(loaded.stream().filter(event -> event.getUniqueID() == firstId).count() == 1, "retried first page keeps its database identity");
             EventQueue.invokeAndWait(() -> {
                 for (SolarEvent event : loaded)
-                    check(EventCache.getRelatedEvents(event.getUniqueID()) != null, "completed download publishes every page");
-                SWEKDownloader.requestForInterval(start, end);
-                check(!SWEKDownloader.isGroupBusy(group), "completed pages are not scheduled again");
+                    check(session.getRelatedEvents(event.getUniqueID()) != null, "completed download publishes every page");
+                session.requestForInterval(start, end);
+                check(!session.isGroupBusy(group), "completed pages are not scheduled again");
             });
             check(handler.pages.size() == 4, "completed interval requires no further fetches");
         } finally {
             EventQueue.invokeAndWait(() -> {
-                SWEKDownloader.setSupplierActive(supplier, false);
-                SWEKDownloader.clearGroupChangedCallback();
+                session.setSupplierActive(supplier, false);
+                session.setGroupChangedCallback(_ -> {});
             });
         }
     }
@@ -400,7 +442,7 @@ public final class EventCacheTest {
         PaginatedHandler() throws Exception {}
 
         @Override
-        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page) {
+        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) {
             pages.add(page);
             check(page == 0 || page == 1, "only two pages exist");
             if (pages.size() == 2)
@@ -415,7 +457,7 @@ public final class EventCacheTest {
         }
 
         @Override
-        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier) {
+        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) {
             throw new AssertionError("controlled pagination supplies pages directly");
         }
 
@@ -429,22 +471,22 @@ public final class EventCacheTest {
         ControlledHandler handler = new ControlledHandler(2);
         SWEKSupplier supplier = supplier(group, "multiple", handler);
         long end = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), start = end - TimeUnit.DAYS.toMillis(1);
-        EventQueue.invokeAndWait(() -> SWEKDownloader.setSupplierActive(supplier, true));
+        EventQueue.invokeAndWait(() -> session.setSupplierActive(supplier, true));
         request(group, start, end);
         await(handler.entered, "both interval workers are fetching");
         EventQueue.invokeAndWait(() -> {
-            SWEKDownloader.setSupplierActive(supplier, false);
-            check(!SWEKDownloader.isGroupBusy(group), "cancellation clears all workers from busy state");
-            SWEKDownloader.setSupplierActive(supplier, true);
+            session.setSupplierActive(supplier, false);
+            check(!session.isGroupBusy(group), "cancellation clears all workers from busy state");
+            session.setSupplierActive(supplier, true);
         });
         handler.release.countDown();
         await(request(group, start, end), "replacement interval workers finish");
         check(handler.calls.get() == 4, "both cancelled intervals are fetched by the new state");
         EventQueue.invokeAndWait(() -> {
-            SWEKDownloader.requestForInterval(start, end);
-            check(!SWEKDownloader.isGroupBusy(group), "replacement workers retain interval coverage");
-            SWEKDownloader.setSupplierActive(supplier, false);
-            SWEKDownloader.clearGroupChangedCallback();
+            session.requestForInterval(start, end);
+            check(!session.isGroupBusy(group), "replacement workers retain interval coverage");
+            session.setSupplierActive(supplier, false);
+            session.setGroupChangedCallback(_ -> {});
         });
     }
 
@@ -456,46 +498,47 @@ public final class EventCacheTest {
         Thread.UncaughtExceptionHandler[] previous = new Thread.UncaughtExceptionHandler[1];
         EventListener.Handle listener = () -> { throw failure; };
         EventQueue.invokeAndWait(() -> {
-            SWEKDownloader.setSupplierActive(supplier, true);
+            session.setSupplierActive(supplier, true);
             previous[0] = Thread.currentThread().getUncaughtExceptionHandler();
             Thread.currentThread().setUncaughtExceptionHandler((thread, error) -> {
                 if (error == failure) reported.countDown();
                 else previous[0].uncaughtException(thread, error);
             });
-            EventCache.registerHandler(listener);
+            session.registerHandler(listener);
         });
         try {
             CountDownLatch idle = request(group, start, end);
             await(reported, "publication error remains observable");
             await(idle, "publication failure still clears busy state");
             EventQueue.invokeAndWait(() -> {
-                SWEKDownloader.requestForInterval(start, end);
-                check(!SWEKDownloader.isGroupBusy(group), "listener failure does not invalidate successfully loaded interval");
+                session.requestForInterval(start, end);
+                check(!session.isGroupBusy(group), "listener failure does not invalidate successfully loaded interval");
             });
         } finally {
             EventQueue.invokeAndWait(() -> {
-                EventCache.unregisterHandler(listener);
+                session.unregisterHandler(listener);
                 Thread.currentThread().setUncaughtExceptionHandler(previous[0]);
-                SWEKDownloader.setSupplierActive(supplier, false);
-                SWEKDownloader.clearGroupChangedCallback();
+                session.setSupplierActive(supplier, false);
+                session.setGroupChangedCallback(_ -> {});
             });
         }
     }
 
     private static SWEKSupplier supplier(SWEKGroup group, String name, SWEKHandler handler) {
         SWEKSupplier supplier = new SWEKSupplier(group, name, name, new SWEK.Source("test", List.of(), handler, Map.of()), name, List.of());
-        SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelations(List.of());
+        session.close();
+        session = new SWEKSession(new SWEKCatalog(0, List.of(supplier), List.of()));
+        database = EventDatabaseTest.database(session);
         return supplier;
     }
 
     private static CountDownLatch request(SWEKGroup group, long start, long end) throws Exception {
         CountDownLatch idle = new CountDownLatch(1);
         EventQueue.invokeAndWait(() -> {
-            SWEKDownloader.setGroupChangedCallback(changed -> {
-                if (changed == group && !SWEKDownloader.isGroupBusy(group)) idle.countDown();
+            session.setGroupChangedCallback(changed -> {
+                if (changed == group && !session.isGroupBusy(group)) idle.countDown();
             });
-            SWEKDownloader.requestForInterval(start, end);
+            session.requestForInterval(start, end);
         });
         return idle;
     }
@@ -525,7 +568,7 @@ public final class EventCacheTest {
         }
 
         @Override
-        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page) throws Exception {
+        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
             int call = calls.incrementAndGet();
             if (call <= blockedCalls) {
                 entered.countDown();
@@ -541,7 +584,7 @@ public final class EventCacheTest {
         }
 
         @Override
-        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier) {
+        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) {
             throw new AssertionError("controlled fetch supplies its page directly");
         }
 

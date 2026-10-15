@@ -11,11 +11,12 @@ import tempfile
 
 root = Path(__file__).resolve().parents[3]
 tests = {
-    "HEKHandlerTest": "plugins.swek.sources",
-    "EventDatabaseTest": "database",
+    "HEKHandlerTest": "event.sources",
+    "EventDatabaseTest": "event",
     "EventCacheTest": "event",
-    "EventFilterRequestsTest": "event.filter",
-    "SWEKIntegrationTest": "plugins.swek",
+    "EventFilterRequestsTest": "event",
+    "SWEKIntegrationTest": "event",
+    "SWEKLayerTest": "plugins.swek",
 }
 classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
 with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
