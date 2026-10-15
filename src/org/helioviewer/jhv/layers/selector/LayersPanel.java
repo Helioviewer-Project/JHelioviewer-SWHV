@@ -21,8 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.DisplayController;
@@ -46,9 +46,8 @@ public final class LayersPanel extends JPanel {
     static final int ENABLED_COL = 0;
     static final int NAME_COL = 1;
     static final int TIME_COL = 2;
-    static final int DOWNLOAD_COL = 3;
-    static final int REMOVE_COL = 4;
-    static final int NUMBER_COLUMNS = 5;
+    static final int REMOVE_COL = 3;
+    static final int NUMBER_COLUMNS = 4;
 
     private static final int NUMBEROFVISIBLEROWS = 9;
 
@@ -109,10 +108,11 @@ public final class LayersPanel extends JPanel {
         public void lazyRepaint() {
             if (dirty) {
                 super.repaint();
-            } else if (dirtyRect != null) {
-                super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
-            } else if (dirtyTimeColumn) {
-                repaintTimeColumn();
+            } else {
+                if (dirtyRect != null)
+                    super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
+                if (dirtyTimeColumn)
+                    repaintTimeColumn();
             }
             dirty = false;
             dirtyRect = null;
@@ -156,23 +156,27 @@ public final class LayersPanel extends JPanel {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new CellRenderer.Enabled());
-        grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
+        TableColumn enabledColumn = grid.getColumnModel().getColumn(ENABLED_COL);
+        enabledColumn.setCellRenderer(new CellRenderer.Enabled());
+        enabledColumn.setPreferredWidth(ICON_WIDTH + 8);
+        enabledColumn.setMaxWidth(ICON_WIDTH + 8);
 
         grid.getColumnModel().getColumn(NAME_COL).setCellRenderer(new CellRenderer.Name());
 
-        grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new CellRenderer.Time());
-        int timeWidth = SwingUtilities.computeStringWidth(grid.getFontMetrics(CellRenderer.Time.font), "2000-01-01T12:00:00.000");
-        grid.getColumnModel().getColumn(TIME_COL).setMinWidth(timeWidth);
+        TableColumn timeColumn = grid.getColumnModel().getColumn(TIME_COL);
+        CellRenderer.Time timeRenderer = new CellRenderer.Time();
+        timeRenderer.setFont(CellRenderer.Time.font);
+        timeRenderer.setText("2000-01-01T12:00:00.000");
+        int timeWidth = timeRenderer.getPreferredSize().width;
+        timeColumn.setCellRenderer(timeRenderer);
+        timeColumn.setMinWidth(timeWidth);
+        timeColumn.setPreferredWidth(timeWidth);
+        timeColumn.setMaxWidth(timeWidth);
 
-        grid.getColumnModel().getColumn(DOWNLOAD_COL).setCellRenderer(new CellRenderer.Loading());
-        grid.getColumnModel().getColumn(DOWNLOAD_COL).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(DOWNLOAD_COL).setMaxWidth(ICON_WIDTH + 2);
-
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
-        grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
+        TableColumn removeColumn = grid.getColumnModel().getColumn(REMOVE_COL);
+        removeColumn.setCellRenderer(new CellRenderer.Remove());
+        removeColumn.setPreferredWidth(ICON_WIDTH + 2);
+        removeColumn.setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting())
@@ -272,7 +276,6 @@ public final class LayersPanel extends JPanel {
         }
         int row = Math.min(preferredRow, rowCount - 1);
         grid.getSelectionModel().setSelectionInterval(row, row);
-        refreshSelectedOptionsPanel();
     }
 
     private void refreshSelectedOptionsPanel() {
@@ -280,11 +283,14 @@ public final class LayersPanel extends JPanel {
     }
 
     public void setOptionsPanel(@Nullable Layer layer) {
-        optionsPanelWrapper.removeAll();
         Component optionsPanel = layer == null ? null : options.getOptionsPanel(layer);
-        if (optionsPanel != null) {
+        if (optionsPanel != null)
             ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
-            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
+        if (current != optionsPanel) {
+            optionsPanelWrapper.removeAll();
+            if (optionsPanel != null)
+                optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
         repaint();
