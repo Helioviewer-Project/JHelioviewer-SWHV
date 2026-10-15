@@ -27,8 +27,14 @@ import org.json.JSONObject;
 // has to be public for state
 public final class EventTimelineLayer extends TimelineLayer implements SWEKSession.Listener {
 
+    // Toolkit part of a click on an event: the event information window.
+    public interface Ui {
+        void open(RelatedEvents related, SolarEvent event, Point locationOnScreen);
+    }
+
     private final SWEKSession session;
-    private SWEKDialogs dialogs;
+    @Nullable
+    private Ui ui;
     private EventPlotConfiguration eventUnderMouse;
     private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
     private List<RelatedEvents> visibleEvents = Collections.emptyList();
@@ -38,8 +44,8 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         registerAndRefresh();
     }
 
-    void setDialogs(SWEKDialogs _dialogs) {
-        dialogs = _dialogs;
+    void setUi(@Nullable Ui _ui) {
+        ui = _ui;
     }
 
     @Nullable
@@ -146,7 +152,7 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         visibleEvents = List.of();
         eventPlots.clear();
         eventUnderMouse = null;
-        dialogs = null;
+        ui = null;
     }
 
     @Override
@@ -269,17 +275,12 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
     @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
-        if (eventUnderMouse == null || dialogs == null)
+        if (eventUnderMouse == null || ui == null)
             return null;
 
+        Ui target = ui;
         RelatedEvents event = eventUnderMouse.event;
-        return (location, timestamp) -> {
-            SWEKEventInformationDialog dialog = dialogs.createInformation(event, event.getClosestTo(timestamp));
-            if (dialog == null) return;
-            dialog.pack();
-            dialog.setLocation(location);
-            dialog.setVisible(true);
-        };
+        return (location, timestamp) -> target.open(event, event.getClosestTo(timestamp), location);
     }
 
 }

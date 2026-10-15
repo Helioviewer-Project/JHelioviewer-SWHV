@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.GridLayout;
 import java.awt.event.FocusEvent;
@@ -28,7 +28,15 @@ final class FilterDialog extends JDialog implements FocusListener, WindowFocusLi
         addFocusListener(this);
         addWindowFocusListener(this);
 
-        List<FilterPanel> filterPanels = FilterPanelFactory.createFilterPanel(supplier, this);
+        List<FilterPanel> filterPanels = new ArrayList<>();
+        for (SWEK.Parameter parameter : supplier.getParameterList()) {
+            SWEK.ParameterFilter filter = parameter.filter();
+            if (filter == null)
+                continue;
+            for (SWEK.Operand operand : filter.operands())
+                filterPanels.add(new FilterPanel(parameter, operand, this));
+        }
+
         JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
         filterPanels.forEach(filterPanel::add);
 

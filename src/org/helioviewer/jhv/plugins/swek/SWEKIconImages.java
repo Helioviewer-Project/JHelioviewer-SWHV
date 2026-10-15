@@ -3,11 +3,11 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
-final class SWEKIconImages {
+public final class SWEKIconImages {
 
     private static final HashMap<String, BufferedImage> images = new HashMap<>();
 
-    static BufferedImage getImage(String iconName) {
+    public static BufferedImage getImage(String iconName) {
         return images.computeIfAbsent(SWEKIconBank.resource(iconName), ignored -> {
             SWEKIconBank.Pixels pixels = SWEKIconBank.getPixels(iconName);
             BufferedImage image = new BufferedImage(pixels.width(), pixels.height(), BufferedImage.TYPE_4BYTE_ABGR_PRE);

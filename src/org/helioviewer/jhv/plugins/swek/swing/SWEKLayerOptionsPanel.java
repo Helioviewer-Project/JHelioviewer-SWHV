@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+
+import org.helioviewer.jhv.plugins.swek.SWEKLayer;
 
 @SuppressWarnings("serial")
 final class SWEKLayerOptionsPanel extends JPanel {

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -29,6 +29,7 @@ import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
+import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 
 import com.formdev.flatlaf.util.ScaledImageIcon;
 import com.formdev.flatlaf.util.UIScale;
@@ -45,13 +46,13 @@ final class SWEKTreePane extends JPanel {
     private final IdentityHashMap<SWEKGroup, DefaultMutableTreeNode> groupNodes = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
     private final SWEKSession session;
-    private final SWEKDialogs dialogs;
+    private final SWEKSwingUI ui;
     private final Timer loadingTimer;
 
-    SWEKTreePane(SWEKSession _session, SWEKDialogs _dialogs) {
+    SWEKTreePane(SWEKSession _session, SWEKSwingUI _ui) {
         super(new BorderLayout());
         session = _session;
-        dialogs = _dialogs;
+        ui = _ui;
         treeModel = createTreeModel(session.catalog().getGroups());
 
         tree = new JTree(treeModel);
@@ -165,7 +166,7 @@ final class SWEKTreePane extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Point pressedLocation = e.getLocationOnScreen();
-                    dialogs.showFilter(supplier, pressedLocation);
+                    ui.showFilter(supplier, pressedLocation);
                 }
             });
             panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, filterButton.getPreferredSize().height));

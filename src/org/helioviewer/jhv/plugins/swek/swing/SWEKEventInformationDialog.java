@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -28,7 +28,7 @@ import org.helioviewer.jhv.thread.Task;
 final class SWEKEventInformationDialog extends JDialog {
 
     private final SWEKSession session;
-    private final SWEKDialogs dialogs;
+    private final SWEKSwingUI ui;
     private JPanel allTablePanel;
 
     private DataCollapsiblePanel standardParameters;
@@ -38,13 +38,13 @@ final class SWEKEventInformationDialog extends JDialog {
 
     private SolarEvent event;
 
-    SWEKEventInformationDialog(SWEKDialogs _dialogs, RelatedEvents related, SolarEvent _event) {
+    SWEKEventInformationDialog(SWEKSwingUI _ui, RelatedEvents related, SolarEvent _event) {
         super(MainFrame.get(), _event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        dialogs = _dialogs;
-        session = dialogs.session;
+        ui = _ui;
+        session = ui.session;
         event = _event;
 
         initAllTablePanel();
@@ -163,12 +163,7 @@ final class SWEKEventInformationDialog extends JDialog {
 
     private JPanel createEventPanel(RelatedEvents related, SolarEvent event) {
         JButton detailsButton = new JButton("Details");
-        detailsButton.addActionListener(e -> {
-            SWEKEventInformationDialog dialog = dialogs.createInformation(related, event);
-            if (dialog == null) return;
-            dialog.pack();
-            dialog.setVisible(true);
-        });
+        detailsButton.addActionListener(e -> ui.open(related, event));
 
         JPanel eventAndButtonPanel = new JPanel(new GridBagLayout());
 

@@ -46,7 +46,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
 
     // Toolkit part of canvas hover: the hand cursor and the event information window.
-    interface CanvasUi {
+    public interface CanvasUi {
         void setHand(boolean hand);
 
         void open(RelatedEvents related, SolarEvent event, PointerEvent e);
@@ -586,11 +586,11 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         return null;
     }
 
-    boolean isIcons() {
+    public boolean isIcons() {
         return icons;
     }
 
-    void setIcons(boolean _icons) {
+    public void setIcons(boolean _icons) {
         icons = _icons;
         DisplayController.display();
     }

@@ -7,11 +7,10 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.event.SWEKConfig;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.sources.HEKHandler;
-import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
+import org.helioviewer.jhv.plugins.swek.swing.SWEKSwingUI;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
@@ -22,9 +21,7 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     private SWEKLayer layer;
     private EventTimelineLayer etl;
     private SWEKSession session;
-    private SWEKDialogs dialogs;
-    private SWEKTreePane swekPanel;
-    private SWEKPopupController popupController;
+    private SWEKSwingUI ui;
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
@@ -58,30 +55,17 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     @Override
     public void installGUI() {
-        dialogs = new SWEKDialogs(session);
-        etl.setDialogs(dialogs);
-        swekPanel = new SWEKTreePane(session, dialogs);
-        popupController = new SWEKPopupController(dialogs);
+        ui = new SWEKSwingUI(session);
+        etl.setUi(ui);
         bindLayer();
-
-        MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
-        MainFrame.getLeftContentPane().revalidate();
-
-        LayerOptions.register(SWEKLayer.class, selectedLayer -> new SWEKLayerOptionsPanel((SWEKLayer) selectedLayer));
     }
 
     @Override
     public void uninstallGUI() {
-        popupController = null;
+        etl.setUi(null);
+        ui.close();
+        ui = null;
         bindLayer();
-        LayerOptions.unregister(SWEKLayer.class);
-        etl.setDialogs(null);
-        dialogs.close();
-        dialogs = null;
-
-        MainFrame.getLeftContentPane().remove(swekPanel);
-        MainFrame.getLeftContentPane().revalidate();
-        swekPanel = null;
     }
 
     @Override
@@ -131,7 +115,7 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     private void bindLayer() {
         if (layer != null)
-            layer.setUi(popupController);
+            layer.setUi(ui);
     }
 
 }

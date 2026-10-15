@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.swek;
+package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -15,6 +15,7 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
+import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")

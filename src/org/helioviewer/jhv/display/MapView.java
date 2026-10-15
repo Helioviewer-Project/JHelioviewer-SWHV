@@ -106,7 +106,7 @@ public abstract class MapView {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
 
-    public Vec3 mouseToPlane(Viewport vp, int x, int y) { // only for SWEKPopupController
+    public Vec3 mouseToPlane(Viewport vp, int x, int y) { // only for SWEKLayer
         return ViewportMath.unprojectToOutputPlane(camera, vp, cameraWidth(vp), x, y, Quat.ZERO);
     }
 
@@ -116,7 +116,7 @@ public abstract class MapView {
 
     public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
 
-    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y); // only for SWEKPopupController
+    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y); // only for SWEKLayer
 
     public abstract void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
 
