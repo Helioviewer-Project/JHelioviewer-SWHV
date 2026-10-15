@@ -26,6 +26,10 @@ public class FilterManager {
         listeners.remove(listener);
     }
 
+    public static void clear() {
+        filters.clear();
+    }
+
     static void addFilter(SWEKSupplier supplier, SWEK.Param filter) {
         filters.computeIfAbsent(supplier, _ -> new ArrayList<>()).add(filter);
     }

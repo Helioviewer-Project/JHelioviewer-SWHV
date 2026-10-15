@@ -157,6 +157,11 @@ public class SWEKDownloader {
         FilterManager.removeListener(filterListener);
     }
 
+    public static void clear() {
+        for (SWEKSupplier supplier : new ArrayList<>(activeSuppliers.keySet()))
+            stopDownloadSupplier(supplier, false);
+    }
+
     public static void setGroupChangedCallback(Consumer<SWEKGroup> callback) {
         groupChanged = callback;
     }

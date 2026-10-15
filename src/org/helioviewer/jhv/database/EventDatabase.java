@@ -65,6 +65,10 @@ public class EventDatabase {
     private static final HashMap<String, PreparedStatement> statements = new HashMap<>();
     private static final HashMap<SWEKSupplier, RequestCache> storedIntervals = new HashMap<>();
 
+    public static void clearStoredIntervals() {
+        executor.execute(storedIntervals::clear);
+    }
+
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
     private record StoredEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
@@ -393,7 +397,8 @@ public class EventDatabase {
         typedCache = new RequestCache();
         int typeId = findEventTypeId(type);
         if (typeId == -1) {
-            storedIntervals.put(type, typedCache);
+            if (SWEKCatalog.getSupplier(type.id()) == type)
+                storedIntervals.put(type, typedCache);
             return typedCache;
         }
 
@@ -412,7 +417,9 @@ public class EventDatabase {
                     typedCache.adaptRequestCache(beginDate, endDate);
             }
         }
-        storedIntervals.put(type, typedCache);
+        // A cancelled worker may finish after the plugin's catalog was replaced.
+        if (SWEKCatalog.getSupplier(type.id()) == type)
+            storedIntervals.put(type, typedCache);
         return typedCache;
     }
 

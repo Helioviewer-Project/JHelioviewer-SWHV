@@ -4,8 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.database.EventDatabase;
+import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
@@ -44,8 +47,13 @@ public class SWEKPlugin extends Plugin {
         TimelineLayers.remove(etl);
         etl = null;
         SWEKDownloader.removeFilterListener();
+        layer.setEnabled(false);
         Layers.remove(layer);
         layer = null;
+        SWEKDownloader.clear();
+        FilterManager.clear();
+        SWEKCatalog.clear();
+        EventDatabase.clearStoredIntervals();
         groups = List.of();
     }
 

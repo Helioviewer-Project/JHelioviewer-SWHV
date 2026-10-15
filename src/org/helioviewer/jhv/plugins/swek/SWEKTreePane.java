@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ final class SWEKTreePane extends JPanel {
     private final IdentityHashMap<SWEKGroup, Component> groupComponents = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKGroup, DefaultMutableTreeNode> groupNodes = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
+    private final List<FilterDialog> filterDialogs = new ArrayList<>();
     private final Timer loadingTimer;
 
     SWEKTreePane(List<SWEKGroup> groups) {
@@ -118,7 +120,7 @@ final class SWEKTreePane extends JPanel {
             if (component instanceof JPanel panel && panel.getComponentCount() > 1)
                 panel.getComponent(1).setVisible(busy);
         } else if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKSupplier supplier) {
-            component = supplierComponents.computeIfAbsent(supplier, SWEKTreePane::createSupplierComponent);
+            component = supplierComponents.computeIfAbsent(supplier, this::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
                 checkBox.setSelected(SWEKDownloader.isSupplierActive(supplier));
         }
@@ -147,7 +149,7 @@ final class SWEKTreePane extends JPanel {
         return panel;
     }
 
-    private static Component createSupplierComponent(SWEKSupplier supplier) {
+    private Component createSupplierComponent(SWEKSupplier supplier) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
@@ -159,6 +161,7 @@ final class SWEKTreePane extends JPanel {
 
         if (supplier.containsFilter()) {
             FilterDialog filterDialog = new FilterDialog(supplier);
+            filterDialogs.add(filterDialog);
             JideButton filterButton = new JideButton("Filter");
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -193,6 +196,7 @@ final class SWEKTreePane extends JPanel {
     public void removeNotify() {
         SWEKDownloader.clearGroupChangedCallback();
         loadingTimer.stop();
+        filterDialogs.forEach(FilterDialog::dispose);
         super.removeNotify();
     }
 
