@@ -1,14 +1,11 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
@@ -22,7 +19,6 @@ import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
-import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputMouseListener;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -118,22 +114,13 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
-            BufferedImage bi = NativeImageFactory.createRGBAPremultipliedImage(icon.getIconWidth(), icon.getIconHeight());
+            SWEKIconBank.Pixels pixels = SWEKIconBank.getPixels(group.getIconKey());
+            tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
             try {
-                Graphics g = bi.createGraphics();
-                try {
-                    icon.paintIcon(null, g, 0, 0);
-                } finally {
-                    g.dispose();
-                }
-
-                tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
-
-                ByteBuffer data = NativeImageFactory.getByteBuffer(bi);
-                tex.upload2D(GLTexture.Format.RGBA8, bi.getWidth(), bi.getHeight(), GL.LINEAR, data);
-            } finally {
-                NativeImageFactory.free(bi);
+                tex.upload2D(GLTexture.Format.RGBA8, pixels.width(), pixels.height(), GL.LINEAR, ByteBuffer.wrap(pixels.rgba()));
+            } catch (RuntimeException | Error e) {
+                tex.delete();
+                throw e;
             }
             iconCacheId.put(key, tex);
         }

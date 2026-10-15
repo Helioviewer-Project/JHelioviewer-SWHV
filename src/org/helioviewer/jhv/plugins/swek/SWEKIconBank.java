@@ -1,59 +1,78 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.image.BufferedImage;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import javax.annotation.Nonnull;
-import javax.swing.ImageIcon;
+import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.io.FileUtils;
 
-import org.helioviewer.jhv.app.Log;
+import org.lwjgl.stb.STBImage;
 
-final class SWEKIconBank {
+public final class SWEKIconBank {
 
-    private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
-    private static final ImageIcon blank = new ImageIcon(new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB));
+    // Top-to-bottom, premultiplied RGBA. Cached pixels are owned by the Java heap.
+    record Pixels(int width, int height, byte[] rgba) {}
 
-    @Nonnull
-    static ImageIcon getIcon(String iconName) {
-        ImageIcon icon = iconBank.get(iconName);
-        icon = icon == null ? iconBank.get("Other") : icon;
-        return icon == null ? blank : icon;
+    private static final HashMap<String, Pixels> icons = new HashMap<>();
+
+    static Pixels getPixels(String iconName) {
+        return icons.computeIfAbsent(resource(iconName), SWEKIconBank::decode);
     }
 
-    private static ImageIcon getImageIcon(String path) throws Exception {
-        URL url = SWEKPlugin.class.getResource(path);
-        if (url == null)
-            throw new Exception("Resource " + path + " not found");
-        return new ImageIcon(url);
-    }
-
-    static {
-        try {
-            iconBank.put("ActiveRegion", getImageIcon("/images/EventIcons/ar_icon.png"));
-            iconBank.put("CoronalDimming", getImageIcon("/images/EventIcons/cd_icon.png"));
-            iconBank.put("CME", getImageIcon("/images/EventIcons/ce_icon.png"));
-            iconBank.put("CoronalHole", getImageIcon("/images/EventIcons/ch_icon.png"));
-            iconBank.put("CoronalWave", getImageIcon("/images/EventIcons/cw_icon.png"));
-            iconBank.put("EmergingFlux", getImageIcon("/images/EventIcons/ef_icon.png"));
-            iconBank.put("Eruption", getImageIcon("/images/EventIcons/er_icon.png"));
-            iconBank.put("FilamentActivation", getImageIcon("/images/EventIcons/fa_icon.png"));
-            iconBank.put("FilamentEruption", getImageIcon("/images/EventIcons/fe_icon.png"));
-            iconBank.put("Filament", getImageIcon("/images/EventIcons/fi_icon.png"));
-            iconBank.put("Flare", getImageIcon("/images/EventIcons/fl_icon.png"));
-            iconBank.put("Loop", getImageIcon("/images/EventIcons/lp_icon.png"));
-            iconBank.put("NothingReported", getImageIcon("/images/EventIcons/nr_icon.png"));
-            iconBank.put("Oscillation", getImageIcon("/images/EventIcons/os_icon.png"));
-            iconBank.put("Other", getImageIcon("/images/EventIcons/ot_icon.png"));
-            iconBank.put("Plage", getImageIcon("/images/EventIcons/pg_icon.png"));
-            iconBank.put("Sigmoid", getImageIcon("/images/EventIcons/sg_icon.png"));
-            iconBank.put("SpraySurge", getImageIcon("/images/EventIcons/sp_icon.png"));
-            iconBank.put("SunSpot", getImageIcon("/images/EventIcons/ss_icon.png"));
-            iconBank.put("Comesep", getImageIcon("/images/EventIcons/comesep.png"));
-            iconBank.put("RHESSI", getImageIcon("/images/EventIcons/rhessi.png"));
-        } catch (Exception e) {
-            Log.error(e);
+    private static Pixels decode(String resource) {
+        try (InputStream input = FileUtils.getResource(resource)) {
+            ByteBuffer encoded = BufferUtils.directByteBuffer(ByteBuffer.wrap(input.readAllBytes()));
+            int[] width = new int[1];
+            int[] height = new int[1];
+            int[] channels = new int[1];
+            ByteBuffer decoded = STBImage.stbi_load_from_memory(encoded, width, height, channels, 4);
+            if (decoded == null)
+                throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
+            try {
+                byte[] rgba = new byte[decoded.remaining()];
+                // stbi_image_free needs the original buffer position.
+                decoded.get(0, rgba);
+                for (int i = 0; i < rgba.length; i += 4) {
+                    int alpha = rgba[i + 3] & 0xff;
+                    for (int channel = 0; channel < 3; channel++)
+                        rgba[i + channel] = (byte) (((rgba[i + channel] & 0xff) * alpha + 127) / 255);
+                }
+                return new Pixels(width[0], height[0], rgba);
+            } finally {
+                STBImage.stbi_image_free(decoded);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot load SWEK icon " + resource, e);
         }
+    }
+
+    public static String resource(String iconName) {
+        String file = switch (iconName) {
+            case "ActiveRegion" -> "ar_icon.png";
+            case "CoronalDimming" -> "cd_icon.png";
+            case "CME" -> "ce_icon.png";
+            case "CoronalHole" -> "ch_icon.png";
+            case "CoronalWave" -> "cw_icon.png";
+            case "EmergingFlux" -> "ef_icon.png";
+            case "Eruption" -> "er_icon.png";
+            case "FilamentActivation" -> "fa_icon.png";
+            case "FilamentEruption" -> "fe_icon.png";
+            case "Filament" -> "fi_icon.png";
+            case "Flare" -> "fl_icon.png";
+            case "Loop" -> "lp_icon.png";
+            case "NothingReported" -> "nr_icon.png";
+            case "Oscillation" -> "os_icon.png";
+            case "Plage" -> "pg_icon.png";
+            case "Sigmoid" -> "sg_icon.png";
+            case "SpraySurge" -> "sp_icon.png";
+            case "SunSpot" -> "ss_icon.png";
+            case "Comesep" -> "comesep.png";
+            case "RHESSI" -> "rhessi.png";
+            default -> "ot_icon.png";
+        };
+        return "/images/EventIcons/" + file;
     }
 
 }

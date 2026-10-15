@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -31,6 +30,8 @@ import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 
+import com.formdev.flatlaf.util.ScaledImageIcon;
+import com.formdev.flatlaf.util.UIScale;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
@@ -131,8 +132,9 @@ final class SWEKTreePane extends JPanel {
     private Component createGroupComponent(SWEKGroup group) {
         JLabel label = new JLabel(group.getName());
         int size = label.getPreferredSize().height;
-        ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
-        label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
+        int iconSize = UIScale.unscale(size);
+        label.setIcon(new ScaledImageIcon(new ImageIcon(SWEKIconImages.getImage(group.getIconKey())), iconSize, iconSize));
+        size = label.getPreferredSize().height;
 
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.setOpaque(false);
