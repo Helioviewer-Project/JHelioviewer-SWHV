@@ -94,6 +94,7 @@ public final class SWEKConfig {
         List<SWEK.Parameter> defaultParameters = parseParameters(obj.getJSONArray("parameter_list"));
         SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseEventIconKey(obj));
 
+        int supplierCount = suppliers.size();
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
             JSONObject supplier = suppliersArray.getJSONObject(i);
@@ -108,7 +109,7 @@ public final class SWEKConfig {
             SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("id"), parameters);
             suppliers.add(supplierObj);
         }
-        if (suppliers.stream().noneMatch(supplier -> supplier.group() == group))
+        if (suppliers.size() == supplierCount)
             return;
 
         groupsByName.put(group.getName(), group);

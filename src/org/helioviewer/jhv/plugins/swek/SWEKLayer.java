@@ -48,7 +48,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
     private static final double POLYGON_RADIUS = Sun.Radius * 1.01;
 
-    private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
+    private final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_ALPHA = 0.7;
     private static final double ICON_SIZE = 0.1;
     private static final double ICON_SIZE_HIGHLIGHTED = 0.16;
@@ -94,7 +94,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         jo.put("icons", icons);
     }
 
-    private static void bindTexture(SWEKGroup group) {
+    private void bindTexture(SWEKGroup group) {
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {

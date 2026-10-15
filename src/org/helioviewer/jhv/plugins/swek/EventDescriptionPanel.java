@@ -65,10 +65,6 @@ class EventDescriptionPanel extends JPanel {
 
         addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
         addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
-        // this.addLineToSummaryPanel(summaryPanel, 2, "object_id", new
-        // JTextArea(event.toString()));
-        // this.addLineToSummaryPanel(summaryPanel, 4, "event_id", new
-        // JTextArea(event.getUniqueID()));
 
         GridBagConstraints colorLabelConstraint = new GridBagConstraints();
         colorLabelConstraint.gridx = 2;

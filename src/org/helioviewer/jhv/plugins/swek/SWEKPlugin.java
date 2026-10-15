@@ -67,14 +67,14 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
         MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         MainFrame.getLeftContentPane().revalidate();
 
-        LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
+        LayerOptions.register(SWEKLayer.class, selectedLayer -> new SWEKLayerOptionsPanel((SWEKLayer) selectedLayer));
         popupController.install();
     }
 
     @Override
     public void uninstallGUI() {
         popupController.uninstall();
-        popupController.setLayer(null);
+        popupController = null;
         LayerOptions.unregister(SWEKLayer.class);
         etl.setDialogs(null);
         dialogs.close();
@@ -83,7 +83,6 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
         MainFrame.getLeftContentPane().remove(swekPanel);
         MainFrame.getLeftContentPane().revalidate();
         swekPanel = null;
-        popupController = null;
     }
 
     @Override
@@ -121,20 +120,20 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     @Override
     public void layerRemoved(int index, Layer removed) {
-        detachMissingLayer();
+        if (removed == layer)
+            detachLayer();
     }
 
     @Override
     public void layersCleared() {
-        detachMissingLayer();
+        if (layer != null && !Layers.getLayers().contains(layer))
+            detachLayer();
     }
 
-    private void detachMissingLayer() {
-        if (layer != null && !Layers.getLayers().contains(layer)) {
-            layer.detach();
-            layer = null;
-            bindLayer();
-        }
+    private void detachLayer() {
+        layer.detach();
+        layer = null;
+        bindLayer();
     }
 
     private void bindLayer() {

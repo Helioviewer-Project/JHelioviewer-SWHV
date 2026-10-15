@@ -70,7 +70,7 @@ class SWEKPopupController implements InputMouseListener, SWEKSession.Listener {
 
     void uninstall() {
         guiInstalled = false;
-        updateMouseTracking();
+        setLayer(null);
     }
 
     private void updateMouseTracking() {
