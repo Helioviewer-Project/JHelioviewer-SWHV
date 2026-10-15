@@ -167,9 +167,9 @@ public final class SWEKLayerTest {
         check(event.getAllEventParameters().length == 6 && event.getVisibleEventParameters().length == 5, "detail lists retain URLs and hidden metadata");
         EventParameter link = event.getVisibleEventParameters()[2];
         check(link.isUrl(), "URL classification");
-        check(link.getDisplayParameterValue().equals("<a href=\"https://example.com/event\">Open URL</a>"), "detail link formatting is unchanged");
+        check("https://example.com/event".equals(link.getLink()), "URL values link to themselves");
         EventParameter region = new EventParameter("ar_noaanum", "Region", "13664");
-        check(region.getDisplayParameterValue().contains("NOAA%2013664") && !region.isUrl(), "generated region links remain distinct from URL values");
+        check(region.getLink() != null && region.getLink().contains("NOAA%2013664") && !region.isUrl(), "generated region links remain distinct from URL values");
     }
 
     public static void checkPropagation(SolarEvent event) {

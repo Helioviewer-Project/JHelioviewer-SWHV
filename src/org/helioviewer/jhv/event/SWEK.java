@@ -21,7 +21,20 @@ public class SWEK {
 
     }
 
-    public record ParameterFilter(String type, double min, double max, double startValue, double stepSize, String units) {}
+    public record ParameterFilter(String type, double min, double max, double startValue, double stepSize, String units) {
+        public List<Operand> operands() {
+            return switch (type.toLowerCase()) {
+                case "doublemaxfilter", "flarefilter" -> List.of(Operand.BIGGER_OR_EQUAL);
+                case "doubleminfilter" -> List.of(Operand.SMALLER_OR_EQUAL);
+                case "doubleminmaxfilter" -> List.of(Operand.BIGGER_OR_EQUAL, Operand.SMALLER_OR_EQUAL);
+                default -> List.of();
+            };
+        }
+
+        public boolean isFlare() {
+            return "flarefilter".equalsIgnoreCase(type);
+        }
+    }
 
     public record Param(String name, double value, Operand operand) {}
 

@@ -61,20 +61,19 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
         dialogs = new SWEKDialogs(session);
         etl.setDialogs(dialogs);
         swekPanel = new SWEKTreePane(session, dialogs);
-        popupController = new SWEKPopupController(session, dialogs);
+        popupController = new SWEKPopupController(dialogs);
         bindLayer();
 
         MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         MainFrame.getLeftContentPane().revalidate();
 
         LayerOptions.register(SWEKLayer.class, selectedLayer -> new SWEKLayerOptionsPanel((SWEKLayer) selectedLayer));
-        popupController.install();
     }
 
     @Override
     public void uninstallGUI() {
-        popupController.uninstall();
         popupController = null;
+        bindLayer();
         LayerOptions.unregister(SWEKLayer.class);
         etl.setDialogs(null);
         dialogs.close();
@@ -108,11 +107,6 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
         instance.bindLayer();
     }
 
-    static void layerStateChanged(SWEKLayer changed) {
-        if (instance != null && instance.layer == changed)
-            instance.bindLayer();
-    }
-
     @Nullable
     static EventTimelineLayer getTimelineLayer() {
         return instance == null ? null : instance.etl;
@@ -133,12 +127,11 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     private void detachLayer() {
         layer.detach();
         layer = null;
-        bindLayer();
     }
 
     private void bindLayer() {
-        if (popupController != null)
-            popupController.setLayer(layer);
+        if (layer != null)
+            layer.setUi(popupController);
     }
 
 }

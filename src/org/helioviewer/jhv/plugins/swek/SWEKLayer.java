@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
@@ -21,6 +23,9 @@ import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.InputMouseListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.PolarBasis;
@@ -31,6 +36,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
@@ -40,8 +46,17 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
 // has to be public for state
-public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listener, TimeListener.Range {
+public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listener, TimeListener.Range, InputMouseListener {
     record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
+
+    // Toolkit part of canvas hover: the hand cursor and the event information window.
+    interface CanvasUi {
+        void setHand(boolean hand);
+
+        void open(RelatedEvents related, SolarEvent event, PointerEvent e);
+    }
+
+    private record Hover(RelatedEvents events, int x, int y, long time) {}
 
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
@@ -56,7 +71,10 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     private static final float[][] texCoord = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
 
     private final SWEKSession session;
-    private SWEKContext swekContext;
+    @Nullable
+    private CanvasUi ui;
+    @Nullable
+    private Hover hover;
     private boolean icons = true;
 
     private final GLSLLine lineEvent = new GLSLLine(true);
@@ -82,11 +100,13 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
 
     void detach() {
         setEnabled(false);
-        swekContext = null;
+        ui = null;
     }
 
-    void setContext(SWEKContext _swekContext) {
-        swekContext = _swekContext;
+    void setUi(@Nullable CanvasUi _ui) {
+        if (ui != null)
+            ui.setHand(false);
+        ui = _ui;
     }
 
     @Override
@@ -407,9 +427,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
-        if (swekContext != null && swekContext.mouseOverEvents() != null) {
-            drawText(vp, swekContext.mouseOverEvents(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
-        }
+        if (hover != null)
+            drawText(vp, hover.events(), hover.x(), hover.y(), hover.time());
     }
 
     @Override
@@ -429,14 +448,15 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
 
         if (enabled) {
             session.addListener(this);
+            InputController.addListener(this);
             Player.addTimeRangeListener(this); // calls timeRangeChanged, which requests the events
         } else {
             invalidateActiveEvents();
-            session.highlight(null);
+            clearHover();
             Player.removeTimeRangeListener(this);
+            InputController.removeListener(this);
             session.removeListener(this);
         }
-        SWEKPlugin.layerStateChanged(this);
     }
 
     @Override
@@ -470,9 +490,113 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     public void cacheUpdated() {
         if (!enabled)
             return;
+        if (hover != null && session.getRelatedEvents(hover.events().getClosestTo(hover.time()).getUniqueID()) != hover.events())
+            clearHover();
         invalidateActiveEvents();
         session.requestForInterval(Player.getStartTime(), Player.getEndTime());
         DisplayController.display();
+    }
+
+    private void clearHover() {
+        hover = null;
+        session.highlight(null);
+        if (ui != null)
+            ui.setHand(false);
+    }
+
+    @Override
+    public void mouseClicked(PointerEvent e) {
+        if (hover != null && ui != null)
+            ui.open(hover.events(), hover.events().getClosestTo(hover.time()), e);
+    }
+
+    @Override
+    public void mouseExited(PointerEvent e) {
+        clearHover();
+    }
+
+    @Override
+    public void mouseMoved(PointerEvent e) {
+        long time = GLRenderer.getDisplayedViewpoint().time.milli;
+        List<ActiveEvent> active = activeEvents(time);
+        if (active.isEmpty()) {
+            clearHover();
+            return;
+        }
+
+        int x = e.x();
+        int y = e.y();
+        Viewport vp = Display.getActiveViewport();
+        MapView mv = GLRenderer.getMapView();
+        RelatedEvents found = mv.isOrthographic()
+                ? findOrthographicEvent(active, time, mv.mouseToSurface(vp, x, y), mv.mouseToPlane(vp, x, y))
+                : findProjectedEvent(active, time, mv, vp, mv.mouseToScreen(vp, x, y));
+
+        hover = found == null ? null : new Hover(found, x, y, time);
+        session.highlight(found);
+        if (ui != null)
+            ui.setHand(found != null);
+    }
+
+    @Nullable
+    private static RelatedEvents findOrthographicEvent(List<ActiveEvent> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+        for (ActiveEvent active : activeEvents) {
+            SolarEvent evt = active.event();
+            EventGeometry pi = evt.getPositionInformation();
+            if (pi == null)
+                continue;
+
+            Vec3 hitpoint, pt;
+            if (evt.isCactus()) {
+                double principalAngle = Math.toRadians(evt.getCMEParameters().principalAngleDegree());
+                double distSun = SWEKData.cactusDistance(evt, currentTime);
+                Quat q = pi.getEarth().toQuat();
+                pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
+                hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
+            } else {
+                hitpoint = sphereHitpoint;
+                pt = pi.centralPoint();
+            }
+
+            if (pt != null && hitpoint != null) {
+                double deltaX = Math.abs(hitpoint.x - pt.x);
+                double deltaY = Math.abs(hitpoint.y - pt.y);
+                double deltaZ = Math.abs(hitpoint.z - pt.z);
+                if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08)
+                    return active.relatedEvents();
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private static RelatedEvents findProjectedEvent(List<ActiveEvent> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
+        MapScale scale = mv.scale(vp);
+        for (ActiveEvent active : activeEvents) {
+            SolarEvent evt = active.event();
+            EventGeometry pi = evt.getPositionInformation();
+            if (pi == null)
+                continue;
+
+            Vec2 tf = null;
+            if (mv.isRectWarp() && evt.isCactus()) {
+                double principalAngle = evt.getCMEParameters().principalAngleDegree();
+                double distSun = SWEKData.cactusDistance(evt, currentTime);
+                tf = new Vec2((scale.toUnitX(principalAngle) - 0.5) * vp.aspect, scale.toUnitY(distSun) - 0.5);
+            } else {
+                Vec3 pt = pi.centralPoint();
+                if (pt != null)
+                    tf = mv.projectToScreen(vp, pt);
+            }
+
+            if (tf != null) {
+                double deltaX = Math.abs(tf.x - mousePosition.x);
+                double deltaY = Math.abs(tf.y - mousePosition.y);
+                if (deltaX < 0.02 && deltaY < 0.02)
+                    return active.relatedEvents();
+            }
+        }
+        return null;
     }
 
     boolean isIcons() {

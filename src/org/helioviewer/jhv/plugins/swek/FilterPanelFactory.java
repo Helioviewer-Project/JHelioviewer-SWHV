@@ -46,22 +46,10 @@ class FilterPanelFactory {
         List<FilterPanel> panels = new ArrayList<>();
         for (SWEK.Parameter p : supplier.getParameterList()) {
             SWEK.ParameterFilter filter = p.filter();
-            if (filter != null) {
-                String filterType = filter.type().toLowerCase();
-                switch (filterType) {
-                    case "doublemaxfilter" ->
-                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
-                    case "doubleminfilter" ->
-                            panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
-                    case "doubleminmaxfilter" -> {
-                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
-                        panels.add(new FilterPanel(p, generateMinOrMaxSpinner(p), filterDialog, SWEK.Operand.SMALLER_OR_EQUAL));
-                    }
-                    case "flarefilter" ->
-                            panels.add(new FilterPanel(p, generateFlareSpinner(p), filterDialog, SWEK.Operand.BIGGER_OR_EQUAL));
-                    default -> {}
-                }
-            }
+            if (filter == null)
+                continue;
+            for (SWEK.Operand operand : filter.operands())
+                panels.add(new FilterPanel(p, filter.isFlare() ? generateFlareSpinner(p) : generateMinOrMaxSpinner(p), filterDialog, operand));
         }
         return panels;
     }

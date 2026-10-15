@@ -1,34 +1,24 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.util.regex.Matcher;
-
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.event.EventParameter;
 
 @SuppressWarnings("serial")
 class ParameterTableModel extends AbstractTableModel {
 
     private final EventParameter[] parameters;
-    private final String[] urls;
 
     private static final int STRING_CUTOFF = 256;
 
     ParameterTableModel(EventParameter[] _parameters) {
         parameters = _parameters;
-        urls = new String[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            Matcher matcher = Regex.HREF.matcher(parameters[i].getDisplayParameterValue());
-            if (matcher.find())
-                urls[i] = matcher.group(1);
-        }
     }
 
     @Nullable
     String getURL(int rowIndex) {
-        return urls[rowIndex];
+        return parameters[rowIndex].getLink();
     }
 
     @Override
@@ -52,8 +42,12 @@ class ParameterTableModel extends AbstractTableModel {
             if (columnIndex == 0) {
                 return parameters[rowIndex].getParameterDisplayName();
             } else if (columnIndex == 1) {
-                String result = parameters[rowIndex].getDisplayParameterValue();
-                return result.length() > STRING_CUTOFF && urls[rowIndex] == null ? result.substring(0, STRING_CUTOFF) + "..." : result;
+                EventParameter parameter = parameters[rowIndex];
+                String value = parameter.getSimpleDisplayParameterValue();
+                String link = parameter.getLink();
+                if (link != null)
+                    return "<a href=\"" + link + "\">" + (parameter.isUrl() ? "Open URL" : value) + "</a>";
+                return value.length() > STRING_CUTOFF ? value.substring(0, STRING_CUTOFF) + "..." : value;
             }
         }
         return "";

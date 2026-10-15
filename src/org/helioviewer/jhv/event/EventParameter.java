@@ -3,6 +3,8 @@ package org.helioviewer.jhv.event;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Regex;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -17,8 +19,6 @@ public class EventParameter {
     private final String parameterDisplayName;
     // The value of the parameter
     private final String parameterValue;
-
-    private String parameterDisplayValue;
 
     private String parameterSimpleDisplayValue;
     private Boolean url;
@@ -47,16 +47,13 @@ public class EventParameter {
         return parameterSimpleDisplayValue;
     }
 
-    public String getDisplayParameterValue() {
-        if (parameterDisplayValue == null) {
-            parameterDisplayValue = getSimpleDisplayParameterValue();
-            if (parameterName == "ar_noaanum")
-                parameterDisplayValue = ("<a href=\"https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" +
-                        parameterDisplayValue +
-                        "%22&sort=date%20desc\">" +
-                        parameterDisplayValue + "</a>").intern();
-        }
-        return parameterDisplayValue;
+    @Nullable
+    public String getLink() {
+        if (isUrl())
+            return parameterValue;
+        if (parameterName == "ar_noaanum")
+            return "https://ui.adsabs.harvard.edu/#search/q=%22NOAA%20" + getSimpleDisplayParameterValue() + "%22&sort=date%20desc";
+        return null;
     }
 
     public boolean isUrl() {
@@ -71,11 +68,8 @@ public class EventParameter {
                 !Regex.Integer.matcher(value).matches()) {
             String result = numFormatter.format(Double.parseDouble(value));
             return result.contains("E0") ? result.substring(0, result.length() - 2) : result;
-        } else {
-            if (isUrl())
-                return "<a href=\"" + value + "\">Open URL</a>";
-            return value;
         }
+        return value;
     }
 
     @Override
