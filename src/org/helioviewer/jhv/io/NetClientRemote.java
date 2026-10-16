@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -16,6 +18,7 @@ import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
 //import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -34,8 +37,28 @@ class NetClientRemote implements NetClient {
 
     private static final int cacheSize = 1024 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
+    /**
+     * Try IPv4 before IPv6, and stop waiting a full minute on an address that will not answer.
+     *
+     * <p>Several of the archives publish an AAAA record for a host that a given network cannot
+     * actually reach: umbra.nascom.nasa.gov resolves to both 198.118.248.134 and 2001:4d0:14:100::134,
+     * and where the second has no route, a request that picks it spends the whole connect timeout
+     * and then fails with "No route to host" rather than falling back. That made PUNCH loads fail
+     * at random while the identical listing succeeded moments earlier, and left even the successes
+     * taking eight to fourteen seconds for thirty kilobytes.
+     *
+     * <p>Ordering, not disabling: IPv6 is still there as a fallback for a network where it works,
+     * and the shorter connect timeout means an address that is dead costs seconds instead of a
+     * minute. The read timeout is untouched, since a slow archive is a different thing from an
+     * unreachable one.
+     */
+    private static final Dns IPV4_FIRST = hostname -> Dns.SYSTEM.lookup(hostname).stream()
+            .sorted(Comparator.comparingInt(a -> a instanceof Inet4Address ? 0 : 1))
+            .toList();
+
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
+            .dns(IPV4_FIRST)
+            .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .cache(new Cache(Directories.clientCacheDir, cacheSize))
             .proxyAuthenticator(Authenticator.JAVA_NET_AUTHENTICATOR)
