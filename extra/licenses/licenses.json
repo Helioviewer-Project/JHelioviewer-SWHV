@@ -428,7 +428,7 @@
     },
     {
       "path": "lib/jhv/linux-amd64/libjhvj2k.so",
-      "sha256": "42614aef7d204d4d28a0cb1c2631d6219630a754662b4f3f65db5fe126dcff62",
+      "sha256": "f6efff933911e61be19edbc0b65ea31175250c8a01c04ea3ed70ef350afcb04e",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -506,7 +506,7 @@
     },
     {
       "path": "lib/jhv/macos-amd64/libjhvj2k.dylib",
-      "sha256": "bafd179cecd159dd3b99173b4b8c6cc1a57209b7d6c4a57598ddb79c7fd74fd8",
+      "sha256": "7959a64aefe04d321a1b91131c3366674e73fd7e5367ed953086a242d9208115",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -584,7 +584,7 @@
     },
     {
       "path": "lib/jhv/macos-arm64/libjhvj2k.dylib",
-      "sha256": "62e65a2cae60eee36ab71a379e205400addd269b57a5d74f0e38633d0d0093f3",
+      "sha256": "3b9e0087ae09ecec5e02805c7a0d7e8f3de523a4280d158088004fb65b68af8e",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -636,7 +636,7 @@
     },
     {
       "path": "lib/jhv/windows-amd64/jhvj2k.dll",
-      "sha256": "5f5c1d50e8f6cd60b8417e277b925816e34fe26c946018366a28795b5a2613b9",
+      "sha256": "267408dafff687921b7f36fc06629bd1adaeea89f70b5297e507811cbab3a50f",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -649,7 +649,7 @@
     },
     {
       "path": "lib/jhv/windows-amd64/kdu_jni.dll",
-      "sha256": "d8b7962cb4fa66e0b3705656f1291fbee55d0fd685ab161b28f914a7cc2f17ee",
+      "sha256": "731d3664f878357e464c346316183c1df6f58d5df96e5ea7a3cace059758bca8",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [],
@@ -662,7 +662,7 @@
     },
     {
       "path": "lib/jhv/windows-amd64/kdu_v7AR.dll",
-      "sha256": "0016d3179071af8b2d2942f2e587087454be2e3beb7e36f23caf1a894d9d9002",
+      "sha256": "8dcc6d815d580b5e29d55f9174305cb42144e512acdfbbd86051aed1b7804b62",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [],
