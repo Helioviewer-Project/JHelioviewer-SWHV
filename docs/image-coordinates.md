@@ -229,17 +229,17 @@ the fragment color.
 
 ## Cutouts
 
-`SDOCutout` and `SampClient` use `DecodedImage.geometry().original.cutoutBounds()`. With original reference
-pixel `c` and original pixel spacings `px,py`, that rectangle is:
+`SDOCutout` and `SampClient` use `DecodedImage.geometry().original.bounds`. With original reference
+pixel `c` and original pixel spacings `px,py`, that rectangle in image-axis units with Y up is:
 
 ```text
-left = -c.x · px          width  = W · px
-top  = -c.y · py          height = H · py
+left   = -c.x · px              width  = W · px
+bottom = -(H - c.y) · py        height = H · py
 ```
 
-It uses the cutout services' image-axis convention, with Y following rows. The callers convert units to
-arcseconds and reverse the Y center for the service request. Neither the rectangle nor its dimensions
-come from the reduced texture, so progressive resolution changes cannot alter the requested cutout.
+The callers convert units to arcseconds and send the rectangle's center and size. Neither the rectangle
+nor its dimensions come from the reduced texture, so progressive resolution changes cannot alter the
+requested cutout.
 
 ## Regression checks
 

@@ -112,7 +112,9 @@ public final class JHVMetadataDump {
                 ? geometry.pixelSizeY
                 : geometry.pixelSizeY / unitsPerArcsec;
         Region hpcBounds = ImageBounds.hpc(meta);
-        Region renderRegion = geometry.withSize(pixelWidth, pixelHeight).cutoutBounds();
+        // The validator's rectangle follows rows: its lower Y edge is the negated upper plane edge.
+        Region sized = geometry.withSize(pixelWidth, pixelHeight).bounds;
+        Region renderRegion = new Region(sized.llx, -sized.ury, sized.width, sized.height);
         Vec2 sunShift = new Vec2((geometry.sunPixel.x - geometry.referencePixel.x) * geometry.pixelSizeX,
                 (geometry.sunPixel.y - geometry.referencePixel.y) * geometry.pixelSizeY);
 

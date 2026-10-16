@@ -142,9 +142,9 @@ public final class SampClient extends HubConnector {
         msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
-        Region region = Region.scale(id.image().geometry().original.cutoutBounds(), 1 / id.image().geometry().wcs.unitsPerArcsec());
+        Region region = Region.scale(id.image().geometry().original.bounds, 1 / id.image().geometry().wcs.unitsPerArcsec());
         msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
-        msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
+        msg.addParam("cutout.y0", SampUtils.encodeFloat(region.lly + region.height / 2.));
         msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
         msg.addParam("cutout.h", SampUtils.encodeFloat(region.height));
 

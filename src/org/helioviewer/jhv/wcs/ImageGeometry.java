@@ -83,10 +83,4 @@ public final class ImageGeometry {
         Vec2 offset = planeToPixel.transform(x, y);
         return new Vec2(offset.x + referencePixel.x, offset.y + referencePixel.y);
     }
-
-    // Existing cutout services express rectangles in image-axis units with row-oriented Y.
-    public Region cutoutBounds() {
-        return new Region(-referencePixel.x * pixelSizeX, -referencePixel.y * pixelSizeY,
-                grid.width() * pixelSizeX, grid.height() * pixelSizeY);
-    }
 }

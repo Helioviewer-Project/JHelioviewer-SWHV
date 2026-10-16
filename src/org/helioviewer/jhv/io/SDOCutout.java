@@ -27,9 +27,9 @@ public final class SDOCutout {
         }
         ImageData id = activeLayer.getImageData();
         if (id != null) {
-            Region region = Region.scale(id.image().geometry().original.cutoutBounds(), 1 / id.image().geometry().wcs.unitsPerArcsec());
+            Region region = Region.scale(id.image().geometry().original.bounds, 1 / id.image().geometry().wcs.unitsPerArcsec());
             str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
-            str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
+            str.append(String.format("&yCen=%.1f", region.lly + region.height / 2.));
             str.append(String.format("&width=%.1f", region.width));
             str.append(String.format("&height=%.1f", region.height));
         }

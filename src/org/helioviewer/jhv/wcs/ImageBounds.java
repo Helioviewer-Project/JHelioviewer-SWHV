@@ -9,8 +9,7 @@ public final class ImageBounds {
     public static double radial(MetaData metaData) {
         ImageGeometry geometry = metaData.getGeometry();
         Region region = geometry.bounds;
-        WcsHeader wcsHeader = geometry.wcs;
-        if (!wcsHeader.projection.isSurfaceMap()) {
+        if (!geometry.wcs.projection.isSurfaceMap()) {
             double x0 = 0, x1 = geometry.grid.width();
             double y0 = 0, y1 = geometry.grid.height();
             double xm = 0.5 * (x0 + x1);
@@ -28,11 +27,13 @@ public final class ImageBounds {
                 return radius;
         }
 
-        Vec2 sun = sunCenter(metaData);
-        double x0 = region.llx - sun.x;
-        double x1 = region.urx - sun.x;
-        double y0 = region.lly - sun.y;
-        double y1 = region.ury - sun.y;
+        // Sun offset from the reference pixel in the rectangle's frame: image axes, Y up.
+        double sunX = (geometry.sunPixel.x - geometry.referencePixel.x) * geometry.pixelSizeX;
+        double sunY = (geometry.referencePixel.y - geometry.sunPixel.y) * geometry.pixelSizeY;
+        double x0 = region.llx - sunX;
+        double x1 = region.urx - sunX;
+        double y0 = region.lly - sunY;
+        double y1 = region.ury - sunY;
         return Math.max(
                 Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
@@ -45,20 +46,6 @@ public final class ImageBounds {
         if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
             return Math.hypot(hpcPlane.x, hpcPlane.y);
         return 0;
-    }
-
-    private static Vec2 sunCenter(MetaData metaData) {
-        WcsHeader wcsHeader = metaData.getGeometry().wcs;
-        if (!wcsHeader.projection.isSurfaceMap()) {
-            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
-            if (sun != null && Double.isFinite(sun.x) && Double.isFinite(sun.y)) {
-                ImageGeometry geometry = metaData.getGeometry();
-                Vec2 pixel = geometry.toPixel(sun.x, sun.y);
-                return new Vec2((pixel.x - geometry.referencePixel.x) * geometry.pixelSizeX,
-                        -(pixel.y - geometry.referencePixel.y) * geometry.pixelSizeY);
-            }
-        }
-        return wcsHeader.crval;
     }
 
     public static Region hpc(MetaData metaData) {
