@@ -5,7 +5,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.ArrayList;
 
 import javax.swing.JTextField;
 import javax.swing.Popup;
@@ -19,14 +18,15 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 class TimeField extends JTextField {
 
-    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
+    private final Runnable onChange;
     private long selectedTime = System.currentTimeMillis();
 
-    private final CalendarPicker calendarPicker = new CalendarPicker();
+    private final CalendarPicker calendarPicker = new CalendarPicker(this::hidePopup);
     private final JideButton calendarButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    TimeField(String tip) {
+    TimeField(String tip, Runnable _onChange) {
+        onChange = _onChange;
         calendarButton.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -41,7 +41,6 @@ class TimeField extends JTextField {
                 hidePopup();
             }
         });
-        calendarPicker.addListener(this::hidePopup);
         calendarButton.setMargin(new Insets(0, 0, 0, 0));
         calendarPicker.setPreferredSize(calendarPicker.getMinimumSize());
         calendarButton.setToolTipText(tip);
@@ -106,7 +105,7 @@ class TimeField extends JTextField {
         long old = selectedTime;
         setTime(time);
         if (selectedTime != old)
-            listeners.forEach(CalendarListener::calendarAction);
+            onChange.run();
     }
 
     void setTime(long time) {
@@ -117,11 +116,6 @@ class TimeField extends JTextField {
 
     long getTime() {
         return selectedTime;
-    }
-
-    void addListener(CalendarListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
     }
 
 }

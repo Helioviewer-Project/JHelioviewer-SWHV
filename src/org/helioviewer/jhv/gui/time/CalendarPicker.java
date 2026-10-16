@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -35,14 +34,15 @@ class CalendarPicker extends JPanel {
         DAYS, MONTHS, YEARS
     }
 
-    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
+    private final Runnable onSelect;
     private final NavigationPanel navigationPanel = new NavigationPanel();
     private final SelectionPanel selectionPanel = new SelectionPanel();
 
     private DisplayMode displayMode = DisplayMode.DAYS;
     private CalendarViewController calendarViewController = new DayViewController();
 
-    CalendarPicker() {
+    CalendarPicker(Runnable _onSelect) {
+        onSelect = _onSelect;
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(250, 200));
         // add sub components
@@ -92,16 +92,6 @@ class CalendarPicker extends JPanel {
 
     long getTime() {
         return calendarViewController.getTime();
-    }
-
-    void addListener(CalendarListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
-    }
-
-    // Informs all listeners of this class by passing the corresponding event
-    private void informCalendarListeners() {
-        listeners.forEach(CalendarListener::calendarAction);
     }
 
     // Panel which acts as a container for the navigation buttons on the top of
@@ -235,7 +225,7 @@ class CalendarPicker extends JPanel {
                     calendarViewController.setTimeOfCellValue(v.value);
 
                     switch (displayMode) {
-                        case DAYS -> informCalendarListeners();
+                        case DAYS -> onSelect.run();
                         case MONTHS -> {
                             changeDisplayMode(DisplayMode.DAYS);
                             updateDateDisplay();

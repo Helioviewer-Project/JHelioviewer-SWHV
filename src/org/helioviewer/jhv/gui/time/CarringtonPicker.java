@@ -4,7 +4,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -24,7 +23,7 @@ import com.jidesoft.swing.JideButton;
 @SuppressWarnings("serial")
 class CarringtonPicker extends JideButton {
 
-    private final ArrayList<CalendarListener> listeners = new ArrayList<>();
+    private final Runnable onSelect;
     private final JPopupMenu popup = new JPopupMenu();
     private final JList<Integer> list = new JList<>(new AbstractListModel<>() {
         @Override
@@ -53,7 +52,8 @@ class CarringtonPicker extends JideButton {
 
     private long time;
 
-    CarringtonPicker() {
+    CarringtonPicker(Runnable _onSelect) {
+        onSelect = _onSelect;
         setText("CR");
         setToolTipText("Select Carrington rotation");
 
@@ -98,7 +98,7 @@ class CarringtonPicker extends JideButton {
 
     private void setTimeFromCarrington(long _time) {
         setTime(_time);
-        listeners.forEach(CalendarListener::calendarAction);
+        onSelect.run();
     }
 
     void setTime(long _time) {
@@ -108,11 +108,6 @@ class CarringtonPicker extends JideButton {
 
     long getTime() {
         return time;
-    }
-
-    void addListener(CalendarListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
     }
 
 }

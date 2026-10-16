@@ -45,17 +45,13 @@ public final class TimeSelectorPanel extends JPanel {
     }
 
     private final ArrayList<TimeListener.Selection> listeners = new ArrayList<>();
-    private final TimeField startField = new TimeField("Select start date");
-    private final TimeField endField = new TimeField("Select end date");
-    private final CarringtonPicker carringtonPicker = new CarringtonPicker();
+    private final TimeField startField = new TimeField("Select start date", this::timeChanged);
+    private final TimeField endField = new TimeField("Select end date", this::timeChanged);
+    private final CarringtonPicker carringtonPicker = new CarringtonPicker(this::carringtonChanged);
 
     public TimeSelectorPanel() {
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
-
-        startField.addListener(this::timeChanged);
-        endField.addListener(this::timeChanged);
-        carringtonPicker.addListener(this::carringtonChanged);
 
         JideSplitButton backButton = new JideSplitButton(Buttons.skipBack);
         backButton.setMargin(new Insets(0, 0, 0, 0));
