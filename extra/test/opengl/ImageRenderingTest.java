@@ -31,6 +31,7 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
@@ -39,6 +40,7 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsProjection;
 
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -58,6 +60,7 @@ public final class ImageRenderingTest {
         Directories.createCacheDirs();
         AppInit.loadSpice();
         Position viewpoint = Sun.getEarth(new JHVTime("2026-01-15T12:00:00"));
+        rayIntersections(viewpoint.time);
         DisplayController.setRenderRequestHandler(_ -> {});
         DisplayController.setViewpointUpdate(_ -> viewpoint, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         AngleRenderer renderer = AngleRenderer.pbuffer(512, 512);
@@ -166,6 +169,31 @@ public final class ImageRenderingTest {
             renderer.destroy();
         }
         System.out.println("ImageRenderingTest passed");
+    }
+
+    private static void rayIntersections(JHVTime time) {
+        // Known sphere points give a geometric reference independent of the quadratic formula.
+        // Include a distant observer to check that accuracy does not degrade with distance.
+        for (double distance : new double[]{10, 215, 1e8}) {
+            for (double longitude : new double[]{0, .7}) {
+                Position observer = new Position(time, distance, longitude, .2);
+                for (Vec2 xy : new Vec2[]{Vec2.ZERO, new Vec2(.3, .4), new Vec2(-.8, -.2), new Vec2(.99, 0)}) {
+                    Vec3 view = new Vec3(xy.x, xy.y, Math.sqrt(1 - xy.x * xy.x - xy.y * xy.y));
+                    double zeta = distance - view.z;
+                    double phi = Math.atan2(view.x, zeta);
+                    double theta = Math.atan2(view.y, Math.hypot(view.x, zeta));
+                    Vec3 expected = observer.toQuat().rotateInverseVector(view);
+                    Vec3 actual = WcsProjection.helioprojectiveToWorld(observer, phi, theta);
+                    if (actual == null || !(Math.hypot(Math.hypot(actual.x - expected.x, actual.y - expected.y), actual.z - expected.z) <= 2e-12))
+                        throw new AssertionError("Wrong ray/sphere intersection: distance " + distance + ", point " + view + ": " + actual);
+                }
+                double offDisk = Math.asin(1 / distance) * 1.001;
+                if (WcsProjection.helioprojectiveToWorld(observer, offDisk, 0) != null ||
+                        WcsProjection.helioprojectiveToWorld(observer, 0, offDisk) != null)
+                    throw new AssertionError("Off-disk ray hit the sphere: distance " + distance);
+            }
+        }
+        System.out.println("PASS: Java ray/sphere intersections preserve surface points, viewpoint rotation and off-disk rejection");
     }
 
     private static void fitsReference(GLStreamingTexture2D texture, GLStreamingTexture2D difference,

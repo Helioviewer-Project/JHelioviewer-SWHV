@@ -12,21 +12,24 @@ public final class WcsProjection {
 
     public static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
         Vec3 ray = helioprojectiveRay(longitude, latitude);
-
-        double b = viewpoint.distance * ray.z;
-        double c = viewpoint.distance * viewpoint.distance - 1;
-        double discriminant = b * b - c;
+        double observerDistance = viewpoint.distance;
+        double a = Vec3.dot(ray, ray);
+        double b = observerDistance * ray.z;
+        // Same stable intersection as imageCommon.frag, evaluated in double precision.
+        double impactX = observerDistance * ray.x;
+        double impactY = observerDistance * ray.y;
+        double discriminant = a - (impactX * impactX + impactY * impactY);
         if (discriminant < 0)
             return null;
 
         double root = Math.sqrt(discriminant);
-        double t = -b - root;
-        if (t <= 0)
-            t = -b + root;
+        double signedRoot = -b - root > 0 ? -root : root;
+        double t = (-b + signedRoot) / a;
         if (t <= 0)
             return null;
 
-        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        // Expand Z to avoid cancelling the observer distance against t * ray.z.
+        Vec3 view = new Vec3(t * ray.x, t * ray.y, (impactX * ray.x + impactY * ray.y + signedRoot * ray.z) / a);
         return viewpoint.toQuat().rotateInverseVector(view);
     }
 
