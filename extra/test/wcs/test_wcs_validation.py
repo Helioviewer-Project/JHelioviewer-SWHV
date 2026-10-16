@@ -27,6 +27,25 @@ from test_wcs_rendering import (
 
 
 class ValidationTest(unittest.TestCase):
+    def test_surface_radial_extent_is_the_unit_sphere(self):
+        # Longitude offsets, angular units and map coverage cannot create off-limb data.
+        for projection in ("CAR", "CEA"):
+            for width, longitude, scale in ((128, 0, 1), (17, 354, 0.1), (129, -366, 2)):
+                header = image_header(projection)
+                header["NAXIS1"] = width
+                header["CRPIX1"] = width / 3
+                header["CRVAL1"] = longitude
+                header["CDELT1"] *= scale
+                for units in ("deg", "rad"):
+                    with self.subTest(projection=projection, width=width, longitude=longitude, units=units):
+                        converted = header.copy()
+                        if units == "rad":
+                            for axis in (1, 2):
+                                converted[f"CUNIT{axis}"] = units
+                                for keyword in ("CDELT", "CRVAL"):
+                                    converted[f"{keyword}{axis}"] = math.radians(converted[f"{keyword}{axis}"])
+                        self.assertEqual(cpu.image_radial_bound(cpu.build_jhv_meta(converted)), 1.0)
+
     def test_observation_date_and_time(self):
         cases = [
             ({"DATE-OBS": "2026-03-01", "TIME-OBS": "23:14"}, "2026-03-01T23:14"),

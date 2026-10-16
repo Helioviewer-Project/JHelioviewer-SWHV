@@ -1,116 +1,113 @@
 # Image coordinates from source to screen
 
-JHV positions decoded images through one pixel-coordinate model. Metadata defines how original image
-pixels map to the WCS projection plane. A decoder grid defines where decoded samples lie in those original
-pixels. Composing the two gives the geometry used for filtering and texture sampling.
+JHV positions every decoded image through one pixel-coordinate model. Metadata maps original image
+pixels to the WCS projection plane. A decoder grid says where the decoded samples lie in those original
+pixels. The two compose into the geometry that filtering and texture sampling use.
 
-The original image footprint remains independent of the selected resolution. A coarser decode changes the
-sample locations and texture dimensions, without moving detector masks, slits or cutout bounds.
+The image footprint does not depend on the decode level. A coarser decode moves the sample positions
+and shrinks the texture. It does not move detector masks, slits or cutout bounds.
 
 ## Pixel and texture conventions
 
-Original image coordinates start at the upper-left edge. X increases across columns and Y follows buffer
-rows. An image of size `W × H` occupies `[0,W] × [0,H]`; the center of sample `(i,j)` is `(i+0.5,j+0.5)`.
-These coordinates are relative to the image, regardless of its origin in a JPEG 2000 codestream canvas.
+Original image coordinates start at the upper-left edge. X increases along a row and Y follows the buffer
+rows. An image of `W × H` pixels occupies `[0,W] × [0,H]`. The center of pixel `(i,j)` is `(i+0.5, j+0.5)`.
+These coordinates are relative to the image, whatever its origin on a JPEG 2000 canvas.
 
-Decoded buffers use the same edge-and-center convention within their own grids. Normalized texture
-coordinates divide those buffer coordinates by the buffer width and height. Thus decoded sample `(i,j)`
-is fetched at `((i+0.5)/Wr, (j+0.5)/Hr)`.
+Decoded buffers use the same convention on their own grid. Normalized texture coordinates divide buffer
+coordinates by the buffer size, so decoded sample `(i,j)` is read at `((i+0.5)/Wr, (j+0.5)/Hr)`.
 
-Texture row zero is addressed near texture coordinate `v=0`. Its position on screen comes from the image
-geometry; no additional vertical flip belongs in the texture-coordinate calculation. FITS decoding reverses
-FITS rows into this buffer order in `FITSData`, and FITS metadata converts its reference pixel accordingly.
-Framebuffer coordinates, whose origin is at the lower left, are a separate space handled by the viewport
-and screen transforms.
+Texture row zero sits at texture coordinate `v = 0`. Where that row appears on screen follows from the
+image geometry alone; the texture-coordinate path contains no vertical flip. `FITSData` writes FITS rows
+into this top-down order, and `FitsMetaData` converts the reference pixel to match. Framebuffer coordinates
+have their origin at the lower left and belong to the viewport and screen transforms, not to this model.
 
 ## Metadata to original image geometry
 
-[`WcsInterpreter`](../src/org/helioviewer/jhv/metadata/WcsInterpreter.java) reads the FITS linear transform:
-PC with CDELT takes precedence over CD, which takes precedence over CDELT with CROTA. It converts angular
-units and retains the full matrix, including rotation and signed axis scales.
+[`WcsInterpreter`](../src/org/helioviewer/jhv/metadata/WcsInterpreter.java) reads the FITS linear transform.
+PC with CDELT takes precedence over CD, and CD over CDELT with CROTA. The result is the full matrix,
+rotation and signed scales included, in angular units.
 
-[`FitsMetaData`](../src/org/helioviewer/jhv/metadata/FitsMetaData.java) then converts the FITS convention,
-where centers are integers starting at one and Y increases upward. For image height `H`, its reference
-pixel in buffer coordinates is:
+[`FitsMetaData`](../src/org/helioviewer/jhv/metadata/FitsMetaData.java) converts the FITS convention, where
+pixel centers are integers from one and Y increases upward. For image height `H` the reference pixel in
+buffer coordinates is:
 
 ```text
 c.x = CRPIX1 - 0.5
 c.y = H - (CRPIX2 - 0.5)
 ```
 
-The second matrix column changes sign to account for buffer Y. The matrix is also scaled into JHV's
-projection-plane units. Observer images use solar-radius units; CAR maps use longitude and latitude in
-radians, and CEA maps use longitude and the equal-area latitude coordinate. LASCO retains its instrument
-rule that suppresses metadata rotation because its image pixels have already been rotated.
+The second matrix column changes sign for the downward Y. The matrix is then scaled into plane units:
+solar radii for observer images, radians of longitude and latitude for CAR maps, and longitude with the
+equal-area latitude coordinate for CEA maps. LASCO keeps its rule that drops the metadata rotation, because
+its pixels are already rotated.
 
-[`ImageGeometry`](../src/org/helioviewer/jhv/wcs/ImageGeometry.java) stores this complete linear mapping.
-With pixel coordinate `P`, reference pixel `c`, matrix `A = pixelToPlane` and projection-plane point `p`:
+[`ImageGeometry`](../src/org/helioviewer/jhv/wcs/ImageGeometry.java) holds the complete linear mapping.
+With pixel coordinate `P`, reference pixel `c`, matrix `A = pixelToPlane` and plane point `p`:
 
 ```text
 p = A · (P - c)
 P = inverse(A) · p + c
 ```
 
-[`WcsHeader`](../src/org/helioviewer/jhv/wcs/WcsHeader.java) stores the projection parameters: projection
-kind, CRVAL, PV coefficients and plane units per radian. `unitsPerArcsec()` derives the arcsecond
-conversion from that same WCS scale, including for basic/fallback images. The nonlinear conversion between
-the projection plane and helioprojective angles belongs to `WcsProjection` on the CPU and the projection functions in
-`imageCommon.frag` on the GPU. CRVAL participates in that conversion; it is not the pixel reference `c`.
+[`WcsHeader`](../src/org/helioviewer/jhv/wcs/WcsHeader.java) holds the projection parameters: projection
+kind, CRVAL, PV coefficients and plane units per radian. `unitsPerArcsec()` derives the arcsecond scale
+from the same value, also for images without observational metadata. The nonlinear step between the plane
+and helioprojective angles lives in `WcsProjection` on the CPU and in `imageCommon.frag` on the GPU.
+CRVAL belongs to that step; it is not the pixel reference `c`.
 
-`BasicMetaData` supplies centered geometry with uniform pixel spacing when observational metadata is
-unavailable. `ImageBounds` maps original pixel corners and edge midpoints through the geometry and WCS
-projection for camera bounds. `ImageGeometry.bounds` is the image-axis rectangle used for sizing; the full
-matrix and projection determine the image's orientation and footprint in the scene.
+`BasicMetaData` supplies a centered geometry with uniform pixel spacing when metadata is missing.
+`ImageBounds` maps the image corners and edge midpoints through the geometry and projection to obtain the
+camera bounds. `ImageGeometry.bounds` is the axis-aligned rectangle in plane units used for sizing. The
+matrix and projection, not that rectangle, decide where the image lies in the scene. Surface maps skip the
+projection and bound the map by its far corner from the reference pixel.
 
 ## Decoder output to original pixels
 
-[`ImageGrid`](../src/org/helioviewer/jhv/image/ImageGrid.java) describes a decoded buffer by its resolution
-level, actual width and height, and first sample center in original image pixels. For the supported
-JPEG 2000 grids, level `r` has spacing `s = 2^r` along both axes.
+[`ImageGrid`](../src/org/helioviewer/jhv/image/ImageGrid.java) describes a decoded buffer: its level, its
+actual width and height, and the position of its first sample center in original pixels. Level `r` has
+spacing `s = 2^r` on both axes.
 
-Let `F` be the first decoded sample's position in original pixels, and `Q` a decoded buffer coordinate.
-The grid mapping, applied separately to X and Y, is:
+Let `F` be that first sample center and `Q` a decoded buffer coordinate. On each axis:
 
 ```text
 P = F + s · (Q - 0.5)
 Q = (P - F) / s + 0.5
 ```
 
-For a zero-origin JPEG 2000 image, `F=0.5`. Its reduced samples lie at `0.5`, `s+0.5`, `2s+0.5`, and so on.
-This describes their positions. A reduced wavelet reconstruction does not simply copy every `s`th original
-pixel value.
+For a zero-origin JPEG 2000 image `F = 0.5`, so the reduced samples sit at `0.5`, `s+0.5`, `2s+0.5`, …
+This is where the samples are, not how they are computed. A reduced wavelet reconstruction is not a copy
+of every `s`th pixel.
 
-The actual dimensions matter. For a native image interval `[X0,X1)`, the supported decoder grid has:
+The actual dimensions matter. For a canvas interval `[X0,X1)` the decoder grid is:
 
 ```text
-Xr = ceil(X0 / s)
-Wr = ceil(X1 / s) - Xr
+Xr  = ceil(X0 / s)
+Wr  = ceil(X1 / s) - Xr
 F.x = s · Xr - X0 + 0.5
 ```
 
-The same calculation applies to Y. The native bridge reports the full-resolution decoder origin and each
-level's actual dimensions. [`J2KNative.frame`](../src/org/helioviewer/jhv/source/J2KNative.java) converts the
-native origin into `ImageGrid.firstX/firstY` at the binding boundary. Native decode requests are relative
-to the level's image; the bridge adds that level's native origin when calling Kakadu.
+Y follows the same rule. The native bridge reports the full-resolution origin and each level's dimensions.
+[`J2KNative.frame`](../src/org/helioviewer/jhv/source/J2KNative.java) turns them into `ImageGrid` values
+at the binding boundary, so Kakadu's absolute coordinates stop there. Decode requests are relative to the
+level; the bridge adds the level origin.
 
-For example, a zero-origin image of width 129 has reduced width 17 at level 3, with sample centers at
-`0.5, 8.5, …, 128.5`. Stretching 17 texels uniformly between edges 0 and 129 would give different centers
-and spacing. Even with exactly divisible dimensions, stretching 4096 pixels into a 2048-texel texture
-would place its first center at original coordinate 1 instead of 0.5.
+Example: a zero-origin image 129 pixels wide has 17 samples at level 3, centered at `0.5, 8.5, …, 128.5`.
+Stretching 17 texels between the edges 0 and 129 gives other centers and another spacing. Even with
+divisible sizes the stretch is wrong: 4096 pixels stretched into 2048 texels put the first center at 1
+instead of 0.5.
 
-The native geometry reader accepts selected components with unit base sampling, zero registration and
-matching grids. Components requiring resampling are rejected. Local FITS and raster sources expose an
-identity grid at level 0.
+The native geometry reader accepts components with unit sampling, zero registration and a common grid.
+Components that would need resampling are rejected. FITS and raster sources expose an identity grid at
+level 0.
 
 ## Composition, decoding and caching
 
-`Frames.Frame.geometry()` reconciles the metadata dimensions with the source's actual full-resolution
-size. If those sizes differ, `withSize` preserves the WCS matrix and reference pixel while changing the
-extent. `FrameDecoder` chooses a requested level from display size and decodes the finest complete level
-at that level or coarser.
+`Frames.Frame.geometry()` reconciles the metadata size with the source's actual full-resolution size.
+When they differ, `withSize` keeps the matrix and reference pixel and changes the extent. `FrameDecoder`
+picks the level from the display size and decodes the finest complete level at that level or coarser.
 
-On a cache miss, `FrameDecoder.decodeImage` composes the frame geometry with the selected `ImageGrid` by
-calling `ImageGeometry.forGrid`. Substituting the grid equation into the original pixel mapping gives:
+On a cache miss `FrameDecoder.decodeImage` composes the frame geometry with the chosen grid through
+`ImageGeometry.forGrid`. Substituting the grid equation into the pixel mapping gives:
 
 ```text
 Adecoded = s · A
@@ -118,42 +115,41 @@ cdecoded = (c - F) / s + 0.5
 p = Adecoded · (Q - cdecoded)
 ```
 
-The composed geometry retains its original geometry through `original`. The identity grid reuses the
-original object. The filtered pixel buffer and composed geometry become one cached `DecodedImage`.
+The composed geometry keeps a reference to its original through `original`. The identity grid returns the
+original object. Pixels and composed geometry are cached together as one `DecodedImage`.
 
 ```mermaid
 flowchart TD
     M[Metadata] --> O[Original ImageGeometry]
-    N[Source dimensions and sample grid] --> G[ImageGrid]
-    O --> D[FrameDecoder: compose geometry]
+    N[Source size and sample grid] --> G[ImageGrid]
+    O --> D[FrameDecoder composes]
     G --> D
-    D --> F[Decode and filter pixels]
-    F --> C[Cached DecodedImage: pixels and geometry]
+    D --> F[Decode and filter]
+    F --> C[Cached DecodedImage]
     C --> R[ImageLayer and GLSLImageShader]
     R --> S[Scene point to WCS plane]
-    S --> P[Original and decoded texture coordinates]
-    P --> T[Clip, sample, sharpen and apply LUT]
+    S --> P[Original then decoded texture coordinates]
+    P --> T[Clip, sample, sharpen, LUT]
 ```
 
-A cache hit reuses the pixels and composed geometry. It does not decode, filter, compose the geometry again
-or read native geometry. Viewpoint and display adjustments are applied when rendering. Pixel ownership and
-cache lifetime are described in [Image Buffer Cache](image-buffer-cache.md).
+A cache hit reuses pixels and geometry. It does not decode, filter, compose or read native geometry again.
+Viewpoint and display adjustments apply at render time. Buffer ownership and cache lifetime are described
+in [Image Buffer Cache](image-buffer-cache.md).
 
 ## RHEF sample positions
 
-RHEF runs on the decode worker before texture upload. It receives the same composed `ImageGeometry` that
-will accompany the output pixels. MGN and WOW do not use physical image geometry.
+RHEF runs on the decode worker before upload, with the composed geometry its output pixels will carry.
+MGN and WOW do not use geometry.
 
-The original geometry locates the Sun in original pixels. For an offset observer image, it projects
-helioprojective `(0,0)` onto the WCS plane and applies the inverse pixel mapping. The grid composition
-carries that position into decoded pixels:
+The original geometry locates the Sun in original pixels by projecting helioprojective `(0,0)` to the
+plane and applying the inverse mapping. Composition carries that position onto the decoded grid:
 
 ```text
 sunDecoded = (sunOriginal - F) / s + 0.5
 ```
 
-[`FilterRHEF`](../src/org/helioviewer/jhv/image/FilterRHEF.java) uses the lengths of the composed matrix
-columns as the X and Y pixel spacings. For decoded sample `(i,j)`, its annulus radius is calculated from:
+[`FilterRHEF`](../src/org/helioviewer/jhv/image/FilterRHEF.java) takes the X and Y spacings from the
+lengths of the composed matrix columns. For decoded sample `(i,j)`:
 
 ```text
 dx = (i + 0.5 - sunDecoded.x) · pixelSizeX
@@ -161,99 +157,87 @@ dy = (j + 0.5 - sunDecoded.y) · pixelSizeY
 radius = sqrt(dx² + dy²)
 ```
 
-Consequently, the annuli follow the actual reduced sample grid, including its offset from the original
-image edges. Passing the original image extent and merely dividing it by the decoded dimensions would
-assign different physical positions to those samples.
+The annuli therefore follow the real reduced grid, offset from the image edges included. Dividing the
+original extent by the decoded size would place the samples elsewhere.
 
 ## Scene coordinates to texture reads
 
-[`ImageLayer.render`](../src/org/helioviewer/jhv/layers/ImageLayer.java) supplies current and comparison
-image geometries, observer orientations, time differences and display adjustments to `GLSLImageShader`.
-A user CROTA adjustment rotates the projection-plane input before the inverse pixel mapping. CRVAL
-adjustments are supplied to the projection calculation. These adjustments do not rewrite cached geometry.
+[`ImageLayer.render`](../src/org/helioviewer/jhv/layers/ImageLayer.java) passes both image geometries,
+the observer orientations, the time differences and the display adjustments to `GLSLImageShader`. A user
+CROTA adjustment rotates the plane point before the inverse mapping. CRVAL adjustments go into the
+projection step. Neither rewrites cached geometry.
 
-The mapping mode determines how each screen fragment reaches the source projection plane:
+The mapping mode decides how a fragment reaches the source plane:
 
-- **Orthographic** starts with the visible solar sphere or the image-plane intersection. Observer rotation
-  and differential rotation select the source point. TAN uses JHV's planar shortcut, subtracting CRVAL
-  from the source point's X/Y; other observer projections use helioprojective angles.
-- **HPC** starts with helioprojective longitude and latitude from the displayed angular bounds.
-- **Latitudinal** starts with longitude and latitude on the solar sphere and transforms them into the
-  image observer's frame.
-- **RadialWarp and RectWarp** construct a warped HPC plane point, then obtain helioprojective angles.
+- **Orthographic** starts on the visible solar sphere or the image plane. Observer rotation and
+  differential rotation pick the source point. TAN subtracts CRVAL from the point's X and Y directly;
+  the other observer projections go through helioprojective angles.
+- **HPC** starts from helioprojective longitude and latitude inside the displayed angular bounds.
+- **Latitudinal** starts from longitude and latitude on the sphere, rotated into the image observer's frame.
+- **RadialWarp and RectWarp** build a warped HPC plane point and derive the angles from it.
 
-CAR and CEA source maps use the point's solar longitude and latitude directly, with CEA's equal-area
-latitude conversion. The display mapping mode and the source WCS projection are separate choices.
+CAR and CEA sources use the point's solar longitude and latitude directly, CEA with its equal-area
+latitude. The display mode and the source projection are independent choices.
 
-From the resulting WCS plane point, every mode calculates original normalized image coordinates:
-
-```text
-source  = original pixel coordinate / original image dimensions
-```
-
-`GLSLImageShader` forms this affine mapping from the original `planeToPixel` and `referencePixel`
-divided by the original dimensions. In
-[`imageCommon.frag`](../resources/glsl/imageCommon.frag), `sourceX/sourceY` contain its two rows.
-Clipping and wrapping operate on these original coordinates. Immediately before texture reads,
-`getColor` converts them to decoded normalized coordinates with one `sampling` vector per image:
+From the plane point every mode computes original normalized coordinates:
 
 ```text
-scale   = originalSize / (step * decodedSize)
-offset  = (0.5 - firstSampleCenter / step) / decodedSize
-texture = source * scale + offset
+source = original pixel coordinate / original image size
 ```
 
-`GLSLImageShader` derives the two-axis scale and offset from the existing grid when preparing the
-uniforms. The shader stores them in `sampling.xy` and `sampling.zw`. At level 0 this is the identity.
-The two-image uniform block contains 224 bytes.
+`GLSLImageShader` builds this affine mapping from the original `planeToPixel` and `referencePixel`
+divided by the original size. [`imageCommon.frag`](../resources/glsl/imageCommon.frag) stores its two rows
+in `sourceX` and `sourceY`. Clipping and wrapping act on `source`. Right before the texture reads,
+`getColor` converts it to decoded coordinates with one `sampling` vector per image:
 
-Current and comparison images have independent mappings. Difference rendering transforms the same scene
-location through each image's observer and WCS geometry before subtracting their sampled intensities.
+```text
+scale   = originalSize / (step · decodedSize)
+offset  = (0.5 - F / step) / decodedSize
+texture = source · scale + offset
+```
+
+The binder derives scale and offset from the grid; the shader keeps them in `sampling.xy` and
+`sampling.zw`. At level 0 they are the identity. The two-image uniform block is 224 bytes.
+
+The current and comparison images have independent mappings. Difference rendering sends the same scene
+point through each image's observer and WCS geometry, then subtracts the sampled values.
 
 ## Masks, slits, wrapping and sharpening
 
-Detector masks are sampled with `source`. Slits and image-edge clipping also use `source`.
-Their positions do not depend on decoded texture size. Dithering uses this original normalized position.
+Detector masks, slits, edge clipping and dithering use `source`. They do not depend on the decoded size.
 
-Radius masks, sectors and the LASCO linear cutoff operate earlier, in the mode's solar scene or HPC plane
-coordinates through `clipPlanarMasks`. They do not use decoded pixel coordinates.
+Radius masks, sectors and the LASCO linear cutoff act earlier, on the mode's scene or HPC plane point in
+`clipPlanarMasks`. They never see decoded coordinates.
 
-For CAR/CEA longitude wrapping, `source.x` is wrapped before the sampling conversion. The conversion
-therefore includes the corresponding decoded texture displacement without a separate wrapping correction.
+CAR and CEA longitude wrapping wraps `source.x` before the sampling conversion. The conversion then carries
+the wrapped position onto the decoded texture; no second correction is needed.
 
-Sharpening samples a nine-tap blur around the decoded texture coordinate, using offsets in current-buffer
-texels. In difference mode, comparison offsets are multiplied by
-`comparison.sampling.xy / current.sampling.xy`. This preserves the same displacement in original
-normalized image coordinates even when the two decoded textures have different rounded dimensions.
-Brightness, enhancement, difference contrast, sharpening, gamma, dithering and LUT conversion then produce
-the fragment color.
+Sharpening blurs nine taps around the decoded coordinate, with offsets in current-image texels. In
+difference mode the comparison offsets are scaled by `comparison.sampling.xy / current.sampling.xy`, which
+keeps the same displacement in original coordinates when the two textures have different sizes. Brightness,
+enhancement, difference contrast, sharpening, gamma, dithering and the LUT then give the fragment color.
 
 ## Cutouts
 
-`SDOCutout` and `SampClient` use `DecodedImage.geometry().original.bounds`. With original reference
-pixel `c` and original pixel spacings `px,py`, that rectangle in image-axis units with Y up is:
+`SDOCutout` and `SampClient` use `DecodedImage.geometry().original.bounds`. With reference pixel `c` and
+pixel spacings `px, py`, that rectangle, in image-axis units with Y up, is:
 
 ```text
 left   = -c.x · px              width  = W · px
 bottom = -(H - c.y) · py        height = H · py
 ```
 
-The callers convert units to arcseconds and send the rectangle's center and size. Neither the rectangle
-nor its dimensions come from the reduced texture, so progressive resolution changes cannot alter the
-requested cutout.
+The callers convert to arcseconds and send the center and size. Nothing in it comes from the reduced
+texture, so a resolution change cannot alter the requested cutout.
 
 ## Regression checks
 
-The existing tests cover separate parts of this path:
-
-- `J2KNativeTest` compares native dimensions, grid positions and decoded pixels against Kakadu.
-- `J2KReaderTest` checks geometry composition with even/odd dimensions, nonzero native origins and unequal
-  pixel spacings.
-- `FramesTest` checks reduced-grid RHEF, retention of original cutout geometry and reuse on a cache hit.
-- `ImageRenderingTest` compares reduced ramps with full-resolution references in all display modes, checks
-  detector-mask and slit coverage and reduced CAR/CEA wrapping, and compares nonlinear sharpening against
-  an independent CPU reference.
-- The WCS metadata and rendering validators check projection geometry against independent references.
+- `J2KNativeTest` compares native dimensions, grid positions and decoded pixels with Kakadu.
+- `J2KReaderTest` checks composition with even and odd sizes, nonzero origins and unequal spacings.
+- `FramesTest` checks reduced-grid RHEF, retained original cutout geometry and reuse on a cache hit.
+- `ImageRenderingTest` compares reduced ramps with full-resolution references in every mode, checks
+  detector masks, slits and reduced CAR/CEA wrapping, and compares sharpening with a CPU reference.
+- The WCS metadata and rendering validators check the projection geometry against independent references.
 
 Run the offline and GPU suites from the repository root:
 
@@ -263,5 +247,5 @@ python3 extra/test/j2k/run_j2k_tests.py
 python3 extra/test/run_tests.py opengl shaders --no-build
 ```
 
-Native build and validation commands are in [Preparing JPEG 2000 native libraries](../extra/jpeg2000/README.md).
-WCS validation is described in [the WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md).
+Native build steps are in [Preparing JPEG 2000 native libraries](../extra/jpeg2000/README.md). WCS
+validation is in [the WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md).

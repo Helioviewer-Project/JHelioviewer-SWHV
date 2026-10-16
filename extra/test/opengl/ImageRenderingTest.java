@@ -194,12 +194,12 @@ public final class ImageRenderingTest {
                         Transform.ortho2D(1, 1, 0, 0);
                     GLSLScreenShader.setView(view, Display.getViewport(0));
                     for (int effect = 0; effect < 4; effect++) {
-                        ByteBuffer expected = renderSampling(texture, difference, mask, reference, reference, mode, wcs, effect, size);
+                        ByteBuffer expected = renderSampling(texture, difference, mask, reference, reference, mode, wcs, effect, size, Mat2.IDENTITY);
                         for (int level : new int[]{1, 3}) {
                             DecodedImage image = ramp(full, geometry[2], geometry[3], level);
                             DecodedImage prior = ramp(full, geometry[2], geometry[3], level + 1);
                             try {
-                                ByteBuffer actual = renderSampling(texture, difference, mask, image, prior, mode, wcs, effect, size);
+                                ByteBuffer actual = renderSampling(texture, difference, mask, image, prior, mode, wcs, effect, size, Mat2.IDENTITY);
                                 int visible = 0;
                                 for (int i = 0; i < actual.capacity(); i += 4) {
                                     int a = actual.get(i) & 255, e = expected.get(i) & 255;
@@ -221,9 +221,55 @@ public final class ImageRenderingTest {
                 reference.release();
             }
         }
+        transforms(texture, difference, mask, wcs, centeredView, size);
         sharpening(texture, difference, mask, wcs, centeredView, size);
         wrapping(texture, difference, mask, centeredView, size);
         System.out.println("PASS: reduced-grid alignment, fixed detector masks and slits, CAR/CEA wrapping, and nonlinear sharpening against a CPU reference");
+    }
+
+    private static void transforms(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
+                                   WcsHeader wcs, Position viewpoint, int size) {
+        MapView view = MapView.create(Display.getCamera(), viewpoint, MapMode.Orthographic, GridType.Viewpoint, new MapScale[]{MapScale.ortho});
+        Transform.ortho(1, 4, 0, 0, Quat.ZERO);
+        GLSLScreenShader.setView(view, Display.getViewport(0));
+        Vec2 referencePixel = new Vec2(61.25, 45.75);
+        ImageGeometry referenceGeometry = new ImageGeometry(129, 97, wcs,
+                new Mat2(.04, .01, .005, -.06), referencePixel);
+        // Rotate both plane axes by 90 degrees. Applying the same rotation to
+        // the plane input must recover the reference, including its shear and unequal scales.
+        ImageGeometry rotated = new ImageGeometry(129, 97, wcs,
+                new Mat2(-.005, .06, .04, .01), referencePixel);
+        Mat2 adjustment = new Mat2(0, -1, 1, 0);
+        DecodedImage reference = ramp(referenceGeometry, 3, 5, 0);
+        try {
+            for (int level : new int[]{0, 3}) {
+                DecodedImage image = ramp(rotated, 3, 5, level);
+                DecodedImage prior = ramp(rotated, 3, 5, level + 1);
+                try {
+                    for (int effect = 0; effect < 4; effect++) {
+                        ByteBuffer expected = renderSampling(texture, difference, mask, reference, reference,
+                                MapMode.Orthographic, wcs, effect, size, Mat2.IDENTITY);
+                        ByteBuffer actual = renderSampling(texture, difference, mask, image, prior,
+                                MapMode.Orthographic, wcs, effect, size, adjustment);
+                        int visible = 0;
+                        for (int i = 0; i < actual.capacity(); i += 4) {
+                            int a = actual.get(i) & 255, e = expected.get(i) & 255;
+                            if ((a == 0) != (e == 0) || Math.abs(a - e) > 2)
+                                throw new AssertionError("Rotated sampling mismatch: level " + level + " effect " + effect + " pixel " + i / 4);
+                            if (e != 0) visible++;
+                        }
+                        if (visible < 20)
+                            throw new AssertionError("Rotation test rendered no useful pixels");
+                    }
+                } finally {
+                    prior.release();
+                    image.release();
+                }
+            }
+        } finally {
+            reference.release();
+        }
+        System.out.println("PASS: Java shader binding composes user rotation, shear, unequal scales and reduced grids");
     }
 
     private static void wrapping(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
@@ -244,8 +290,8 @@ public final class ImageRenderingTest {
             DecodedImage prior = ramp(full, 3, 5, 4);
             try {
                 for (int effect = 0; effect < 4; effect++) {
-                    ByteBuffer expected = renderSampling(texture, difference, mask, reference, reference, MapMode.Latitudinal, wcs, effect, size);
-                    ByteBuffer actual = renderSampling(texture, difference, mask, image, prior, MapMode.Latitudinal, wcs, effect, size);
+                    ByteBuffer expected = renderSampling(texture, difference, mask, reference, reference, MapMode.Latitudinal, wcs, effect, size, Mat2.IDENTITY);
+                    ByteBuffer actual = renderSampling(texture, difference, mask, image, prior, MapMode.Latitudinal, wcs, effect, size, Mat2.IDENTITY);
                     int visible = 0;
                     for (int i = 0; i < actual.capacity(); i += 4) {
                         int a = actual.get(i) & 255, e = expected.get(i) & 255;
@@ -302,7 +348,7 @@ public final class ImageRenderingTest {
             for (int effect : new int[]{1, 3}) {
                 double value = effect == 1 ? 2 * checkerSample(0, 0) - blur : .5 - 2.5 * differenceBlur;
                 int expected = (int) Math.clamp(Math.floor(value * 256), 0, 255);
-                ByteBuffer actual = renderSampling(texture, difference, mask, images[0], images[1], MapMode.Orthographic, wcs, effect, size);
+                ByteBuffer actual = renderSampling(texture, difference, mask, images[0], images[1], MapMode.Orthographic, wcs, effect, size, Mat2.IDENTITY);
                 int center = actual.get(4 * (size * (size / 2) + size / 2)) & 255;
                 // Dithering adds at most one grayscale step; LUT quantization adds another.
                 if (Math.abs(center - expected) > 2)
@@ -341,7 +387,7 @@ public final class ImageRenderingTest {
     }
 
     private static ByteBuffer renderSampling(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
-                                             DecodedImage image, DecodedImage prior, MapMode mode, WcsHeader wcs, int effect, int size) {
+                                             DecodedImage image, DecodedImage prior, MapMode mode, WcsHeader wcs, int effect, int size, Mat2 adjustment) {
         texture.upload(image.imageBuffer());
         difference.upload(prior.imageBuffer());
         mask.bind();
@@ -349,7 +395,7 @@ public final class ImageRenderingTest {
         texture.bind();
         float[] crval = {0, 0};
         GLSLImageShader.bindImages(image.geometry(), crval, 215, 0, Quat.ZERO, Quat.ZERO,
-                prior.geometry(), crval, 215, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                prior.geometry(), crval, 215, 0, Quat.ZERO, Quat.ZERO, adjustment);
         GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 1f / image.imageBuffer().width, 1f / image.imageBuffer().height,
                 (effect & 1) != 0 ? -1 : 0, effect >= 2 ? 1 : 0,
                 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 100, .375f, .625f, 0);

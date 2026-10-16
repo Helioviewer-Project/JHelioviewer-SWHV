@@ -194,23 +194,23 @@ public final class FrameDecoderTest {
         Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ImageGrid[].class, int.class);
         constructor.setAccessible(true);
         try {
-            for (int[] geometry : new int[][]{{4096, 4096, 4096, 4096, 4}, {2048, 4096, 2048, 4096, 4},
+            for (int[] dimensions : new int[][]{{4096, 4096, 4096, 4096, 4}, {2048, 4096, 2048, 4096, 4},
                     {4096, 2048, 4096, 2048, 4}, {4096, 4096, 8192, 4096, 3}}) {
                 ImageGrid[] levels = new ImageGrid[6];
                 for (int i = 0; i < levels.length; i++)
-                    levels[i] = new ImageGrid(i, geometry[0] >> i, geometry[1] >> i);
+                    levels[i] = new ImageGrid(i, dimensions[0] >> i, dimensions[1] >> i);
                 sets.set(0, constructor.newInstance(levels, 1));
-                MetaData metadata = new BasicMetaData(geometry[0], geometry[1], "Selection test") {
+                MetaData metadata = new BasicMetaData(dimensions[0], dimensions[1], "Selection test") {
                     @Override
                     public ImageGeometry getGeometry() {
-                        return new ImageGeometry(geometry[0], geometry[1], super.getGeometry().wcs,
-                                new Mat2((double) geometry[2] / geometry[0], 0, 0, -(double) geometry[3] / geometry[1]), Vec2.ZERO);
+                        return new ImageGeometry(dimensions[0], dimensions[1], super.getGeometry().wcs,
+                                new Mat2((double) dimensions[2] / dimensions[0], 0, 0, -(double) dimensions[3] / dimensions[1]), Vec2.ZERO);
                     }
                 };
                 Frames.Frame frame = new Frames.Frame(opened.frames.time(0), metadata, Frames.EMPTY_METAXML, opened.source, 0);
                 int selected = FrameDecoder.level(frame, 1.0 / 16);
-                if (selected != geometry[4])
-                    throw new AssertionError("Wrong resolution for " + Arrays.toString(geometry) + ": " + selected);
+                if (selected != dimensions[4])
+                    throw new AssertionError("Wrong resolution for " + Arrays.toString(dimensions) + ": " + selected);
             }
         } finally {
             sets.set(0, originalSet);

@@ -1011,15 +1011,17 @@ def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float
 
 
 def image_radial_bound(meta: JHVMeta) -> float:
-    if not is_surface_map_projection(meta):
-        radius = 0.0
-        for plane in rotated_image_plane_edge_samples(meta):
-            helioprojective = project_plane_internal_to_world(plane, meta)
-            hpc_xy = helioprojectiveToHpcXY(helioprojective, meta.observer_distance)
-            if math.isfinite(hpc_xy[0]) and math.isfinite(hpc_xy[1]):
-                radius = max(radius, math.hypot(hpc_xy[0], hpc_xy[1]))
-        if radius > 0.0:
-            return radius
+    # Surface maps have no off-limb extent. Angular map coordinates are not solar radii.
+    if is_surface_map_projection(meta):
+        return 1.0
+    radius = 0.0
+    for plane in rotated_image_plane_edge_samples(meta):
+        helioprojective = project_plane_internal_to_world(plane, meta)
+        hpc_xy = helioprojectiveToHpcXY(helioprojective, meta.observer_distance)
+        if math.isfinite(hpc_xy[0]) and math.isfinite(hpc_xy[1]):
+            radius = max(radius, math.hypot(hpc_xy[0], hpc_xy[1]))
+    if radius > 0.0:
+        return radius
 
     x0 = -meta.crpix1_gl * meta.unit_per_pixel_x - meta.crval_internal_x
     x1 = (meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x - meta.crval_internal_x

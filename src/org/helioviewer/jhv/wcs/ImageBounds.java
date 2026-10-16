@@ -8,18 +8,21 @@ public final class ImageBounds {
 
     public static double radial(MetaData metaData) {
         ImageGeometry geometry = metaData.getGeometry();
+        // CAR/CEA describe the unit solar surface, not an off-limb image plane.
+        // Their angular extent and longitude reference cannot enlarge a radius in solar radii.
+        if (geometry.wcs.projection.isSurfaceMap())
+            return 1;
+
         Region region = geometry.bounds;
-        if (!geometry.wcs.projection.isSurfaceMap()) {
-            double distance = metaData.getViewpoint().distance;
-            double radius = 0;
-            for (Vec2 helioprojective : boundary(geometry)) {
-                Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
-                if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
-                    radius = Math.max(radius, Math.hypot(hpcPlane.x, hpcPlane.y));
-            }
-            if (radius > 0)
-                return radius;
+        double distance = metaData.getViewpoint().distance;
+        double radius = 0;
+        for (Vec2 helioprojective : boundary(geometry)) {
+            Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
+            if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
+                radius = Math.max(radius, Math.hypot(hpcPlane.x, hpcPlane.y));
         }
+        if (radius > 0)
+            return radius;
 
         // Sun offset from the reference pixel in the rectangle's frame: image axes, Y up.
         double sunX = (geometry.sunPixel.x - geometry.referencePixel.x) * geometry.pixelSizeX;
