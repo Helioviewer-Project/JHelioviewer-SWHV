@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.ImageBounds;
 import org.helioviewer.jhv.wcs.ImageGeometry;
@@ -111,7 +112,7 @@ public final class JHVMetadataDump {
         double arcsecPerPixelY = wcs.projection == WcsHeader.Projection.CEA
                 ? geometry.pixelSizeY
                 : geometry.pixelSizeY / unitsPerArcsec;
-        Region hpcBounds = ImageBounds.hpc(meta);
+        Region hpcBounds = ImageBounds.hpc(geometry);
         // The validator's rectangle follows rows: its lower Y edge is the negated upper plane edge.
         Region sized = geometry.withSize(pixelWidth, pixelHeight).bounds;
         Region renderRegion = new Region(sized.llx, -sized.ury, sized.width, sized.height);
@@ -142,7 +143,7 @@ public final class JHVMetadataDump {
                 .put("hpc_max_x", hpcBounds.urx)
                 .put("hpc_min_y", hpcBounds.lly)
                 .put("hpc_max_y", hpcBounds.ury)
-                .put("radial_bound", ImageBounds.radial(meta))
+                .put("radial_bound", ImageBounds.radial(geometry, meta.viewpoint.distance))
                 .put("sun_shift_x", sunShift.x)
                 .put("sun_shift_y", sunShift.y)
                 .put("projection", wcs.projection.name())

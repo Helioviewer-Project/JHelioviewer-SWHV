@@ -10,7 +10,9 @@ import org.helioviewer.jhv.wcs.ImageGeometry;
 
 class CommonMetaData implements MetaData {
 
-    protected ImageGeometry geometry = new ImageGeometry(1, 1, 1);
+    private static final ImageGeometry DEFAULT_GEOMETRY = new ImageGeometry(1, 1, 1);
+
+    protected ImageGeometry geometry = DEFAULT_GEOMETRY;
     protected String displayName = "unknown";
     protected URI sourceUri = MetaData.UNKNOWN_SOURCE_URI;
     protected DetectorMask detectorMask = DetectorMask.NONE;

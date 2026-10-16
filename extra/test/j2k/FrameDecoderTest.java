@@ -46,7 +46,6 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.Directories;
@@ -62,6 +61,7 @@ import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // The real timeline, decoder and reader thread on a JPIP movie, headless.
 // Arguments: Kakadu library, bridge library, movie JPIP URI, image JPIP URI, local JP2 file.

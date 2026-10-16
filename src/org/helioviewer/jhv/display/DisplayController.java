@@ -12,8 +12,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
@@ -189,14 +188,13 @@ public final class DisplayController {
         if (imageData == null)
             return 0;
 
-        MetaData metaData = imageData.metaData();
-        ImageGeometry geometry = metaData.getGeometry();
+        ImageGeometry geometry = imageData.metaData().getGeometry();
         if (mode != MapMode.HPC) // one viewport pixel per image pixel
             return vp.height * geometry.pixelSizeY;
 
         Region scale = ImageLayers.computeHpcScaleBounds();
         double viewportHeight = Math.max(scale.height, scale.width / vp.aspect);
-        return viewportHeight > 0 ? vp.height * ImageBounds.hpc(metaData).height / (geometry.grid.height() * viewportHeight) : 0;
+        return viewportHeight > 0 ? vp.height * ImageBounds.hpc(geometry).height / (geometry.grid.height() * viewportHeight) : 0;
     }
 
     public static void resetView() {

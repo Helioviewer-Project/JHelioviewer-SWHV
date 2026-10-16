@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.metadata;
+package org.helioviewer.jhv.math;
 
 public class Region {
 

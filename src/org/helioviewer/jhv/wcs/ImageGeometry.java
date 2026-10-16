@@ -1,10 +1,9 @@
 package org.helioviewer.jhv.wcs;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.metadata.Region;
 
 // Complete buffer-pixel <-> WCS-plane mapping. Pixel Y follows buffer rows.
 // The original geometry owns the image footprint; a decoded grid composes with it.

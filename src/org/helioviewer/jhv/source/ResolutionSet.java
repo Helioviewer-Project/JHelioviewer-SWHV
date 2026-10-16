@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.source;
 
-import org.helioviewer.jhv.image.ImageGrid;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {

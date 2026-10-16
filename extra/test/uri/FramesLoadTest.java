@@ -14,9 +14,9 @@ import java.util.zip.CRC32;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 import org.lwjgl.system.MemoryUtil;
 

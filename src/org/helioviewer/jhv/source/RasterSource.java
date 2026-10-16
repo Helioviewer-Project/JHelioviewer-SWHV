@@ -22,10 +22,10 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // One image readable by ImageIO; the file is read again for each decode.
 public final class RasterSource implements Source {

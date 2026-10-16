@@ -25,7 +25,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.math.Mat2;
@@ -34,6 +33,7 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public final class ImageRenderingTest {

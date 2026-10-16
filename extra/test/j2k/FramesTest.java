@@ -21,7 +21,6 @@ import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.Directories;
@@ -32,6 +31,7 @@ import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 import org.lwjgl.system.MemoryUtil;
 

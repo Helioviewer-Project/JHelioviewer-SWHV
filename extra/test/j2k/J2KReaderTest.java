@@ -10,12 +10,12 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HexFormat;
 
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 // Raw reader pixels, independent of the view's delivery and filtering path.

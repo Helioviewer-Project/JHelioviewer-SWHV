@@ -9,7 +9,6 @@ import java.awt.image.Raster;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.math.MathUtils;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 class RadioJ2KData {
 

@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.movie.ExportMovie;
 
 public final class GLRenderer {

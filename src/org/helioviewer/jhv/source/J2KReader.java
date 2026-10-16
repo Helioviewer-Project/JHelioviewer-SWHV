@@ -10,9 +10,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 class J2KReader implements Runnable {
 

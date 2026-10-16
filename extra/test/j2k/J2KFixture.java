@@ -21,9 +21,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // Reader-level fixtures for the live decoder test, in the package of the reader internals they use.
 public final class J2KFixture {

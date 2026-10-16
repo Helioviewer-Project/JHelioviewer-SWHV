@@ -16,7 +16,7 @@ import java.util.concurrent.CancellationException;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.image.ImageGrid;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // FFM binding of native/jpeg2000/jhv_j2k.h; the library must be loaded first.
 // The monitor serializes calls on the source. A decode runs outside it.

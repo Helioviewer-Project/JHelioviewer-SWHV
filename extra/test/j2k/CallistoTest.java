@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
@@ -28,6 +27,7 @@ import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // Arguments: Kakadu library, bridge library, Callisto JP2 file.
 public final class CallistoTest {

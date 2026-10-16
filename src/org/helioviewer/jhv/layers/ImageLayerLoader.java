@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
@@ -32,6 +31,7 @@ import org.helioviewer.jhv.source.RasterSource;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 final class ImageLayerLoader {
 

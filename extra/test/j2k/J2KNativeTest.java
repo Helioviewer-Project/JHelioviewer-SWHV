@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.helioviewer.jhv.image.ImageGrid;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 import com.sun.management.UnixOperatingSystemMXBean;
 

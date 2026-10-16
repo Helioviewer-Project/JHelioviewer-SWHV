@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.image;
+package org.helioviewer.jhv.wcs;
 
 // Buffer samples in original image pixels: upper-left edge (0,0), centers at half-integers.
 // level identifies a pyramid level; it also determines the spacing for the supported decoders.

@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;

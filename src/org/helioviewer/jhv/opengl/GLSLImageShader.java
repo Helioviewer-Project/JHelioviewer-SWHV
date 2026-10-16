@@ -3,11 +3,11 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.display.MapMode;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public final class GLSLImageShader extends GLSLScreenShader {

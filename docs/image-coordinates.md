@@ -58,12 +58,14 @@ CRVAL belongs to that step; it is not the pixel reference `c`.
 `BasicMetaData` supplies a centered geometry with uniform pixel spacing when metadata is missing.
 `ImageBounds` maps the image corners and edge midpoints through the geometry and projection to obtain the
 camera bounds. `ImageGeometry.bounds` is the axis-aligned rectangle in plane units used for sizing. The
-matrix and projection, not that rectangle, decide where the image lies in the scene. Surface maps skip the
-projection and bound the map by its far corner from the reference pixel.
+matrix and projection, not that rectangle, decide where the image lies in the scene. Radial bounds are
+one solar radius for CAR/CEA surface maps. Observer images use the projected boundary's largest radius,
+falling back to rectangle corners relative to the Sun when no projected radius is usable. HPC bounds
+use the projected boundary for both surface maps and observer images.
 
 ## Decoder output to original pixels
 
-[`ImageGrid`](../src/org/helioviewer/jhv/image/ImageGrid.java) describes a decoded buffer: its level, its
+[`ImageGrid`](../src/org/helioviewer/jhv/wcs/ImageGrid.java) describes a decoded buffer: its level, its
 actual width and height, and the position of its first sample center in original pixels. Level `r` has
 spacing `s = 2^r` on both axes.
 

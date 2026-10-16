@@ -3,8 +3,8 @@ package org.helioviewer.jhv.io;
 import org.helioviewer.jhv.layers.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.metadata.FitsMetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 

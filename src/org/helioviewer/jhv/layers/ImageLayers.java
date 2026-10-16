@@ -7,7 +7,8 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.ImageRequestSettings;
-import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.math.Region;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiTimer;
@@ -46,7 +47,8 @@ public final class ImageLayers {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (!layer.isEnabled())
                 continue;
-            size = Math.max(size, ImageBounds.radial(layer.getMetaData()));
+            MetaData metaData = layer.getMetaData();
+            size = Math.max(size, ImageBounds.radial(metaData.getGeometry(), metaData.getViewpoint().distance));
         }
         return size;
     }
@@ -71,7 +73,7 @@ public final class ImageLayers {
             if (!layer.isEnabled())
                 continue;
 
-            Region bounds = ImageBounds.hpc(layer.getMetaData());
+            Region bounds = ImageBounds.hpc(layer.getMetaData().getGeometry());
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);

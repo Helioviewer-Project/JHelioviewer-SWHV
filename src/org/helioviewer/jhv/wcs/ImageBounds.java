@@ -1,20 +1,17 @@
 package org.helioviewer.jhv.wcs;
 
+import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 
 public final class ImageBounds {
 
-    public static double radial(MetaData metaData) {
-        ImageGeometry geometry = metaData.getGeometry();
+    public static double radial(ImageGeometry geometry, double distance) {
         // CAR/CEA describe the unit solar surface, not an off-limb image plane.
         // Their angular extent and longitude reference cannot enlarge a radius in solar radii.
         if (geometry.wcs.projection.isSurfaceMap())
             return 1;
 
         Region region = geometry.bounds;
-        double distance = metaData.getViewpoint().distance;
         double radius = 0;
         for (Vec2 helioprojective : boundary(geometry)) {
             Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
@@ -36,10 +33,10 @@ public final class ImageBounds {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
-    public static Region hpc(MetaData metaData) {
+    public static Region hpc(ImageGeometry geometry) {
         double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        for (Vec2 helioprojective : boundary(metaData.getGeometry())) {
+        for (Vec2 helioprojective : boundary(geometry)) {
             double x = Math.toDegrees(helioprojective.x);
             double y = Math.toDegrees(helioprojective.y);
             minX = Math.min(minX, x);

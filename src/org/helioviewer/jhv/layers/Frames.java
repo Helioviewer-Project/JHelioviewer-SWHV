@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBufferCache;
-import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // The timeline of an image layer: frames sorted by time, each from a source or empty. EDT only.
 public final class Frames implements Source.Listener {
