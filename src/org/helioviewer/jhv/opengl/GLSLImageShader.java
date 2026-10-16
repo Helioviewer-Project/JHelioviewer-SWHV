@@ -79,12 +79,14 @@ public final class GLSLImageShader extends GLSLScreenShader {
 
     private static void putImage(FloatBuffer values, ImageGeometry image, float[] crval,
                                  float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView, Mat2 adjustment) {
-        putTransform(values, image.original.planeToTexture, image.original.referenceTexture, adjustment);
+        ImageGeometry original = image.original;
+        int width = original.grid.width(), height = original.grid.height();
+        putTransform(values, original.planeToPixel, original.referencePixel, width, height, adjustment);
         ImageGrid grid = image.grid;
         double step = grid.step();
         // Original normalized pixels -> decoded normalized pixels: scale, then offset.
-        values.put((float) (image.original.grid.width() / (step * grid.width())));
-        values.put((float) (image.original.grid.height() / (step * grid.height())));
+        values.put((float) (width / (step * grid.width())));
+        values.put((float) (height / (step * grid.height())));
         values.put((float) ((.5 - grid.firstX() / step) / grid.width()));
         values.put((float) ((.5 - grid.firstY() / step) / grid.height()));
         WcsHeader wcs = image.wcs;
@@ -94,14 +96,14 @@ public final class GLSLImageShader extends GLSLScreenShader {
         sourceView.setFloatBuffer(values);
     }
 
-    // The user rotation acts on the plane, so it precedes the plane-to-texture matrix.
-    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, Mat2 adjustment) {
-        values.put((float) (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10));
-        values.put((float) (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11));
-        values.put((float) reference.x).put(0);
-        values.put((float) (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10));
-        values.put((float) (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11));
-        values.put((float) reference.y).put(0);
+    // WCS plane -> normalized original pixels; the user rotation acts on the plane first.
+    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, int width, int height, Mat2 adjustment) {
+        values.put((float) ((matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10) / width));
+        values.put((float) ((matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11) / width));
+        values.put((float) (reference.x / width)).put(0);
+        values.put((float) ((matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10) / height));
+        values.put((float) ((matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11) / height));
+        values.put((float) (reference.y / height)).put(0);
     }
 
     static void bindDisplay(float[] color,

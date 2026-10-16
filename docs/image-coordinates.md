@@ -191,7 +191,8 @@ From the resulting WCS plane point, every mode calculates original normalized im
 source  = original pixel coordinate / original image dimensions
 ```
 
-The original `ImageGeometry.planeToTexture` and `referenceTexture` encode this affine mapping. In
+`GLSLImageShader` forms this affine mapping from the original `planeToPixel` and `referencePixel`
+divided by the original dimensions. In
 [`imageCommon.frag`](../resources/glsl/imageCommon.frag), `sourceX/sourceY` contain its two rows.
 Clipping and wrapping operate on these original coordinates. Immediately before texture reads,
 `getColor` converts them to decoded normalized coordinates with one `sampling` vector per image:

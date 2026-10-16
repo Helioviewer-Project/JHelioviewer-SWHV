@@ -14,16 +14,12 @@ public final class ImageGeometry {
     public final ImageGrid grid;
     public final WcsHeader wcs;
     public final Mat2 pixelToPlane;
-    private final Mat2 planeToPixel;
+    public final Mat2 planeToPixel;
     public final Vec2 referencePixel;
     public final double pixelSizeX;
     public final double pixelSizeY;
     public final Vec2 sunPixel;
     public final Region bounds;
-
-    // Complete WCS-plane -> normalized buffer coordinates, ready for rendering.
-    public final Mat2 planeToTexture;
-    public final Vec2 referenceTexture;
 
     public ImageGeometry(int width, int height, double pixelSize) {
         this(width, height, new WcsHeader(WcsHeader.Projection.TAN, new float[6], Sun.MeanEarthDistance, Vec2.ZERO),
@@ -53,9 +49,6 @@ public final class ImageGeometry {
                     ? WcsProjection.helioprojectiveToPlane(wcs, 0, 0) : null;
             sunPixel = sun == null ? referencePixel : toPixel(sun.x, sun.y);
         }
-        planeToTexture = new Mat2(planeToPixel.m00 / grid.width(), planeToPixel.m01 / grid.width(),
-                planeToPixel.m10 / grid.height(), planeToPixel.m11 / grid.height());
-        referenceTexture = new Vec2(referencePixel.x / grid.width(), referencePixel.y / grid.height());
     }
 
     // Actual source dimensions can differ from NAXIS; the WCS reference pixel stays fixed.
