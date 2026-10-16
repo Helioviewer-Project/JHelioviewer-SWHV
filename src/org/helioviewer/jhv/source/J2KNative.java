@@ -39,7 +39,7 @@ final class J2KNative implements AutoCloseable {
     private static final ValueLayout.OfInt I = ValueLayout.JAVA_INT;
     private static final ValueLayout.OfLong L = ValueLayout.JAVA_LONG;
     private static final MemoryLayout P = ValueLayout.ADDRESS;
-    private static final int MAX_LEVELS = 33;
+    private static final int MAX_LEVELS = 31;
     private static final long FRAME_SIZE = 296, FRAME_WIDTH = 20, FRAME_HEIGHT = 152, FRAME_X = 284, FRAME_Y = 288;
     private static final MethodHandle OPEN = bind("open", P, P, P);
     private static final MethodHandle CLOSE = bind("close", null, P);

@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -30,11 +31,18 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.metadata.FitsMetaData;
+import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
+import org.helioviewer.jhv.source.FITSSource;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsHeader;
+
+import nom.tam.fits.Fits;
+import nom.tam.fits.Header;
+import nom.tam.fits.ImageHDU;
 
 public final class ImageRenderingTest {
     private static final int TEXTURE_SIZE = 64;
@@ -149,6 +157,7 @@ public final class ImageRenderingTest {
                 }
             }
             sampling(texture, difference, lut, mask, viewpoint);
+            fitsReference(texture, difference, lut, mask, viewpoint);
         } finally {
             mask.delete();
             lut.delete();
@@ -157,6 +166,83 @@ public final class ImageRenderingTest {
             renderer.destroy();
         }
         System.out.println("ImageRenderingTest passed");
+    }
+
+    private static void fitsReference(GLStreamingTexture2D texture, GLStreamingTexture2D difference,
+                                      GLTexture lut, GLTexture mask, Position viewpoint) throws Exception {
+        byte[][] pixels = new byte[96][128];
+        int[] counts = new int[256];
+        for (int y = 0; y < 96; y++) {
+            for (int x = 0; x < 128; x++) {
+                // FITS centers are (x+1,y+1); the reference is (64.25,24.25).
+                int value = 32 + (int) Math.hypot(x + 1 - 64.25, y + 1 - 24.25);
+                pixels[y][x] = (byte) value;
+                counts[value]++;
+            }
+        }
+        Path path = Files.createTempFile("jhv-offcenter-", ".fits");
+        try {
+            try (Fits fits = new Fits()) {
+                ImageHDU hdu = (ImageHDU) Fits.makeHDU(pixels);
+                Header header = hdu.getHeader();
+                header.addValue("DATE-OBS", "2026-01-15T12:00:00", null);
+                header.addValue("CRPIX1", 64.25, null);
+                header.addValue("CRPIX2", 24.25, null);
+                header.addValue("CDELT1", 100, null);
+                header.addValue("CDELT2", 100, null);
+                fits.addHDU(hdu);
+                fits.write(path.toFile());
+            }
+            FITSSource source = new FITSSource(path.toFile());
+            FitsMetaData metadata = new FitsMetaData(new XMLMetaDataContainer(source.xml(0)), path.toUri());
+            ImageGeometry geometry = metadata.getGeometry();
+            DecodedImage image = new DecodedImage(source.decode(0, 0, ImageFilter.NONE, null, null), geometry);
+            try {
+                ByteBuffer decoded = (ByteBuffer) image.imageBuffer().buffer;
+                for (int y = 0; y < 96; y++)
+                    for (int x = 0; x < 128; x++)
+                        if (decoded.get(y * 128 + x) != pixels[95 - y][x])
+                            throw new AssertionError("FITS buffer row order changed");
+                int size = 257, center = size / 2;
+                GLRenderer.reshape(size, size);
+                GL.glViewport(0, 0, size, size);
+                MapView view = MapView.create(Display.getCamera(), new Position(viewpoint.time, 215, 0, 0),
+                        MapMode.Orthographic, GridType.Viewpoint, new MapScale[]{MapScale.ortho});
+                Transform.ortho(1, size * geometry.pixelSizeX, 0, 0, Quat.ZERO);
+                GLSLScreenShader.setView(view, Display.getViewport(0));
+                lut.upload2D(GLTexture.Format.RGBA8, 256, 1, GL.NEAREST, LUT.gray().rgba());
+                ByteBuffer white = BufferUtils.newByteBuffer(1);
+                white.put(0, (byte) 255);
+                mask.upload2D(GLTexture.Format.R8, 1, 1, GL.NEAREST, white);
+                ByteBuffer rendered = renderSampling(texture, difference, mask, image, image,
+                        MapMode.Orthographic, geometry.wcs, 0, size, Mat2.IDENTITY);
+                for (int[] sample : new int[][]{{0, 0, 32}, {16, 0, 48}, {0, 16, 48}}) {
+                    int actual = rendered.get(4 * ((center + sample[1]) * size + center + sample[0])) & 255;
+                    // Integer rings, interpolation and the shader's one-byte dither.
+                    if (Math.abs(actual - sample[2]) > 2)
+                        throw new AssertionError("Off-center FITS reference rendered " + actual + ", expected " + sample[2]);
+                }
+            } finally {
+                image.release();
+            }
+            DecodedImage filtered = new DecodedImage(source.decode(0, 0, ImageFilter.of(ImageFilter.Type.RHEF, geometry), null, null), geometry);
+            try {
+                ShortBuffer decoded = (ShortBuffer) filtered.imageBuffer().buffer;
+                for (int y = 0; y < 96; y++) {
+                    for (int x = 0; x < 128; x++) {
+                        int value = pixels[95 - y][x] & 255;
+                        short expected = Float.floatToFloat16(counts[value] >= 5 ? .5f : value / 255f);
+                        if (decoded.get(y * 128 + x) != expected)
+                            throw new AssertionError("RHEF annulus is not centered on the FITS reference pixel at " + x + "," + y);
+                    }
+                }
+            } finally {
+                filtered.release();
+            }
+        } finally {
+            Files.deleteIfExists(path);
+        }
+        System.out.println("PASS: off-center FITS reference through row reversal, rendering and RHEF annuli");
     }
 
     private static void sampling(GLStreamingTexture2D texture, GLStreamingTexture2D difference,

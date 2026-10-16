@@ -309,7 +309,7 @@ public final class FramesTest {
         };
         source.ready[0] = true;
         Frames frames = new Frames(List.of(new Frames.Frame(new JHVTime(1_800_000_000_000L), metadata, Frames.EMPTY_METAXML, source, 0)));
-        // Independent expected texel-cell bounds: centers are (-63.5 + 8*x, -47.5 + 8*y).
+        // Expected geometry passed to RHEF: centers are (-63.5 + 8*x, -47.5 + 8*y).
         DecodedImage expected = new DecodedImage(ImageBuffer.fromBytes(16, 12, samples,
                 ImageFilter.of(ImageFilter.Type.RHEF, new ImageGeometry(16, 12, originalGeometry.wcs,
                         new Mat2(8, 0, 0, -8), new Vec2(67.5 / 8, 51.5 / 8)))), originalGeometry);
