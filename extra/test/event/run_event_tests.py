@@ -18,7 +18,7 @@ tests = {
     "SWEKIntegrationTest": "event",
     "SWEKLayerTest": "plugins.swek",
 }
-classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
+classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), str(root / "lib"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
 with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
     work = Path(workspace)
     classes = work / "classes"

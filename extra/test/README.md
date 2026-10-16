@@ -6,7 +6,9 @@ Run the routine offline regression suites from the repository root:
 python3 extra/test/run_tests.py
 ```
 
-Requires Python 3, JDK 25, and Ant on `PATH`. The runner compiles JHV first,
+Requires Python 3, JDK 25, and Ant on `PATH`. Native resources are read from
+`lib/jhv/<platform>/`. FFmpeg binaries use Git LFS; run `git lfs pull` if they
+were not downloaded during checkout. The runner compiles JHV first,
 then runs maintenance, model, JPIP, timeline, and event tests. Java tests use
 temporary class and home directories, leaving normal JHV settings and caches
 alone. JPIP and HAPI tests need permission to open loopback sockets. Model and

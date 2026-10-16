@@ -58,7 +58,7 @@ if args.start or args.end:
     parser.error("--start and --end apply only to --capture-stix")
 
 root = Path(__file__).resolve().parents[3]
-classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
+classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), str(root / "lib"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
 with tempfile.TemporaryDirectory(prefix="jhv-timeline-tests-") as classes:
     subprocess.run([
         "javac", "-cp", classpath, "-d", classes,

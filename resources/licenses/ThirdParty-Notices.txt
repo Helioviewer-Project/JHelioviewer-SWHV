@@ -374,33 +374,130 @@ Source: lib/guava-33.7.1-jre.jar!META-INF/LICENSE
 
 License terms are included in Apache-2.0.txt.
 
-lib/jhv/jhv-natives-linux.jar
+lib/jhv/linux-amd64/ffmpeg
+--------------------------
+
+Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/linux-amd64/libEGL.so
 -----------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
+Supplemental notices: ANGLE.txt.
 
-Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
+lib/jhv/linux-amd64/libGLESv2.so
+--------------------------------
 
-lib/jhv/jhv-natives-macos-arm64.jar
+Supplemental notices: ANGLE.txt.
+
+lib/jhv/linux-amd64/libJNISpice.so
+----------------------------------
+
+Supplemental notices: SPICE.txt.
+
+lib/jhv/linux-amd64/libjhvj2k.so
+--------------------------------
+
+Supplemental notices: esajpip.txt.
+
+lib/jhv/linux-amd64/libkdu_jni.so
+---------------------------------
+
+Separately maintained notices: Kakadu.txt.
+
+lib/jhv/macos-amd64/ffmpeg
+--------------------------
+
+Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/macos-amd64/libEGL.dylib
+--------------------------------
+
+Supplemental notices: ANGLE.txt.
+
+lib/jhv/macos-amd64/libGLESv2.dylib
 -----------------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
+Supplemental notices: ANGLE.txt.
 
-Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
+lib/jhv/macos-amd64/libJNISpice.dylib
+-------------------------------------
 
-lib/jhv/jhv-natives-macos.jar
------------------------------
+Supplemental notices: SPICE.txt.
 
-Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
+lib/jhv/macos-amd64/libjhvj2k.dylib
+-----------------------------------
 
-Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
+Supplemental notices: esajpip.txt.
 
-lib/jhv/jhv-natives-windows.jar
--------------------------------
+lib/jhv/macos-amd64/libkdu_jni.dylib
+------------------------------------
 
-Supplemental notices: ANGLE.txt, SPICE.txt, esajpip.txt.
+Separately maintained notices: Kakadu.txt.
 
-Separately maintained notices: FFmpeg-Notices.txt, Kakadu.txt.
+lib/jhv/macos-arm64/ffmpeg
+--------------------------
+
+Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/macos-arm64/libEGL.dylib
+--------------------------------
+
+Supplemental notices: ANGLE.txt.
+
+lib/jhv/macos-arm64/libGLESv2.dylib
+-----------------------------------
+
+Supplemental notices: ANGLE.txt.
+
+lib/jhv/macos-arm64/libJNISpice.dylib
+-------------------------------------
+
+Supplemental notices: SPICE.txt.
+
+lib/jhv/macos-arm64/libjhvj2k.dylib
+-----------------------------------
+
+Supplemental notices: esajpip.txt.
+
+lib/jhv/macos-arm64/libkdu_jni.dylib
+------------------------------------
+
+Separately maintained notices: Kakadu.txt.
+
+lib/jhv/windows-amd64/JNISpice.dll
+----------------------------------
+
+Supplemental notices: SPICE.txt.
+
+lib/jhv/windows-amd64/ffmpeg
+----------------------------
+
+Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/windows-amd64/jhvj2k.dll
+--------------------------------
+
+Supplemental notices: esajpip.txt.
+
+lib/jhv/windows-amd64/kdu_jni.dll
+---------------------------------
+
+Separately maintained notices: Kakadu.txt.
+
+lib/jhv/windows-amd64/kdu_v7AR.dll
+----------------------------------
+
+Separately maintained notices: Kakadu.txt.
+
+lib/jhv/windows-amd64/libEGL.dll
+--------------------------------
+
+Supplemental notices: ANGLE.txt.
+
+lib/jhv/windows-amd64/libGLESv2.dll
+-----------------------------------
+
+Supplemental notices: ANGLE.txt.
 
 lib/jnispice.jar
 ----------------

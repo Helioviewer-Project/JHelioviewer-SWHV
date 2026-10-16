@@ -34,6 +34,7 @@
       <fileEntry mountPoint="182" file="../bin/natives-macos.jar" />
       <fileEntry mountPoint="182" file="../bin/natives-windows.jar" />
       <fileEntry mountPoint="182" file="../bin/JHelioviewer.jar" />
+      <dirEntry mountPoint="182" file="../bin/jhv" entryMode="subdir" subDirectory="jhv" />
     </entries>
     <components>
       <component name="JHelioviewer" id="23" changeable="false">
@@ -46,6 +47,7 @@
       <executable name="JHelioviewer" iconSet="true" iconFile="./resources/JHelioviewer.ico" executableDir="bin" redirectStderr="false" executableMode="gui" singleInstance="true" dpiAware="true" />
       <java mainClass="org.helioviewer.jhv.JHelioviewer" vmParameters="-Xms2g --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED --enable-native-access=ALL-UNNAMED">
         <classPath>
+          <directory location="classes" />
           <archive location="classes/natives-linux.jar" failOnError="false" />
           <archive location="classes/natives-macos.jar" failOnError="false" />
           <archive location="classes/natives-windows.jar" failOnError="false" />
@@ -1134,6 +1136,9 @@ return true;</property>
   <mediaSets>
     <macosArchive name="Mac OS X Single Bundle Archive" id="68" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" architecture="amd64" dmgStylingMode="none" launcherId="24">
       <exclude>
+        <entry location="classes/jhv/linux-amd64" />
+        <entry location="classes/jhv/macos-arm64" />
+        <entry location="classes/jhv/windows-amd64" />
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-windows.jar" />
       </exclude>
@@ -1149,6 +1154,9 @@ return true;</property>
     </macosArchive>
     <windows name="Windows 64 bit" id="150" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" architecture="64">
       <exclude>
+        <entry location="classes/jhv/linux-amd64" />
+        <entry location="classes/jhv/macos-amd64" />
+        <entry location="classes/jhv/macos-arm64" />
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-macos.jar" />
       </exclude>
@@ -1160,6 +1168,9 @@ return true;</property>
     </windows>
     <linuxDeb name="Linux Deb Archive 64 bit" id="218" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_amd64" bzip="true" maintainerEmail="daniel.mueller@esa.int" architectureSet="true" architecture="amd64">
       <exclude>
+        <entry location="classes/jhv/macos-amd64" />
+        <entry location="classes/jhv/macos-arm64" />
+        <entry location="classes/jhv/windows-amd64" />
         <entry location="classes/natives-macos.jar" />
         <entry location="classes/natives-windows.jar" />
       </exclude>
@@ -1167,6 +1178,9 @@ return true;</property>
     </linuxDeb>
     <linuxRPM name="Linux RPM 64 bit" id="270" mediaFileName="${compiler:sys.shortName}.${compiler:sys.version}.x86_64" arch="x86_64">
       <exclude>
+        <entry location="classes/jhv/macos-amd64" />
+        <entry location="classes/jhv/macos-arm64" />
+        <entry location="classes/jhv/windows-amd64" />
         <entry location="classes/natives-macos.jar" />
         <entry location="classes/natives-windows.jar" />
       </exclude>
@@ -1174,6 +1188,9 @@ return true;</property>
     </linuxRPM>
     <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_arm64" dmgStylingMode="none" launcherId="24">
       <exclude>
+        <entry location="classes/jhv/linux-amd64" />
+        <entry location="classes/jhv/macos-amd64" />
+        <entry location="classes/jhv/windows-amd64" />
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-windows.jar" />
       </exclude>

@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import update_ffmpeg as updater
 
 CONFIG = (
-    b"--prefix=/build --enable-gpl --enable-version3 --enable-libx264 --enable-libx265"
+    b"--extra-version=Jellyfin --enable-gpl --enable-version3 --enable-libx264 --enable-libx265 --prefix=/build"
 )
 
 
@@ -38,16 +38,20 @@ class UpdateFFmpegTest(unittest.TestCase):
         self.notice.write_text("old notice\n")
         self.license = self.notice.with_name("GPL-3.0.txt")
         self.license.write_text("license retained unchanged\n")
-        self.manifest = {"copyright_year": 2026, "builds": {}}
+        self.manifest = {
+            "version": "8.1.3-1", "source_revision": "a" * 40,
+            "release_url": updater.SOURCE + "/releases/tag/v8.1.3-1",
+            "copyright_year": 2026, "builds": {},
+        }
         self.archives = {}
         self.binaries = {}
-        self.original_jars = {}
-        for platform, filename in updater.JARS.items():
+        self.original_files = {}
+        for platform in updater.PLATFORMS:
             binary = platform.encode() + b"\0" + CONFIG + b"\0"
             self.binaries[platform] = binary
-            member = "package/bin/ffmpeg"
+            member = "ffmpeg.exe" if platform == "windows-amd64" else "ffmpeg"
             archive = io.BytesIO()
-            if platform == "linux-amd64":
+            if platform != "windows-amd64":
                 suffix = ".tar.xz"
                 with tarfile.open(fileobj=archive, mode="w:xz") as output:
                     info = tarfile.TarInfo(member)
@@ -58,29 +62,23 @@ class UpdateFFmpegTest(unittest.TestCase):
                 with zipfile.ZipFile(archive, "w") as output:
                     output.writestr(member, binary)
                     output.writestr("../must-not-be-extracted", b"unrelated member")
-            url = f"https://example.org/{platform}{suffix}"
+            url = updater.SOURCE + f"/releases/download/v8.1.3-1/{platform}{suffix}"
             self.archives[url] = archive.getvalue()
             self.manifest["builds"][platform] = {
-                "provider": "Test provider",
-                "version": "9.0.1",
-                "source_revision": "a" * 40,
-                "recipes_url": "https://example.org/recipes/commit",
-                "build_info_url": "https://example.org/versions.txt",
                 "url": url,
                 "archive_sha256": sha256(archive.getvalue()),
                 "member": member,
                 "binary_sha256": sha256(binary),
             }
-            jar = self.root / "lib/jhv" / filename
-            with zipfile.ZipFile(jar, "w") as output:
-                output.comment = b"keep archive comment"
-                info = zipfile.ZipInfo("unrelated/native", (2020, 1, 2, 3, 4, 6))
-                info.external_attr = 0o100755 << 16
-                info.comment = b"keep entry comment"
-                output.writestr(info, b"keep native library")
-                output.writestr("META-INF/MANIFEST.MF", b"Manifest-Version: 1.0\n")
-                output.writestr(f"jhv/{platform}/ffmpeg", b"old binary")
-            self.original_jars[jar] = jar.read_bytes()
+            directory = self.root / "lib/jhv" / platform
+            directory.mkdir()
+            executable = directory / "ffmpeg"
+            executable.write_bytes(b"old binary")
+            executable.chmod(0o755)
+            unrelated = directory / "library.so"
+            unrelated.write_bytes(b"keep native library")
+            self.original_files[executable] = executable.read_bytes()
+            self.original_files[unrelated] = unrelated.read_bytes()
         self.network = patch.object(updater, "urlopen", side_effect=self.open_url)
         self.urlopen = self.network.start()
         self.addCleanup(self.network.stop)
@@ -92,37 +90,20 @@ class UpdateFFmpegTest(unittest.TestCase):
         return io.BytesIO(self.archives[request.full_url])
 
     def assert_unchanged(self):
-        for jar, original in self.original_jars.items():
-            self.assertEqual(jar.read_bytes(), original)
+        for path, original in self.original_files.items():
+            self.assertEqual(path.read_bytes(), original)
         self.assertEqual(self.notice.read_text(), "old notice\n")
         self.assertFalse(self.record.exists())
         self.assertEqual(list(self.root.glob(".ffmpeg-update-*")), [])
 
-    def test_updates_zip_and_tar_preserving_other_entries(self):
+    def test_updates_zip_and_tar_preserving_other_files(self):
         updater.update(self.root, self.manifest)
         self.assertEqual(self.urlopen.call_count, 4)
-        for platform, filename in updater.JARS.items():
-            jar = self.root / "lib/jhv" / filename
-            with zipfile.ZipFile(jar) as after, zipfile.ZipFile(
-                io.BytesIO(self.original_jars[jar])
-            ) as before:
-                self.assertEqual(after.namelist(), before.namelist())
-                self.assertEqual(after.comment, before.comment)
-                for name in before.namelist():
-                    if name.endswith("/ffmpeg"):
-                        self.assertEqual(after.read(name), self.binaries[platform])
-                    else:
-                        self.assertEqual(after.read(name), before.read(name))
-                        for attribute in (
-                            "date_time",
-                            "external_attr",
-                            "comment",
-                            "compress_type",
-                        ):
-                            self.assertEqual(
-                                getattr(after.getinfo(name), attribute),
-                                getattr(before.getinfo(name), attribute),
-                            )
+        for platform in updater.PLATFORMS:
+            directory = self.root / "lib/jhv" / platform
+            self.assertEqual((directory / "ffmpeg").read_bytes(), self.binaries[platform])
+            self.assertEqual((directory / "ffmpeg").stat().st_mode & 0o777, 0o755)
+            self.assertEqual((directory / "library.so").read_bytes(), b"keep native library")
         self.assertEqual(self.notice.read_text(), updater.notice_text(self.manifest))
         self.assertIn("included in GPL-3.0.txt", self.notice.read_text())
         self.assertEqual(json.loads(self.record.read_text()), self.manifest)
@@ -139,7 +120,7 @@ class UpdateFFmpegTest(unittest.TestCase):
 
     def test_repeat_update_is_byte_identical_and_offline(self):
         updater.update(self.root, self.manifest)
-        before = {path: path.read_bytes() for path in self.original_jars}
+        before = {path: path.read_bytes() for path in self.original_files}
         notice_time = self.notice.stat().st_mtime_ns
         self.urlopen.reset_mock()
         updater.update(self.root, self.manifest)
@@ -191,16 +172,11 @@ class UpdateFFmpegTest(unittest.TestCase):
 
     def test_refuses_downgrade(self):
         discovered = copy.deepcopy(self.manifest)
-        for version in ("8.1.2", "9.0"):
-            discovered["builds"]["windows-amd64"]["version"] = version
-            with self.subTest(version=version), self.assertRaisesRegex(
-                ValueError, "downgrade"
-            ):
+        for version in ("8.1.2-5", "8.1.3-0"):
+            discovered["version"] = version
+            with self.subTest(version=version), self.assertRaisesRegex(ValueError, "downgrade"):
                 updater.reuse_recorded_hashes(discovered, self.manifest)
-        self.assertLess(
-            updater.version_key("n9.0.1-2-gabcdef"),
-            updater.version_key("n9.0.1-11-gabcdef"),
-        )
+        self.assertLess(updater.version_key("8.1.3-2"), updater.version_key("8.1.3-11"))
 
     def test_check_is_offline_and_never_creates_staging_directory(self):
         with patch.object(
@@ -277,25 +253,22 @@ class UpdateFFmpegTest(unittest.TestCase):
                 archive, {"url": "https://example.org/test.tar.xz", "member": "ffmpeg"}
             )
 
-    def test_rejects_missing_jar_entry(self):
-        jar = next(iter(self.original_jars))
-        with self.assertRaisesRegex(ValueError, "expected one"):
-            updater.replace_entry(
-                jar, self.root / "candidate.jar", "wrong/ffmpeg", b"unused"
-            )
-        self.assertEqual(jar.read_bytes(), self.original_jars[jar])
-
     def test_manifest_validation(self):
         path = self.root / "ffmpeg.json"
         path.write_text(json.dumps(self.manifest))
         self.assertEqual(updater.load_manifest(path), self.manifest)
         for field, value in (
             ("archive_sha256", "bad"),
-            ("source_revision", "main"),
             ("url", "http://example.org/ffmpeg.zip"),
         ):
             manifest = copy.deepcopy(self.manifest)
             manifest["builds"]["macos-arm64"][field] = value
+            path.write_text(json.dumps(manifest))
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                updater.load_manifest(path)
+        for field, value in (("source_revision", "main"), ("version", "latest"), ("release_url", "http://example.org")):
+            manifest = copy.deepcopy(self.manifest)
+            manifest[field] = value
             path.write_text(json.dumps(manifest))
             with self.subTest(field=field), self.assertRaises(ValueError):
                 updater.load_manifest(path)
@@ -307,153 +280,58 @@ class UpdateFFmpegTest(unittest.TestCase):
 
 class DiscoveryTest(unittest.TestCase):
     def setUp(self):
-        updater.github_revision.cache_clear()
-        self.addCleanup(updater.github_revision.cache_clear)
-
-    @staticmethod
-    def asset(
-        version="n9.0.1-11-ge47273f4d9", branch="9.0", target="linux64", variant="gpl"
-    ):
-        extension = "tar.xz" if target == "linux64" else "zip"
-        name = f"ffmpeg-{version}-{target}-{variant}-{branch}.{extension}"
-        return {
-            "name": name,
-            "digest": "sha256:" + "a" * 64,
-            "browser_download_url": "https://example.org/" + name,
+        version = "8.1.3-1"
+        self.release = {
+            "tag_name": "v" + version,
+            "html_url": updater.SOURCE + "/releases/tag/v" + version,
+            "published_at": "2026-09-27T14:06:00Z",
+            "draft": False, "prerelease": False, "assets": [],
         }
+        for platform, target in updater.PLATFORMS.items():
+            suffix = "zip" if platform == "windows-amd64" else "tar.xz"
+            name = f"jellyfin-ffmpeg_{version}_portable_{target}-gpl.{suffix}"
+            self.release["assets"].append({
+                "name": name, "digest": "sha256:" + "a" * 64,
+                "browser_download_url": updater.SOURCE + "/releases/download/v" + version + "/" + name,
+            })
 
-    def test_selects_highest_numeric_stable_branch_not_snapshot_or_nonfree(self):
-        assets = [self.asset(), self.asset(target="win64")]
-        for target in ("linux64", "win64"):
-            assets += [
-                self.asset(version="n10.0", branch="10.0", target=target),
-                self.asset(version="N-123456-gabcdef", branch="11.0", target=target),
-                self.asset(
-                    version="n11.0", branch="11.0", target=target, variant="nonfree"
-                ),
-                self.asset(
-                    version="n11.0", branch="11.0", target=target, variant="gpl-shared"
-                ),
-                self.asset(version="n11.0-rc1", branch="11.0", target=target),
-            ]
-        selected = updater.select_btbn_assets({"assets": assets})
-        self.assertEqual(set(selected), {"linux64", "win64"})
-        self.assertTrue(all(value[1] == "n10.0" for value in selected.values()))
+    def discover(self):
+        with patch.object(updater, "fetch_json", side_effect=[self.release, {"sha": "b" * 40}]):
+            return updater.discover_releases()
 
-    def test_incomplete_latest_branch_does_not_fall_back(self):
-        assets = [
-            self.asset(),
-            self.asset(target="win64"),
-            self.asset(version="n10.0", branch="10.0"),
-        ]
+    def test_selects_one_complete_portable_gpl_release(self):
+        self.release["assets"].append({"name": "shared-or-nonfree.zip"})
+        manifest = self.discover()
+        self.assertEqual(manifest["version"], "8.1.3-1")
+        self.assertEqual(manifest["source_revision"], "b" * 40)
+        self.assertEqual(manifest["release_url"], self.release["html_url"])
+        self.assertEqual(manifest["copyright_year"], 2026)
+        self.assertEqual(set(manifest["builds"]), set(updater.PLATFORMS))
+        for platform, build in manifest["builds"].items():
+            self.assertEqual(build["archive_sha256"], "a" * 64)
+            self.assertEqual(build["member"], "ffmpeg.exe" if platform == "windows-amd64" else "ffmpeg")
+            self.assertNotIn("binary_sha256", build)
+
+    def test_missing_platform_is_rejected(self):
+        self.release["assets"].pop()
         with self.assertRaisesRegex(ValueError, "missing a platform"):
-            updater.select_btbn_assets({"assets": assets})
+            self.discover()
 
-    def test_different_platform_revisions_are_rejected(self):
-        with self.assertRaisesRegex(ValueError, "revisions differ"):
-            updater.select_btbn_assets(
-                {
-                    "assets": [
-                        self.asset(),
-                        self.asset(version="n9.0.1-12-gabcdef", target="win64"),
-                    ]
-                }
-            )
+    def test_missing_or_invalid_checksum_is_rejected(self):
+        for digest in (None, "", "sha256:invalid"):
+            self.release["assets"][0]["digest"] = digest
+            with self.subTest(digest=digest), self.assertRaisesRegex(ValueError, "SHA-256"):
+                self.discover()
 
-    def test_macos_selects_release_link_and_resolves_tag_without_fetching_zip(self):
-        url = updater.RIEDL + "/download/macos/arm64/1787073674_9.0.1/ffmpeg.zip"
-        page = f'<a href="{url}">release</a><a href="{url}.sha256">checksum</a><a href="/download/macos/arm64/9999999999_N-123456-gabcdef/ffmpeg.zip">snapshot</a>'
-        responses = [
-            io.BytesIO(b"ffmpeg version 9.0.1-https://www.martin-riedl.de\n"),
-            io.BytesIO(("a" * 64 + "  ffmpeg.zip\n").encode()),
-        ]
-        with patch.object(
-            updater, "request", side_effect=responses
-        ) as request, patch.object(
-            updater, "fetch_json", return_value=[{"sha": "b" * 40}]
-        ) as recipes, patch.object(
-            updater, "github_revision", return_value="c" * 40
-        ) as revision:
-            build, year = updater.discover_macos("arm64", page)
-        self.assertTrue(
-            all(not call.args[0].endswith(".zip") for call in request.call_args_list)
-        )
-        self.assertEqual(build["url"], url)
-        self.assertEqual(build["archive_sha256"], "a" * 64)
-        self.assertEqual(build["member"], "ffmpeg")
-        self.assertEqual(year, 2026)
-        self.assertNotIn("binary_sha256", build)
-        revision.assert_called_once_with("FFmpeg/FFmpeg", "n9.0.1")
-        self.assertIn("until=", recipes.call_args.args[0])
-
-    def test_macos_rejects_empty_or_invalid_checksum(self):
-        page = '<a href="/download/macos/arm64/1787073674_9.0.1/ffmpeg.zip">release</a>'
-        for checksum in (b"", b" \t\r\n", b"invalid  ffmpeg.zip\n"):
-            responses = [
-                io.BytesIO(b"ffmpeg version 9.0.1-test\n"),
-                io.BytesIO(checksum),
-            ]
-            with self.subTest(checksum=checksum), patch.object(
-                updater, "request", side_effect=responses
-            ), patch.object(updater, "fetch_json") as recipes:
-                with self.assertRaisesRegex(ValueError, "Invalid checksum for"):
-                    updater.discover_macos("arm64", page)
-                recipes.assert_not_called()
-
-    def test_macos_rejects_empty_recipe_list(self):
-        page = '<a href="/download/macos/arm64/1787073674_9.0.1/ffmpeg.zip">release</a>'
-        responses = [
-            io.BytesIO(b"ffmpeg version 9.0.1-test\n"),
-            io.BytesIO(b"a" * 64 + b"  ffmpeg.zip\n"),
-        ]
-        with patch.object(updater, "request", side_effect=responses), patch.object(
-            updater, "fetch_json", return_value=[]
-        ), patch.object(updater, "github_revision") as revision:
-            with self.assertRaisesRegex(ValueError, "No published build recipe found"):
-                updater.discover_macos("arm64", page)
-            revision.assert_not_called()
-
-    def test_macos_missing_release_does_not_fall_back_to_snapshot(self):
-        with patch.object(updater, "request") as request, self.assertRaisesRegex(
-            ValueError, "Expected one stable"
-        ):
-            updater.discover_macos(
-                "arm64",
-                '<a href="/download/macos/arm64/9999999999_N-123456-gabcdef/ffmpeg.zip">snapshot</a>',
-            )
-        request.assert_not_called()
-
-    def test_dated_release_is_used_instead_of_floating_latest(self):
-        release = {
-            "tag_name": "autobuild-2026-09-02-13-13",
-            "html_url": "https://example.org/dated",
-            "draft": False,
-            "prerelease": False,
-            "assets": [self.asset(), self.asset(target="win64")],
-        }
-        floating = {**release, "tag_name": "latest"}
-        mac = {"provider": "Martin Riedl"}
-        with patch.object(
-            updater, "request", return_value=io.BytesIO(b"download page")
-        ), patch.object(
-            updater, "discover_macos", return_value=(mac, 2026)
-        ), patch.object(
-            updater, "fetch_json", return_value=[floating, release]
-        ), patch.object(
-            updater, "github_revision", return_value="c" * 40
-        ) as revision, patch(
-            "sys.stdout", new_callable=io.StringIO
-        ):
-            manifest = updater.discover_releases()
-        linux = manifest["builds"]["linux-amd64"]
-        self.assertEqual(linux["build_info_url"], release["html_url"])
-        self.assertEqual(linux["version"], "n9.0.1-11-ge47273f4d9-20260902")
-        self.assertEqual(
-            linux["member"],
-            self.asset()["name"].removesuffix(".tar.xz") + "/bin/ffmpeg",
-        )
-        revision.assert_any_call("FFmpeg/FFmpeg", "e47273f4d9")
-        revision.assert_any_call("BtbN/FFmpeg-Builds", release["tag_name"])
+    def test_unstable_release_is_rejected(self):
+        for field in ("draft", "prerelease"):
+            self.release[field] = True
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "stable"):
+                self.discover()
+            self.release[field] = False
+        self.release["tag_name"] = "v9.0-rc1"
+        with self.assertRaisesRegex(ValueError, "Unrecognized"):
+            self.discover()
 
 
 if __name__ == "__main__":

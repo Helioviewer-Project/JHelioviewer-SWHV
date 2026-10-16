@@ -4,7 +4,6 @@ from unittest.mock import patch
 from pathlib import Path
 import tempfile
 import unittest
-import zipfile
 
 from PIL import Image
 
@@ -17,36 +16,28 @@ class UpdateAngleTest(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
 
-    def test_jar_replacement_preserves_other_entries(self):
-        original = self.root / "old.jar"
-        target = self.root / "new.jar"
-        with zipfile.ZipFile(original, "w") as archive:
-            archive.comment = b"jar comment"
-            archive.writestr("jhv/linux-amd64/libEGL.so", b"old-egl")
-            archive.writestr("jhv/linux-amd64/libGLESv2.so", b"old-gles")
-            archive.writestr("jhv/linux-amd64/kdu.so", b"untouched")
-            archive.writestr("META-INF/MANIFEST.MF", b"manifest")
-        (self.root / "libEGL.so").write_bytes(b"new-egl")
-        (self.root / "libGLESv2.so").write_bytes(b"new-gles")
-        updater.replace_libraries(original, target, {name: (self.root / name).read_bytes() for name in ("libEGL.so", "libGLESv2.so")})
-        with zipfile.ZipFile(target) as archive:
-            self.assertEqual(archive.read("jhv/linux-amd64/libEGL.so"), b"new-egl")
-            self.assertEqual(archive.read("jhv/linux-amd64/libGLESv2.so"), b"new-gles")
-            self.assertEqual(archive.read("jhv/linux-amd64/kdu.so"), b"untouched")
-            self.assertEqual(archive.read("META-INF/MANIFEST.MF"), b"manifest")
-            self.assertEqual(archive.comment, b"jar comment")
-
-    def test_missing_native_entry_rejected(self):
-        original = self.root / "old.jar"
-        with zipfile.ZipFile(original, "w") as archive:
-            archive.writestr("unrelated", b"data")
-        with self.assertRaisesRegex(ValueError, "Missing jar entries"):
-            updater.replace_libraries(original, self.root / "new.jar", {"libEGL.so": b"egl", "libGLESv2.so": b"gles"})
+    def test_install_changes_only_selected_files(self):
+        library = self.root / "lib/jhv/linux-amd64/libEGL.so"
+        library.parent.mkdir(parents=True)
+        library.write_bytes(b"old egl")
+        other = library.with_name("libkdu_jni.so")
+        other.write_bytes(b"untouched")
+        output = self.root / "staged"
+        for name, data in {"candidate/jhv/linux-amd64/libEGL.so": b"new egl", "angle.json": b"manifest", "ANGLE.txt": b"notice"}.items():
+            path = output / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+        (self.root / "extra/angle").mkdir(parents=True)
+        (self.root / "extra/licenses").mkdir(parents=True)
+        with patch.object(updater.subprocess, "run"):
+            updater.install(self.root, output, {"jhv/linux-amd64/libEGL.so": updater.digest(library)})
+        self.assertEqual(library.read_bytes(), b"new egl")
+        self.assertEqual(other.read_bytes(), b"untouched")
 
     def test_install_restores_all_files_after_sync_failure(self):
         output = self.root / "staged"
         originals = {
-            "lib/jhv/test.jar": b"old jar",
+            "lib/jhv/linux-amd64/libEGL.so": b"old egl",
             "extra/angle/angle.json": b"old version",
             "extra/licenses/ANGLE.txt": b"old source",
             "extra/licenses/licenses.json": b"old inventory",
@@ -56,7 +47,7 @@ class UpdateAngleTest(unittest.TestCase):
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
-        for name in ("candidate-jars/test.jar", "angle.json", "ANGLE.txt"):
+        for name in ("candidate/jhv/linux-amd64/libEGL.so", "angle.json", "ANGLE.txt"):
             path = output / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"new")
@@ -68,7 +59,7 @@ class UpdateAngleTest(unittest.TestCase):
             (self.root / "extra/licenses/licenses.json").write_bytes(b"new inventory")
             raise subprocess.CalledProcessError(1, "sync")
 
-        hashes = {"test.jar": updater.digest(self.root / "lib/jhv/test.jar")}
+        hashes = {"jhv/linux-amd64/libEGL.so": updater.digest(self.root / "lib/jhv/linux-amd64/libEGL.so")}
         with patch.object(updater.subprocess, "run", side_effect=fail_sync):
             with self.assertRaises(subprocess.CalledProcessError):
                 updater.install(self.root, output, hashes)

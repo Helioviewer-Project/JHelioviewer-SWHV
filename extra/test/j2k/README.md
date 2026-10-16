@@ -67,8 +67,8 @@ To also retrieve from ROB using the actual JPIP socket, client, disk cache and d
 python3 extra/test/j2k/run_j2k_tests.py --live
 ```
 
-The native libraries come from the host's bundled native JAR. `--bridge PATH`
-overrides its bridge with a supplied `libjhvj2k`; Kakadu still comes from the JAR
+The native libraries come from `lib/jhv/<platform>/`. `--bridge PATH`
+overrides its bridge with a supplied `libjhvj2k`; Kakadu still comes from that directory
 and must be compatible with that bridge.
 The live runner supports macOS arm64, macOS x86-64 and Linux x86-64.
 GC-dependent abandoned-timeline cleanup is opt-in with `--live --cleaner`.

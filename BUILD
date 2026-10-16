@@ -40,15 +40,26 @@ II) Build the source code with Ant (http://ant.apache.org/)
 
     2.) The following ant targets exist:
 
-           ant                   - just builds JHelioviewer.jar
+           ant                   - builds JHelioviewer.jar and the Metal host on macOS
+
+           ant compile           - compiles Java sources only
 
            ant prone             - run Error Prone static analysis tool on the source tree
 
            ant clean             - delete temporary build files
 
-    3.) The Java Development Kit version 19 or later has to be installed and present in the PATH.
+    3.) Java Development Kit 25 and Ant must be on PATH. Building the Metal host
+        on macOS also requires the Xcode command-line tools. The FFmpeg files in
+        lib/jhv use Git LFS; run git lfs pull if checkout did not download them.
 
     4.) After the source is built, the program can be run by executing the following
     command:
 
         java --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.swing=ALL-UNNAMED -jar JHelioviewer.jar
+
+III) Assemble the release directory and archive:
+
+        ant -f release/build.xml
+
+    This invokes the root build and packages its output in release/bin.
+    The install4j project consumes that directory.

@@ -375,96 +375,328 @@
       "native_members": []
     },
     {
-      "path": "lib/jhv/jhv-natives-linux.jar",
-      "sha256": "aa793eedf69aff12d2975f0bb6507a6c5da206b6ec1933580567bdfe48a7e335",
+      "path": "lib/jhv/linux-amd64/ffmpeg",
+      "sha256": "79a8d05b3d26859cc5267966a5c7b711f28104c8fd4fa53db8b89e9db00106b5",
       "embedded_notices": [],
       "declarations": [],
-      "supplemental_notices": [
-        "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt",
-        "extra/licenses/esajpip.txt"
-      ],
+      "supplemental_notices": [],
       "external_notices": [
-        "resources/licenses/FFmpeg-Notices.txt",
-        "resources/licenses/Kakadu.txt"
+        "resources/licenses/FFmpeg-Notices.txt"
       ],
       "native_members": [
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/ffmpeg",
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libEGL.so",
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libGLESv2.so",
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libJNISpice.so",
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libjhvj2k.so",
-        "lib/jhv/jhv-natives-linux.jar!jhv/linux-amd64/libkdu_jni.so"
+        "lib/jhv/linux-amd64/ffmpeg"
       ]
     },
     {
-      "path": "lib/jhv/jhv-natives-macos-arm64.jar",
-      "sha256": "25310e5ff1882e31fb04738eae3bca99bb9b25fe0c1d67764ea0015b19556ce3",
+      "path": "lib/jhv/linux-amd64/libEGL.so",
+      "sha256": "d81961dc27f4f4c4d711d8459dbf2d84697f4e9e090aee575b52159a78df553e",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
-        "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt",
-        "extra/licenses/esajpip.txt"
+        "extra/licenses/ANGLE.txt"
       ],
-      "external_notices": [
-        "resources/licenses/FFmpeg-Notices.txt",
-        "resources/licenses/Kakadu.txt"
-      ],
+      "external_notices": [],
       "native_members": [
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/ffmpeg",
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libEGL.dylib",
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libGLESv2.dylib",
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libJNISpice.dylib",
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libjhvj2k.dylib",
-        "lib/jhv/jhv-natives-macos-arm64.jar!jhv/macos-arm64/libkdu_jni.dylib"
+        "lib/jhv/linux-amd64/libEGL.so"
       ]
     },
     {
-      "path": "lib/jhv/jhv-natives-macos.jar",
-      "sha256": "fea653b501ef637bf7a37f7104c5196909e529398a122a667ae37726e4770095",
+      "path": "lib/jhv/linux-amd64/libGLESv2.so",
+      "sha256": "2b9f66e77af39342c4fd5c647ae68cc3183b0e82e59a25d560ad3a3cbb758c76",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
-        "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt",
-        "extra/licenses/esajpip.txt"
+        "extra/licenses/ANGLE.txt"
       ],
-      "external_notices": [
-        "resources/licenses/FFmpeg-Notices.txt",
-        "resources/licenses/Kakadu.txt"
-      ],
+      "external_notices": [],
       "native_members": [
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/ffmpeg",
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libEGL.dylib",
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libGLESv2.dylib",
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libJNISpice.dylib",
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libjhvj2k.dylib",
-        "lib/jhv/jhv-natives-macos.jar!jhv/macos-amd64/libkdu_jni.dylib"
+        "lib/jhv/linux-amd64/libGLESv2.so"
       ]
     },
     {
-      "path": "lib/jhv/jhv-natives-windows.jar",
-      "sha256": "dbb53bc861dd118ef2a6c7d755354512ec7f769809485703e74105494f457ce1",
+      "path": "lib/jhv/linux-amd64/libJNISpice.so",
+      "sha256": "7986888a6bd7d95849b6fcd248faddcdc45de32e9abd8af15a82216269e3abd6",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
-        "extra/licenses/ANGLE.txt",
-        "extra/licenses/SPICE.txt",
+        "extra/licenses/SPICE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/linux-amd64/libJNISpice.so"
+      ]
+    },
+    {
+      "path": "lib/jhv/linux-amd64/libjhvj2k.so",
+      "sha256": "42614aef7d204d4d28a0cb1c2631d6219630a754662b4f3f65db5fe126dcff62",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
         "extra/licenses/esajpip.txt"
       ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/linux-amd64/libjhvj2k.so"
+      ]
+    },
+    {
+      "path": "lib/jhv/linux-amd64/libkdu_jni.so",
+      "sha256": "43131d1001129a049e19c6168b101e074ca6c88b1da084bfa94f6981f53602b7",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
       "external_notices": [
-        "resources/licenses/FFmpeg-Notices.txt",
         "resources/licenses/Kakadu.txt"
       ],
       "native_members": [
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/JNISpice.dll",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/ffmpeg",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/jhvj2k.dll",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/kdu_jni.dll",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/kdu_v7AR.dll",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/libEGL.dll",
-        "lib/jhv/jhv-natives-windows.jar!jhv/windows-amd64/libGLESv2.dll"
+        "lib/jhv/linux-amd64/libkdu_jni.so"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/ffmpeg",
+      "sha256": "7fac408456170601ca9a68457e783e954ca87f434ae5c36f8103b599df06ed90",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/FFmpeg-Notices.txt"
+      ],
+      "native_members": [
+        "lib/jhv/macos-amd64/ffmpeg"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libEGL.dylib",
+      "sha256": "d10427dc4d24e9e8fc5e5e17b0b2b5c8b36c0ae97209c383daaa7e08e9f82efa",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libEGL.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libGLESv2.dylib",
+      "sha256": "edfaa533c696f16b83dea3e8d62f22f6282aefc634054f396e989f4b20e54128",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libGLESv2.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libJNISpice.dylib",
+      "sha256": "4d1a4eb87c143a519996575ea8e83479baede44fce71efd5c6afe284b0278350",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/SPICE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libJNISpice.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libjhvj2k.dylib",
+      "sha256": "bafd179cecd159dd3b99173b4b8c6cc1a57209b7d6c4a57598ddb79c7fd74fd8",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libjhvj2k.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libkdu_jni.dylib",
+      "sha256": "577ef9be8f8d290bb3b95ec025b71591a8a5a3062a93e8cc9d55cae1bd4e7fbd",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/Kakadu.txt"
+      ],
+      "native_members": [
+        "lib/jhv/macos-amd64/libkdu_jni.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/ffmpeg",
+      "sha256": "f043b55df439a90743faf539ce88b723c84eb8baa0ae3323a894c87b459b85ef",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/FFmpeg-Notices.txt"
+      ],
+      "native_members": [
+        "lib/jhv/macos-arm64/ffmpeg"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libEGL.dylib",
+      "sha256": "6fba1a2d1cb3c1d3be7628fda81392cc025d169c157ae663f9dd69f02c3a147b",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libEGL.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libGLESv2.dylib",
+      "sha256": "47286731bfb95378bd85d7698ac6e9983d8001b287ac03e85479be5555ffbed1",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libGLESv2.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libJNISpice.dylib",
+      "sha256": "4e47f3ff9e96427c9cd4257f5f50c6d0c62f47a68f5ac20b19142065880b8a59",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/SPICE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libJNISpice.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libjhvj2k.dylib",
+      "sha256": "62e65a2cae60eee36ab71a379e205400addd269b57a5d74f0e38633d0d0093f3",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libjhvj2k.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libkdu_jni.dylib",
+      "sha256": "8ce86f5ed5b9119aa5b9221ed143d646372b21cbb3d61a9b54a18568d955bdaa",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/Kakadu.txt"
+      ],
+      "native_members": [
+        "lib/jhv/macos-arm64/libkdu_jni.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/JNISpice.dll",
+      "sha256": "56f5e2533ac82bf5f3eb76c2d1af1c56a7c62dfb40d2af58e2b00f2cb8afe096",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/SPICE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/JNISpice.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/ffmpeg",
+      "sha256": "47495334f74912826bc474d246fe69fb4c01cd0d3c612d24b6a06000fe4c1483",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/FFmpeg-Notices.txt"
+      ],
+      "native_members": [
+        "lib/jhv/windows-amd64/ffmpeg"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/jhvj2k.dll",
+      "sha256": "5f5c1d50e8f6cd60b8417e277b925816e34fe26c946018366a28795b5a2613b9",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/jhvj2k.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/kdu_jni.dll",
+      "sha256": "d8b7962cb4fa66e0b3705656f1291fbee55d0fd685ab161b28f914a7cc2f17ee",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/Kakadu.txt"
+      ],
+      "native_members": [
+        "lib/jhv/windows-amd64/kdu_jni.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/kdu_v7AR.dll",
+      "sha256": "0016d3179071af8b2d2942f2e587087454be2e3beb7e36f23caf1a894d9d9002",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [],
+      "external_notices": [
+        "resources/licenses/Kakadu.txt"
+      ],
+      "native_members": [
+        "lib/jhv/windows-amd64/kdu_v7AR.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/libEGL.dll",
+      "sha256": "f9845093b9a883ea69ca6c8c255bcc40bf755555de7b39e23ff4a1cbde1350e2",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/libEGL.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/libGLESv2.dll",
+      "sha256": "efc567c86046e939318f672c2d133592b113769f0edf02c703a590f10451116f",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/ANGLE.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/libGLESv2.dll"
       ]
     },
     {

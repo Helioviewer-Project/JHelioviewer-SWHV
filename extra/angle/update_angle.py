@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Stage ANGLE jars, test old/new rendering, and optionally install the tested jars."""
+"""Stage ANGLE libraries, compare old/new rendering, and optionally install the tested files."""
 import argparse
 import hashlib
 import html
-import io
 import json
 import os
 from pathlib import Path
@@ -18,9 +17,9 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 PLATFORMS = {
     "macos-arm64": ("macos-arm64", "dylib"),
-    "macos-x64": ("macos", "dylib"),
-    "linux-x64": ("linux", "so"),
-    "windows-x64": ("windows", "dll"),
+    "macos-x64": ("macos-amd64", "dylib"),
+    "linux-x64": ("linux-amd64", "so"),
+    "windows-x64": ("windows-amd64", "dll"),
 }
 
 
@@ -61,29 +60,11 @@ def license_notice(directory, revision):
     return f"ANGLE\n=====\n\nSource: https://chromium.googlesource.com/angle/angle/+/{revision}/LICENSE\n\n{text}\n"
 
 
-def replace_libraries(original, destination, replacements):
-    found = set()
-    with zipfile.ZipFile(original) as source, zipfile.ZipFile(destination, "w") as target:
-        for info in source.infolist():
-            name = Path(info.filename).name
-            if name in replacements:
-                if name in found:
-                    raise ValueError(f"Duplicate native library: {name}")
-                found.add(name)
-                data = replacements[name]
-            else:
-                data = source.read(info)
-            target.writestr(info, data)
-        target.comment = source.comment
-    if found != replacements.keys():
-        raise ValueError(f"Missing jar entries: {replacements.keys() - found}")
-
-
 def install(root, output, original_hashes):
     for name, checksum in original_hashes.items():
-        if digest(root / "lib/jhv" / name) != checksum:
-            raise RuntimeError("Repository jars changed during testing")
-    replacements = {Path("lib/jhv") / name: output / "candidate-jars" / name for name in original_hashes}
+        if digest(root / "lib" / name) != checksum:
+            raise RuntimeError("Repository native libraries changed during testing")
+    replacements = {Path("lib") / name: output / "candidate" / name for name in original_hashes}
     replacements[Path("extra/angle/angle.json")] = output / "angle.json"
     replacements[Path("extra/licenses/ANGLE.txt")] = output / "ANGLE.txt"
     # The license synchronizer can update or remove generated notices.
@@ -110,11 +91,11 @@ def install(root, output, original_hashes):
         raise
 
 
-def run_tests(jars, output):
+def run_tests(libraries, output):
     output.mkdir()
     with (output / "tests.log").open("w") as log:
         result = subprocess.run([sys.executable, str(ROOT / "extra/test/run_tests.py"),
-                                 "--no-build", "--native-jars", str(jars),
+                                 "--no-build", "--native-resources", str(libraries),
                                  "--render-output", str(output), "opengl"],
                                 cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
     if result.returncode:
@@ -192,11 +173,11 @@ def main():
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--artifacts", type=Path, help="directory containing extracted angle-PLATFORM artifacts")
     source.add_argument("--release", help="release tag in bogdanni/angle-builds (downloads only)")
-    parser.add_argument("--output", type=Path, required=True, help="new directory for staged jars and comparison report")
-    parser.add_argument("--baseline-ref", default="HEAD", help="Git revision containing previous native jars")
+    parser.add_argument("--output", type=Path, required=True, help="new directory for staged libraries and comparison report")
+    parser.add_argument("--baseline-ref", default="HEAD", help="Git revision containing previous native libraries")
     parser.add_argument("--pixel-tolerance", type=int, default=2, help="maximum accepted 8-bit channel difference")
     parser.add_argument("--electron-reference", action="store_true", help="also download/use matching macOS ARM Electron and run WCS reference tests")
-    parser.add_argument("--install", action="store_true", help="replace jars only if tests and comparisons pass")
+    parser.add_argument("--install", action="store_true", help="replace libraries only if tests and comparisons pass")
     args = parser.parse_args()
     if not re.fullmatch(r"\d+\.\d+\.\d+", args.version) or not 0 <= args.pixel_tolerance <= 255:
         parser.error("Invalid version or pixel tolerance")
@@ -222,8 +203,8 @@ def main():
             else:
                 with tarfile.open(artifacts / ("angle-" + platform + ".tar.gz")) as archive:
                     archive.extractall(destination, filter="data")
-    baseline = output / "baseline-jars"
-    staged = output / "candidate-jars"
+    baseline = output / "baseline"
+    staged = output / "candidate"
     baseline.mkdir()
     staged.mkdir()
     configs = []
@@ -232,22 +213,18 @@ def main():
     (output / "baseline.txt").write_text(baseline_ref + "\n")
     manifest = dict(electron_version=args.version, binaries={})
     original_hashes = {}
-    for platform, (jar_platform, suffix) in PLATFORMS.items():
+    for platform, (resource, suffix) in PLATFORMS.items():
         directory = artifacts / ("angle-" + platform)
         configs.append(artifact(directory, platform, args.version))
         notices.append(license_notice(directory, configs[-1].get("ANGLE_SHA", "")))
-        name = "jhv-natives-" + jar_platform + ".jar"
-        original = ROOT / "lib/jhv" / name
-        original_hashes[name] = digest(original)
-        previous = subprocess.check_output(["git", "show", baseline_ref + ":lib/jhv/" + name], cwd=ROOT)
-        libraries = {lib: (directory / lib).read_bytes() for lib in ("libEGL." + suffix, "libGLESv2." + suffix)}
-        with zipfile.ZipFile(io.BytesIO(previous)) as archive:
-            old_libraries = {Path(entry.filename).name: archive.read(entry) for entry in archive.infolist()
-                             if Path(entry.filename).name in libraries}
-        if old_libraries.keys() != libraries.keys():
-            raise ValueError(f"Missing ANGLE libraries in baseline: {name}")
-        replace_libraries(original, baseline / name, old_libraries)
-        replace_libraries(original, staged / name, libraries)
+        for library in ("libEGL." + suffix, "libGLESv2." + suffix):
+            name = f"jhv/{resource}/{library}"
+            original_hashes[name] = digest(ROOT / "lib" / name)
+            previous = subprocess.check_output(["git", "show", baseline_ref + ":lib/" + name], cwd=ROOT)
+            for destination, data in ((baseline, previous), (staged, (directory / library).read_bytes())):
+                path = destination / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
         manifest["binaries"][platform] = {lib: digest(directory / lib) for lib in ("libEGL." + suffix, "libGLESv2." + suffix)}
     if any(config != configs[0] for config in configs[1:]):
         raise ValueError("Artifacts have different source/build pins")
@@ -265,13 +242,13 @@ def main():
     changed = compare_images(output / "before", output / "after", output, args.pixel_tolerance)
     print("Rendering report:", output / "report.html")
     if changed:
-        print("Rendering differences require review. Repository jars were not changed.")
+        print("Rendering differences require review. Repository libraries were not changed.")
         return 1
     if args.electron_reference:
         electron_reference(args.version, output)
     if args.install:
         install(ROOT, output, original_hashes)
-    print("Graphics assertions and rendering comparison passed." + (" Jars installed." if args.install else " Staged jars retained for review."))
+    print("Graphics assertions and rendering comparison passed." + (" Libraries installed." if args.install else " Staged libraries retained for review."))
     return 0
 
 

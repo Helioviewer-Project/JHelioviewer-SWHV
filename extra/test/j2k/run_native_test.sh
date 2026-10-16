@@ -44,7 +44,7 @@ open(folder + '/sycc.jp2', 'wb').write(rebuilt(sycc))
 open(folder + '/malformed.jp2', 'wb').write(rebuilt(lambda kind, payload: b'\xffO\xffQ\x00\x02' if kind == b'jp2c' else payload))
 EOF
 
-classpath=$(find lib extra/test/j2k/lib -name '*.jar' | tr '\n' ':')
+classpath=lib:$(find lib extra/test/j2k/lib -name '*.jar' | tr '\n' ':')
 javac -nowarn -cp "$classpath" -d "$test/classes" \
     src/org/helioviewer/jhv/source/J2KNative.java extra/test/j2k/J2KNativeTest.java
 python3 - "$classpath$test/classes" "$kdu" "$library" "$test" "$image" "$@" <<'EOF'

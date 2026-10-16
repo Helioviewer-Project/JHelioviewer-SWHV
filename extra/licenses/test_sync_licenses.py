@@ -267,20 +267,18 @@ class LicenseSyncTest(unittest.TestCase):
             self.run_sync()
         self.assertEqual(self.snapshot(), self.protected)
 
-    def test_mixed_native_archive_unknown_member_prevents_changes(self):
+    def test_unknown_loose_native_prevents_changes(self):
         self.native["EGL"] = ("ANGLE.txt",)
         (self.sources / "ANGLE.txt").write_text("Copyright ANGLE")
-        self.jar(
-            "jhv/jhv-natives-test.jar",
-            {"jhv/test/libEGL.so": b"angle", "jhv/test/ffmpeg": b"ffmpeg"},
-        )
+        directory = self.root / "lib/jhv/test"
+        directory.mkdir(parents=True)
+        (directory / "libEGL.so").write_bytes(b"angle")
+        (directory / "ffmpeg").write_bytes(b"ffmpeg")
         self.run_sync()
+        self.assertEqual(len(self.report()["artifacts"]), 2)
         before, report = self.snapshot(), self.report_path.read_bytes()
-        self.jar(
-            "jhv/jhv-natives-test.jar",
-            {"jhv/test/libEGL.so": b"angle", "new-resource": b"unknown"},
-        )
-        with self.assertRaisesRegex(ValueError, "Unrecognized native archive member"):
+        (directory / "new-resource").write_bytes(b"unknown")
+        with self.assertRaisesRegex(ValueError, "No native notice found"):
             self.run_sync()
         self.assertEqual(self.snapshot(), before)
         self.assertEqual(self.report_path.read_bytes(), report)
@@ -445,13 +443,14 @@ class LicenseSyncTest(unittest.TestCase):
         self.missing = syncer.MISSING_NOTICES
         self.additional = syncer.ADDITIONAL_NOTICES
         self.native = syncer.NATIVE_NOTICES
-        jars = list((syncer.ROOT / "lib").rglob("*.jar"))
-        for jar in jars:
-            link = self.root / "lib" / jar.relative_to(syncer.ROOT / "lib")
+        artifacts = list((syncer.ROOT / "lib").rglob("*.jar"))
+        artifacts.extend(path for path in (syncer.ROOT / "lib/jhv").rglob("*") if path.is_file())
+        for artifact in artifacts:
+            link = self.root / "lib" / artifact.relative_to(syncer.ROOT / "lib")
             link.parent.mkdir(parents=True, exist_ok=True)
-            link.symlink_to(jar)
+            link.symlink_to(artifact)
         self.run_sync()
-        self.assertEqual(len(self.report()["artifacts"]), len(jars))
+        self.assertEqual(len(self.report()["artifacts"]), len(artifacts))
         self.assertIn("IPTC Photo Metadata", self.notices())
         self.assertIn("Dracula", self.notices())
         # Preserve every copyright line in the currently distributed notices,

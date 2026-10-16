@@ -18,12 +18,12 @@ from urllib.request import urlopen
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--live", action="store_true", help="also test live ROB retrieval (requires network and the native libraries)")
 parser.add_argument("--cleaner", action="store_true", help="with --live, also exercise GC-dependent abandoned-view cleanup")
-parser.add_argument("--bridge", help="libjhvj2k to use instead of the one in the natives jar")
+parser.add_argument("--bridge", help="libjhvj2k to use instead of the one in lib/jhv")
 args = parser.parse_args()
 if args.cleaner and not args.live:
     parser.error("--cleaner requires --live")
 root = Path(__file__).resolve().parents[3]
-classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"),
+classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), str(root / "lib"),
                              *(str(p) for p in sorted((root / "lib").rglob("*.jar")))])
 with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
@@ -83,13 +83,10 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
             parser.error("Live test currently supports macOS and Linux x86-64")
         # The bridge finds Kakadu next to itself.
         libraries = [str(work / ("libkdu_jni" + suffix)), str(work / ("libjhvj2k" + suffix))]
-        with zipfile.ZipFile(root / "lib/jhv" / ("jhv-natives-" + target + ".jar")) as jar:
-            native_directory = "jhv/" + (target if target == "macos-arm64" else target + "-amd64") + "/"
-            Path(libraries[0]).write_bytes(jar.read(native_directory + "libkdu_jni" + suffix))
-            if args.bridge:
-                Path(libraries[1]).write_bytes(Path(args.bridge).read_bytes())
-            else:
-                Path(libraries[1]).write_bytes(jar.read(native_directory + "libjhvj2k" + suffix))
+        native_directory = root / "lib/jhv" / (target if target == "macos-arm64" else target + "-amd64")
+        Path(libraries[0]).write_bytes((native_directory / ("libkdu_jni" + suffix)).read_bytes())
+        Path(libraries[1]).write_bytes(Path(args.bridge).read_bytes() if args.bridge
+                                      else (native_directory / ("libjhvj2k" + suffix)).read_bytes())
         uri = "jpip://jpip.swhv.oma.be/aia_171/2026/09/09/2026_09_09__12_00_33_349__SDO_AIA_AIA_171.jp2"
         movie_request = ("https://api.swhv.oma.be/hv_docpage/v2/getJPX/?sourceId=10"
                          "&startTime=2026-09-08T12:00:00Z&endTime=2026-09-10T12:00:00Z"

@@ -20,19 +20,17 @@ publish releases. Run the build workflow separately, selecting all platforms.
 Individual-platform artifacts can also be collected under the same directory;
 the updater requires their source/build pins to match.
 
-The updater verifies artifact file checksums and platform/version metadata, then
-replaces only EGL/GLES entries in staged copies of the current jars. Other native
-libraries and jar entries are preserved. The checksummed ANGLE license must agree
-across all four builds. Its text and source revision are staged as `ANGLE.txt`. `d3dcompiler_47.dll` is not added to jars:
-JHV's native loader extracts the EGL/GLES pair; packaging another DLL alone would
-not make it available to the Windows loader.
+The updater verifies artifact checksums and platform/version metadata, then stages
+only EGL/GLES files under `baseline/jhv/<platform>/` and `candidate/jhv/<platform>/`.
+Other native libraries come from the current `lib/jhv` tree. The checksummed ANGLE
+license must agree across all four builds; its text and source revision are staged
+as `ANGLE.txt`. `d3dcompiler_47.dll` is not added: JHV's native loader extracts the
+EGL/GLES pair, so another DLL alone would not be available to the Windows loader.
 
-Previous EGL/GLES libraries come from `HEAD` by default. Both staged JAR sets
-preserve every other entry from the current JARs. Use `--baseline-ref COMMIT` to
-compare another committed version. The baseline and candidate run with identical
-current JHV code in separate JVMs and fresh native caches. This isolates the
-ANGLE update from Java/shader changes. The resolved baseline commit, library
-hashes, test logs, and staged jars remain in the output directory.
+Previous EGL/GLES files come from `HEAD` by default. Use `--baseline-ref COMMIT`
+to compare another committed version containing the loose libraries. Both sets run
+with identical current JHV code in separate JVMs and fresh native caches. The
+resolved baseline commit, hashes, logs and staged files remain in the output directory.
 
 `report.html` shows previous/candidate/difference images. `comparison.json`
 contains per-image maximum channel difference, mean difference, and pixel count
@@ -79,11 +77,11 @@ bundled libraries. The WCS validator's default version follows `angle.json`;
 Repeat with a new output directory and `--install` to install only after all
 selected tests and image comparisons pass. Original files are retained under
 `original-files` with repository-relative paths. If copying or license
-synchronization fails, the jars, version manifest, and notices are restored.
+synchronization fails, the libraries, version manifest, and notices are restored.
 `angle.json` records the installed version, pins, and binary hashes. Installation
 also updates `extra/licenses/ANGLE.txt` from the builds and runs the existing
-license synchronizer to refresh distributed notices and the JAR inventory. Review the
-jar/manifest changes and commit them yourself. The updater never commits or pushes.
+license synchronizer to refresh distributed notices and the artifact inventory. Review the
+library/manifest changes and commit them yourself. The updater never commits or pushes.
 
 Run updater unit tests with:
 

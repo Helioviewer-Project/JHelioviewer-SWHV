@@ -12,7 +12,7 @@ BUILD_DIR="${TMPDIR:-/tmp}/jhv-fits-benchmark"
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-CP="bin:resources"
+CP="bin:resources:lib"
 if [[ -n "${JHV_NOM_TAM_JAR:-}" ]]; then
   if [[ ! -f "$JHV_NOM_TAM_JAR" ]]; then
     echo "Candidate nom-tam JAR not found: $JHV_NOM_TAM_JAR" >&2

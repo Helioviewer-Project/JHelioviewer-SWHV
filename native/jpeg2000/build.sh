@@ -7,13 +7,13 @@ root=$PWD
 : "${KDU_VENDOR:?Set KDU_VENDOR to the Kakadu SDK directory}"
 : "${BUILD:=$root/tmp/j2k-native}"
 case "$(uname -s)-$(uname -m)" in
-    Darwin-arm64) target=macos-arm64; resource=macos-arm64; suffix=dylib ;;
-    Darwin-x86_64) target=macos; resource=macos-amd64; suffix=dylib ;;
-    Linux-x86_64) target=linux; resource=linux-amd64; suffix=so ;;
+    Darwin-arm64) resource=macos-arm64; suffix=dylib ;;
+    Darwin-x86_64) resource=macos-amd64; suffix=dylib ;;
+    Linux-x86_64) resource=linux-amd64; suffix=so ;;
     *) echo "Unsupported host: build native/jpeg2000 with CMake." >&2; exit 1 ;;
 esac
 mkdir -p "$BUILD"
-unzip -p "lib/jhv/jhv-natives-$target.jar" "jhv/$resource/libkdu_jni.$suffix" > "$BUILD/libkdu_jni.$suffix"
+cp "lib/jhv/$resource/libkdu_jni.$suffix" "$BUILD/"
 options=()
 if [ "$suffix" = dylib ]; then options+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0); fi
 cmake -S native/jpeg2000 -B "$BUILD/bridge" -DCMAKE_BUILD_TYPE=Release \

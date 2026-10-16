@@ -63,7 +63,7 @@ ADDITIONAL_NOTICES = {
     "square/kotlin-stdlib-*.jar": "Kotlin.txt",
     "formats/prettytime-nlp-*.jar": "PrettyTime.txt",
 }
-# Native libraries are detected from actual archive members, not JAR names.
+# Native notices follow the actual binaries, including those inside JARs.
 # Keys omit the platform's "lib" prefix and shared-library extension.
 NATIVE_NOTICES = {
     "jhvj2k": ("esajpip.txt",),
@@ -214,12 +214,16 @@ def prepare(root):
                 used.add(name)
         return text
 
-    for jar in sorted((root / "lib").rglob("*.jar")):
-        relative = jar.relative_to(root / "lib").as_posix()
-        location = jar.relative_to(root).as_posix()
-        with zipfile.ZipFile(jar) as archive:
-            texts, declarations, binaries = archive_evidence(archive, location)
-            entries = [n for n in archive.namelist() if not n.endswith("/")]
+    artifacts = set((root / "lib").rglob("*.jar"))
+    artifacts.update(path for path in (root / "lib/jhv").rglob("*") if path.is_file())
+    for artifact in sorted(artifacts):
+        relative = artifact.relative_to(root / "lib").as_posix()
+        location = artifact.relative_to(root).as_posix()
+        if artifact.suffix == ".jar":
+            with zipfile.ZipFile(artifact) as archive:
+                texts, declarations, binaries = archive_evidence(archive, location)
+        else:
+            texts, declarations, binaries = [], [], [location]
 
         additional = {
             name
@@ -239,22 +243,13 @@ def prepare(root):
             )
 
         for source in binaries:
-            name = Path(source.rsplit("!", 1)[1]).name.split(".")[0].removeprefix("lib")
+            name = Path(source.rsplit("!", 1)[-1]).name.split(".")[0].removeprefix("lib")
             if name in EXTERNAL_BINARIES:
                 external.add(EXTERNAL_BINARIES[name])
             elif name in NATIVE_NOTICES:
                 additional.update(NATIVE_NOTICES[name])
             elif not own_texts:
                 errors.append(f"No native notice found for {source}")
-        # These archives mix independently licensed binaries and have no umbrella
-        # license. Do not silently ignore a newly added resource.
-        if relative.startswith("jhv/jhv-natives-"):
-            known = {source.removeprefix(location + "!") for source in binaries}
-            unknown = set(entries) - known - {"META-INF/MANIFEST.MF"}
-            errors.extend(
-                f"Unrecognized native archive member: {location}!{n}"
-                for n in sorted(unknown)
-            )
 
         if not (own_texts or declared or additional or external):
             errors.append(
@@ -299,7 +294,7 @@ def prepare(root):
             )
         sections.append("\n".join(parts))
 
-        with jar.open("rb") as stream:
+        with artifact.open("rb") as stream:
             checksum = hashlib.file_digest(stream, "sha256").hexdigest()
         inventory.append(
             {

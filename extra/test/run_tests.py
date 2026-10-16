@@ -26,16 +26,14 @@ JAVA_TESTS = {
 }
 
 
-def run_java_suite(suite, native_jars=None, render_output=None):
-    native_jars = native_jars.resolve() if native_jars else None
+def run_java_suite(suite, native_resources=None, render_output=None):
+    native_resources = native_resources.resolve() if native_resources else ROOT / "lib"
     render_output = render_output.resolve() if render_output else None
+    if not (native_resources / "jhv").is_dir():
+        raise FileNotFoundError(native_resources / "jhv")
     jars = sorted((ROOT / "lib").rglob("*.jar"))
-    if native_jars:
-        jars = [native_jars / p.name if p.parent == ROOT / "lib/jhv" else p for p in jars]
-        for jar in jars:
-            if not jar.is_file():
-                raise FileNotFoundError(jar)
-    classpath = os.pathsep.join([str(ROOT / "bin"), str(ROOT / "resources"), *map(str, jars)])
+    directories = list(dict.fromkeys([ROOT / "bin", ROOT / "resources", native_resources, ROOT / "lib"]))
+    classpath = os.pathsep.join(map(str, [*directories, *jars]))
     with tempfile.TemporaryDirectory(prefix="jhv-" + suite + "-tests-") as temporary:
         sources = [TESTS / suite / (name.rsplit(".", 1)[-1] + ".java") for name in JAVA_TESTS[suite]]
         subprocess.run(["javac", "-cp", classpath, "-d", temporary, *map(str, sources)],
@@ -61,7 +59,7 @@ def main():
     parser.add_argument("suites", nargs="*", choices=[*DEFAULT_SUITES, "shaders", "wcs", "opengl", "uri"],
                         default=DEFAULT_SUITES, help="suites to run (default: %(default)s)")
     parser.add_argument("--no-build", action="store_true", help="skip the initial ant compile")
-    parser.add_argument("--native-jars", type=Path, help="use staged native jars instead of lib/jhv")
+    parser.add_argument("--native-resources", type=Path, help="use a staged resource directory containing jhv/<platform>")
     parser.add_argument("--render-output", type=Path, help="save OpenGL regression images")
     args = parser.parse_args()
     if not args.no_build and any(suite != "maintenance" and suite != "shaders" for suite in args.suites):
@@ -72,7 +70,7 @@ def main():
         start = time.monotonic()
         try:
             if suite in JAVA_TESTS:
-                run_java_suite(suite, args.native_jars, args.render_output)
+                run_java_suite(suite, args.native_resources, args.render_output)
             elif suite == "uri":
                 subprocess.run(["bash", str(TESTS / "uri/run-fast-rice-verifier.sh")],
                                cwd=ROOT, env={**os.environ, "JHV_SKIP_COMPILE": "1"}, check=True)

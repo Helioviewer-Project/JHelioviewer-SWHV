@@ -61,16 +61,16 @@ builds/linux-x64/
 builds/windows-x64/
 ```
 
-From the JHV root, stage the updated JARs:
+From the JHV root, stage the updated libraries:
 
 ```sh
-python3 extra/jpeg2000/prepare_natives.py /path/to/builds /path/to/staged-jars
+python3 extra/jpeg2000/prepare_natives.py /path/to/builds /path/to/staged-natives
 ```
 
-The Python 3 script verifies build checksums, replaces the Kakadu and bridge
-entries in copies of the current native JARs, and verifies that unrelated entries retain
-their contents. Review the staged JARs and build records before copying the JARs
-into `lib/jhv`. `--platform macos-arm64`, for example, stages a single platform.
+The Python 3 script verifies build checksums and stages the Kakadu and bridge
+libraries under `staged-natives/jhv/<platform>/`. Review those files and the build
+records before copying the staged `jhv` directory into `lib`. Other native files
+are not replaced. `--platform macos-arm64`, for example, stages a single platform.
 
 To check a local build without rebuilding it:
 
