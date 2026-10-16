@@ -11,8 +11,9 @@ Requires Python 3, JDK 25, and Ant on `PATH`. Native resources are read from
 were not downloaded during checkout. The runner compiles JHV first,
 then runs maintenance, model, JPIP, timeline, and event tests. Java tests use
 temporary class and home directories, leaving normal JHV settings and caches
-alone. JPIP and HAPI tests need permission to open loopback sockets. Model and
-event tests use bundled native libraries, but need no graphics context.
+alone. JPIP and HAPI tests need permission to open loopback sockets. Model,
+image-loading and event tests use bundled native libraries, but need no graphics
+context.
 
 Select suites when working on a particular area:
 
@@ -32,17 +33,45 @@ silently skipping it. Some failure-path tests deliberately log exceptions.
 | --- | --- | --- |
 | `maintenance` (`extra/licenses/`, `extra/ffmpeg/`) | License synchronization and FFmpeg update scripts, using mocked downloads and temporary files | Yes |
 | `model` | Model URI recognition, Assimp metadata, generated glTF loading, geometry, materials, and layer metadata | Yes |
-| `j2k` | Disk cache entries and initialization failures, HTTP response boundaries, JPIP channel requests, response bodies in request order and socket cleanup | Yes |
+| `j2k` | Image ownership/cache, worker requests, frame selection/loading, layer load completion, image request settings, disk cache failures, HTTP boundaries and JPIP socket cleanup | Yes |
 | `timelines` | HAPI server configuration and catalog loading, partial failures and cancellation, timeline data, request coverage, cache, export, and Java2D drawing | Yes |
 | `event` | HEK fixture parsing, event database persistence, filtering, cache/download coordination, and SWEK configuration | Yes |
 | `shaders` (`opengl/`) | GLSL syntax and program linking using `glslangValidator` | No |
-| `opengl` | Production ANGLE grids, image shaders, colored vertices and models, framebuffer readback, and export geometry/state | No |
+| `opengl` | Production ANGLE grids, image shaders, colored vertices and models, framebuffer readback, export geometry/state, and context destruction/recreation after injected loss | No |
 | `uri` | FITS Rice decoding, provider selection, buffer boundaries, and compressed/uncompressed loader comparisons using nom-tam fixtures | No |
 | `wcs` | FITS coordinate comparisons against Astropy, Java metadata, validator failure checks, and GLSL syntax | No |
 
 `data/` holds shared FITS and model fixtures. `event/hek-events.json.gz` is the
 captured HEK fixture for offline tests. Test classes retain their application
 packages so they can exercise package-private code without widening its API.
+
+## Production areas to tests
+
+Use this mapping with the [execution-path architecture map](../../docs/architecture.md).
+Production paths below are relative to `src/org/helioviewer/jhv/` unless stated
+otherwise. Run a suite with `python3 extra/test/run_tests.py <suite>`, combining
+suites when a change crosses areas. This is a guide to existing coverage, not a
+claim that a suite validates every behavior in those files.
+
+| Changed production area | Existing checks | Additional verification or limit |
+| --- | --- | --- |
+| `image/ImageBuffer*`, `image/DecodedImage`, `layers/FrameDecoder`, `layers/Frames`, `thread/LatestWorker` | `j2k`: [ImageBufferCacheTest](j2k/ImageBufferCacheTest.java) covers reference ownership, eviction and keyed worker requests; [FramesTest](j2k/FramesTest.java) covers selection, stale delivery, arrivals and sampling | Native JPEG 2000 decode coverage needs the native checks below. Rendering/processing changes also need `opengl`. |
+| `io/Load`, `layers/ImageLayerLoader`, `layers/ImageLayer`, `io/ImageRequestSettings` | `j2k`: [FramesLoadTest](uri/FramesLoadTest.java), [LayerLoadTest](uri/LayerLoadTest.java), [ImageRequestSettingsTest](j2k/ImageRequestSettingsTest.java) | These loader tests live under `uri/` but run in `j2k`. They use local FITS/ZIP/directory inputs; remote service behavior is separate. |
+| `source/jpip/` and `source/J2KReader` | `j2k`: [JPIPCacheManagerTest](j2k/JPIPCacheManagerTest.java), [HTTPStreamTest](j2k/HTTPStreamTest.java), [JPIPSocketTest](j2k/JPIPSocketTest.java), [J2KReaderTest](j2k/J2KReaderTest.java) | Offline `J2KReaderTest` checks missing-native-library behavior. Real retrieval/decode requires the opt-in live runner. |
+| `source/J2KSource`, Java/native decode interface, repository-root `native/jpeg2000/` | [check_native_build.py](j2k/check_native_build.py) runs [J2KNativeTest](j2k/J2KNativeTest.java) against supplied native libraries and esajpip fixtures | Follow the [native build/validation guide](../jpeg2000/README.md) on each affected platform. `python3 extra/test/j2k/run_j2k_tests.py --live` adds `FrameDecoderTest` and `CallistoTest`; offline runs compile those classes but do not execute them. |
+| `source/FITSData`, `source/FITSSource`, `source/FastRice*` | `uri`: [FastRiceVerifier](uri/FastRiceVerifier.java) checks provider selection, decoder boundaries and compressed/uncompressed loading; `j2k` exercises local FITS frame loading | `uri` needs external nom-tam fixtures. Add `wcs` for metadata interpretation and `opengl` for displayed pixel/geometry changes. |
+| `metadata/WcsInterpreter`, `metadata/FitsMetaData`, `wcs/`, image projection/sampling shaders | `wcs`: [validation runner](wcs/run_jhv_wcs_hpc_validation_suite.py), including Java metadata comparisons; `opengl`: [ImageRenderingTest](opengl/ImageRenderingTest.java), [GridRenderingTest](opengl/GridRenderingTest.java); `shaders`: GLSL syntax/linking | Select checks matching the changed transform. Electron checks are opt-in. Syntax, numerical reference checks and production ANGLE rendering establish different things. |
+| `opengl/`, `layers/grid/`, `display/` | `shaders` and `opengl`: image/grid/model/colored-vertex rendering, [GLGrabRenderingTest](opengl/GLGrabRenderingTest.java), [ContextRecoveryTest](opengl/ContextRecoveryTest.java) | Context recovery injects loss into a pbuffer renderer and explicitly recreates it. It does not exercise `AngleCanvas`'s automatic recovery or native window lifecycle. Verify affected platforms and GUI resize/show/hide behavior. |
+| `opengl/model/`, `layers/ModelLayer`, model detection in `io/DataUri` | `model`: [ModelDataUriTest](model/ModelDataUriTest.java), [AssimpMetaDataTest](model/AssimpMetaDataTest.java), [AssimpModelLoaderTest](model/AssimpModelLoaderTest.java); `opengl`: [ModelRenderingTest](opengl/ModelRenderingTest.java) | Loader/metadata assertions do not replace rendered-output checks. |
+| `timelines/band/`, `timelines/TimelineLayers`, `time/RequestCache`, `timelines/draw/`, `timelines/chart/` | `timelines`: [HapiCatalogTest](timelines/HapiCatalogTest.java) and [TimelineDataTest](timelines/TimelineDataTest.java), including request reuse, coverage, band restoration, data export/import and chart painting | Verify mouse interaction, chart show/hide/re-attach behavior, display scales and recorded chart output for relevant UI changes. Use the explicit benchmarks below for performance claims. |
+| `event/`, `plugins/swek/`, repository-root `resources/settings/SWEK.json` | `event`: [runner](event/run_event_tests.py) executes HEK parsing, database, cache, filter-request, integration and SWEK layer tests | Live HEK availability is a separate probe. Interactive event selection and overlay appearance need GUI verification when affected. |
+| `movie/`, `app/Commands`, `app/state/`, `io/samp/`, Swing controls | `opengl` checks capture/readback and export view-state restoration; `timelines` checks band serialization/restoration and chart painting | These are partial checks. The listed suites do not provide an end-to-end SAMP, whole-session restoration or encoded-movie regression. Exercise the changed command/state/recording flow, including completion/failure and output. |
+| Repository-root `extra/licenses/`, `extra/ffmpeg/` | `maintenance`: license and FFmpeg updater unit tests | Downloads are mocked. These checks do not run an installed FFmpeg encoder. ANGLE updates have their own [validation workflow](../angle/README.md). |
+
+The execution lists in [run_tests.py](run_tests.py) and its delegated runners are
+authoritative for what a command runs. Update this table in the same patch when
+production paths move, suites change, or coverage is added/removed. Inspect test
+assertions before treating a mapped suite as evidence for a particular change.
 
 ## Graphics and WCS
 
