@@ -94,18 +94,14 @@ public final class GLSLImageShader extends GLSLScreenShader {
         sourceView.setFloatBuffer(values);
     }
 
+    // The user rotation acts on the plane, so it precedes the plane-to-texture matrix.
     private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, Mat2 adjustment) {
-        if (adjustment == Mat2.IDENTITY) {
-            values.put((float) matrix.m00).put((float) matrix.m01).put((float) reference.x).put(0);
-            values.put((float) matrix.m10).put((float) matrix.m11).put((float) reference.y).put(0);
-        } else {
-            values.put((float) (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10));
-            values.put((float) (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11));
-            values.put((float) reference.x).put(0);
-            values.put((float) (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10));
-            values.put((float) (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11));
-            values.put((float) reference.y).put(0);
-        }
+        values.put((float) (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10));
+        values.put((float) (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11));
+        values.put((float) reference.x).put(0);
+        values.put((float) (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10));
+        values.put((float) (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11));
+        values.put((float) reference.y).put(0);
     }
 
     static void bindDisplay(float[] color,
