@@ -309,7 +309,7 @@ final class EventDatabase {
     }
 
     private void addRelationEvents(List<StoredEvent> storedEvents, int id, SWEKSupplier supplier,
-                                          SWEKGroup relatedGroup, String eventParameter, String relatedParameter) {
+                                   SWEKGroup relatedGroup, String eventParameter, String relatedParameter) {
         for (SWEKSupplier relatedSupplier : catalog.getSuppliers(relatedGroup)) {
             if (relatedSupplier == supplier)
                 continue;
@@ -323,7 +323,7 @@ final class EventDatabase {
     }
 
     private List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
-                                                         String leftParameter, String rightParameter) throws Exception {
+                                                  String leftParameter, String rightParameter) throws Exception {
         List<StoredEvent> ret = new ArrayList<>();
         int rightTypeId = findEventTypeId(rightType);
         if (rightTypeId == -1)

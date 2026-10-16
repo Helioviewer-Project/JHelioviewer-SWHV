@@ -3,6 +3,16 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.ActionMapUIResource;
+import javax.swing.plaf.InputMapUIResource;
+
+import com.formdev.flatlaf.jideoss.ui.FlatRangeSliderUI;
+import com.jidesoft.plaf.LookAndFeelFactory;
 import com.jidesoft.swing.RangeSlider;
 
 // Range slider over [min, max] in steps of 1/scale; values are exact multiples of 1/scale.
@@ -10,6 +20,24 @@ import com.jidesoft.swing.RangeSlider;
 public final class JHVRangeSlider extends RangeSlider {
 
     private final int scale;
+
+    @Override
+    public void updateUI() {
+        LookAndFeelFactory.installJideExtension();
+        setUI(new FlatRangeSliderUI() {
+            @Override
+            protected void installAdditionalKeyboardActions(JSlider slider) {
+                // JIDE adds range-only shortcuts to otherwise shared slider maps.
+                InputMap keys = new InputMapUIResource();
+                keys.setParent(SwingUtilities.getUIInputMap(slider, JComponent.WHEN_FOCUSED));
+                SwingUtilities.replaceUIInputMap(slider, JComponent.WHEN_FOCUSED, keys);
+                ActionMap actions = new ActionMapUIResource();
+                actions.setParent(SwingUtilities.getUIActionMap(slider));
+                SwingUtilities.replaceUIActionMap(slider, actions);
+                super.installAdditionalKeyboardActions(slider);
+            }
+        });
+    }
 
     public JHVRangeSlider(double min, double max, double low, double high, int _scale) {
         super(JHVSlider.toStep(min, _scale), JHVSlider.toStep(max, _scale), JHVSlider.toStep(low, _scale), JHVSlider.toStep(high, _scale));

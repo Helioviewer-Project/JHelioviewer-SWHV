@@ -28,6 +28,7 @@ public final class SWEKSession implements AutoCloseable {
 
     public interface Listener {
         void cacheUpdated();
+
         void highlightChanged();
     }
 
