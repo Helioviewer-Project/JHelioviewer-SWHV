@@ -36,7 +36,7 @@ if(WIN32)
     target_compile_definitions(jhvj2k PRIVATE CORESYS_IMPORTS)
     target_link_libraries(jhvj2k PRIVATE "${KDU_CORE_LIBRARY}")
     target_link_options(jhvj2k PRIVATE -static -static-libgcc -static-libstdc++
-        -Wl,--major-subsystem-version,5,--minor-subsystem-version,2)
+        -Wl,--no-insert-timestamp,--major-subsystem-version,5,--minor-subsystem-version,2)
 endif()
 if(APPLE)
     set_target_properties(jhvj2k PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE INSTALL_RPATH "@loader_path")
