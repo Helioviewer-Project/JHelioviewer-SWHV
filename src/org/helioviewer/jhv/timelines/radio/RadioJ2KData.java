@@ -9,12 +9,12 @@ import java.awt.image.Raster;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.source.J2KSource;
-import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -47,7 +47,7 @@ class RadioJ2KData {
         owner = _owner;
         source = new J2KSource(dataUri.file().toPath());
         try {
-            ResolutionSet.Level resLevel = source.level(0, 0);
+            ImageGrid resLevel = source.level(0, 0);
             j2kWidth = resLevel.width();
 
             String xml = source.xml(0);
@@ -89,7 +89,7 @@ class RadioJ2KData {
     }
 
     // The columns of a level which cover a full-resolution range, rounded to 32 pixels at full resolution.
-    static Crop levelCrop(int x, int width, int fullWidth, ResolutionSet.Level res) {
+    static Crop levelCrop(int x, int width, int fullWidth, ImageGrid res) {
         x = Math.min(MathUtils.roundDownTo(x, QUANTA), fullWidth - 1);
         width = Math.min(MathUtils.roundUpTo(width + QUANTA, QUANTA), fullWidth - x);
         int shift = res.level(), round = (1 << shift) - 1;

@@ -8,6 +8,7 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.ImageBounds;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONArray;
@@ -104,28 +105,31 @@ public final class JHVMetadataDump {
         int pixelWidth = (int) header.getLongValue("ZNAXIS1", header.getLongValue("NAXIS1"));
         int pixelHeight = (int) header.getLongValue("ZNAXIS2", header.getLongValue("NAXIS2"));
 
-        WcsHeader wcs = meta.getWcsHeader();
+        ImageGeometry geometry = meta.getGeometry();
+        WcsHeader wcs = geometry.wcs;
+        double unitsPerArcsec = wcs.unitsPerArcsec();
         double arcsecPerPixelY = wcs.projection == WcsHeader.Projection.CEA
-                ? meta.unitPerPixelY
-                : meta.unitPerPixelY / meta.unitPerArcsec;
+                ? geometry.pixelSizeY
+                : geometry.pixelSizeY / unitsPerArcsec;
         Region hpcBounds = ImageBounds.hpc(meta);
-        Region renderRegion = meta.imageToRegion(pixelWidth, pixelHeight);
-        Vec2 sunShift = meta.getSunShift();
+        Region renderRegion = geometry.withSize(pixelWidth, pixelHeight).cutoutBounds();
+        Vec2 sunShift = new Vec2((geometry.sunPixel.x - geometry.referencePixel.x) * geometry.pixelSizeX,
+                (geometry.sunPixel.y - geometry.referencePixel.y) * geometry.pixelSizeY);
 
         return new JSONObject()
-                .put("arcsec_per_pixel_x", meta.unitPerPixelX / meta.unitPerArcsec)
+                .put("arcsec_per_pixel_x", geometry.pixelSizeX / unitsPerArcsec)
                 .put("arcsec_per_pixel_y", arcsecPerPixelY)
-                .put("unit_per_arcsec", meta.unitPerArcsec)
-                .put("unit_per_pixel_x", meta.unitPerPixelX)
-                .put("unit_per_pixel_y", meta.unitPerPixelY)
+                .put("unit_per_arcsec", unitsPerArcsec)
+                .put("unit_per_pixel_x", geometry.pixelSizeX)
+                .put("unit_per_pixel_y", geometry.pixelSizeY)
                 .put("plane_units_per_rad", wcs.unitsPerRad)
                 .put("crval_internal_x", wcs.crval.x)
                 .put("crval_internal_y", wcs.crval.y)
                 .put("image_to_plane", new JSONArray(new double[]{
-                        wcs.imageToPlane.m00,
-                        wcs.imageToPlane.m01,
-                        wcs.imageToPlane.m10,
-                        wcs.imageToPlane.m11}))
+                        geometry.pixelToPlane.m00 / geometry.pixelSizeX,
+                        -geometry.pixelToPlane.m01 / geometry.pixelSizeY,
+                        geometry.pixelToPlane.m10 / geometry.pixelSizeX,
+                        -geometry.pixelToPlane.m11 / geometry.pixelSizeY}))
                 .put("render_rect", new JSONArray(new double[]{
                         renderRegion.llx,
                         renderRegion.lly,

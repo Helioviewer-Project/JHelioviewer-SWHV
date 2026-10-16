@@ -15,6 +15,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 
@@ -102,18 +103,13 @@ public final class J2KSource implements Source {
     // Called during initialization, then only by the JPIP reader.
     void update(int frame) throws IOException {
         J2KNative.Frame info = client.frame(frame);
-        int levels = info.width().length;
+        int levels = info.levels().length;
         if (levels == 0)
             return;
 
         ResolutionSet set = sets.get(frame);
         if (set == null) {
-            ResolutionSet.Level[] resolutions = new ResolutionSet.Level[levels];
-            for (int i = 0; i < levels; i++) {
-                int width = info.width()[i], height = info.height()[i];
-                resolutions[i] = new ResolutionSet.Level(i, width, height);
-            }
-            set = new ResolutionSet(resolutions, info.channels());
+            set = new ResolutionSet(info.levels(), info.channels());
             set.setCompleteLevels(info.ready());
             sets.set(frame, set);
         } else {
@@ -171,7 +167,7 @@ public final class J2KSource implements Source {
     }
 
     // The level, or the coarsest one the frame has.
-    public ResolutionSet.Level level(int frame, int level) {
+    public ImageGrid level(int frame, int level) {
         return levels(frame).getLevel(level);
     }
 
@@ -257,7 +253,7 @@ public final class J2KSource implements Source {
                               @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws IOException {
         try (J2KNative.Decode job = client.beginDecode(frame, level)) {
             ResolutionSet set = levels(frame);
-            ResolutionSet.Level resolution = set.getLevel(level);
+            ImageGrid resolution = set.getLevel(level);
             boolean gray = set.numComps == 1;
             try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(resolution.width(), resolution.height(), gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32)) {
                 decode(job, 0, 0, resolution.width(), resolution.height(), outBuffer.byteBuffer());

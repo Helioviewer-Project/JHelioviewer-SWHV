@@ -12,8 +12,8 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsHeader;
-import org.helioviewer.jhv.wcs.WcsProjection;
 
 public final class FitsMetaData extends CommonMetaData {
 
@@ -25,9 +25,6 @@ public final class FitsMetaData extends CommonMetaData {
     private String measurement = "";
     private String observatory = "";
     private final long cacheTimestamp;
-
-    private double referenceX = 0;
-    private double referenceY = 0;
 
     public FitsMetaData(@Nonnull MetaDataContainer m, @Nonnull URI _sourceUri) {
         sourceUri = _sourceUri;
@@ -73,12 +70,12 @@ public final class FitsMetaData extends CommonMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
-            cutOffValue = (float) -region.llx;
+            cutOffValue = (float) -geometry.bounds.llx;
             double maskRotation = -m.getDouble("CROTA").map(Math::toRadians).orElse(0.); // C2 JP2 already rotated
             cutOffX = (float) (Math.sin(maskRotation) / 0.9625);
             cutOffY = (float) (Math.cos(maskRotation) / 0.9625);
         }/* else if (instrument.equals("SWAP")) {
-            cutOffValue = (float) -region.llx;
+            cutOffValue = (float) -geometry.bounds.llx;
             double maskRotation = -m.getDouble("SOLAR_EP").map(Math::toRadians).orElse(0.);
             cutOffX = (float) Math.sin(maskRotation);
             cutOffY = (float) Math.cos(maskRotation);
@@ -270,40 +267,25 @@ public final class FitsMetaData extends CommonMetaData {
 
         WcsInterpreter.Result wcs = WcsInterpreter.read(m);
         WcsHeader.Projection projection = wcs.projection();
-        boolean isSurfaceMap = projection.isSurfaceMap();
         double planeScale;
 
-        if (isSurfaceMap) {
-            unitPerArcsec = Math.PI / (180. * 3600.);
+        if (projection.isSurfaceMap()) {
             planeScale = 1;
         } else {
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-            unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-            planeScale = unitPerArcsec;
+            planeScale = Sun.Radius / radiusSunInArcsec;
         }
-        unitPerPixelX = wcs.unitPerPixelX() * planeScale;
-        unitPerPixelY = wcs.unitPerPixelY() * planeScale;
-
-        // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
+        // Convert FITS centers and upward Y once, into buffer edge coordinates.
         double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
         double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
-        referenceX = unitPerPixelX * crpix1;
-        referenceY = unitPerPixelY * (pixelH - crpix2);
-
-        region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
-
+        Mat2 transform = wcs.pixelToPlane();
+        if (CROTABlockSet.contains(instrument))
+            transform = new Mat2(Math.hypot(transform.m00, transform.m10), 0, 0, Math.hypot(transform.m01, transform.m11));
+        Mat2 pixelToPlane = new Mat2(transform.m00 * planeScale, -transform.m01 * planeScale,
+                transform.m10 * planeScale, -transform.m11 * planeScale);
         Vec2 crval = new Vec2(wcs.crval().x * planeScale, wcs.crval().y * planeScale);
-        Mat2 imageToPlane = CROTABlockSet.contains(instrument) ? Mat2.IDENTITY : wcs.imageToPlane();
-        wcsHeader = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval, imageToPlane);
-
-        // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
-        if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
-            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
-            if (sun != null) {
-                sunShiftX = sun.x;
-                sunShiftY = -sun.y;
-            }
-        }
+        WcsHeader header = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval);
+        geometry = new ImageGeometry(pixelW, pixelH, header, pixelToPlane, new Vec2(crpix1, pixelH - crpix2));
     }
 
     private double getSolarRadiusFactor() {
@@ -335,12 +317,6 @@ public final class FitsMetaData extends CommonMetaData {
         if (wv < 6562)
             return Sun.RadiusFactor_6173;
         return Sun.RadiusFactor_6562;
-    }
-
-    @Nonnull
-    @Override
-    public Region imageToRegion(int width, int height) {
-        return new Region(-referenceX, -referenceY, width * unitPerPixelX, height * unitPerPixelY);
     }
 
     @Nonnull

@@ -36,7 +36,7 @@ public final class ImageLayers {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (!layer.isEnabled())
                 continue;
-            size = Math.max(size, layer.getMetaData().getPhysicalRegion().height);
+            size = Math.max(size, layer.getMetaData().getGeometry().bounds.height);
         }
         return size;
     }

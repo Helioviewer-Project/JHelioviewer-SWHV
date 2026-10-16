@@ -14,19 +14,12 @@ final class WcsInterpreter {
             WcsHeader.Projection projection,
             float[] pv2,
             Vec2 crval,
-            Mat2 imageToPlane,
-            double unitPerPixelX,
-            double unitPerPixelY,
+            Mat2 pixelToPlane,
             double unitsPerRad) {}
 
     private record AxisUnits(
             double arcsecX,
             double arcsecY) {}
-
-    private record LinearTransform(
-            Mat2 imageToPlane,
-            double unitPerPixelX,
-            double unitPerPixelY) {}
 
     private record MatrixKeywords(boolean present, Mat2 matrix) {}
 
@@ -39,7 +32,7 @@ final class WcsInterpreter {
         AxisUnits units = readAxisUnits(m, isSurfaceMap);
         double pv2_1 = m.getDouble("PV2_1").orElse(1.);
         float[] pv2 = readPv2(m, projection, pv2_1);
-        LinearTransform transform = computeLinearTransform(m, units, projection);
+        Mat2 transform = computeLinearTransform(m, units, projection);
         double crval1 = m.getDouble("CRVAL1").orElse(0.);
         double crval2 = m.getDouble("CRVAL2").orElse(0.);
         Vec2 crval;
@@ -56,7 +49,7 @@ final class WcsInterpreter {
             unitsPerRad = ARCSEC_PER_RAD;
         }
 
-        return new Result(projection, pv2, crval, transform.imageToPlane, transform.unitPerPixelX, transform.unitPerPixelY, unitsPerRad);
+        return new Result(projection, pv2, crval, transform, unitsPerRad);
     }
 
     private static MatrixKeywords readMatrix(MetaDataContainer m, String prefix, double diagonalDefault) {
@@ -103,7 +96,7 @@ final class WcsInterpreter {
         return pv2;
     }
 
-    private static LinearTransform computeLinearTransform(
+    private static Mat2 computeLinearTransform(
             MetaDataContainer m, AxisUnits units, WcsHeader.Projection projection) {
         // Surface-map X is angular longitude. Y is angular latitude for CAR and equal-area Y for CEA.
         boolean isSurfaceMap = projection.isSurfaceMap();
@@ -122,7 +115,7 @@ final class WcsInterpreter {
         // FITS WCS/wcslib gives PC precedence over CD when both are present.
         MatrixKeywords pc = readMatrix(m, "PC", 1.);
         if (pc.present)
-            return normalizeRows(
+            return scaleRows(
                     pc.matrix,
                     m.getRequiredDouble("CDELT1") * axis1Scale,
                     m.getRequiredDouble("CDELT2") * axis2Scale);
@@ -130,41 +123,26 @@ final class WcsInterpreter {
         // Any CD card selects a zero-defaulted CD matrix and makes CDELT and CROTA irrelevant.
         MatrixKeywords cd = readMatrix(m, "CD", 0.);
         if (cd.present)
-            return normalizeRows(cd.matrix, axis1Scale, axis2Scale);
+            return scaleRows(cd.matrix, axis1Scale, axis2Scale);
 
         double unitPerPixelX = m.getRequiredDouble("CDELT1") * axis1Scale;
         double unitPerPixelY = m.getRequiredDouble("CDELT2") * axis2Scale;
         if (isSurfaceMap)
-            return normalize(unitPerPixelX, 0, 0, unitPerPixelY);
+            return new Mat2(unitPerPixelX, 0, 0, unitPerPixelY);
 
         double crota = m.getDouble("CROTA").or(() -> m.getDouble("CROTA1")).or(() -> m.getDouble("CROTA2"))
                 .map(Math::toRadians).orElse(0.);
         double c = Math.cos(crota);
         double s = Math.sin(crota);
-        return normalize(
+        return new Mat2(
                 unitPerPixelX * c,
                 -unitPerPixelY * s,
                 unitPerPixelX * s,
                 unitPerPixelY * c);
     }
 
-    private static LinearTransform normalizeRows(Mat2 matrix, double rowScaleX, double rowScaleY) {
-        return normalize(
-                rowScaleX * matrix.m00,
-                rowScaleX * matrix.m01,
-                rowScaleY * matrix.m10,
-                rowScaleY * matrix.m11);
-    }
-
-    private static LinearTransform normalize(double m00, double m01, double m10, double m11) {
-        double unitPerPixelX = Math.hypot(m00, m10);
-        double unitPerPixelY = Math.hypot(m01, m11);
-        double divisorX = unitPerPixelX == 0 ? 1 : unitPerPixelX;
-        double divisorY = unitPerPixelY == 0 ? 1 : unitPerPixelY;
-        return new LinearTransform(
-                new Mat2(m00 / divisorX, m01 / divisorY, m10 / divisorX, m11 / divisorY),
-                unitPerPixelX,
-                unitPerPixelY);
+    private static Mat2 scaleRows(Mat2 matrix, double rowScaleX, double rowScaleY) {
+        return new Mat2(rowScaleX * matrix.m00, rowScaleX * matrix.m01, rowScaleY * matrix.m10, rowScaleY * matrix.m11);
     }
 
     private static double ceaLatitudeCoordinate(double latitude, double pv2_1) {

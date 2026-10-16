@@ -1,8 +1,10 @@
 # Image Buffer Cache
 
 `ImageBufferCache` holds decoded solar images for every image layer. Each entry is a
-`DecodedImage`: an `ImageBuffer` with native pixels and a `Region` giving their physical
-extent. A cache hit during playback or scrubbing skips decoding and filtering.
+`DecodedImage`: an `ImageBuffer` with native pixels and its `ImageGeometry`, including the
+original image geometry. The [coordinate model](image-coordinates.md) connects metadata,
+decoder grids, filtering and texture sampling. A cache hit during playback or scrubbing skips
+decoding and filtering.
 
 ## Keys and budget
 

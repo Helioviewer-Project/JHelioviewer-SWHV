@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
@@ -47,7 +48,7 @@ public final class J2KFixture {
                 source.update(0);
                 ResolutionSet set = source.levels(0);
                 if (!set.isDisplayable()) {
-                    ResolutionSet.Level size = set.getClosestLevel(64, 64);
+                    ImageGrid size = set.getClosestLevel(64, 64);
                     J2KReader.readWindow(() -> socket.sendFrame(stream, size.width(), size.height(), 1),
                             () -> receive(socket, source, opening, 0));
                     source.update(0);
@@ -55,7 +56,7 @@ public final class J2KFixture {
                 int level = source.levels(0).getCompleteLevel(0).level() - 1;
                 if (level < 0 || source.getFrameStatus(0, level))
                     throw new AssertionError("Fixture needs an incomplete level finer than its opening");
-                ResolutionSet.Level size = set.getLevel(level);
+                ImageGrid size = set.getLevel(level);
                 J2KReader.readWindow(() -> socket.sendFrame(stream, size.width(), size.height(), 1),
                         () -> receive(socket, source, finer, 0));
                 source.update(0);
@@ -131,13 +132,13 @@ public final class J2KFixture {
                 keys.setAccessible(true);
                 keys.set(reader, new String[3]);
                 J2KReader.Read params = new J2KReader.Read(0, responses.level, false);
-                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ResolutionSet.Level.class, boolean.class);
+                Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ImageGrid.class, boolean.class);
                 readFrames.setAccessible(true);
                 J2KReader current = reader;
                 Future<Boolean> pump = tasks.submit(() -> (boolean) readFrames.invoke(current, params, source.levels(0).getLevel(responses.level), false));
                 if (!sent.await(5, TimeUnit.SECONDS))
                     throw new AssertionError("Reader did not pipeline two requests");
-                ResolutionSet.Level coarse = source.level(0, Integer.MAX_VALUE);
+                ImageGrid coarse = source.level(0, Integer.MAX_VALUE);
                 byte[] expected = source.decodeRegion(0, coarse.level(), 0, 0, coarse.width(), coarse.height());
                 Future<?> pixels = tasks.submit(() -> {
                     decoding.countDown();

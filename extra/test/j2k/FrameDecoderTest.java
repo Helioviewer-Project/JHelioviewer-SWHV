@@ -46,19 +46,22 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.source.J2KFixture;
 import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 // The real timeline, decoder and reader thread on a JPIP movie, headless.
 // Arguments: Kakadu library, bridge library, movie JPIP URI, image JPIP URI, local JP2 file.
@@ -109,7 +112,7 @@ public final class FrameDecoderTest {
             show(opened, 0, Integer.MAX_VALUE, true);
             await(opened, frames - 1);
             // A finer level of the shown frame is fetched and delivered without another request to decode.
-            ResolutionSet.Level finer = opened.source.level(0, 3);
+            ImageGrid finer = opened.source.level(0, 3);
             show(opened, 0, 3, true);
             ImageData image;
             do {
@@ -188,19 +191,20 @@ public final class FrameDecoderTest {
         // Before signalling the reader, exercise the selector with square, tall, wide and unequal-scale geometry.
         AtomicReferenceArray<ResolutionSet> sets = (AtomicReferenceArray<ResolutionSet>) field(J2KSource.class, opened.source, "sets");
         ResolutionSet originalSet = sets.get(0);
-        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ResolutionSet.Level[].class, int.class);
+        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ImageGrid[].class, int.class);
         constructor.setAccessible(true);
         try {
             for (int[] geometry : new int[][]{{4096, 4096, 4096, 4096, 4}, {2048, 4096, 2048, 4096, 4},
                     {4096, 2048, 4096, 2048, 4}, {4096, 4096, 8192, 4096, 3}}) {
-                ResolutionSet.Level[] levels = new ResolutionSet.Level[6];
+                ImageGrid[] levels = new ImageGrid[6];
                 for (int i = 0; i < levels.length; i++)
-                    levels[i] = new ResolutionSet.Level(i, geometry[0] >> i, geometry[1] >> i);
+                    levels[i] = new ImageGrid(i, geometry[0] >> i, geometry[1] >> i);
                 sets.set(0, constructor.newInstance(levels, 1));
                 MetaData metadata = new BasicMetaData(geometry[0], geometry[1], "Selection test") {
                     @Override
-                    public Region getPhysicalRegion() {
-                        return new Region(0, 0, geometry[2], geometry[3]);
+                    public ImageGeometry getGeometry() {
+                        return new ImageGeometry(geometry[0], geometry[1], super.getGeometry().wcs,
+                                new Mat2((double) geometry[2] / geometry[0], 0, 0, -(double) geometry[3] / geometry[1]), Vec2.ZERO);
                     }
                 };
                 Frames.Frame frame = new Frames.Frame(opened.frames.time(0), metadata, Frames.EMPTY_METAXML, opened.source, 0);
@@ -217,10 +221,10 @@ public final class FrameDecoderTest {
     private static void checkRefresh(Opened opened) throws Exception {
         Frames frames = opened.frames;
         FrameDecoder decoder = opened.decoder;
-        ResolutionSet.Level size = opened.source.level(0, Integer.MAX_VALUE);
+        ImageGrid size = opened.source.level(0, Integer.MAX_VALUE);
         MetaData metadata = frames.get(0).metaData();
         Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
-        double scale = size.height() / metadata.getPhysicalRegion().height;
+        double scale = size.height() / metadata.getGeometry().bounds.height;
         clearImages();
         EventQueue.invokeAndWait(() -> decoder.decode(frames, latest, scale, true));
         ImageData image = images.poll(60, TimeUnit.SECONDS);
@@ -268,7 +272,7 @@ public final class FrameDecoderTest {
 
             String[] hashes = new String[frames];
             for (int frame = 0; frame < frames; frame++) {
-                ResolutionSet.Level size = opened.source.level(frame, 4);
+                ImageGrid size = opened.source.level(frame, 4);
                 show(opened, frame, 4, false);
                 ImageData image = images.poll(60, TimeUnit.SECONDS);
                 if (image == null)
@@ -341,7 +345,7 @@ public final class FrameDecoderTest {
     private static void show(Opened opened, int frame, int level, boolean priority) throws Exception {
         Frames frames = opened.frames;
         MetaData metadata = frames.get(frame).metaData();
-        double scale = opened.source.level(frame, level).height() / metadata.getPhysicalRegion().height;
+        double scale = opened.source.level(frame, level).height() / metadata.getGeometry().bounds.height;
         clearImages();
         EventQueue.invokeAndWait(() -> {
             frames.select(frames.time(frame));
@@ -409,7 +413,7 @@ public final class FrameDecoderTest {
     }
 
     private static void checkPixels(Opened opened) throws Exception {
-        ResolutionSet.Level size = opened.source.level(0, 0);
+        ImageGrid size = opened.source.level(0, 0);
         ImageData image = images.poll(60, TimeUnit.SECONDS);
         if (image == null)
             throw new AssertionError("Decoded image was not delivered");

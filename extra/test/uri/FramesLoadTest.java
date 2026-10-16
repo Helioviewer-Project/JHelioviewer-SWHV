@@ -14,9 +14,9 @@ import java.util.zip.CRC32;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.Directories;
-import org.helioviewer.jhv.source.ResolutionSet;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -114,8 +114,8 @@ public final class FramesLoadTest {
             Set<Long> checksums = new HashSet<>();
             for (int i = 0; i < frames.size(); i++) {
                 Frames.Frame frame = frames.get(i);
-                ResolutionSet.Level size = frame.source().levels(frame.index()).getLevel(0);
-                double scale = size.height() / frame.metaData().getPhysicalRegion().height;
+                ImageGrid size = frame.source().levels(frame.index()).getLevel(0);
+                double scale = size.height() / frame.metaData().getGeometry().bounds.height;
                 EventQueue.invokeAndWait(() -> {
                     frames.select(frame.time());
                     decoder.decode(frames, frame.metaData().getViewpoint(), scale, true);

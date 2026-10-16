@@ -25,6 +25,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.source.Source;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONObject;
@@ -232,31 +233,25 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         ImageData imageDataDiff = comparisonImageData(current);
         MetaData meta1 = imageDataDiff.metaData();
         Position metaViewpoint1 = meta1.getViewpoint();
-        WcsHeader wcs0 = meta0.getWcsHeader();
-        WcsHeader wcs1 = meta1.getWcsHeader();
+        ImageGeometry geometry0 = current.image().geometry();
+        ImageGeometry geometry1 = imageDataDiff.image().geometry();
+        WcsHeader wcs0 = geometry0.wcs;
+        WcsHeader wcs1 = geometry1.wcs;
 
         Quat q = mv.viewRotation();
         Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
         Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
 
-        Mat2 planeToImage0 = wcs0.planeToImage;
-        Mat2 planeToImage1 = wcs1.planeToImage;
         double deltaCROTA = displaySettings.getDeltaCROTA();
-        if (deltaCROTA != 0) {
-            // The user rotation follows the metadata image-to-plane transform,
-            // so it precedes that transform's inverse in plane-to-image order.
-            Mat2 inverseAdjustment = Mat2.rotation(Math.toRadians(-deltaCROTA));
-            planeToImage0 = Mat2.multiply(planeToImage0, inverseAdjustment);
-            planeToImage1 = Mat2.multiply(planeToImage1, inverseAdjustment);
-        }
+        Mat2 adjustment = deltaCROTA == 0 ? Mat2.IDENTITY : Mat2.rotation(Math.toRadians(-deltaCROTA));
 
         double deltaCRVAL1 = displaySettings.getDeltaCRVAL1();
         if (deltaCRVAL1 == 0) {
             crval0[0] = (float) wcs0.crval.x;
             crval1[0] = (float) wcs1.crval.x;
         } else {
-            crval0[0] = (float) (wcs0.crval.x + deltaCRVAL1 * meta0.getUnitPerArcsec());
-            crval1[0] = (float) (wcs1.crval.x + deltaCRVAL1 * meta1.getUnitPerArcsec());
+            crval0[0] = (float) (wcs0.crval.x + deltaCRVAL1 * wcs0.unitsPerArcsec());
+            crval1[0] = (float) (wcs1.crval.x + deltaCRVAL1 * wcs1.unitsPerArcsec());
         }
 
         double deltaCRVAL2 = displaySettings.getDeltaCRVAL2();
@@ -264,8 +259,8 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
             crval0[1] = (float) wcs0.crval.y;
             crval1[1] = (float) wcs1.crval.y;
         } else {
-            crval0[1] = (float) (wcs0.crval.y + deltaCRVAL2 * meta0.getUnitPerArcsec());
-            crval1[1] = (float) (wcs1.crval.y + deltaCRVAL2 * meta1.getUnitPerArcsec());
+            crval0[1] = (float) (wcs0.crval.y + deltaCRVAL2 * wcs0.unitsPerArcsec());
+            crval1[1] = (float) (wcs1.crval.y + deltaCRVAL2 * wcs1.unitsPerArcsec());
         }
 
         float deltaT0 = 0, deltaT1 = 0;
@@ -279,10 +274,10 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
 
         GLSLImageShader.bindImages(
-                current.region(), planeToImage0, crval0, wcs0,
+                geometry0, crval0,
                 (float) metaViewpoint0.distance, deltaT0, cameraDiff0, sourceView0,
-                imageDataDiff.region(), planeToImage1, crval1, wcs1,
-                (float) metaViewpoint1.distance, deltaT1, cameraDiff1, sourceView1);
+                geometry1, crval1,
+                (float) metaViewpoint1.distance, deltaT1, cameraDiff1, sourceView1, adjustment);
         GLSLImageShader.render(mv.mode(), wcs0.pv2, wcs1.pv2);
     }
 

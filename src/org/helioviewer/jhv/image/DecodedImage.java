@@ -1,27 +1,27 @@
 package org.helioviewer.jhv.image;
 
-import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 public final class DecodedImage {
 
     private final ImageBuffer imageBuffer;
-    private final Region region;
+    private final ImageGeometry geometry;
 
     // The decoder starts with one reference and transfers it to the cache.
     // After publication, delivery and layer references are retained and released on the EDT.
     private int references = 1;
 
-    public DecodedImage(ImageBuffer _imageBuffer, Region _region) {
+    public DecodedImage(ImageBuffer _imageBuffer, ImageGeometry _geometry) {
         imageBuffer = _imageBuffer;
-        region = _region;
+        geometry = _geometry;
     }
 
     public ImageBuffer imageBuffer() {
         return imageBuffer;
     }
 
-    public Region region() {
-        return region;
+    public ImageGeometry geometry() {
+        return geometry;
     }
 
     public void retain() {

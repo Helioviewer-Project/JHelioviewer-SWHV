@@ -190,7 +190,7 @@ public final class DisplayController {
 
         MetaData metaData = imageData.metaData();
         double imageHeight = oneToOneImageHeight(metaData, mode);
-        double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / metaData.getPhysicalRegion().height;
+        double cameraWidth = vp.height * metaData.getGeometry().pixelSizeY * imageHeight / metaData.getGeometry().bounds.height;
         if (mode == MapMode.Orthographic)
             return cameraWidth;
 
@@ -199,7 +199,7 @@ public final class DisplayController {
     }
 
     private static double oneToOneImageHeight(MetaData metaData, MapMode mode) {
-        return mode == MapMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getPhysicalRegion().height;
+        return mode == MapMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getGeometry().bounds.height;
     }
 
     private static double oneToOneViewportHeight(Viewport vp, MapMode mode) {

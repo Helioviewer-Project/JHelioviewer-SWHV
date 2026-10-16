@@ -10,8 +10,13 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HexFormat;
 
+import org.helioviewer.jhv.image.ImageGrid;
+import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
+import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 // Raw reader pixels, independent of the view's delivery and filtering path.
 // Arguments: Kakadu library, bridge library, single-frame JPIP URI, movie JPIP URI.
@@ -52,15 +57,15 @@ public final class J2KReaderTest {
     }
 
     private static void testResolutions() {
-        ResolutionSet set = new ResolutionSet(new ResolutionSet.Level[]{
-                new ResolutionSet.Level(0, 100, 60), new ResolutionSet.Level(1, 50, 30),
-                new ResolutionSet.Level(2, 25, 15)}, 1);
+        ResolutionSet set = new ResolutionSet(new ImageGrid[]{
+                new ImageGrid(0, 100, 60), new ImageGrid(1, 50, 30),
+                new ImageGrid(2, 25, 15)}, 1);
         for (int[] expected : new int[][]{{101, 61, 0}, {100, 60, 0}, {51, 30, 0}, {50, 31, 0},
                 {50, 30, 1}, {49, 29, 1}, {26, 15, 1}, {25, 16, 1}, {25, 15, 2}, {24, 14, 2}, {0, 0, 2}}) {
             if (set.getNextLevel(expected[0], expected[1]).level() != expected[2])
                 throw new AssertionError("Wrong resolution at boundary " + Arrays.toString(expected));
         }
-        ResolutionSet single = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, 100, 60)}, 1);
+        ResolutionSet single = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, 100, 60)}, 1);
         if (single.getNextLevel(1, 1).level() != 0 || single.getNextLevel(101, 61).level() != 0)
             throw new AssertionError("Single resolution selection");
         if (set.isDisplayable())
@@ -71,6 +76,37 @@ public final class J2KReaderTest {
         set.setCompleteLevels(2);
         if (!set.getComplete(1) || set.getComplete(0) || set.getCompleteLevel(0).level() != 1)
             throw new AssertionError("Progressive completion");
+
+        // One mapping from original pixels; every reduced grid composes with it.
+        for (int[] dimensions : new int[][]{{128, 96, 0, 0}, {129, 97, 0, 0}, {129, 97, 3, 5}}) {
+            int width = dimensions[0], height = dimensions[1], x = dimensions[2], y = dimensions[3];
+            WcsHeader wcs = new WcsHeader(WcsHeader.Projection.TAN, new float[6], 215, Vec2.ZERO);
+            ImageGeometry original = new ImageGeometry(width, height, wcs, new Mat2(2, 0, 0, -3), new Vec2(18.5, 17));
+            if (original.forGrid(new ImageGrid(0, width, height)) != original)
+                throw new AssertionError("Level zero changed the geometry");
+            for (int r = 1; r <= 4; r++) {
+                int step = 1 << r;
+                int rx = Math.ceilDiv(x, step), ry = Math.ceilDiv(y, step);
+                ImageGrid grid = new ImageGrid(r, Math.ceilDiv(x + width, step) - rx, Math.ceilDiv(y + height, step) - ry,
+                        rx * step - x + .5, ry * step - y + .5);
+                ImageGeometry decoded = original.forGrid(grid);
+                for (int n : new int[]{0, grid.width() - 1}) {
+                    Vec2 plane = decoded.toPlane(n + .5, .5);
+                    if (plane.x != -37 + ((rx + n) * step - x + .5) * 2)
+                        throw new AssertionError("Wrong reduced X sample position");
+                    Vec2 pixel = decoded.toPixel(plane.x, plane.y);
+                    if (Math.abs(pixel.x - n - .5) > 1e-12)
+                        throw new AssertionError("Reduced geometry did not invert");
+                }
+                for (int n : new int[]{0, grid.height() - 1}) {
+                    Vec2 plane = decoded.toPlane(.5, n + .5);
+                    if (plane.y != 51 - ((ry + n) * step - y + .5) * 3)
+                        throw new AssertionError("Wrong reduced Y sample position");
+                }
+                if (decoded.original != original)
+                    throw new AssertionError("Decoded geometry lost the original footprint");
+            }
+        }
     }
 
     private static void testContinuation() throws Exception {
@@ -138,7 +174,7 @@ public final class J2KReaderTest {
         J2KReader reader = null;
         JPIPSocket socket = null;
         try {
-            Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ResolutionSet.Level.class, boolean.class);
+            Method readFrames = J2KReader.class.getDeclaredMethod("readFrames", J2KReader.Read.class, ImageGrid.class, boolean.class);
             readFrames.setAccessible(true);
             Field retries = J2KReader.class.getDeclaredField("retries");
             retries.setAccessible(true);
@@ -176,7 +212,7 @@ public final class J2KReaderTest {
             }
             int index = frames;
             for (int level : levels) {
-                ResolutionSet.Level size = reader == null ? new ResolutionSet.Level(0, 4096, 4096) : source.levels(0).getLevel(level);
+                ImageGrid size = reader == null ? new ImageGrid(0, 4096, 4096) : source.levels(0).getLevel(level);
                 if (frames == 1 && mode == Mode.PREFETCH
                         && (Boolean.TRUE.equals(source.getFrameStatus(0, level)) || JPIPCacheManager.get(keys[0], level) != null))
                     throw new AssertionError("Level " + level + " complete or cached before retrieval");

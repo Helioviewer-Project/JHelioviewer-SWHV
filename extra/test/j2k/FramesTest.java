@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers;
 import java.awt.EventQueue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -17,15 +18,20 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.image.ClipSet;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -62,6 +68,7 @@ public final class FramesTest {
         synthesis();
         delivery(false);
         delivery(true);
+        sampling();
         arrivals();
         System.out.println("PASS: nearest selectable frame by time, equal synthetic endpoints give one frame");
     }
@@ -280,13 +287,82 @@ public final class FramesTest {
         System.out.println("PASS: arrivals publish catch-up before notification; hidden layers settle without decoding and resume when shown");
     }
 
-    private static ResolutionSet completeLevels() throws Exception {
-        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ResolutionSet.Level[].class, int.class);
+    private static void sampling() throws Exception {
+        ResolutionSet levels = completeLevels(new ImageGrid(0, 128, 96), new ImageGrid(1, 64, 48),
+                new ImageGrid(2, 32, 24), new ImageGrid(3, 16, 12));
+        ImageGeometry originalGeometry = new ImageGeometry(128, 96, 1);
+        BasicMetaData metadata = new BasicMetaData(128, 96, "Sampling test") {
+            @Override public ImageGeometry getGeometry() { return originalGeometry; }
+        };
+        byte[] samples = new byte[16 * 12];
+        for (int i = 0; i < samples.length; i++)
+            samples[i] = (byte) (1 + i * 37 % 254);
+        AtomicInteger decodes = new AtomicInteger();
+        Stub source = new Stub(1) {
+            @Override public ResolutionSet levels(int frame) { return levels; }
+            @Override public ImageBuffer decode(int frame, int level, ImageFilter filter, ImageProcessingSettings.FITSParameters fits, ClipSet.Range clip) {
+                if (level != 3)
+                    throw new AssertionError("Sampling test did not select the reduced level");
+                decodes.incrementAndGet();
+                return ImageBuffer.fromBytes(16, 12, samples, filter);
+            }
+        };
+        source.ready[0] = true;
+        Frames frames = new Frames(List.of(new Frames.Frame(new JHVTime(1_800_000_000_000L), metadata, Frames.EMPTY_METAXML, source, 0)));
+        // Independent expected texel-cell bounds: centers are (-63.5 + 8*x, -47.5 + 8*y).
+        DecodedImage expected = new DecodedImage(ImageBuffer.fromBytes(16, 12, samples,
+                ImageFilter.of(ImageFilter.Type.RHEF, new ImageGeometry(16, 12, originalGeometry.wcs,
+                        new Mat2(8, 0, 0, -8), new Vec2(67.5 / 8, 51.5 / 8)))), originalGeometry);
+        ImageProcessingSettings settings = new ImageProcessingSettings(() -> {});
+        settings.setFilter(ImageFilter.Type.RHEF);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        CountDownLatch delivered = new CountDownLatch(1);
+        AtomicInteger deliveries = new AtomicInteger();
+        FrameDecoder decoder = new FrameDecoder(settings, data -> {
+            try {
+                if (data.image().geometry().original != originalGeometry)
+                    throw new AssertionError("Reduced decode changed the original bounds used by cutouts");
+                if (!((ShortBuffer) data.imageBuffer().buffer).equals((ShortBuffer) expected.imageBuffer().buffer))
+                    throw new AssertionError("RHEF did not use the decoded sample positions");
+                ImageGeometry geometry = data.image().geometry();
+                if (geometry.sunPixel.x != 67.5 / 8 || geometry.sunPixel.y != 51.5 / 8)
+                    throw new AssertionError("Decoded geometry lost the Sun's pixel position");
+                deliveries.incrementAndGet();
+            } catch (Throwable t) {
+                failure.set(t);
+            } finally {
+                delivered.countDown();
+            }
+        });
+        try {
+            EventQueue.invokeAndWait(() -> {
+                decoder.reset(frames.serial());
+                decoder.decode(frames, metadata.getViewpoint(), 0, false);
+            });
+            if (!delivered.await(5, TimeUnit.SECONDS))
+                throw new AssertionError("Sampling test did not deliver the decode", failure.get());
+            EventQueue.invokeAndWait(() -> decoder.decode(frames, metadata.getViewpoint(), 0, false));
+            EventQueue.invokeAndWait(() -> {}); // Deliver the queued cache hit.
+            if (failure.get() != null)
+                throw new AssertionError("Sampling geometry", failure.get());
+            if (decodes.get() != 1 || deliveries.get() != 2)
+                throw new AssertionError("Cached sampling test decoded again or did not deliver");
+        } finally {
+            EventQueue.invokeAndWait(() -> { decoder.dispose(); frames.close(); });
+            expected.release();
+        }
+        System.out.println("PASS: reduced RHEF uses sample positions, original cutout bounds survive and cached playback does not decode again");
+    }
+
+    private static ResolutionSet completeLevels(ImageGrid... resolutions) throws Exception {
+        Constructor<ResolutionSet> constructor = ResolutionSet.class.getDeclaredConstructor(ImageGrid[].class, int.class);
         constructor.setAccessible(true);
-        ResolutionSet levels = constructor.newInstance(new ResolutionSet.Level[]{new ResolutionSet.Level(0, 2, 2)}, 1);
+        if (resolutions.length == 0)
+            resolutions = new ImageGrid[]{new ImageGrid(0, 2, 2)};
+        ResolutionSet levels = constructor.newInstance(resolutions, 1);
         Method complete = ResolutionSet.class.getDeclaredMethod("setCompleteLevels", int.class);
         complete.setAccessible(true);
-        complete.invoke(levels, 1);
+        complete.invoke(levels, resolutions.length);
         return levels;
     }
 

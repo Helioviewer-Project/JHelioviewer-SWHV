@@ -1,15 +1,17 @@
 package org.helioviewer.jhv.source;
 
+import org.helioviewer.jhv.image.ImageGrid;
+
 // A class describing the available resolution levels for a given image
 public class ResolutionSet {
 
     // The indices represent the number of discardLayers
-    private final Level[] resolutions;
+    private final ImageGrid[] resolutions;
     // Native completion snapshot, published by J2KSource.update() to EDT and decode workers.
     private volatile int completeFrom;
     final int numComps;
 
-    ResolutionSet(Level[] _resolutions, int _numComps) {
+    ResolutionSet(ImageGrid[] _resolutions, int _numComps) {
         resolutions = _resolutions;
         numComps = _numComps;
 
@@ -30,20 +32,20 @@ public class ResolutionSet {
     }
 
     // The finest complete level at this one or coarser; a displayable frame has one.
-    public Level getCompleteLevel(int level) {
+    public ImageGrid getCompleteLevel(int level) {
         return getLevel(Math.max(level, completeFrom));
     }
 
-    public Level getLevel(int idx) {
+    public ImageGrid getLevel(int idx) {
         return resolutions[Math.min(idx, resolutions.length - 1)];
     }
 
-    Level getClosestLevel(int w, int h) {
-        Level closest = resolutions[0];
-        int bestDistance = Math.abs(closest.width - w) + Math.abs(closest.height - h);
+    ImageGrid getClosestLevel(int w, int h) {
+        ImageGrid closest = resolutions[0];
+        int bestDistance = Math.abs(closest.width() - w) + Math.abs(closest.height() - h);
         for (int i = 1; i < resolutions.length; i++) {
-            Level res = resolutions[i];
-            int distance = Math.abs(res.width - w) + Math.abs(res.height - h);
+            ImageGrid res = resolutions[i];
+            int distance = Math.abs(res.width() - w) + Math.abs(res.height() - h);
             if (distance < bestDistance) {
                 closest = res;
                 bestDistance = distance;
@@ -52,14 +54,12 @@ public class ResolutionSet {
         return closest;
     }
 
-    public Level getNextLevel(int w, int h) {
+    public ImageGrid getNextLevel(int w, int h) {
         for (int i = 1; i < resolutions.length; ++i) {
-            if (resolutions[i].width < w || resolutions[i].height < h)
+            if (resolutions[i].width() < w || resolutions[i].height() < h)
                 return resolutions[i - 1];
         }
         return resolutions[resolutions.length - 1];
     }
-
-    public record Level(int level, int width, int height) {}
 
 }

@@ -16,6 +16,8 @@ import java.util.concurrent.CancellationException;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.image.ImageGrid;
+
 // FFM binding of native/jpeg2000/jhv_j2k.h; the library must be loaded first.
 // The monitor serializes calls on the source. A decode runs outside it.
 final class J2KNative implements AutoCloseable {
@@ -30,7 +32,7 @@ final class J2KNative implements AutoCloseable {
 
     // Levels are finest first. Without the frame's header only stream is set.
     // The ready levels are the coarsest ones.
-    record Frame(long stream, int channels, int ready, int[] width, int[] height) {}
+    record Frame(long stream, int channels, int ready, ImageGrid[] levels) {}
 
     record Response(int reason, boolean progressed) {}
 
@@ -38,7 +40,7 @@ final class J2KNative implements AutoCloseable {
     private static final ValueLayout.OfLong L = ValueLayout.JAVA_LONG;
     private static final MemoryLayout P = ValueLayout.ADDRESS;
     private static final int MAX_LEVELS = 33;
-    private static final long FRAME_SIZE = 288, FRAME_WIDTH = 20, FRAME_HEIGHT = 152;
+    private static final long FRAME_SIZE = 296, FRAME_WIDTH = 20, FRAME_HEIGHT = 152, FRAME_X = 284, FRAME_Y = 288;
     private static final MethodHandle OPEN = bind("open", P, P, P);
     private static final MethodHandle CLOSE = bind("close", null, P);
     private static final MethodHandle NEW_CHANNEL = bind("new_channel", null, P);
@@ -104,12 +106,15 @@ final class J2KNative implements AutoCloseable {
             int levels = info.get(I, 12);
             if (levels < 0 || levels > MAX_LEVELS)
                 throw new IOException("Invalid JPEG 2000 level count");
-            int[] width = new int[levels], height = new int[levels];
+            ImageGrid[] resolutions = new ImageGrid[levels];
+            int x = info.get(I, FRAME_X), y = info.get(I, FRAME_Y);
             for (int l = 0; l < levels; l++) {
-                width[l] = info.get(I, FRAME_WIDTH + 4L * l);
-                height[l] = info.get(I, FRAME_HEIGHT + 4L * l);
+                int step = 1 << l;
+                double firstX = (double) Math.ceilDiv(x, step) * step - x + .5;
+                double firstY = (double) Math.ceilDiv(y, step) * step - y + .5;
+                resolutions[l] = new ImageGrid(l, info.get(I, FRAME_WIDTH + 4L * l), info.get(I, FRAME_HEIGHT + 4L * l), firstX, firstY);
             }
-            return new Frame(info.get(L, 0), info.get(I, 8), info.get(I, 16), width, height);
+            return new Frame(info.get(L, 0), info.get(I, 8), info.get(I, 16), resolutions);
         }
     }
 

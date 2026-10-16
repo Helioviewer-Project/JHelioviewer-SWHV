@@ -2,8 +2,6 @@ package org.helioviewer.jhv.metadata;
 
 public class Region {
 
-    public static final Region DEFAULT = new Region(-0.5, -0.5, 1, 1);
-
     public final double width;
     public final double height;
 
@@ -11,7 +9,6 @@ public class Region {
     public final double lly;
     public final double urx;
     public final double ury;
-    public final float[] glslArray;
 
     public Region(double newLLX, double newLLY, double newWidth, double newHeight) {
         width = newWidth;
@@ -22,8 +19,6 @@ public class Region {
 
         urx = llx + width;
         ury = lly + height;
-
-        glslArray = new float[]{(float) llx, (float) lly, (float) (1. / width), (float) (1. / height)};
     }
 
     public static Region scale(Region r, double f) {

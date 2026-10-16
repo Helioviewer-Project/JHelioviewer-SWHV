@@ -30,7 +30,7 @@ def load_module(path: Path, name: str):
 
 def java_classpath(java_out: Path) -> str:
     jars = sorted((REPO_ROOT / "lib").glob("**/*.jar"))
-    parts = [str(REPO_ROOT / "bin"), str(java_out), *map(str, jars)]
+    parts = [str(REPO_ROOT / "bin"), str(java_out), str(REPO_ROOT / "resources"), str(REPO_ROOT / "lib"), *map(str, jars)]
     return ":".join(parts)
 
 

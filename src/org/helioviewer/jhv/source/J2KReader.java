@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 
@@ -160,7 +161,7 @@ class J2KReader implements Runnable {
         fetchFirst(64, 64, 0);
         ResolutionSet set = source.geometry(0);
         if (set != null && !set.isDisplayable()) { // the window did not cover a level
-            ResolutionSet.Level res = set.getClosestLevel(64, 64);
+            ImageGrid res = set.getClosestLevel(64, 64);
             // Pad rsiz for the classical esajpip issue documented beside request()'s pad below.
             fetchFirst(res.width(), res.height(), 1);
         }
@@ -218,7 +219,7 @@ class J2KReader implements Runnable {
 
     // Sends the request a frame needs in this pass; null when it needs none.
     @Nullable
-    private Sent request(int frame, ResolutionSet.Level wanted) throws IOException {
+    private Sent request(int frame, ImageGrid wanted) throws IOException {
         int width = wanted.width(), height = wanted.height();
         if (isSettled(frame, width, height))
             return null;
@@ -232,7 +233,7 @@ class J2KReader implements Runnable {
         }
 
         // The signalled frame's size while the header is unknown; else the frame's own, the region padded.
-        ResolutionSet.Level res = set == null ? wanted : set.getNextLevel(width, height);
+        ImageGrid res = set == null ? wanted : set.getNextLevel(width, height);
         // Classical esajpip server issue: precinct selection can omit the last precinct
         // when the last image coordinate is exactly a precinct boundary. Request rsiz=W+1,H+1
         // while keeping fsiz=W,H. The new server clips rsiz to the image. Pad only exact
@@ -247,7 +248,7 @@ class J2KReader implements Runnable {
     }
 
     // Feeds the next response to the source. False when its frame needs another request in this pass.
-    private boolean receive(Sent sent, ResolutionSet.Level wanted) throws IOException {
+    private boolean receive(Sent sent, ImageGrid wanted) throws IOException {
         int frame = sent.frame;
         Window state = window(client.response(socket.receive(), frame));
         update(frame);
@@ -276,7 +277,7 @@ class J2KReader implements Runnable {
         return true;
     }
 
-    private boolean readFrames(Read params, ResolutionSet.Level wanted, boolean singleFrame) throws IOException {
+    private boolean readFrames(Read params, ImageGrid wanted, boolean singleFrame) throws IOException {
         ArrayDeque<Integer> remaining = new ArrayDeque<>();
         if (singleFrame) {
             remaining.add(params.frame());
@@ -332,7 +333,7 @@ class J2KReader implements Runnable {
                 continue;
             }
 
-            ResolutionSet.Level wanted = source.levels(params.frame()).getLevel(params.level());
+            ImageGrid wanted = source.levels(params.frame()).getLevel(params.level());
 
             source.setDownloading(true);
 

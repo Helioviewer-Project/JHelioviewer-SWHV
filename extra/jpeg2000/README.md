@@ -20,6 +20,9 @@ appropriate `-DCMAKE_OSX_ARCHITECTURES=arm64` or
 `-DKDU_CORE_LIBRARY=/path/to/kdu_v7AR.dll`; supply `kdu_jni.dll` as `KDU_LIBRARY`.
 MinGW produces `libjhvj2k.dll`; copy it as `jhvj2k.dll` before validation and packaging.
 The SDK and libraries must match, and all libraries must target the same architecture.
+The bridge and Java binding must also match: frame geometry includes the full
+decoder origin and each level's dimensions. Rebuild every platform's bridge when changing
+that interface.
 The Windows JNI/support DLL must also export the Kakadu support functions used
 by the bridge.
 
@@ -80,7 +83,8 @@ python3 extra/test/j2k/check_native_build.py /path/to/builds/macos-arm64 --esajp
 
 The check runs `J2KNativeTest` through JHV's Java binding. It compares every
 frame and resolution of the existing RGB, grayscale and JPX fixtures in the
-esajpip checkout against Kakadu's compositor. It also checks concurrent decode
+esajpip checkout against Kakadu's compositor, and checks each level's origin and
+dimensions against Kakadu's codestream geometry. It also checks concurrent decode
 jobs that outlive their source, failure recovery, repeated open/decode/close
 cycles, and malformed JPIP response parsing. File-descriptor counts are checked
 on Unix.

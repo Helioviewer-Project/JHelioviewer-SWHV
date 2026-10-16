@@ -204,4 +204,11 @@ its default source checkout, `../esajpip-SWHV`.
 This suite does not cover all reader lifecycle races, GUI rendering, all HTTP framing errors,
 or GUI playback with 8 GiB of actual cached pixels. Live pixel hashes compare runs
 of the same decoder, while the native test compares against Kakadu's compositor.
-The view check uses image metadata but does not independently validate its geometry.
+The offline frame-decoder check verifies reduced-grid RHEF placement, retention of the
+original image bounds used by cutouts, and reuse of that result on a cache hit.
+Resolution checks include even and odd dimensions, nonzero origins and unequal
+physical pixel sizes. The native test independently compares per-level origins and
+dimensions against Kakadu's codestream geometry.
+The separate OpenGL suite (`python3 extra/test/run_tests.py opengl`) compares reduced
+ramps with a full-resolution reference in every projection mode, including sharpening,
+difference images at different levels, and unchanged detector-mask and slit coverage.

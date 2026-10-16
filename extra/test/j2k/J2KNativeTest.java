@@ -22,10 +22,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.helioviewer.jhv.image.ImageGrid;
+
 import com.sun.management.UnixOperatingSystemMXBean;
 
 import kdu_jni.Jp2_family_src;
+import kdu_jni.Jpx_input_box;
 import kdu_jni.Jpx_source;
+import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_compositor_buf;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
@@ -52,7 +56,7 @@ public final class J2KNativeTest {
 
     private static byte[] pixels(J2KNative source, int frame, int level) throws IOException {
         J2KNative.Frame info = source.frame(frame);
-        int width = info.width()[level], height = info.height()[level];
+        int width = info.levels()[level].width(), height = info.levels()[level].height();
         int size = width * height * info.channels();
         ByteBuffer output = ByteBuffer.allocateDirect(size + 16);
         output.position(7).limit(7 + size);
@@ -78,9 +82,23 @@ public final class J2KNativeTest {
         Kdu_dims dims = new Kdu_dims();
         Kdu_dims empty = new Kdu_dims();
         Kdu_dims changed = new Kdu_dims();
+        Kdu_codestream stream = new Kdu_codestream();
+        Jpx_input_box input = null;
         try {
             family.Open(path.toString());
             check(file.Open(family, false) > 0, "reference JPX open failed");
+            input = file.Access_codestream(Math.toIntExact(info.stream())).Open_stream();
+            stream.Create(input);
+            stream.Get_dims(0, dims, true);
+            int fullX = dims.Access_pos().Get_x(), fullY = dims.Access_pos().Get_y();
+            stream.Apply_input_restrictions(0, 0, level, 0, null, Kdu_global.KDU_WANT_OUTPUT_COMPONENTS);
+            stream.Get_dims(0, dims, true);
+            ImageGrid grid = info.levels()[level];
+            check(grid.firstX() == dims.Access_pos().Get_x() * grid.step() - fullX + .5
+                    && grid.firstY() == dims.Access_pos().Get_y() * grid.step() - fullY + .5
+                    && grid.width() == dims.Access_size().Get_x() && grid.height() == dims.Access_size().Get_y(),
+                    "decoder grid differs from Kakadu: " + path + " frame " + frame + " level " + level);
+            stream.Destroy();
             compositor = new Kdu_region_compositor(file);
             compositor.Set_quality_limiting(limiter, -1, -1);
             boolean gray = info.channels() == 1;
@@ -111,6 +129,8 @@ public final class J2KNativeTest {
             return new Reference(width, height, out);
         } finally {
             if (compositor != null) compositor.Native_destroy();
+            if (stream.Exists()) stream.Destroy();
+            if (input != null) input.Native_destroy();
             limiter.Native_destroy();
             changed.Native_destroy();
             empty.Native_destroy();
@@ -126,12 +146,12 @@ public final class J2KNativeTest {
             source.xml(frame);
             source.palette(frame);
             J2KNative.Frame info = source.frame(frame);
-            int levels = info.width().length;
+            int levels = info.levels().length;
             check(levels > 0 && info.ready() == levels, "local frame not ready");
             for (int level = 0; level < levels; level++) {
                 Reference expected = reference(path, frame, info, level, access);
                 String where = path + " frame " + frame + " level " + level;
-                check(info.width()[level] == expected.width() && info.height()[level] == expected.height(),
+                check(info.levels()[level].width() == expected.width() && info.levels()[level].height() == expected.height(),
                         "geometry differs from Kakadu's compositor: " + where);
                 check(Arrays.equals(pixels(source, frame, level), expected.pixels()),
                         "pixels differ from Kakadu's compositor: " + where);
@@ -143,7 +163,7 @@ public final class J2KNativeTest {
         try (J2KNative source = new J2KNative(path)) {
             // Jobs outlive their source.
             J2KNative.Frame info = source.frame(0);
-            int level = info.width().length - 1, width = info.width()[level], height = info.height()[level];
+            int level = info.levels().length - 1, width = info.levels()[level].width(), height = info.levels()[level].height();
             byte[] expected = pixels(source, 0, level);
             try (J2KNative.Decode first = source.beginDecode(0, level);
                  J2KNative.Decode second = source.beginDecode(0, level);
@@ -179,8 +199,8 @@ public final class J2KNativeTest {
             try { source.exportFrame(0); throw new AssertionError("local frame exported"); }
             catch (IOException expected) { /* Expected. */ }
             J2KNative.Frame info = source.frame(0);
-            int level = info.width().length - 1, width = info.width()[level], height = info.height()[level];
-            try { source.beginDecode(0, info.width().length).close(); throw new AssertionError("level out of range accepted"); }
+            int level = info.levels().length - 1, width = info.levels()[level].width(), height = info.levels()[level].height();
+            try { source.beginDecode(0, info.levels().length).close(); throw new AssertionError("level out of range accepted"); }
             catch (IOException expected) { /* Expected. */ }
             try (J2KNative.Decode job = source.beginDecode(0, level)) {
                 ByteBuffer small = ByteBuffer.allocateDirect(1);
@@ -199,7 +219,7 @@ public final class J2KNativeTest {
         long before = bean == null ? 0 : bean.getOpenFileDescriptorCount();
         for (int i = 0; i < 200; i++) {
             try (J2KNative source = new J2KNative(image)) {
-                pixels(source, 0, source.frame(0).width().length - 1);
+                pixels(source, 0, source.frame(0).levels().length - 1);
             }
         }
         if (bean != null)
@@ -369,7 +389,7 @@ public final class J2KNativeTest {
         int levels;
         byte[][] expected;
         try (J2KNative local = new J2KNative(image)) {
-            levels = local.frame(0).width().length;
+            levels = local.frame(0).levels().length;
             expected = new byte[levels][];
             for (int level = 0; level < levels; level++)
                 expected[level] = pixels(local, 0, level);
@@ -381,7 +401,7 @@ public final class J2KNativeTest {
             check(source.response(body(responses.resolve("reduced-header.jpp")), 0).reason() == 2, "header response");
             check(source.frames() == 1, "frame count");
             J2KNative.Frame info = source.frame(0);
-            check(info.stream() == 0 && info.width().length == levels && info.ready() == 0, "frame with its header only");
+            check(info.stream() == 0 && info.levels().length == levels && info.ready() == 0, "frame with its header only");
             try { source.beginDecode(0, levels - 1).close(); throw new AssertionError("unready level decoded"); }
             catch (IOException expectedFailure) { check(expectedFailure.getMessage().contains("not ready"), expectedFailure.toString()); }
 

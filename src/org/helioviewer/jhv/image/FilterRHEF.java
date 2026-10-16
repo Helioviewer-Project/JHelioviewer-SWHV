@@ -2,8 +2,8 @@ package org.helioviewer.jhv.image;
 
 import java.util.Arrays;
 
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 // Radial Histogram Equalizing Filter (Gilly & DeForest 2024): rank-equalizes pixel
 // values within ~1-pixel-wide annuli centered on the Sun, flattening the radial
@@ -13,10 +13,10 @@ class FilterRHEF implements ImageFilter.Algorithm {
     // Annuli with fewer valid pixels are passed through unfiltered
     private static final int MIN_BIN_COUNT = 5;
 
-    private final SunCenteredRegion sunCenteredRegion;
+    private final ImageGeometry geometry;
 
-    FilterRHEF(SunCenteredRegion _sunCenteredRegion) {
-        sunCenteredRegion = _sunCenteredRegion;
+    FilterRHEF(ImageGeometry _geometry) {
+        geometry = _geometry;
     }
 
     @Override
@@ -24,21 +24,13 @@ class FilterRHEF implements ImageFilter.Algorithm {
         if (width < 1 || height < 1)
             return data;
 
-        // Buffer geometry in physical units; the region origin sits at the Sun center.
-        // With invalid region dimensions, assume the Sun at the image center with pixel units.
-        Region region = sunCenteredRegion.region();
-        double pixX, pixY, llx, lly;
-        if (!(region.width > 0) || !(region.height > 0)) {
-            pixX = 1;
-            pixY = 1;
-            llx = -.5 * width;
-            lly = -.5 * height;
-        } else {
-            pixX = region.width / width;
-            pixY = region.height / height;
-            llx = region.llx;
-            lly = region.lly;
-        }
+        // Without valid pixel sizes, assume the Sun at the image center with pixel units.
+        boolean valid = geometry.pixelSizeX > 0 && geometry.pixelSizeY > 0;
+        double pixX = valid ? geometry.pixelSizeX : 1;
+        double pixY = valid ? geometry.pixelSizeY : 1;
+        double sunX = valid ? geometry.sunPixel.x : .5 * width;
+        double sunY = valid ? geometry.sunPixel.y : .5 * height;
+        double llx = -sunX * pixX, lly = -sunY * pixY;
         double invBinWidth = 1 / Math.min(pixX, pixY); // ~1-pixel-wide annuli
 
         double dxMax = Math.max(Math.abs(llx), Math.abs(llx + width * pixX));

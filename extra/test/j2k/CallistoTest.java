@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
@@ -24,7 +25,6 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.source.J2KSource;
-import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -40,10 +40,10 @@ public final class CallistoTest {
             String xml = source.xml(0);
             if (xml == null || !xml.contains("STARTFRQ"))
                 throw new AssertionError("Expected a Callisto fixture");
-            ResolutionSet.Level size = source.level(0, 0);
+            ImageGrid size = source.level(0, 0);
             System.out.println("Callisto dimensions=" + size.width() + "x" + size.height());
             for (int level = 0; level <= 5; level++) {
-                ResolutionSet.Level reduced = source.level(0, level);
+                ImageGrid reduced = source.level(0, level);
                 byte[] full = source.decodeRegion(0, reduced.level(), 0, 0, reduced.width(), reduced.height());
                 if (full.length != reduced.width() * reduced.height())
                     throw new AssertionError("Expected indexed grayscale Callisto data");
@@ -67,7 +67,7 @@ public final class CallistoTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static void radioCache(Path file, J2KSource source, ResolutionSet.Level size) throws Exception {
+    private static void radioCache(Path file, J2KSource source, ImageGrid size) throws Exception {
         Platform.init();
         Directories.createPersistentDirs();
         Directories.createCacheDirs();
@@ -137,7 +137,7 @@ public final class CallistoTest {
                     int sample = initialPixels[0] & 0xff;
                     if (after.getRaster() != before.getRaster() || after.getRGB(0, 0) != (0xff000000 | sample << 16 | sample << 8 | sample))
                         throw new AssertionError("Eviction or LUT change lost the displayed scalar raster");
-                    ResolutionSet.Level coarse = source.level(0, 5);
+                    ImageGrid coarse = source.level(0, 5);
                     RadioJ2KData.Crop coarseCrop = RadioJ2KData.levelCrop(0, size.width(), size.width(), coarse);
                     owner.putDecoded(data[0], coarseCrop, source.decodeRegion(0, 5, 0, 0, coarseCrop.width(), coarseCrop.height()));
                     data[0].requestData(new TimeAxis(date, date + TimeUtils.DAY_IN_MILLIS));
@@ -166,7 +166,7 @@ public final class CallistoTest {
         requestedDays(date);
     }
 
-    private static void checkDrawing(RadioJ2KData data, long date, RadioJ2KData.Crop crop, ResolutionSet.Level full) throws Exception {
+    private static void checkDrawing(RadioJ2KData data, long date, RadioJ2KData.Crop crop, ImageGrid full) throws Exception {
         double low = (double) field(data, "endFreq"), high = (double) field(data, "startFreq");
         double span = high - low;
         TimeAxis.Mapper x = new TimeAxis(date - TimeUtils.DAY_IN_MILLIS / 2, date + 3 * TimeUtils.DAY_IN_MILLIS / 2).mapper(20, 400);
@@ -226,7 +226,7 @@ public final class CallistoTest {
         System.out.println("PASS: visible radio days and neighbours only, midnight boundary, pan pruning and download cancellation");
     }
 
-    private static void compare(byte[] full, ResolutionSet.Level reduced, byte[] cropped, RadioJ2KData.Crop crop) {
+    private static void compare(byte[] full, ImageGrid reduced, byte[] cropped, RadioJ2KData.Crop crop) {
         int x = crop.x(), width = crop.width(), height = crop.height(), fullWidth = reduced.width();
         if (width <= 0 || x < 0 || x + width > fullWidth || height != reduced.height() || cropped.length != width * height)
             throw new AssertionError("Crop outside full image: " + crop);

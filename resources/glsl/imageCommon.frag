@@ -20,8 +20,9 @@ out vec4 outColor;
 in vec2 normalizedScreenpos;
 
 struct Image {
-    vec4 rect;
-    vec4 planeToImage; // row-major 2x2 matrix
+    vec4 sourceX; // affine WCS-plane -> original normalized pixels; w is padding
+    vec4 sourceY;
+    vec4 sampling; // original -> decoded normalized pixels: xy scale, zw offset
     vec2 crval;
     float planeUnitsPerRadian;
     float projectionCode;
@@ -105,6 +106,8 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     if (texture(mask, texcoord).r == 0.)
         discard;
 
+    vec2 imageCoord = texcoord * images[0].sampling.xy + images[0].sampling.zw;
+    vec2 diffImageCoord = difftexcoord * images[1].sampling.xy + images[1].sampling.zw;
     vec2 brightness = display.brightness;
     if (display.enhanced != 0. && factor != 1.)
         brightness.y *= pow(factor, display.enhanced);
@@ -112,9 +115,9 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     float value;
     bool diffMode = display.isDiff != NODIFFERENCE;
     if (!diffMode) {
-        value = fetch(image, texcoord, brightness);
+        value = fetch(image, imageCoord, brightness);
     } else {
-        value = fetch(image, texcoord, brightness) - fetch(diffImage, difftexcoord, brightness);
+        value = fetch(image, imageCoord, brightness) - fetch(diffImage, diffImageCoord, brightness);
         value = value * BOOST + 0.5;
     }
 
@@ -125,12 +128,13 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
         if (!diffMode) {
             for (int i = 0; i < BLUR_TAP_COUNT; i++) {
                 vec2 offset = blurOffset[i] * sharpenStep;
-                blurredValue += fetch(image, texcoord + offset, brightness) * blurKernel[i];
+                blurredValue += fetch(image, imageCoord + offset, brightness) * blurKernel[i];
             }
         } else {
+            vec2 diffScale = images[1].sampling.xy / images[0].sampling.xy;
             for (int i = 0; i < BLUR_TAP_COUNT; i++) {
                 vec2 offset = blurOffset[i] * sharpenStep;
-                blurredValue += (fetch(image, texcoord + offset, brightness) - fetch(diffImage, difftexcoord + offset, brightness)) * blurKernel[i];
+                blurredValue += (fetch(image, imageCoord + offset, brightness) - fetch(diffImage, diffImageCoord + offset * diffScale, brightness)) * blurKernel[i];
             }
             blurredValue = blurredValue * BOOST + 0.5;
         }
@@ -194,12 +198,6 @@ vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
 
 vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
-}
-
-vec2 transform_plane_to_image(const vec4 transform, const vec2 vec) {
-    return vec2(
-        transform.x * vec.x + transform.y * vec.y,
-        transform.z * vec.x + transform.w * vec.y);
 }
 
 // Differential solar rotation.
@@ -343,9 +341,8 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const Image im
 }
 
 vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const Image img) {
-    vec2 centered = transform_plane_to_image(img.planeToImage, plane);
-    vec4 rect = img.rect;
-    return rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    vec3 p = vec3(plane, 1.);
+    return vec2(dot(img.sourceX.xyz, p), dot(img.sourceY.xyz, p));
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const Image img) {

@@ -5,8 +5,8 @@
 #include <mutex>
 
 static_assert(sizeof(size_t) == sizeof(uint64_t), "JHV supports 64-bit native hosts");
-static_assert(sizeof(jhv_j2k_frame_info) == 288 && offsetof(jhv_j2k_frame_info, width) == 20 &&
-              offsetof(jhv_j2k_frame_info, height) == 152, "FFM frame layout");
+static_assert(sizeof(jhv_j2k_frame_info) == 296 && offsetof(jhv_j2k_frame_info, width) == 20 &&
+              offsetof(jhv_j2k_frame_info, x) == 284, "FFM frame layout");
 
 struct jhv_j2k { std::shared_ptr<jhv_j2k_source> source; };
 struct jhv_j2k_job {
@@ -126,6 +126,8 @@ int jhv_j2k_frame(jhv_j2k *source, int frame, jhv_j2k_frame_info *info, char *er
         info->channels = geometry.channels == 1 ? 1 : 4;
         info->levels = geometry.resolutions;
         info->ready = view.source.complete;
+        info->x = geometry.level[0].x;
+        info->y = geometry.level[0].y;
         for (int l = 0; l < info->levels; l++) {
             info->width[l] = geometry.level[l].width;
             info->height[l] = geometry.level[l].height;

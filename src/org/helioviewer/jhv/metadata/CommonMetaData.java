@@ -6,26 +6,17 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.math.Mat2;
-import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 class CommonMetaData implements MetaData {
 
-    private static final double DEFAULT_UNIT_PER_ARCSEC = Sun.Radius / (Math.toDegrees(Math.atan2(Sun.Radius, Sun.MeanEarthDistance)) * 3600);
-
-    protected Region region = Region.DEFAULT;
+    protected ImageGeometry geometry = new ImageGeometry(1, 1, 1);
     protected String displayName = "unknown";
     protected URI sourceUri = MetaData.UNKNOWN_SOURCE_URI;
     protected DetectorMask detectorMask = DetectorMask.NONE;
 
     protected boolean calculateDepth;
 
-    protected double unitPerPixelX = 1;
-    protected double unitPerPixelY = 1;
-    protected double unitPerArcsec = DEFAULT_UNIT_PER_ARCSEC;
-    protected double sunShiftX = 0;
-    protected double sunShiftY = 0;
     protected float responseFactor = 1;
 
     protected Position viewpoint = Sun.StartEarth;
@@ -35,7 +26,6 @@ class CommonMetaData implements MetaData {
     protected float sector0 = 0;
     protected float sector1 = 0;
 
-    protected WcsHeader wcsHeader = new WcsHeader(WcsHeader.Projection.TAN, new float[6], (float) Sun.MeanEarthDistance, Vec2.ZERO, Mat2.IDENTITY);
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
@@ -55,18 +45,8 @@ class CommonMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Region getPhysicalRegion() {
-        return region;
-    }
-
-    @Override
-    public double getUnitPerPixelY() {
-        return unitPerPixelY;
-    }
-
-    @Override
-    public double getUnitPerArcsec() {
-        return unitPerArcsec;
+    public ImageGeometry getGeometry() {
+        return geometry;
     }
 
     @Override
@@ -105,12 +85,6 @@ class CommonMetaData implements MetaData {
         return cutOffY;
     }
 
-    @Nonnull
-    @Override
-    public WcsHeader getWcsHeader() {
-        return wcsHeader;
-    }
-
     @Override
     public float getSector0() {
         return sector0;
@@ -119,18 +93,6 @@ class CommonMetaData implements MetaData {
     @Override
     public float getSector1() {
         return sector1;
-    }
-
-    @Nonnull
-    @Override
-    public Region imageToRegion(int width, int height) {
-        return new Region(region.llx, region.lly, width * unitPerPixelX, height * unitPerPixelY);
-    }
-
-    @Nonnull
-    @Override
-    public Vec2 getSunShift() {
-        return new Vec2(sunShiftX, sunShiftY);
     }
 
     @Override

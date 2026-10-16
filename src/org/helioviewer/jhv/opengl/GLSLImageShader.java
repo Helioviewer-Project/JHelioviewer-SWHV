@@ -3,9 +3,11 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.metadata.Region;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public final class GLSLImageShader extends GLSLScreenShader {
@@ -64,25 +66,46 @@ public final class GLSLImageShader extends GLSLScreenShader {
     }
 
     public static void bindImages(
-            Region r0, Mat2 planeToImage0, float[] crval0, WcsHeader wcs0,
+            ImageGeometry image0, float[] crval0,
             float observerDistance0, float deltaT0, Quat cameraDiff0, Quat sourceView0,
-            Region r1, Mat2 planeToImage1, float[] crval1, WcsHeader wcs1,
-            float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1) {
+            ImageGeometry image1, float[] crval1,
+            float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1, Mat2 adjustment) {
         FloatBuffer values = imageBuffer.begin();
-        putImage(values, r0, planeToImage0, crval0, wcs0, observerDistance0, deltaT0, cameraDiff0, sourceView0);
-        putImage(values, r1, planeToImage1, crval1, wcs1, observerDistance1, deltaT1, cameraDiff1, sourceView1);
+        putImage(values, image0, crval0, observerDistance0, deltaT0, cameraDiff0, sourceView0, adjustment);
+        putImage(values, image1, crval1, observerDistance1, deltaT1, cameraDiff1, sourceView1, adjustment);
 
         imageBuffer.uploadIfChanged();
     }
 
-    private static void putImage(FloatBuffer values, Region r, Mat2 planeToImage, float[] crval, WcsHeader wcs,
-                                 float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView) {
-        values.put(r.glslArray);
-        planeToImage.setFloatBuffer(values);
+    private static void putImage(FloatBuffer values, ImageGeometry image, float[] crval,
+                                 float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView, Mat2 adjustment) {
+        putTransform(values, image.original.planeToTexture, image.original.referenceTexture, adjustment);
+        ImageGrid grid = image.grid;
+        double step = grid.step();
+        // Original normalized pixels -> decoded normalized pixels: scale, then offset.
+        values.put((float) (image.original.grid.width() / (step * grid.width())));
+        values.put((float) (image.original.grid.height() / (step * grid.height())));
+        values.put((float) ((.5 - grid.firstX() / step) / grid.width()));
+        values.put((float) ((.5 - grid.firstY() / step) / grid.height()));
+        WcsHeader wcs = image.wcs;
         values.put(crval).put((float) wcs.unitsPerRad).put(wcs.projection.ordinal());
         values.put((float) wcs.zpnUpperEta).put(observerDistance).put(deltaT).put(0);
         cameraDiff.setFloatBuffer(values);
         sourceView.setFloatBuffer(values);
+    }
+
+    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, Mat2 adjustment) {
+        if (adjustment == Mat2.IDENTITY) {
+            values.put((float) matrix.m00).put((float) matrix.m01).put((float) reference.x).put(0);
+            values.put((float) matrix.m10).put((float) matrix.m11).put((float) reference.y).put(0);
+        } else {
+            values.put((float) (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10));
+            values.put((float) (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11));
+            values.put((float) reference.x).put(0);
+            values.put((float) (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10));
+            values.put((float) (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11));
+            values.put((float) reference.y).put(0);
+        }
     }
 
     static void bindDisplay(float[] color,

@@ -10,19 +10,6 @@ public final class WcsProjection {
 
     private static final int ZPN_BISECTION_STEPS = 50;
 
-    public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
-        Vec2 plane = wcsHeader.imageToPlane.transform(x, y);
-        return inverseWcsPlaneToHelioprojective(wcsHeader, plane.x, plane.y);
-    }
-
-    @Nullable
-    public static Vec2 helioprojectiveToPlane(WcsHeader wcsHeader, double longitude, double latitude) {
-        Vec2 plane = helioprojectiveToWcsPlane(wcsHeader, longitude, latitude);
-        if (plane == null)
-            return null;
-        return wcsHeader.planeToImage.transform(plane.x, plane.y);
-    }
-
     public static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
         Vec3 ray = helioprojectiveRay(longitude, latitude);
 
@@ -58,7 +45,7 @@ public final class WcsProjection {
         return new Vec3(sign * Math.sin(longitude) * cosLat, sign * Math.sin(latitude), -sign * cosLon * cosLat);
     }
 
-    private static Vec2 inverseWcsPlaneToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
+    public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
         if (wcsHeader.projection == WcsHeader.Projection.ARC)
             return inverseArcToHelioprojective(wcsHeader, planeX, planeY);
         if (wcsHeader.projection == WcsHeader.Projection.AZP)
@@ -69,7 +56,7 @@ public final class WcsProjection {
     }
 
     @Nullable
-    private static Vec2 helioprojectiveToWcsPlane(WcsHeader wcsHeader, double longitude, double latitude) {
+    public static Vec2 helioprojectiveToPlane(WcsHeader wcsHeader, double longitude, double latitude) {
         double dphi = longitude - wcsHeader.phi0;
         double sinLat = Math.sin(latitude);
         double cosLat = Math.cos(latitude);

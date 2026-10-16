@@ -3,9 +3,8 @@ package org.helioviewer.jhv.image;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 //import com.google.common.base.Stopwatch;
 
@@ -38,12 +37,12 @@ public class ImageFilter {
         algorithm = _algorithm;
     }
 
-    public static ImageFilter of(Type type, Region imageRegion, MetaData metaData) {
+    public static ImageFilter of(Type type, ImageGeometry geometry) {
         return switch (type) {
             case None -> NONE;
             case MGN -> MGN;
             case WOW -> WOW;
-            case RHEF -> new ImageFilter(new FilterRHEF(SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift())));
+            case RHEF -> new ImageFilter(new FilterRHEF(geometry));
         };
     }
 

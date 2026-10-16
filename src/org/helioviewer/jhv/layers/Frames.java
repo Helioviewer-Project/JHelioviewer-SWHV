@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBufferCache;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -21,11 +22,21 @@ import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 // The timeline of an image layer: frames sorted by time, each from a source or empty. EDT only.
 public final class Frames implements Source.Listener {
 
-    public record Frame(JHVTime time, MetaData metaData, String xml, @Nullable Source source, int index) {}
+    public record Frame(JHVTime time, MetaData metaData, String xml, @Nullable Source source, int index) {
+        // The frame's footprint is independent of the selected decode level.
+        ImageGeometry geometry() {
+            ImageGeometry declared = metaData.getGeometry();
+            if (source == null)
+                return declared;
+            ImageGrid full = source.levels(index).getLevel(0);
+            return declared.withSize(full.width(), full.height());
+        }
+    }
 
     public interface Listener {
         // On the EDT, after the source reported its frame ready.

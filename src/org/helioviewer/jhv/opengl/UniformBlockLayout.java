@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 enum UniformBlockLayout {
-    IMAGE("ImageBlock", 0, 48),
+    IMAGE("ImageBlock", 0, 56),
     SCREEN("ScreenBlock", 1, 24),
     DISPLAY("DisplayBlock", 2, 28),
     LINE("LineBlock", 3, 24),

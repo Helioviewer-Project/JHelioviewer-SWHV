@@ -5,8 +5,7 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 public interface MetaData {
 
@@ -19,16 +18,9 @@ public interface MetaData {
     URI getSourceUri();
 
     @Nonnull
-    Region getPhysicalRegion();
-
-    double getUnitPerPixelY();
-
-    double getUnitPerArcsec();
+    ImageGeometry getGeometry();
 
     float getResponseFactor();
-
-    @Nonnull
-    WcsHeader getWcsHeader();
 
     float getSector0();
 
@@ -46,12 +38,6 @@ public interface MetaData {
 
     @Nonnull
     Position getViewpoint();
-
-    @Nonnull
-    Region imageToRegion(int width, int height);
-
-    @Nonnull
-    Vec2 getSunShift();
 
     boolean getCalculateDepth();
 

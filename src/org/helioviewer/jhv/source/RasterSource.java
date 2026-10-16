@@ -22,6 +22,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
@@ -44,7 +45,7 @@ public final class RasterSource implements Source {
         file = _file;
         Info info = withReader(file, reader -> readInfo(file, reader));
         xml = info.xml();
-        levels = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, info.width(), info.height())}, 1);
+        levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, info.width(), info.height())}, 1);
         lut = info.lut();
     }
 

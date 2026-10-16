@@ -17,6 +17,7 @@ import java.util.zip.CRC32;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 
 import nom.tam.fits.FitsFactory;
@@ -94,10 +95,10 @@ public final class FITSLoadBenchmark {
 
     private static Result load(File file, Options options, ImageProcessingSettings.FITSParameters state, ClipSet.Range clipRange) throws Exception {
         if (options.mode() == Mode.Info) {
-            ResolutionSet.Level size = new FITSSource(file).levels(0).getLevel(0);
+            ImageGrid size = new FITSSource(file).levels(0).getLevel(0);
             return new Result(size.width(), size.height(), null, "");
         }
-        ImageBuffer buffer = new FITSSource(file).decode(0, 0, ImageFilter.of(options.filter(), null, null), state, clipRange);
+        ImageBuffer buffer = new FITSSource(file).decode(0, 0, ImageFilter.of(options.filter(), null), state, clipRange);
         return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 

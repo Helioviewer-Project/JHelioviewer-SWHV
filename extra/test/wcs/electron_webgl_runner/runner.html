@@ -88,17 +88,12 @@ function setUniformInt(gl, program, name, value) {
 
 const uniformBlockLayouts = {
   ImageBlock: {
-    byteLength: 192,
-    offsets: {
-      "images[0].rect": 0, "images[0].planeToImage": 16, "images[0].crval": 32,
-      "images[0].planeUnitsPerRadian": 40, "images[0].projectionCode": 44,
-      "images[0].zpnUpperEta": 48, "images[0].observerDistance": 52, "images[0].deltaT": 56,
-      "images[0].cameraDiff": 64, "images[0].sourceViewQuat": 80,
-      "images[1].rect": 96, "images[1].planeToImage": 112, "images[1].crval": 128,
-      "images[1].planeUnitsPerRadian": 136, "images[1].projectionCode": 140,
-      "images[1].zpnUpperEta": 144, "images[1].observerDistance": 148, "images[1].deltaT": 152,
-      "images[1].cameraDiff": 160, "images[1].sourceViewQuat": 176,
-    },
+    byteLength: 224,
+    offsets: Object.fromEntries([0, 1].flatMap(i => Object.entries({
+      sourceX: 0, sourceY: 16, sampling: 32, crval: 48,
+      planeUnitsPerRadian: 56, projectionCode: 60, zpnUpperEta: 64,
+      observerDistance: 68, deltaT: 72, cameraDiff: 80, sourceViewQuat: 96,
+    }).map(([field, offset]) => [`images[${i}].${field}`, i * 112 + offset]))),
   },
   ScreenBlock: {
     byteLength: 96,
@@ -158,25 +153,32 @@ function putVec4(block, offset, values) {
 
 function imageBlock(job) {
   const secondary = job.secondary || job;
-  const block = new Float32Array(48);
+  const block = new Float32Array(56);
   putImage(block, 0, job);
-  putImage(block, 24, secondary);
+  putImage(block, 28, secondary);
   return block;
 }
 
 function putImage(block, offset, image) {
-  putVec4(block, offset, image.rect);
-  putVec4(block, offset + 4, image.planeToImage);
-  block[offset + 8] = image.crval[0];
-  block[offset + 9] = image.crval[1];
-  block[offset + 10] = image.planeUnitsPerRadian;
-  block[offset + 11] = image.projectionCode;
-  block[offset + 12] = image.zpnUpperEta;
-  block[offset + 13] = image.observerDistance;
-  block[offset + 14] = image.deltaT || 0;
-  block[offset + 15] = 0;
-  putVec4(block, offset + 16, image.cameraDiff || [0, 0, 0, 1]);
-  putVec4(block, offset + 20, image.sourceViewQuat || [0, 0, 0, 1]);
+  // Independent reference metadata still provides the old physical rectangle and
+  // normalized inverse. Compose those into the production pixel mapping here.
+  const [x, y, sx, sy] = image.rect;
+  const [a, b, c, d] = image.planeToImage;
+  const rowX = [a * sx, b * sx, -x * sx, 0];
+  const rowY = [-c * sy, -d * sy, -y * sy, 0];
+  putVec4(block, offset, rowX);
+  putVec4(block, offset + 4, rowY);
+  putVec4(block, offset + 8, [1, 1, 0, 0]); // These reference jobs use full-resolution textures.
+  block[offset + 12] = image.crval[0];
+  block[offset + 13] = image.crval[1];
+  block[offset + 14] = image.planeUnitsPerRadian;
+  block[offset + 15] = image.projectionCode;
+  block[offset + 16] = image.zpnUpperEta;
+  block[offset + 17] = image.observerDistance;
+  block[offset + 18] = image.deltaT || 0;
+  block[offset + 19] = 0;
+  putVec4(block, offset + 20, image.cameraDiff || [0, 0, 0, 1]);
+  putVec4(block, offset + 24, image.sourceViewQuat || [0, 0, 0, 1]);
 }
 
 function screenBlock(job) {
@@ -586,7 +588,7 @@ function diagnosticFragment(job, commonSource) {
       throw new Error("Production getColor signature not found");
     const source = commonSource.replace(signature,
         "vec4 getColor(vec2 uv, vec2 diffUV, float factor);\nvec4 unusedGetColor(");
-    const output = job.difference ? "vec4(uv, diffUV)" : "vec4(uv, texture(image, uv).r, 1.)";
+    const output = job.difference ? "vec4(uv, diffUV)" : "vec4(uv, texture(image, uv * images[0].sampling.xy + images[0].sampling.zw).r, 1.)";
     return productionFragment(job, `${source}\nvec4 getColor(vec2 uv, vec2 diffUV, float factor) {
       if (texture(mask, uv).r == 0.) discard;
       return ${output};

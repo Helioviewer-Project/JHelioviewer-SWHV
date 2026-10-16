@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import java.nio.FloatBuffer;
-
 public final class Mat2 {
 
     public static final Mat2 IDENTITY = new Mat2(1, 0, 0, 1);
@@ -24,14 +22,6 @@ public final class Mat2 {
         return new Mat2(c, -s, s, c);
     }
 
-    public static Mat2 multiply(Mat2 a, Mat2 b) {
-        return new Mat2(
-                a.m00 * b.m00 + a.m01 * b.m10,
-                a.m00 * b.m01 + a.m01 * b.m11,
-                a.m10 * b.m00 + a.m11 * b.m10,
-                a.m10 * b.m01 + a.m11 * b.m11);
-    }
-
     public Mat2 inverse() {
         double determinant = m00 * m11 - m01 * m10;
         if (!Double.isFinite(determinant) || determinant == 0)
@@ -43,7 +33,4 @@ public final class Mat2 {
         return new Vec2(m00 * x + m01 * y, m10 * x + m11 * y);
     }
 
-    public void setFloatBuffer(FloatBuffer buf) {
-        buf.put((float) m00).put((float) m01).put((float) m10).put((float) m11);
-    }
 }

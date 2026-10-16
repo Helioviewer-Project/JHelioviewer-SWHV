@@ -46,6 +46,7 @@ EOF
 
 classpath=lib:$(find lib extra/test/j2k/lib -name '*.jar' | tr '\n' ':')
 javac -nowarn -cp "$classpath" -d "$test/classes" \
+    src/org/helioviewer/jhv/image/ImageGrid.java \
     src/org/helioviewer/jhv/source/J2KNative.java extra/test/j2k/J2KNativeTest.java
 python3 - "$classpath$test/classes" "$kdu" "$library" "$test" "$image" "$@" <<'EOF'
 import os, subprocess, sys

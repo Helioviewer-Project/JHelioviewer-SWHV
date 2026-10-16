@@ -10,11 +10,10 @@ import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
-import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.thread.UiThread;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 // Decodes a layer's current frame on a worker and delivers it on the EDT. EDT only.
 final class FrameDecoder {
@@ -120,8 +119,8 @@ final class FrameDecoder {
     // The coarsest level not smaller than the display needs.
     static int level(Frames.Frame frame, double pixFactor) {
         MetaData m = frame.metaData();
-        int reqWidth = (int) (m.getPhysicalRegion().width * pixFactor + .5);
-        int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
+        int reqWidth = (int) (m.getGeometry().bounds.width * pixFactor + .5);
+        int reqHeight = (int) (m.getGeometry().bounds.height * pixFactor + .5);
         return frame.source().levels(frame.index()).getNextLevel(reqWidth, reqHeight).level();
     }
 
@@ -146,11 +145,9 @@ final class FrameDecoder {
 
     // Runs on the decode worker; the decoder owns solar geometry and image filtering.
     private static DecodedImage decodeImage(Source source, Frames.Frame frame, Key key) throws Exception {
-        MetaData m = frame.metaData();
-        ResolutionSet.Level full = source.levels(frame.index()).getLevel(0);
-        Region region = m.imageToRegion(full.width(), full.height());
-        ImageFilter filter = ImageFilter.of(key.filter, region, m);
-        return new DecodedImage(source.decode(frame.index(), key.level, filter, key.fits, key.clip), region);
+        ImageGeometry geometry = frame.geometry().forGrid(source.levels(frame.index()).getLevel(key.level));
+        ImageFilter filter = ImageFilter.of(key.filter, geometry);
+        return new DecodedImage(source.decode(frame.index(), key.level, filter, key.fits, key.clip), geometry);
     }
 
 }

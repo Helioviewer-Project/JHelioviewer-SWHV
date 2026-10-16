@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
 
@@ -35,7 +36,7 @@ public final class FITSSource implements Source {
         file = _file;
         FITSData data = readData(file);
         xml = getHeaderAsXML(data.header());
-        levels = new ResolutionSet(new ResolutionSet.Level[]{new ResolutionSet.Level(0, data.width(), data.height())}, 1);
+        levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, data.width(), data.height())}, 1);
         clipSet = data.calculateClipSet();
     }
 

@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 public class BasicMetaData extends CommonMetaData {
 
@@ -16,9 +17,7 @@ public class BasicMetaData extends CommonMetaData {
 
     public BasicMetaData(int pixelW, int pixelH, String _displayName, @Nonnull URI _sourceUri) {
         double unitPerPixel = Sun.Radius / Math.max(pixelW, pixelH);
-        unitPerPixelX = unitPerPixel;
-        unitPerPixelY = unitPerPixel;
-        region = new Region(-0.5 * pixelW * unitPerPixel, -0.5 * pixelH * unitPerPixel, pixelW * unitPerPixel, pixelH * unitPerPixel);
+        geometry = new ImageGeometry(pixelW, pixelH, unitPerPixel);
 
         displayName = _displayName;
         sourceUri = _sourceUri;

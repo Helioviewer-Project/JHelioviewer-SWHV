@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.image.ImageGrid;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
@@ -28,7 +29,6 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.source.FITSSource;
 import org.helioviewer.jhv.source.J2KSource;
 import org.helioviewer.jhv.source.RasterSource;
-import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
@@ -256,7 +256,7 @@ final class ImageLayerLoader {
                 if (count > 1)
                     throw new Exception("Frame " + i + " has no usable Helioviewer metadata: " + e.getMessage(), e);
                 xml = Frames.EMPTY_METAXML;
-                ResolutionSet.Level level = source.levels(0).getLevel(0);
+                ImageGrid level = source.levels(0).getLevel(0);
                 m = new BasicMetaData(level.width(), level.height(), dataUri.baseName(), dataUri.sourceUri());
                 Log.warn("Helioviewer metadata missing for " + dataUri.baseName() + " frame " + i, e);
             }

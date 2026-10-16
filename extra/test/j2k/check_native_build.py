@@ -78,6 +78,7 @@ def main():
         palette_fixtures(Path(directory))
         subprocess.run([
             "javac", "--release", "25", "-nowarn", "-cp", classpath, "-d", directory,
+            str(root / "src/org/helioviewer/jhv/image/ImageGrid.java"),
             str(root / "src/org/helioviewer/jhv/source/J2KNative.java"),
             str(root / "extra/test/j2k/J2KNativeTest.java"),
         ], check=True, timeout=60)
