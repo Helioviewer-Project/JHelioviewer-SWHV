@@ -10,19 +10,13 @@ public final class ImageBounds {
         ImageGeometry geometry = metaData.getGeometry();
         Region region = geometry.bounds;
         if (!geometry.wcs.projection.isSurfaceMap()) {
-            double x0 = 0, x1 = geometry.grid.width();
-            double y0 = 0, y1 = geometry.grid.height();
-            double xm = 0.5 * (x0 + x1);
-            double ym = 0.5 * (y0 + y1);
             double distance = metaData.getViewpoint().distance;
-            double radius = radialBound(geometry, distance, x0, y0);
-            radius = Math.max(radius, radialBound(geometry, distance, x1, y0));
-            radius = Math.max(radius, radialBound(geometry, distance, x0, y1));
-            radius = Math.max(radius, radialBound(geometry, distance, x1, y1));
-            radius = Math.max(radius, radialBound(geometry, distance, xm, y0));
-            radius = Math.max(radius, radialBound(geometry, distance, xm, y1));
-            radius = Math.max(radius, radialBound(geometry, distance, x0, ym));
-            radius = Math.max(radius, radialBound(geometry, distance, x1, ym));
+            double radius = 0;
+            for (Vec2 helioprojective : boundary(geometry)) {
+                Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
+                if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
+                    radius = Math.max(radius, Math.hypot(hpcPlane.x, hpcPlane.y));
+            }
             if (radius > 0)
                 return radius;
         }
@@ -39,51 +33,34 @@ public final class ImageBounds {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
-    private static double radialBound(ImageGeometry geometry, double distance, double x, double y) {
-        Vec2 plane = geometry.toPlane(x, y);
-        Vec2 helioprojective = WcsProjection.planeToHelioprojective(geometry.wcs, plane.x, plane.y);
-        Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
-        if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
-            return Math.hypot(hpcPlane.x, hpcPlane.y);
-        return 0;
-    }
-
     public static Region hpc(MetaData metaData) {
-        ImageGeometry geometry = metaData.getGeometry();
-        double x0 = 0, x1 = geometry.grid.width();
-        double y0 = 0, y1 = geometry.grid.height();
-        double xm = 0.5 * (x0 + x1);
-        double ym = 0.5 * (y0 + y1);
-        double[] bounds = {
-                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY
-        };
-        updateHpcBounds(bounds, geometry, x0, y0);
-        updateHpcBounds(bounds, geometry, x1, y0);
-        updateHpcBounds(bounds, geometry, x0, y1);
-        updateHpcBounds(bounds, geometry, x1, y1);
-        updateHpcBounds(bounds, geometry, xm, y0);
-        updateHpcBounds(bounds, geometry, xm, y1);
-        updateHpcBounds(bounds, geometry, x0, ym);
-        updateHpcBounds(bounds, geometry, x1, ym);
-        return regionFromBounds(bounds);
+        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
+        for (Vec2 helioprojective : boundary(metaData.getGeometry())) {
+            double x = Math.toDegrees(helioprojective.x);
+            double y = Math.toDegrees(helioprojective.y);
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
-    private static void updateHpcBounds(double[] bounds, ImageGeometry geometry, double x, double y) {
-        Vec2 plane = geometry.toPlane(x, y);
-        Vec2 helioprojective = WcsProjection.planeToHelioprojective(geometry.wcs, plane.x, plane.y);
-        double hpcX = Math.toDegrees(helioprojective.x);
-        double hpcY = Math.toDegrees(helioprojective.y);
-        bounds[0] = Math.min(bounds[0], hpcX);
-        bounds[1] = Math.max(bounds[1], hpcX);
-        bounds[2] = Math.min(bounds[2], hpcY);
-        bounds[3] = Math.max(bounds[3], hpcY);
-    }
-
-    private static Region regionFromBounds(double[] bounds) {
-        return new Region(bounds[0], bounds[2],
-                Math.max(Math.nextUp(0.0), bounds[1] - bounds[0]),
-                Math.max(Math.nextUp(0.0), bounds[3] - bounds[2]));
+    // Helioprojective angles of the image corners and edge midpoints.
+    private static Vec2[] boundary(ImageGeometry geometry) {
+        double width = geometry.grid.width(), height = geometry.grid.height();
+        Vec2[] points = new Vec2[8];
+        int n = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (i == 1 && j == 1)
+                    continue;
+                Vec2 plane = geometry.toPlane(.5 * i * width, .5 * j * height);
+                points[n++] = WcsProjection.planeToHelioprojective(geometry.wcs, plane.x, plane.y);
+            }
+        }
+        return points;
     }
 
     private ImageBounds() {}
