@@ -1286,24 +1286,24 @@ def screenToHelioprojective(scrpos: tuple[float, float], bounds_deg: tuple[float
 
 def helioprojectiveToWorld(helioprojective: tuple[float, float], observer_distance: float) -> tuple[bool, tuple[float, float, float]]:
     ray = helioprojective_to_observer_ray(helioprojective)
+    a = sum(component * component for component in ray)
     b = observer_distance * ray[2]
-    c = observer_distance * observer_distance - 1.0
-    discriminant = b * b - c
+    impact_x = observer_distance * ray[0]
+    impact_y = observer_distance * ray[1]
+    discriminant = a - (impact_x * impact_x + impact_y * impact_y)
     if discriminant < 0.0:
         return False, (0.0, 0.0, 0.0)
 
     root = math.sqrt(discriminant)
-    t_near = -b - root
-    t_far = -b + root
-    t = t_near if t_near > 0.0 else t_far
+    signed_root = -root if -b - root > 0.0 else root
+    t = (-b + signed_root) / a
     if t <= 0.0:
         return False, (0.0, 0.0, 0.0)
 
-    observer = (0.0, 0.0, observer_distance)
     world = (
-        observer[0] + t * ray[0],
-        observer[1] + t * ray[1],
-        observer[2] + t * ray[2],
+        t * ray[0],
+        t * ray[1],
+        (impact_x * ray[0] + impact_y * ray[1] + signed_root * ray[2]) / a,
     )
     return True, world
 
@@ -1379,10 +1379,16 @@ def sampleHpcTexcoord(
     meta: JHVMeta,
     image2d: np.ndarray,
     delta_t: float = 0.0,
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
 ) -> tuple[tuple[float, float], float]:
     enhancement_factor = 1.0
     hp = helioprojective
     hit, world = helioprojectiveToWorld(hp, meta.observer_distance)
+    if meta.projection in ("CAR", "CEA"):
+        if not hit:
+            return (math.nan, math.nan), enhancement_factor
+        world = rotate_vector_inverse(source_view_quat, world)
+        return sampleOrthoTexcoord(world, meta, image2d), enhancement_factor
     if hit:
         if delta_t != 0.0:
             world = differential(delta_t, world)
@@ -1491,23 +1497,24 @@ def helioprojectiveToObserverRayFloat32(helioprojective: tuple[float, float]) ->
 def helioprojectiveToWorldFloat32(helioprojective: tuple[float, float], observer_distance: float) -> tuple[bool, tuple[float, float, float]]:
     ray = helioprojectiveToObserverRayFloat32(helioprojective)
     observer_distance = f32(observer_distance)
+    a = f32(f32(f32(ray[0] * ray[0]) + f32(ray[1] * ray[1])) + f32(ray[2] * ray[2]))
     b = f32(observer_distance * ray[2])
-    c = f32(f32(observer_distance * observer_distance) - 1.0)
-    discriminant = f32(f32(b * b) - c)
+    impact_x = f32(observer_distance * ray[0])
+    impact_y = f32(observer_distance * ray[1])
+    discriminant = f32(a - f32(f32(impact_x * impact_x) + f32(impact_y * impact_y)))
     if discriminant < 0.0:
         return False, (0.0, 0.0, 0.0)
 
     root = sqrt32(discriminant)
-    t_near = f32(-b - root)
-    t_far = f32(-b + root)
-    t = t_near if t_near > 0.0 else t_far
+    signed_root = -root if f32(-b - root) > 0.0 else root
+    t = f32(f32(-b + signed_root) / a)
     if t <= 0.0:
         return False, (0.0, 0.0, 0.0)
 
     return True, (
         f32(t * ray[0]),
         f32(t * ray[1]),
-        f32(observer_distance + f32(t * ray[2])),
+        f32(f32(f32(f32(impact_x * ray[0]) + f32(impact_y * ray[1])) + f32(signed_root * ray[2])) / a),
     )
 
 

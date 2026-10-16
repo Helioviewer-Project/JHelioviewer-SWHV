@@ -583,7 +583,7 @@ def cpu_texcoord_for_mode(
         if not is_finite_texcoord(hpc_xy) or not clipHpcGeometry(hpc_xy):
             return (math.nan, math.nan)
         helioprojective = worldToHelioprojective((hpc_xy[0], hpc_xy[1], 0.0), meta.observer_distance)
-        texcoord, _ = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image_data, delta_t)
+        texcoord, _ = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image_data, delta_t, source_view_quat)
         return texcoord
     raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
 

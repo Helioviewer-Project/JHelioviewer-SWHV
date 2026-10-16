@@ -386,25 +386,26 @@ vec2 sampleSurfaceMapTexcoord(const vec3 world, const Image img, const float[6] 
 
 bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDistance, out vec3 world) {
     vec3 ray = helioprojectiveToObserverRay(helioprojective);
+    float a = dot(ray, ray);
     float b = observerDistance * ray.z;
-    float c = observerDistance * observerDistance - 1.;
-    vec3 observer = vec3(0., 0., observerDistance);
-    float discriminant = b * b - c;
+    // Avoid subtracting terms of order distance^2; trig approximations need not give a unit ray.
+    vec2 impact = observerDistance * ray.xy;
+    float discriminant = a - dot(impact, impact);
     if (discriminant < 0.) {
         world = vec3(0.);
         return false;
     }
 
     float root = sqrt(discriminant);
-    float tNear = -b - root;
-    float tFar = -b + root;
-    float t = tNear > 0. ? tNear : tFar;
+    float signedRoot = -b - root > 0. ? -root : root;
+    float t = (-b + signedRoot) / a;
     if (t <= 0.) {
         world = vec3(0.);
         return false;
     }
 
-    world = observer + t * ray;
+    // Expand Z to avoid cancelling the observer distance against t * ray.z.
+    world = vec3(t * ray.xy, (dot(impact, ray.xy) + signedRoot * ray.z) / a);
     return true;
 }
 
@@ -450,7 +451,13 @@ vec2 sampleHpcTexcoord(const Image img, vec2 helioprojective, const vec2 hpcXY, 
     float observerDistance = img.observerDistance;
 
     vec3 world;
-    if (helioprojectiveToWorld(helioprojective, observerDistance, world)) {
+    bool onDisk = helioprojectiveToWorld(helioprojective, observerDistance, world);
+    if (isSurfaceMap(img)) {
+        if (!onDisk)
+            discard;
+        return sampleSurfaceMapTexcoord(rotate_vector_inverse(img.sourceViewQuat, world), img, PV);
+    }
+    if (onDisk) {
         if (img.deltaT != 0.) {
             vec3 rotatedWorld = differential(img.deltaT, world);
             helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);

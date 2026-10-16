@@ -182,7 +182,9 @@ The mapping mode decides how a fragment reaches the source plane:
 - **RadialWarp and RectWarp** build a warped HPC plane point and derive the angles from it.
 
 CAR and CEA sources use the point's solar longitude and latitude directly, CEA with its equal-area
-latitude. The display mode and the source projection are independent choices.
+latitude. In HPC and both warp modes, the point comes from the ray's intersection with the solar sphere,
+inverse-rotated by the displayed view rotation; off-limb rays have no map data and are discarded.
+The display mode and the source projection are independent choices.
 
 From the plane point every mode computes original normalized coordinates:
 

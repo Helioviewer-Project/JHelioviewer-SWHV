@@ -223,14 +223,12 @@ def run_cases(root, backend, size, electron):
     )
     for projection in ("TAN", "ARC", "AZP", "ZPN", "CAR", "CEA"):
         surface = projection in ("CAR", "CEA")
-        other_modes = (
-            ("lati_zenithal",)
-            if surface
-            else ("hpc", "lati_zenithal", "radial_warp", "rect_warp")
-        )
+        other_modes = ("hpc", "lati_zenithal", "radial_warp", "rect_warp")
         for mode, distance, degrees, scale, format in (
             *variants,
-            *((mode, 10, 0, 0.5, "R16F") for mode in other_modes),
+            *((mode, distance, degrees, 0.5, "R16F") for mode in other_modes
+              for distance in ((10, 215) if surface and mode != "lati_zenithal" else (10,))
+              for degrees in ((0, 50, 120) if surface and mode != "lati_zenithal" else (0,))),
         ):
             header = image_header(projection, distance)
             meta = cpu.build_jhv_meta(header)
@@ -247,6 +245,8 @@ def run_cases(root, backend, size, electron):
                 if mode == "hpc"
                 else gpu.bounds_for_mode(mode, meta)
             )
+            if surface and mode in gpu.WARP_MODES:
+                bounds = (0, 360, 0, 3)  # A coronagraph alongside the map exposes off-limb rays.
             if mode == "ortho":
                 x, y = nx * scale + 0.12, ny * scale - 0.08
                 world, geometry_valid, on_disk = orthographic_geometry(
@@ -295,6 +295,17 @@ def run_cases(root, backend, size, electron):
                         mode, (ix + 0.5) / size, (iy + 0.5) / size, bounds[3], 1
                     )
                 geometry_valid = np.isfinite(world).all(axis=-1)
+            if surface and mode in ("hpc", "radial_warp", "rect_warp"):
+                # Intersect rays from the observer through the display plane with the unit sphere,
+                # then undo the displayed view rotation before asking Astropy for map pixels.
+                observer = np.array([0, 0, distance])
+                ray = world - observer
+                ray /= np.linalg.norm(ray, axis=-1, keepdims=True)
+                b = distance * ray[..., 2]
+                discriminant = b * b - (distance * distance - 1)
+                geometry_valid &= discriminant >= 0
+                near = -b - np.sqrt(np.maximum(0, discriminant))
+                world = (observer + near[..., None] * ray) @ rotation
             uv, image_valid = reference_pixels(header, world, mode == "ortho")
             valid = geometry_valid & image_valid
             name = f"{projection}_{mode}_{distance}_{degrees}_{format}"

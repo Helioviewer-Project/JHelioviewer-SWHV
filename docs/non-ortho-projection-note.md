@@ -119,9 +119,9 @@ mirror.
 
 The meaning of `sourceViewQuat` depends on the sampling path. For observer images in `Latitudinal`, it rotates a
 solar-world point into that image's observer frame. For surface maps, `ImageLayer` uploads the displayed view rotation;
-`Orthographic` uses it to keep the map attached to the visible sphere, while direct Latitudinal surface-map sampling
-does not need it. The `HPC` and warp image paths do not currently rotate their display coordinates through
-`sourceViewQuat`; that is part of their viewpoint limitation, described below.
+`Orthographic`, `HPC`, and the warp modes inverse-rotate their sphere intersection through it to keep the map attached
+to the visible sphere. Direct Latitudinal surface-map sampling does not need it. Observer images in `HPC` and the
+warp modes do not use `sourceViewQuat`; their viewpoint limitation is described below.
 
 ## Display modes
 
@@ -162,8 +162,13 @@ cannot be interpreted independently of `LONPOLE` and `LATPOLE`.
 - enabled image-layer footprints determine the displayed bounds;
 - those bounds are centered on `(0, 0)` and padded to the viewport aspect ratio.
 
-The GLSL path converts every displayed `(Tx, Ty)` to an observer ray. On-disk rays intersect the unit sphere so that
-differential rotation can be applied to a physical solar point. Off-disk rays proceed directly to the source-image WCS.
+The GLSL path converts every displayed `(Tx, Ty)` to an observer ray. For observer images, on-disk rays intersect the
+unit sphere so that differential rotation can be applied to a physical solar point. Off-disk rays proceed directly to
+the source-image WCS.
+
+For CAR/CEA maps, the sphere intersection is inverse-rotated by the displayed view rotation and sampled through the
+same longitude/latitude mapping used by Orthographic. Longitude wraps; off-disk rays are discarded. The intersection
+uses the image's observer distance, also used to calculate its angular bounds.
 
 Java overlays are first rotated from solar world space into the displayed viewpoint frame, projected to `(Tx, Ty)`, and
 clipped using the current `view.z >= 0` front-hemisphere test. Lines terminate at hidden segments instead of wrapping
@@ -207,7 +212,8 @@ wraps the source texture in X. These are surface coordinates, not observer-image
 - The mapping is anchored so radius `1` occupies the same normalized position for every lambda.
 
 Java overlays first project into the displayed viewpoint's HPC plane and then apply the radial scale. The shader performs
-the inverse screen warp to recover an HPC-plane point and samples through the common HPC observer-image path.
+the inverse screen warp to recover an HPC-plane point and samples through the common HPC path, including its
+surface-map branch.
 
 ### RectWarp
 
@@ -250,9 +256,8 @@ Surface-map sampling supports:
 - `CRLN-CAR / CRLT-CAR`
 - `CRLN-CEA / CRLT-CEA`
 
-Surface maps have a defined display policy only in `Latitudinal` and `Orthographic`. `HPC`, `RadialWarp`, and
-`RectWarp` are observer-centered modes and do not provide a meaningful direct display of solar longitude/latitude map
-data.
+All five modes support surface maps. `Latitudinal` samples longitude and latitude directly. The other modes intersect
+the visible sphere, undo the displayed view rotation, and sample the map at the resulting solar longitude and latitude.
 
 ## Viewpoint limitations
 
@@ -261,14 +266,18 @@ There are two different observer roles:
 - the displayed viewpoint used by Java map geometry and overlays;
 - each source image's observer used to interpret that image's WCS.
 
-`Latitudinal` explicitly bridges those frames with each image slot's `sourceViewQuat`. The `HPC`, `RadialWarp`, and
-`RectWarp` image shaders instead interpret their displayed HPC coordinates directly in the source observer's frame.
+For observer images, `Latitudinal` explicitly bridges those frames with each image slot's `sourceViewQuat`. The `HPC`,
+`RadialWarp`, and `RectWarp` image shaders instead interpret their displayed HPC coordinates directly in the source
+observer's frame.
 Consequently, those image paths are coherent when the displayed viewpoint matches the source observer in orientation
 and distance, but arbitrary user-selected viewpoints are not generally supported. Java overlays may then follow the
 selected viewpoint while the image remains tied to its source observer.
 
 Changing this requires a defined reprojection policy and a corresponding Java-to-GLSL transform. A local scale factor or
 observer-distance normalization is insufficient.
+
+Surface maps follow the displayed orientation in all modes. Their HPC-derived ray intersections and angular bounds
+use the image's metadata observer distance, rather than a separately selected display distance.
 
 ## Validation boundaries
 
@@ -280,10 +289,18 @@ The validation suite in `extra/test` separates several questions:
   Normalized CEA maps with no `CUNIT2` are first canonicalized to an equivalent angular CEA header.
 - Java/Python metadata tests validate the projection parameters and linear WCS transforms that Java derives for GLSL.
 - Electron/WebGL2 runs execute the production shaders on Metal/ANGLE and SwiftShader.
+- Full-fragment CAR/CEA tests cover HPC and both warp modes against independent ray/sphere intersections and Astropy
+  pixel coordinates, including view rotations, near-Sun and Earth distances, off-limb clipping, and difference images.
 - Orthographic and warp modes are compared with their independent CPU mirrors because Astropy does not define JHV's
   display warps.
 - Dedicated internal comparisons distinguish formal-TAN Orthographic geometry, simple-TAN Orthographic geometry, and
   HPC geometry.
+
+The 220 full-fragment cases pass on Metal/ANGLE. On the tested SwiftShader backend, all color and footprint checks
+pass, but 24 CAR/CEA coordinate checks exceed the unchanged 0.05-source-pixel limit, reaching 0.35 pixels near the limb
+on a 128-pixel-wide map. Direct ray probes show sine/cosine approximation errors. The sphere intersection accounts
+for the resulting non-unit rays and avoids cancellation at large observer distances; it cannot recover the exact
+input angles from the approximated ray direction. The SwiftShader coordinate failures remain visible in the test.
 
 Astropy agreement does not validate:
 
