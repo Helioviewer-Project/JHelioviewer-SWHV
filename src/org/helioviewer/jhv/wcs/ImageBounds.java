@@ -33,7 +33,11 @@ public final class ImageBounds {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
-    public static Region hpc(ImageGeometry geometry) {
+    public static Region hpc(ImageGeometry geometry, double distance) {
+        if (geometry.wcs.projection.isSurfaceMap()) {
+            double radius = Math.toDegrees(Math.asin(1 / distance));
+            return new Region(-radius, -radius, 2 * radius, 2 * radius);
+        }
         double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
         for (Vec2 helioprojective : boundary(geometry)) {

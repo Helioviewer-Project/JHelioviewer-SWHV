@@ -291,6 +291,14 @@ public final class FramesTest {
         ResolutionSet levels = completeLevels(new ImageGrid(0, 128, 96), new ImageGrid(1, 64, 48),
                 new ImageGrid(2, 32, 24), new ImageGrid(3, 16, 12));
         ImageGeometry originalGeometry = new ImageGeometry(128, 96, 1);
+        for (Mat2 invalid : new Mat2[]{new Mat2(0, 0, 0, 1), new Mat2(1, 2, 2, 4),
+                new Mat2(Double.NaN, 0, 0, 1), new Mat2(Double.POSITIVE_INFINITY, 0, 0, 1)}) {
+            try {
+                new ImageGeometry(128, 96, originalGeometry.wcs, invalid, Vec2.ZERO);
+                throw new AssertionError("Invalid pixel transform was accepted");
+            } catch (IllegalArgumentException expected) {
+            }
+        }
         BasicMetaData metadata = new BasicMetaData(128, 96, "Sampling test") {
             @Override public ImageGeometry getGeometry() { return originalGeometry; }
         };
@@ -320,8 +328,8 @@ public final class FramesTest {
         AtomicInteger deliveries = new AtomicInteger();
         FrameDecoder decoder = new FrameDecoder(settings, data -> {
             try {
-                if (data.image().geometry().original != originalGeometry)
-                    throw new AssertionError("Reduced decode changed the original bounds used by cutouts");
+                if (data.image().geometry().original != originalGeometry || data.image().geometry().bounds != originalGeometry.bounds)
+                    throw new AssertionError("Reduced decode did not share the original footprint");
                 if (!((ShortBuffer) data.imageBuffer().buffer).equals((ShortBuffer) expected.imageBuffer().buffer))
                     throw new AssertionError("RHEF did not use the decoded sample positions");
                 ImageGeometry geometry = data.image().geometry();

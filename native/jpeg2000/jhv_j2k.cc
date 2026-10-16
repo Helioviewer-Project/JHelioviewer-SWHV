@@ -6,7 +6,7 @@
 
 static_assert(sizeof(size_t) == sizeof(uint64_t), "JHV supports 64-bit native hosts");
 static_assert(sizeof(jhv_j2k_frame_info) == 296 && offsetof(jhv_j2k_frame_info, width) == 20 &&
-              offsetof(jhv_j2k_frame_info, x) == 284, "FFM frame layout");
+              offsetof(jhv_j2k_frame_info, height) == 152 && offsetof(jhv_j2k_frame_info, x) == 284, "FFM frame layout");
 
 struct jhv_j2k { std::shared_ptr<jhv_j2k_source> source; };
 struct jhv_j2k_job {

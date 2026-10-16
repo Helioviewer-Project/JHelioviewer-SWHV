@@ -18,7 +18,7 @@ public final class ImageGeometry {
     public final double pixelSizeX;
     public final double pixelSizeY;
     public final Vec2 sunPixel;
-    public final Region bounds;
+    public final Region bounds; // Original image footprint, independent of the decoded grid.
 
     public ImageGeometry(int width, int height, double pixelSize) {
         this(width, height, new WcsHeader(WcsHeader.Projection.TAN, new float[6], Sun.MeanEarthDistance, Vec2.ZERO),
@@ -38,8 +38,8 @@ public final class ImageGeometry {
         referencePixel = _referencePixel;
         pixelSizeX = Math.hypot(pixelToPlane.m00, pixelToPlane.m10);
         pixelSizeY = Math.hypot(pixelToPlane.m01, pixelToPlane.m11);
-        bounds = new Region(-referencePixel.x * pixelSizeX, -(grid.height() - referencePixel.y) * pixelSizeY,
-                grid.width() * pixelSizeX, grid.height() * pixelSizeY);
+        bounds = source == null ? new Region(-referencePixel.x * pixelSizeX, -(grid.height() - referencePixel.y) * pixelSizeY,
+                grid.width() * pixelSizeX, grid.height() * pixelSizeY) : source.bounds;
         if (source != null) {
             double step = grid.step();
             sunPixel = new Vec2((source.sunPixel.x - grid.firstX()) / step + .5, (source.sunPixel.y - grid.firstY()) / step + .5);

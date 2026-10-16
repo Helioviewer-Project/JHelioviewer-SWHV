@@ -440,16 +440,15 @@ def main() -> int:
                 if mismatch is not None:
                     case_errors.append(mismatch)
 
-            if not validator.is_surface_map_projection(py_meta):
-                hpc_bounds = validator.raw_hpc_footprint_bounds_degrees(py_meta)
-                for field, py_value in zip(
-                    ("hpc_min_x", "hpc_max_x", "hpc_min_y", "hpc_max_y"),
-                    hpc_bounds,
-                    strict=True,
-                ):
-                    mismatch = compare_scalars(field, float(java_meta[field]), py_value, 5e-6, 1e-7)
-                    if mismatch is not None:
-                        case_errors.append(mismatch)
+            hpc_bounds = validator.raw_hpc_footprint_bounds_degrees(py_meta)
+            for field, py_value in zip(
+                ("hpc_min_x", "hpc_max_x", "hpc_min_y", "hpc_max_y"),
+                hpc_bounds,
+                strict=True,
+            ):
+                mismatch = compare_scalars(field, float(java_meta[field]), py_value, 5e-6, 1e-7)
+                if mismatch is not None:
+                    case_errors.append(mismatch)
 
             mismatch = compare_scalars(
                 "radial_bound",

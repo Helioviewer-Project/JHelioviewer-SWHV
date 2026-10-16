@@ -25,7 +25,7 @@ public final class Mat2 {
     public Mat2 inverse() {
         double determinant = m00 * m11 - m01 * m10;
         if (!Double.isFinite(determinant) || determinant == 0)
-            return IDENTITY;
+            throw new IllegalArgumentException("Matrix is singular or non-finite");
         return new Mat2(m11 / determinant, -m01 / determinant, -m10 / determinant, m00 / determinant);
     }
 

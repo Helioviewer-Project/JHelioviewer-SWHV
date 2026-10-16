@@ -44,7 +44,21 @@ class ValidationTest(unittest.TestCase):
                                 converted[f"CUNIT{axis}"] = units
                                 for keyword in ("CDELT", "CRVAL"):
                                     converted[f"{keyword}{axis}"] = math.radians(converted[f"{keyword}{axis}"])
-                        self.assertEqual(cpu.image_radial_bound(cpu.build_jhv_meta(converted)), 1.0)
+                        meta = cpu.build_jhv_meta(converted)
+                        self.assertEqual(cpu.image_radial_bound(meta), 1.0)
+                        radius = math.degrees(math.asin(1 / meta.observer_distance))
+                        self.assertEqual(cpu.raw_hpc_footprint_bounds_degrees(meta), (-radius, radius, -radius, radius))
+
+    def test_radial_fallback_is_centered_on_the_sun(self):
+        # Astropy gives the Sun's FITS pixel independently of JHV's sun-shift helper.
+        sun = self.wcs.wcs_world2pix([[0.0, 0.0]], 1)[0]
+        x, y = sun[0] - .5, self.meta.pixel_height - sun[1] + .5
+        expected = math.hypot(
+            max(abs(x), abs(self.meta.pixel_width - x)) * self.meta.unit_per_pixel_x,
+            max(abs(y), abs(self.meta.pixel_height - y)) * self.meta.unit_per_pixel_y,
+        )
+        with patch.object(cpu, "rotated_image_plane_edge_samples", return_value=()):
+            self.assertAlmostEqual(cpu.image_radial_bound(self.meta), expected, places=10)
 
     def test_observation_date_and_time(self):
         cases = [

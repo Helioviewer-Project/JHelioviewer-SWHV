@@ -57,11 +57,14 @@ CRVAL belongs to that step; it is not the pixel reference `c`.
 
 `BasicMetaData` supplies a centered geometry with uniform pixel spacing when metadata is missing.
 `ImageBounds` maps the image corners and edge midpoints through the geometry and projection to obtain the
-camera bounds. `ImageGeometry.bounds` is the axis-aligned rectangle in plane units used for sizing. The
-matrix and projection, not that rectangle, decide where the image lies in the scene. Radial bounds are
+camera bounds. `ImageGeometry.bounds` is the original image's axis-aligned rectangle in plane units used
+for sizing; decoded geometries share that same footprint. The matrix and projection, not that rectangle,
+decide where the image lies in the scene. Radial bounds are
 one solar radius for CAR/CEA surface maps. Observer images use the projected boundary's largest radius,
 falling back to rectangle corners relative to the Sun when no projected radius is usable. HPC bounds
-use the projected boundary for both surface maps and observer images.
+use the projected boundary for observer images. CAR/CEA maps instead contribute the solar disk's angular
+extent, `asin(1 / distance)`, using the same image observer distance supplied to the shader. Their longitude
+and latitude coverage is not an observer-image field of view.
 
 ## Decoder output to original pixels
 

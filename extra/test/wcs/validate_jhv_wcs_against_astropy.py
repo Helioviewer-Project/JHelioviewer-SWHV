@@ -995,6 +995,9 @@ def rotated_image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float]
 
 
 def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float, float]:
+    if is_surface_map_projection(meta):
+        radius = math.degrees(math.asin(1 / meta.observer_distance))
+        return (-radius, radius, -radius, radius)
     min_x = math.inf
     max_x = -math.inf
     min_y = math.inf
@@ -1023,10 +1026,12 @@ def image_radial_bound(meta: JHVMeta) -> float:
     if radius > 0.0:
         return radius
 
-    x0 = -meta.crpix1_gl * meta.unit_per_pixel_x - meta.crval_internal_x
-    x1 = (meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x - meta.crval_internal_x
-    y0 = -meta.crpix2_gl * meta.unit_per_pixel_y - meta.crval_internal_y
-    y1 = (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y - meta.crval_internal_y
+    # Distances to the Sun in buffer coordinates, including the inverse WCS and row reversal.
+    shift_x, shift_y = image_sun_shift(meta)
+    sun_x = meta.crpix1_gl * meta.unit_per_pixel_x + shift_x
+    sun_y = (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y + shift_y
+    x0, x1 = -sun_x, meta.pixel_width * meta.unit_per_pixel_x - sun_x
+    y0, y1 = -sun_y, meta.pixel_height * meta.unit_per_pixel_y - sun_y
     return max(math.hypot(x0, y0), math.hypot(x1, y0), math.hypot(x0, y1), math.hypot(x1, y1))
 
 

@@ -73,7 +73,8 @@ public final class ImageLayers {
             if (!layer.isEnabled())
                 continue;
 
-            Region bounds = ImageBounds.hpc(layer.getMetaData().getGeometry());
+            MetaData metaData = layer.getMetaData();
+            Region bounds = ImageBounds.hpc(metaData.getGeometry(), metaData.getViewpoint().distance);
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);

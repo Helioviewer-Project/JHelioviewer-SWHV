@@ -194,7 +194,8 @@ public final class DisplayController {
 
         Region scale = ImageLayers.computeHpcScaleBounds();
         double viewportHeight = Math.max(scale.height, scale.width / vp.aspect);
-        return viewportHeight > 0 ? vp.height * ImageBounds.hpc(geometry).height / (geometry.grid.height() * viewportHeight) : 0;
+        return viewportHeight > 0 ? vp.height * ImageBounds.hpc(geometry, imageData.metaData().getViewpoint().distance).height
+                / (geometry.grid.height() * viewportHeight) : 0;
     }
 
     public static void resetView() {

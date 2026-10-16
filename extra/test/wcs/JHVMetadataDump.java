@@ -112,7 +112,7 @@ public final class JHVMetadataDump {
         double arcsecPerPixelY = wcs.projection == WcsHeader.Projection.CEA
                 ? geometry.pixelSizeY
                 : geometry.pixelSizeY / unitsPerArcsec;
-        Region hpcBounds = ImageBounds.hpc(geometry);
+        Region hpcBounds = ImageBounds.hpc(geometry, meta.viewpoint.distance);
         // The validator's rectangle follows rows: its lower Y edge is the negated upper plane edge.
         Region sized = geometry.withSize(pixelWidth, pixelHeight).bounds;
         Region renderRegion = new Region(sized.llx, -sized.ury, sized.width, sized.height);
