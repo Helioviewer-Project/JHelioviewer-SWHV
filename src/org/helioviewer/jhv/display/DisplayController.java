@@ -18,6 +18,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageBounds;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 import org.json.JSONObject;
 
@@ -189,28 +190,13 @@ public final class DisplayController {
             return 0;
 
         MetaData metaData = imageData.metaData();
-        double imageHeight = oneToOneImageHeight(metaData, mode);
-        double cameraWidth = vp.height * metaData.getGeometry().pixelSizeY * imageHeight / metaData.getGeometry().bounds.height;
-        if (mode == MapMode.Orthographic)
-            return cameraWidth;
+        ImageGeometry geometry = metaData.getGeometry();
+        if (mode != MapMode.HPC) // one viewport pixel per image pixel
+            return vp.height * geometry.pixelSizeY;
 
-        double viewportHeight = oneToOneViewportHeight(vp, mode);
-        return viewportHeight > 0 ? cameraWidth / viewportHeight : 0;
-    }
-
-    private static double oneToOneImageHeight(MetaData metaData, MapMode mode) {
-        return mode == MapMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getGeometry().bounds.height;
-    }
-
-    private static double oneToOneViewportHeight(Viewport vp, MapMode mode) {
-        if (mode == MapMode.HPC) {
-            Region bounds = ImageLayers.computeHpcScaleBounds();
-            double halfWidth = 0.5 * bounds.width;
-            double halfHeight = 0.5 * bounds.height;
-            halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
-            return 2 * halfHeight;
-        }
-        return 1;
+        Region scale = ImageLayers.computeHpcScaleBounds();
+        double viewportHeight = Math.max(scale.height, scale.width / vp.aspect);
+        return viewportHeight > 0 ? vp.height * ImageBounds.hpc(metaData).height / (geometry.grid.height() * viewportHeight) : 0;
     }
 
     public static void resetView() {
