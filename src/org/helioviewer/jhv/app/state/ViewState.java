@@ -153,24 +153,10 @@ public final class ViewState {
 
     public static ModeData readModeJson(JSONObject source) {
         ModeData current = modeData();
-        MapMode projectionValue = current.projection();
-        AnnotationMode annotationModeValue = current.annotationMode();
-        String projectionName = source.optString("projection", projectionValue.name());
-        String annotationModeName = source.optString("annotationMode", annotationModeValue.name());
-        try {
-            projectionValue = MapMode.valueOf(projectionName);
-        } catch (IllegalArgumentException e) {
-            Log.warn("Ignoring invalid projection state value: " + projectionName, e);
-        }
-        try {
-            annotationModeValue = AnnotationMode.valueOf(annotationModeName);
-        } catch (IllegalArgumentException e) {
-            Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
-        }
         return new ModeData(
-                projectionValue,
+                readEnum(source, "projection", current.projection()),
                 Math.clamp(source.optDouble("warpLambda", current.warpLambda()), -1, 1),
-                annotationModeValue,
+                readEnum(source, "annotationMode", current.annotationMode()),
                 readBoolean(source, "multiview", current.multiview()),
                 readBoolean(source, "tracking", current.tracking()),
                 readBoolean(source, "refresh", current.refresh()),
@@ -206,44 +192,6 @@ public final class ViewState {
         }
 
         notifyModeListeners();
-    }
-
-    private static void applyModeUpdate(
-            @Nullable MapMode projection,
-            @Nullable AnnotationMode annotationMode,
-            @Nullable Boolean multiview,
-            @Nullable Boolean tracking,
-            @Nullable Boolean refresh,
-            @Nullable Boolean showCorona,
-            @Nullable Boolean differentialRotation) {
-        ModeData current = modeData();
-        applyMode(new ModeData(
-                projection == null ? current.projection() : projection,
-                current.warpLambda(),
-                annotationMode == null ? current.annotationMode() : annotationMode,
-                multiview == null ? current.multiview() : multiview,
-                tracking == null ? current.tracking() : tracking,
-                refresh == null ? current.refresh() : refresh,
-                showCorona == null ? current.showCorona() : showCorona,
-                differentialRotation == null ? current.differentialRotation() : differentialRotation));
-    }
-
-    public static void applyModeUpdateRaw(
-            @Nullable String projection,
-            @Nullable String annotationMode,
-            @Nullable String multiview,
-            @Nullable String tracking,
-            @Nullable String refresh,
-            @Nullable String showCorona,
-            @Nullable String differentialRotation) {
-        applyModeUpdate(
-                parseEnum(projection, MapMode.class, "projection"),
-                parseEnum(annotationMode, AnnotationMode.class, "annotation mode"),
-                parseBoolean(multiview, "multiview"),
-                parseBoolean(tracking, "tracking"),
-                parseBoolean(refresh, "refresh"),
-                parseBoolean(showCorona, "showCorona"),
-                parseBoolean(differentialRotation, "differentialRotation"));
     }
 
     public static MapMode getProjection() {
@@ -372,55 +320,27 @@ public final class ViewState {
         notifyPlaybackConfigListeners();
     }
 
-    private static void applyPlaybackUpdate(
-            @Nullable Player.AdvanceMode advanceMode,
-            @Nullable Integer speed,
-            @Nullable PlaybackSpeedUnit speedUnit,
-            @Nullable Integer firstFrame,
-            @Nullable Integer lastFrame) {
-        if (advanceMode != null)
-            setPlaybackAdvanceMode(advanceMode);
-
-        PlaybackData current = playbackData();
-        if (speed != null || speedUnit != null) {
-            int mergedSpeed = speed == null ? current.speed() : speed;
-            PlaybackSpeedUnit mergedSpeedUnit = speedUnit == null ? current.speedUnit() : speedUnit;
-            setPlaybackSpeed(mergedSpeed, mergedSpeedUnit);
+    public static void applyPlayback(JSONObject source) {
+        Player.AdvanceMode advanceMode = readEnum(source, "advanceMode", playbackAdvanceMode);
+        if (advanceMode == Player.AdvanceMode.SwingDown) {
+            Log.warn("Ignoring internal playback advance mode value: " + advanceMode);
+            advanceMode = playbackAdvanceMode;
         }
+        Integer speed = readInteger(source, "speed", "playback speed");
+        PlaybackSpeedUnit speedUnit = readEnum(source, "speedUnit", playbackSpeedUnit);
+        Integer firstFrame = readInteger(source, "firstFrame", "playback first frame");
+        Integer lastFrame = readInteger(source, "lastFrame", "playback last frame");
 
-        if (firstFrame != null || lastFrame != null) {
-            int mergedFirstFrame = firstFrame == null ? current.firstFrame() : firstFrame;
-            int mergedLastFrame = lastFrame == null ? current.lastFrame() : lastFrame;
-            Player.setPlaybackRange(mergedFirstFrame, mergedLastFrame);
-        }
+        setPlaybackAdvanceMode(advanceMode);
+        if (speed != null || speedUnit != playbackSpeedUnit)
+            setPlaybackSpeed(speed == null ? playbackSpeed : speed, speedUnit);
+        if (firstFrame != null || lastFrame != null)
+            Player.setPlaybackRange(firstFrame == null ? Player.getPlaybackFirstFrame() : firstFrame,
+                    lastFrame == null ? Player.getPlaybackLastFrame() : lastFrame);
     }
 
-    public static void applyPlaybackUpdateRaw(
-            @Nullable String advanceMode,
-            @Nullable String speed,
-            @Nullable String speedUnit,
-            @Nullable String firstFrame,
-            @Nullable String lastFrame) {
-        applyPlaybackUpdate(
-                parseAdvanceMode(advanceMode),
-                parseInteger(speed, "playback speed"),
-                parseEnum(speedUnit, PlaybackSpeedUnit.class, "playback speed unit"),
-                parseInteger(firstFrame, "playback first frame"),
-                parseInteger(lastFrame, "playback last frame"));
-    }
-
-    // Commands/ExportMovie-only partial update entry point.
-    public static void applyRecordStartUpdate(
-            @Nullable String mode,
-            @Nullable String size,
-            @Nullable String advanceMode,
-            @Nullable String speed,
-            @Nullable String speedUnit) {
-        applyRecordingUpdateRaw(mode, size);
-        applyPlaybackUpdateRaw(advanceMode, speed, speedUnit, null, null);
-    }
-
-    private static @Nullable Integer parseInteger(@Nullable String value, String name) {
+    private static @Nullable Integer readInteger(JSONObject source, String key, String name) {
+        String value = source.optString(key, null);
         if (value == null)
             return null;
         try {
@@ -443,35 +363,16 @@ public final class ViewState {
         return currentValue;
     }
 
-    private static @Nullable Boolean parseBoolean(@Nullable String value, String name) {
+    private static <E extends Enum<E>> E readEnum(JSONObject source, String key, E currentValue) {
+        String value = source.optString(key, null);
         if (value == null)
-            return null;
-        if ("true".equalsIgnoreCase(value))
-            return true;
-        if ("false".equalsIgnoreCase(value))
-            return false;
-        Log.warn("Ignoring invalid " + name + " value: " + value);
-        return null;
-    }
-
-    private static <E extends Enum<E>> @Nullable E parseEnum(@Nullable String value, Class<E> enumClass, String name) {
-        if (value == null)
-            return null;
+            return currentValue;
         try {
-            return Enum.valueOf(enumClass, value);
+            return Enum.valueOf(currentValue.getDeclaringClass(), value);
         } catch (IllegalArgumentException e) {
-            Log.warn("Ignoring invalid " + name + " value: " + value, e);
-            return null;
+            Log.warn("Ignoring invalid " + key + " value: " + value, e);
+            return currentValue;
         }
-    }
-
-    private static @Nullable Player.AdvanceMode parseAdvanceMode(@Nullable String value) {
-        Player.AdvanceMode mode = parseEnum(value, Player.AdvanceMode.class, "playback advance mode");
-        if (mode == Player.AdvanceMode.SwingDown) {
-            Log.warn("Ignoring internal playback advance mode value: " + value);
-            return null;
-        }
-        return mode;
     }
 
     public static void setRecordingMode(RecordingMode newRecordingMode) {
@@ -490,21 +391,11 @@ public final class ViewState {
         notifyRecordingConfigListeners();
     }
 
-    private static void applyRecordingUpdate(
-            @Nullable RecordingMode mode,
-            @Nullable RecordingSize size) {
-        if (mode != null)
-            setRecordingMode(mode);
-        if (size != null)
-            setRecordingSize(size);
-    }
-
-    public static void applyRecordingUpdateRaw(
-            @Nullable String mode,
-            @Nullable String size) {
-        applyRecordingUpdate(
-                parseEnum(mode, RecordingMode.class, "recording mode"),
-                parseEnum(size, RecordingSize.class, "recording size"));
+    public static void applyRecording(JSONObject source) {
+        RecordingMode mode = readEnum(source, "mode", recordingMode);
+        RecordingSize size = readEnum(source, "size", recordingSize);
+        setRecordingMode(mode);
+        setRecordingSize(size);
     }
 
     public static void addModeListener(ModeListener listener) {

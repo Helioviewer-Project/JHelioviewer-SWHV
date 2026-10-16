@@ -9,21 +9,9 @@ import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 
+import org.json.JSONObject;
+
 public final class Commands {
-
-    public record PlaybackInput(
-            @Nullable String advanceMode,
-            @Nullable String speed,
-            @Nullable String speedUnit,
-            @Nullable String firstFrame,
-            @Nullable String lastFrame) {}
-
-    public record RecordStartInput(
-            @Nullable String mode,
-            @Nullable String size,
-            @Nullable String advanceMode,
-            @Nullable String speed,
-            @Nullable String speedUnit) {}
 
     public record OperationContext(@Nullable String clientId, @Nullable String requestId,
                                    @Nullable String mtype, @Nullable Completion completion) {
@@ -38,17 +26,9 @@ public final class Commands {
         void finished(OperationContext context, boolean success, String message, @Nullable String output);
     }
 
-    public static void setViewStateRaw(
-            @Nullable String projection,
-            @Nullable String annotationMode,
-            @Nullable String multiview,
-            @Nullable String tracking,
-            @Nullable String refresh,
-            @Nullable String showCorona,
-            @Nullable String differentialRotation) {
+    public static void setViewState(JSONObject input) {
         boolean wasRefresh = ViewState.isRefresh();
-        ViewState.applyModeUpdateRaw(projection, annotationMode, multiview, tracking, refresh, showCorona,
-                differentialRotation);
+        ViewState.applyMode(ViewState.readModeJson(input));
         if (!wasRefresh && ViewState.isRefresh())
             ImageLayers.refreshLayersSpan();
     }
@@ -60,15 +40,8 @@ public final class Commands {
             ImageLayers.refreshLayersSpan();
     }
 
-    public static void setPlayback(@Nullable PlaybackInput input) {
-        if (input == null)
-            return;
-        ViewState.applyPlaybackUpdateRaw(
-                input.advanceMode(),
-                input.speed(),
-                input.speedUnit(),
-                input.firstFrame(),
-                input.lastFrame());
+    public static void setPlayback(JSONObject input) {
+        ViewState.applyPlayback(input);
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
@@ -103,11 +76,11 @@ public final class Commands {
         Player.previousFrame();
     }
 
-    public static void setRecordingRaw(@Nullable String mode, @Nullable String size) {
-        ViewState.applyRecordingUpdateRaw(mode, size);
+    public static void setRecording(JSONObject input) {
+        ViewState.applyRecording(input);
     }
 
-    public static void recordStart(@Nullable OperationContext context, @Nullable RecordStartInput input) {
+    public static void recordStart(@Nullable OperationContext context, @Nullable JSONObject input) {
         ExportMovie.start(context, input);
     }
 

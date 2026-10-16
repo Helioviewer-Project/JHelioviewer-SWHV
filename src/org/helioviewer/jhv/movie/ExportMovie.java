@@ -17,6 +17,8 @@ import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.thread.AppThread;
 
+import org.json.JSONObject;
+
 public final class ExportMovie {
 
     public interface StatusListener {
@@ -40,7 +42,7 @@ public final class ExportMovie {
     private static @Nullable TimelineFrameSource timelineFrameSource;
     private static boolean mainCanvasVisible = true;
 
-    public static void start(@Nullable Commands.OperationContext context, @Nullable Commands.RecordStartInput input) {
+    public static void start(@Nullable Commands.OperationContext context, @Nullable JSONObject input) {
         if (isRecording()) {
             if (context != null)
                 Commands.notifyRecordingFinished(context, false, "Recording already in progress.", null);
@@ -48,8 +50,10 @@ public final class ExportMovie {
         }
 
         try {
-            if (input != null)
-                ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
+            if (input != null) {
+                ViewState.applyRecording(input);
+                ViewState.applyPlayback(input);
+            }
 
             ViewState.PlaybackData playbackData = ViewState.playbackData();
             int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Player.FPS_ABSOLUTE;

@@ -4,14 +4,14 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.thread.UiThread;
 
 import org.astrogrid.samp.Message;
+import org.json.JSONObject;
 
 final class RecordHandlers {
 
     static void register(SampClient client) {
         client.addMessageHandler(SampHandlers.create("jhv.record.set", (senderId, sender, msg) -> {
-            String mode = SampHandlers.optionalString(msg, "mode");
-            String size = SampHandlers.optionalString(msg, "size");
-            UiThread.post(() -> Commands.setRecordingRaw(mode, size));
+            JSONObject parameters = SampHandlers.parameters(msg, "mode", "size");
+            UiThread.post(() -> Commands.setRecording(parameters));
         }));
         client.addMessageHandler(SampHandlers.create("jhv.record.start",
                 (senderId, sender, msg) -> recordStart(msg, senderId)));
@@ -21,13 +21,8 @@ final class RecordHandlers {
 
     private static void recordStart(Message msg, String senderId) {
         Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.record.start", "jhv.record.start.completed");
-        Commands.RecordStartInput input = new Commands.RecordStartInput(
-                SampHandlers.optionalString(msg, "mode"),
-                SampHandlers.optionalString(msg, "size"),
-                SampHandlers.optionalString(msg, "advanceMode"),
-                SampHandlers.optionalString(msg, "speed"),
-                SampHandlers.optionalString(msg, "speedUnit"));
-        UiThread.post(() -> Commands.recordStart(context, input));
+        JSONObject parameters = SampHandlers.parameters(msg, "mode", "size", "advanceMode", "speed", "speedUnit");
+        UiThread.post(() -> Commands.recordStart(context, parameters));
     }
 
     private RecordHandlers() {}

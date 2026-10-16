@@ -11,6 +11,7 @@ import org.helioviewer.jhv.thread.UiThread;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.HubConnection;
+import org.json.JSONObject;
 
 final class SampHandlers {
 
@@ -39,6 +40,19 @@ final class SampHandlers {
 
     static AbstractMessageHandler command(String type, Runnable command) {
         return create(type, (senderId, sender, msg) -> UiThread.post(command));
+    }
+
+    // Copy only the command's supported parameters before dispatching to the UI thread.
+    // SAMP booleans are strings; state files keep their stricter Boolean contract.
+    static JSONObject parameters(Message msg, String... keys) {
+        JSONObject parameters = new JSONObject();
+        for (String key : keys) {
+            String value = optionalString(msg, key);
+            if (value != null)
+                parameters.put(key, "true".equalsIgnoreCase(value) ? Boolean.TRUE :
+                        "false".equalsIgnoreCase(value) ? Boolean.FALSE : value);
+        }
+        return parameters;
     }
 
     static @Nullable String optionalString(Message msg, String key) {

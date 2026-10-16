@@ -7,6 +7,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
+import org.json.JSONObject;
 
 final class PlaybackHandlers {
 
@@ -25,13 +26,8 @@ final class PlaybackHandlers {
 
     private static AbstractMessageHandler playbackSetHandler() {
         return SampHandlers.create("jhv.playback.set", (senderId, sender, msg) -> {
-            Commands.PlaybackInput input = new Commands.PlaybackInput(
-                    SampHandlers.optionalString(msg, "advanceMode"),
-                    SampHandlers.optionalString(msg, "speed"),
-                    SampHandlers.optionalString(msg, "speedUnit"),
-                    SampHandlers.optionalString(msg, "firstFrame"),
-                    SampHandlers.optionalString(msg, "lastFrame"));
-            UiThread.post(() -> Commands.setPlayback(input));
+            JSONObject parameters = SampHandlers.parameters(msg, "advanceMode", "speed", "speedUnit", "firstFrame", "lastFrame");
+            UiThread.post(() -> Commands.setPlayback(parameters));
         });
     }
 
