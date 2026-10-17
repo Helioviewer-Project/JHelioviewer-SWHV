@@ -43,9 +43,7 @@ public class ProxySettings {
                         try {
                             if (user == null || pass == null) {
                                 user = Settings.getProperty("proxy.username");
-                                pass = Settings.getProperty("proxy.password");
-                                if (pass != null)
-                                    pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
+                                pass = getPassword();
                             }
 
                             if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port))
@@ -71,5 +69,21 @@ public class ProxySettings {
     }
 
     public static void init() {}
+
+    @Nullable
+    public static String getPassword() {
+        String password = Settings.getProperty("proxy.password");
+        if (password == null)
+            return null;
+        try {
+            return new String(Base64.getDecoder().decode(password), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException ignore) {
+            return null;
+        }
+    }
+
+    public static void setPassword(String password) {
+        Settings.setProperty("proxy.password", Base64.getEncoder().withoutPadding().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
+    }
 
 }

@@ -9,8 +9,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
@@ -40,6 +38,7 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -297,16 +296,9 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
             super(new BorderLayout());
             setPreferredSize(new Dimension(-1, 150));
 
-            String pass = Settings.getProperty("proxy.password");
-            try {
-                pass = new String(Base64.getDecoder().decode(pass), StandardCharsets.UTF_8);
-            } catch (Exception e) {
-                pass = null;
-            }
-
             String[][] tableData = {
                     {"Proxy username", Settings.getProperty("proxy.username")},
-                    {"Proxy password", pass},
+                    {"Proxy password", ProxySettings.getPassword()},
             };
 
             model = new DefaultTableModel(tableData, new String[]{"Description", "Value"}) {
@@ -357,10 +349,8 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
             if (val0 instanceof String str)
                 Settings.setProperty("proxy.username", str);
             Object val1 = model.getValueAt(1, 1);
-            if (val1 instanceof String str) {
-                String s = Base64.getEncoder().withoutPadding().encodeToString(str.getBytes(StandardCharsets.UTF_8));
-                Settings.setProperty("proxy.password", s);
-            }
+            if (val1 instanceof String str)
+                ProxySettings.setPassword(str);
         }
 
     }
