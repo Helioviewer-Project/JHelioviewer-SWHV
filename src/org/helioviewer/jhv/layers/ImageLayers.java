@@ -14,6 +14,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.wcs.ImageBounds;
+import org.helioviewer.jhv.wcs.ImageGeometry;
 
 public final class ImageLayers {
 
@@ -37,24 +38,27 @@ public final class ImageLayers {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (!layer.isEnabled())
                 continue;
-            size = Math.max(size, layer.getMetaData().getGeometry().bounds.height);
+            ImageGeometry geometry = layer.getMetaData().getGeometry();
+            // Surface maps are rendered on the unit sphere, including partial maps.
+            size = Math.max(size, geometry.wcs.projection.isSurfaceMap() ? 2 : geometry.bounds.height);
         }
         return size;
     }
 
-    public static double getLargestRadialSize() {
+    public static double getLargestRadialSize(double viewDistance) {
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (!layer.isEnabled())
                 continue;
             MetaData metaData = layer.getMetaData();
-            size = Math.max(size, ImageBounds.radial(metaData.getGeometry(), metaData.getViewpoint().distance));
+            double distance = metaData.getRenderDistance(viewDistance);
+            size = Math.max(size, ImageBounds.radial(metaData.getGeometry(), distance));
         }
         return size;
     }
 
-    public static Region computeHpcScaleBounds() {
-        Region bounds = getHpcImageBounds();
+    public static Region computeHpcScaleBounds(double viewDistance) {
+        Region bounds = getHpcImageBounds(viewDistance);
         double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
         double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
         if (halfWidth <= 0)
@@ -64,7 +68,7 @@ public final class ImageLayers {
         return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
     }
 
-    private static Region getHpcImageBounds() {
+    private static Region getHpcImageBounds(double viewDistance) {
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY;
@@ -74,7 +78,8 @@ public final class ImageLayers {
                 continue;
 
             MetaData metaData = layer.getMetaData();
-            Region bounds = ImageBounds.hpc(metaData.getGeometry(), metaData.getViewpoint().distance);
+            double distance = metaData.getRenderDistance(viewDistance);
+            Region bounds = ImageBounds.hpc(metaData.getGeometry(), distance);
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);

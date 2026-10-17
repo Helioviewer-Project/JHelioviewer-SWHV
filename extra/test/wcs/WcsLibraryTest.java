@@ -97,6 +97,17 @@ public final class WcsLibraryTest {
             near(points[2], 0, "negative longitude copy");
             if (!Double.isNaN(points[4]) || !Double.isNaN(points[5]))
                 throw new AssertionError("Invalid cylinder latitude accepted");
+            ImageGeometry geometry = new ImageGeometry(8, 6, wcs, false);
+            for (double distance : new double[]{1.01, 2, 10, 215}) {
+                // Independent tangent point and its intersection with the Sun-center plane.
+                double z = 1 / distance, x = Math.sqrt(1 - z * z);
+                double radius = distance * x / (distance - z);
+                double angle = Math.toDegrees(Math.atan2(x, distance - z));
+                near(ImageBounds.radial(geometry, distance), radius, projection + " tangent plane radius");
+                Region angular = ImageBounds.hpc(geometry, distance);
+                near(angular.llx, -angle, projection + " tangent angular minimum");
+                near(angular.urx, angle, projection + " tangent angular maximum");
+            }
         }
         WcsSolution arc = new WcsSolution(header(WcsSolution.Projection.ARC, 0, 0), 1);
         if (!Double.isNaN(arc.planeToWorld(new double[]{Math.PI + .1, 0})[0]))

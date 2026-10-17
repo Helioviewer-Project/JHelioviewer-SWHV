@@ -8,10 +8,11 @@ import org.helioviewer.jhv.math.Vec2;
 public final class ImageBounds {
 
     public static double radial(ImageGeometry geometry, double distance) {
-        // CAR/CEA describe the unit solar surface, not an off-limb image plane.
-        // Their angular extent and longitude reference cannot enlarge a radius in solar radii.
+        // For observer distance D in solar radii, the tangent ray has sin(alpha) = 1/D.
+        // Its radius on the Sun-center plane is D*tan(alpha) = D/sqrt(D*D - 1).
+        // Factoring the denominator avoids cancellation near D = 1.
         if (geometry.wcs.projection.isSurfaceMap())
-            return 1;
+            return distance / Math.sqrt((distance - 1) * (distance + 1));
 
         Region region = geometry.bounds;
         double radius = 0;

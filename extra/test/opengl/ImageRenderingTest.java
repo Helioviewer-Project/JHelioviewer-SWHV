@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.file.Files;
@@ -25,9 +26,15 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.layers.Frames;
+import org.helioviewer.jhv.layers.ImageData;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -41,6 +48,9 @@ import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.ObserverGeometry;
 import org.helioviewer.jhv.wcs.WcsSolution;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -159,6 +169,9 @@ public final class ImageRenderingTest {
             }
             sampling(texture, difference, lut, mask, viewpoint);
             fitsReference(texture, difference, lut, mask, viewpoint);
+            layerPose(viewpoint.time);
+            layerScales(renderer, viewpoint.time);
+            layerFit(renderer, viewpoint.time);
         } finally {
             mask.delete();
             lut.delete();
@@ -167,6 +180,407 @@ public final class ImageRenderingTest {
             renderer.destroy();
         }
         System.out.println("ImageRenderingTest passed");
+    }
+
+    private static void layerPose(JHVTime time) throws Exception {
+        GLRenderer.reshape(257, 193);
+        Viewport vp = Display.getViewport(0);
+        GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+        // Distinct metadata distances/orientations must not define a surface map's display pose.
+        for (String[] projections : new String[][]{{"CAR", "CEA"}, {"CEA", "CAR"}, {"TAN", "CEA"}, {"CAR", "TAN"}}) {
+            FitsMetaData current = poseMetadata(projections[0], 215, -.1, .15, "2026-01-15T12:00:00");
+            FitsMetaData previous = poseMetadata(projections[1], 4, .2, -.1, "2026-01-15T11:59:00");
+            DecodedImage image = ramp(current.getGeometry(), 3, 5, 1);
+            DecodedImage prior = ramp(previous.getGeometry(), 3, 5, 2);
+            ImageLayer layer = ImageLayer.create();
+            try {
+                layer.init();
+                layer.getDisplaySettings().setBlend(1);
+                layer.handleData(new ImageData(prior, new Frames.Frame(previous.getViewpoint().time,
+                        previous, Frames.EMPTY_METAXML, null, 0), previous.getViewpoint()));
+                layer.handleData(new ImageData(image, new Frames.Frame(current.getViewpoint().time,
+                        current, Frames.EMPTY_METAXML, null, 1), current.getViewpoint()));
+                layer.setVisible(0);
+                for (double distance : new double[]{10, 215}) {
+                    Position displayed = new Position(time, distance, .35, .2);
+                    DisplayController.setViewpointUpdate(_ -> displayed, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+                    for (double drag : new double[]{0, .6}) {
+                        for (MapMode mode : MapMode.values()) {
+                            Display.mode = mode;
+                            double width = mode == MapMode.Orthographic ? 2.4 : 1;
+                            DisplayController.cameraFromJson(new JSONObject()
+                                    .put("fov", 2 * Math.atan(width / (2 * distance)))
+                                    .put("dragRotation", Quat.createAxisY(drag).toJson()));
+                            double halfAngle = Math.toDegrees(Math.asin(1 / distance)) * 1.25;
+                            MapScale scale = switch (mode) {
+                                case Orthographic -> MapScale.ortho;
+                                case HPC -> MapScale.hpc(halfAngle, halfAngle);
+                                case Latitudinal -> MapScale.lati;
+                                case RadialWarp, RectWarp -> MapScale.boxCoxRadial(1.25, 0);
+                            };
+                            MapView view = MapView.create(Display.getCamera(), displayed, mode, GridType.Viewpoint, new MapScale[]{scale});
+                            if (mode == MapMode.Orthographic)
+                                Transform.ortho(vp.aspect, view.cameraWidth(vp), 0, 0, view.viewRotation());
+                            else
+                                Transform.ortho2D(vp.aspect, view.cameraWidth(vp), 0, 0);
+                            GLSLScreenShader.setView(view, vp);
+                            for (boolean diff : new boolean[]{false, true}) {
+                                layer.getDisplaySettings().setDifferenceMode(diff
+                                        ? ImageDisplaySettings.DifferenceMode.Running
+                                        : ImageDisplaySettings.DifferenceMode.None);
+                                layer.prerender();
+                                GL.glClearColor(0, 0, 0, 1);
+                                GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                                layer.render(view, vp);
+                                ByteBuffer pixels = BufferUtils.newByteBuffer(vp.width * vp.height * 4);
+                                GL.glReadPixels(0, 0, vp.width, vp.height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+                                // RadialWarp discards its exact origin; keep CEA probes inside decoded sample centers.
+                                for (int[] offset : new int[][]{{mode == MapMode.RadialWarp ? 12 : 0, 0}, {28, 14}, {-30, -18},
+                                        {100, mode == MapMode.Latitudinal ? 50 : 80}}) {
+                                    int x = vp.width / 2 + offset[0], y = vp.height / 2 + offset[1];
+                                    Vec3 ray = poseRay(mode, offset[0], offset[1], vp, displayed);
+                                    Vec3 world = poseWorld(mode, offset[0], offset[1], vp, displayed, drag);
+                                    // Integer mouse coordinates differ by half a pixel from fragment sample centers.
+                                    Vec3 expectedPick = poseWorld(mode, offset[0] - .5, offset[1] + .5, vp, displayed, drag);
+                                    Vec3 picked = view.mouseToSurface(vp, vp.x + x, vp.yAWT + vp.height - 1 - y);
+                                    if ((picked == null) != (expectedPick == null) || (picked != null
+                                            && Math.hypot(Math.hypot(picked.x - expectedPick.x, picked.y - expectedPick.y), picked.z - expectedPick.z) > 2e-11))
+                                        throw new AssertionError("Independent layer picking: " + mode + " D=" + distance + " drag=" + drag);
+                                    if (!diff && projections[0].equals("TAN") && world == null)
+                                        continue; // Observer off-limb plane geometry is outside this sphere-pose check.
+                                    double value = poseValue(current, world, ray, mode);
+                                    double other = poseValue(previous, world, ray, mode);
+                                    boolean valid = Double.isFinite(value) && (!diff || Double.isFinite(other));
+                                    int expected = valid ? (int) Math.floor(256 * (diff ? .5 + 2.5 * (value - other) : value)) : 0;
+                                    int actual = pixels.get(4 * (y * vp.width + x)) & 255;
+                                    if ((!valid && actual != 0) || (valid && Math.abs(actual - Math.clamp(expected, 0, 255)) > 2))
+                                        throw new AssertionError("Layer pose " + projections[0] + "/" + projections[1] + " " + mode
+                                                + " D=" + distance + " drag=" + drag + " diff=" + diff + " at " + x + "," + y + ": " + actual + " vs " + expected);
+                                }
+                            }
+                        }
+                    }
+                }
+            } finally {
+                Layers.remove(layer);
+                layer.dispose();
+                prior.release();
+                image.release();
+            }
+        }
+        if (GLException.checkErrors("ImageRenderingTest layer pose"))
+            throw new AssertionError("Layer pose rendering failed");
+        System.out.println("PASS: actual layer pose bindings, independent surface/observer pixels and displayed-view picking in all modes");
+    }
+
+    private static void layerScales(AngleRenderer renderer, JHVTime time) throws Exception {
+        // Keep the real renderer and scale construction, without grid/text overlays on the pixel probes.
+        for (Layer layer : Layers.getLayers())
+            layer.setEnabled(false);
+        for (String projection : new String[]{"CAR", "CEA"}) {
+            FitsMetaData surfaceMeta = poseMetadata(projection, 215, -.1, .15, "2026-01-15T12:00:00");
+            FitsMetaData observerMeta = poseMetadata("TAN", 4, .2, -.1, "2026-01-15T11:59:00");
+            DecodedImage surfaceImage = ramp(surfaceMeta.getGeometry(), 3, 5, 1);
+            DecodedImage observerImage = ramp(observerMeta.getGeometry(), 3, 5, 2);
+            ImageLayer surface = ImageLayer.create(), observer = ImageLayer.create();
+            try {
+                surface.getDisplaySettings().setBlend(1);
+                observer.getDisplaySettings().setBlend(1);
+                surface.handleData(new ImageData(surfaceImage, new Frames.Frame(surfaceMeta.getViewpoint().time,
+                        surfaceMeta, Frames.EMPTY_METAXML, null, 0), surfaceMeta.getViewpoint()));
+                observer.handleData(new ImageData(observerImage, new Frames.Frame(observerMeta.getViewpoint().time,
+                        observerMeta, Frames.EMPTY_METAXML, null, 0), observerMeta.getViewpoint()));
+                surface.setEnabled(true);
+                for (boolean mixed : new boolean[]{false, true}) {
+                    observer.setEnabled(mixed);
+                    for (int[] size : new int[][]{{257, 193}, {193, 257}}) {
+                        GLRenderer.reshape(size[0], size[1]);
+                        Viewport vp = Display.getViewport(0);
+                        for (double distance : new double[]{2, 10, 215}) {
+                            Position displayed = new Position(time, distance, .35, .2);
+                            DisplayController.setViewpointUpdate(_ -> displayed, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+                            Display.resetViewportZoom();
+                            DisplayController.cameraFromJson(new JSONObject().put("fov", 2 * Math.atan(1 / (2 * distance)))
+                                    .put("dragRotation", Quat.ZERO.toJson()));
+                            // A unit-sphere tangent point satisfies v·(observer-v)=0.
+                            double tangentZ = 1 / distance, tangentX = Math.sqrt(1 - tangentZ * tangentZ);
+                            double limbRadius = tangentX / (1 - tangentZ / distance);
+                            double surfaceAngle = Math.toDegrees(Math.atan2(tangentX, distance - tangentZ));
+                            // The declared TAN image covers plane coordinates [-.5,.5] on each axis.
+                            double observerAngle = Math.toDegrees(Math.atan(.5));
+                            double halfAngle = mixed ? Math.max(surfaceAngle, observerAngle) : surfaceAngle;
+                            double halfHeight = Math.max(halfAngle, halfAngle / vp.aspect);
+                            Display.mode = MapMode.HPC;
+                            renderer.render(displayed, false);
+                            MapView view = GLRenderer.getMapView();
+                            scaleNear(view.scale(vp).toMapY(1), halfHeight, "HPC vertical scale");
+                            scaleNear(view.scale(vp).toMapX(1), halfHeight * vp.aspect, "HPC horizontal scale");
+                            Layers.setActiveImageLayer(surface);
+                            DisplayController.zoomOneToOne();
+                            scaleNear(view.cameraWidth(vp), vp.height * surfaceAngle / (128 * halfHeight), "surface one-to-one zoom");
+                            if (mixed) {
+                                Layers.setActiveImageLayer(observer);
+                                DisplayController.zoomOneToOne();
+                                scaleNear(view.cameraWidth(vp), vp.height * observerAngle / (128 * halfHeight), "observer one-to-one zoom");
+                            }
+                            for (MapMode mode : new MapMode[]{MapMode.RadialWarp, MapMode.RectWarp}) {
+                                Display.mode = mode;
+                                // The observer's fixed source distance is 4, independent of the display distance.
+                                double outer = mixed ? Math.max(limbRadius, 4 * Math.sqrt(.5)) : limbRadius;
+                                renderer.render(displayed, false);
+                                view = GLRenderer.getMapView();
+                                scaleNear(view.scale(vp).toMapY(1), outer, mode + " outer scale");
+                                if (!mixed && distance == 2) {
+                                    // A visible point with z=.75 projects outside radius 1 at D=2.
+                                    double planeRadius = 2 * Math.sqrt(1 - .75 * .75) / (2 - .75);
+                                    double t = 1 / outer + (1 - 1 / outer) * Math.log(planeRadius) / Math.log(outer);
+                                    int x, y;
+                                    if (mode == MapMode.RectWarp) {
+                                        x = (int) Math.round(.125 * vp.width - .5);
+                                        y = (int) Math.round(t * vp.height - .5);
+                                    } else {
+                                        x = (int) Math.round(vp.width / 2. - .5 * t / Math.sqrt(2) * vp.height / 1.1 - .5);
+                                        y = (int) Math.round(vp.height / 2. + .5 * t / Math.sqrt(2) * vp.height / 1.1 - .5);
+                                    }
+                                    double theta, unitRadius;
+                                    if (mode == MapMode.RectWarp) {
+                                        theta = 2 * Math.PI * (x + .5) / vp.width;
+                                        unitRadius = (y + .5) / vp.height;
+                                    } else {
+                                        double px = 1.1 * (x + .5 - vp.width / 2.) / vp.height;
+                                        double py = 1.1 * (y + .5 - vp.height / 2.) / vp.height;
+                                        theta = Math.atan2(-px, py);
+                                        unitRadius = 2 * Math.hypot(px, py);
+                                    }
+                                    double radius = Math.pow(outer, (unitRadius - 1 / outer) / (1 - 1 / outer));
+                                    if (!(radius > 1 && radius < limbRadius))
+                                        throw new AssertionError("Annulus probe missed the visible surface: " + mode);
+                                    Vec3 ray = new Vec3(-radius * Math.sin(theta), radius * Math.cos(theta), -distance);
+                                    double length = Math.sqrt(radius * radius + distance * distance);
+                                    double impact = distance * radius / length;
+                                    double travel = distance * distance / length - Math.sqrt(1 - impact * impact);
+                                    Vec3 point = new Vec3(travel * ray.x / length, travel * ray.y / length, distance + travel * ray.z / length);
+                                    Vec3 world = rotateY(rotateX(point, -displayed.lat), -displayed.lon);
+                                    int expected = (int) Math.floor(256 * poseValue(surfaceMeta, world, ray, mode));
+                                    ByteBuffer pixel = BufferUtils.newByteBuffer(4);
+                                    GL.glReadPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+                                    if (Math.abs((pixel.get(0) & 255) - expected) > 2)
+                                        throw new AssertionError("Visible surface annulus: " + projection + " " + mode + ": " + (pixel.get(0) & 255) + " vs " + expected);
+                                }
+                            }
+                        }
+                    }
+                }
+            } finally {
+                Layers.remove(observer);
+                Layers.remove(surface);
+                observer.dispose();
+                surface.dispose();
+                observerImage.release();
+                surfaceImage.release();
+            }
+        }
+        if (GLException.checkErrors("ImageRenderingTest layer scales"))
+            throw new AssertionError("Layer scale rendering failed");
+        System.out.println("PASS: tangent-based actual HPC/warp scales, mixed source distances, one-to-one zoom and rendered surface annulus");
+    }
+
+    private static void layerFit(AngleRenderer renderer, JHVTime time) throws Exception {
+        for (Layer layer : Layers.getLayers())
+            layer.setEnabled(false);
+        Display.mode = MapMode.Orthographic;
+        for (String projection : new String[]{"CAR", "CEA"}) {
+            for (double coverage : new double[]{1, .25}) {
+                FitsMetaData surfaceMeta = poseMetadata(projection, 215, -.1, .15, "2026-01-15T12:00:00", coverage);
+                for (double observerSpan : new double[]{.2, 1}) {
+                    FitsMetaData observerMeta = poseMetadata("TAN", 4, .2, -.1, "2026-01-15T11:59:00", observerSpan);
+                    DecodedImage surfaceImage = ramp(surfaceMeta.getGeometry(), 3, 5, 1);
+                    DecodedImage observerImage = ramp(observerMeta.getGeometry(), 3, 5, 2);
+                    ImageLayer surface = ImageLayer.create(), observer = ImageLayer.create();
+                    try {
+                        surface.getDisplaySettings().setBlend(1);
+                        observer.getDisplaySettings().setBlend(1);
+                        surface.handleData(new ImageData(surfaceImage, new Frames.Frame(surfaceMeta.getViewpoint().time,
+                                surfaceMeta, Frames.EMPTY_METAXML, null, 0), surfaceMeta.getViewpoint()));
+                        observer.handleData(new ImageData(observerImage, new Frames.Frame(observerMeta.getViewpoint().time,
+                                observerMeta, Frames.EMPTY_METAXML, null, 0), observerMeta.getViewpoint()));
+                        for (int enabled = 0; enabled < 4; enabled++) {
+                            surface.setEnabled((enabled & 1) != 0);
+                            observer.setEnabled((enabled & 2) != 0);
+                            // Unit sphere: y spans [-1,1], regardless of the map's angular coverage.
+                            // Observer plane: declared angular span / angular solar radius at source D=4.
+                            double height = Math.max(surface.isEnabled() ? 2 : 0,
+                                    observer.isEnabled() ? observerSpan / Math.atan(1. / 4) : 0);
+                            for (int[] size : new int[][]{{257, 193}, {193, 257}}) {
+                                GLRenderer.reshape(size[0], size[1]);
+                                Viewport vp = Display.getViewport(0);
+                                for (double distance : new double[]{10, 215}) {
+                                    Position displayed = new Position(time, distance, .35, .2);
+                                    DisplayController.setViewpointUpdate(_ -> displayed, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+                                    for (boolean reset : new boolean[]{false, true}) {
+                                        DisplayController.cameraFromJson(new JSONObject().put("fov", .2)
+                                                .put("translation", new JSONArray(new double[]{.15, -.1}))
+                                                .put("dragRotation", Quat.createAxisY(.6).toJson()));
+                                        vp.zoom = .7;
+                                        renderer.render(displayed, false);
+                                        if (reset)
+                                            DisplayController.resetCamera();
+                                        else
+                                            DisplayController.zoomFit();
+                                        renderer.render(displayed, false);
+                                        MapView view = GLRenderer.getMapView();
+                                        String context = projection + " coverage=" + coverage + " enabled=" + enabled + " reset=" + reset;
+                                        double expectedHeight = height == 0 ? 2 * distance * Math.tan(Math.toRadians(.5)) : height;
+                                        scaleNear(vp.zoom, reset ? .7 : 1, context + " viewport zoom");
+                                        scaleNear(view.cameraWidth(vp) / vp.zoom, expectedHeight, context + " camera height");
+                                        scaleNear(view.cameraTranslationX(), reset ? 0 : .15, context + " translation X");
+                                        scaleNear(view.cameraTranslationY(), reset ? 0 : -.1, context + " translation Y");
+                                        scaleNear(view.dragRotation().y, reset ? 0 : Math.sin(.3), context + " drag rotation");
+                                        if (coverage == 1 && enabled == 1) {
+                                            // Read actual fitted pixels inside/outside the unit sphere.
+                                            double width = 2 * (reset ? .7 : 1), tx = reset ? 0 : .15, ty = reset ? 0 : -.1;
+                                            for (Vec2 probe : new Vec2[]{new Vec2(0, .5), new Vec2(1.05, 0)}) {
+                                                int x = (int) Math.round(vp.width / 2. + (probe.x + tx) * vp.height / width - .5);
+                                                int y = (int) Math.round(vp.height / 2. + (probe.y + ty) * vp.height / width - .5);
+                                                if (x < 0 || x >= vp.width || y < 0 || y >= vp.height)
+                                                    continue;
+                                                double px = (x + .5 - vp.width / 2.) * width / vp.height - tx;
+                                                double py = (y + .5 - vp.height / 2.) * width / vp.height - ty;
+                                                double radius2 = px * px + py * py;
+                                                int expected = 0;
+                                                if (radius2 < 1) {
+                                                    Vec3 point = new Vec3(px, py, Math.sqrt(1 - radius2));
+                                                    Vec3 world = rotateY(rotateX(rotateY(point, reset ? 0 : -.6), -displayed.lat), -displayed.lon);
+                                                    expected = (int) Math.floor(256 * poseValue(surfaceMeta, world, Vec3.ZERO, MapMode.Orthographic));
+                                                }
+                                                ByteBuffer pixel = BufferUtils.newByteBuffer(4);
+                                                GL.glReadPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+                                                if (Math.abs((pixel.get(0) & 255) - expected) > 2)
+                                                    throw new AssertionError(context + " fitted surface pixel: " + (pixel.get(0) & 255) + " vs " + expected);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } finally {
+                        Layers.remove(observer);
+                        Layers.remove(surface);
+                        observer.dispose();
+                        surface.dispose();
+                        observerImage.release();
+                        surfaceImage.release();
+                    }
+                }
+            }
+        }
+        if (GLException.checkErrors("ImageRenderingTest layer fit"))
+            throw new AssertionError("Layer fit rendering failed");
+        System.out.println("PASS: actual zoom-fit/reset with full/partial CAR/CEA, mixed observer heights, disabled/empty layers and fitted surface pixels");
+    }
+
+    private static void scaleNear(double actual, double expected, String context) {
+        if (!(Math.abs(actual - expected) < 2e-12))
+            throw new AssertionError(context + ": " + actual + " vs " + expected);
+    }
+
+    private static Vec3 poseRay(MapMode mode, double x, double y, Viewport vp, Position displayed) {
+        double mx = .5 + x / vp.width, my = .5 + y / vp.height;
+        return switch (mode) {
+            case HPC -> {
+                double halfAngle = Math.asin(1 / displayed.distance) * 1.25;
+                double lon = halfAngle * (2 * mx - 1), lat = halfAngle * (2 * my - 1);
+                yield new Vec3(Math.sin(lon) * Math.cos(lat), Math.sin(lat), -Math.cos(lon) * Math.cos(lat));
+            }
+            case RadialWarp -> new Vec3(2.5 * 1.1 * x / vp.height, 2.5 * 1.1 * y / vp.height, -displayed.distance);
+            case RectWarp -> new Vec3(-1.25 * my * Math.sin(2 * Math.PI * mx), 1.25 * my * Math.cos(2 * Math.PI * mx), -displayed.distance);
+            default -> Vec3.ZERO;
+        };
+    }
+
+    private static Vec3 poseWorld(MapMode mode, double x, double y, Viewport vp, Position displayed, double drag) {
+        Vec3 point;
+        if (mode == MapMode.Latitudinal) {
+            double lon = 2 * Math.PI * x / vp.width - displayed.lon;
+            double lat = Math.PI * y / vp.height + displayed.lat;
+            return Math.abs(lat) > Math.PI / 2 ? null
+                    : new Vec3(Math.sin(lon) * Math.cos(lat), Math.sin(lat), Math.cos(lon) * Math.cos(lat));
+        }
+        if (mode == MapMode.Orthographic) {
+            double vx = 2.4 * x / vp.height, vy = 2.4 * y / vp.height;
+            if (vx * vx + vy * vy > 1)
+                return null;
+            point = new Vec3(vx, vy, Math.sqrt(1 - vx * vx - vy * vy));
+        } else {
+            Vec3 ray = poseRay(mode, x, y, vp, displayed);
+            // Independent closest-approach construction of the near sphere hit.
+            double length = Math.sqrt(ray.x * ray.x + ray.y * ray.y + ray.z * ray.z);
+            double impact = displayed.distance * Math.hypot(ray.x, ray.y) / length;
+            if (impact > 1)
+                return null;
+            double travel = -displayed.distance * ray.z / length - Math.sqrt(1 - impact * impact);
+            point = new Vec3(travel * ray.x / length, travel * ray.y / length, displayed.distance + travel * ray.z / length);
+        }
+        // Explicit axis rotations, independent of Position.toQuat() and shader quaternion helpers.
+        return rotateY(rotateX(rotateY(point, mode == MapMode.Orthographic ? -drag : 0), -displayed.lat), -displayed.lon);
+    }
+
+    private static FitsMetaData poseMetadata(String projection, double distance, double longitude, double latitude, String date) throws Exception {
+        return poseMetadata(projection, distance, longitude, latitude, date, 1);
+    }
+
+    private static FitsMetaData poseMetadata(String projection, double distance, double longitude, double latitude, String date, double coverage) throws Exception {
+        int width = 256, height = 128;
+        double spanX = projection.equals("TAN") ? Math.toDegrees(1) : 360;
+        double spanY = projection.equals("CAR") ? 180 : Math.toDegrees(projection.equals("CEA") ? 4 : 1);
+        String axes = projection.equals("TAN") ? "HPL" : "CRL";
+        String xml = "<meta><DATE-OBS>" + date + "</DATE-OBS><NAXIS1>" + width + "</NAXIS1><NAXIS2>" + height
+                + "</NAXIS2><CTYPE1>" + axes + "N-" + projection + "</CTYPE1><CTYPE2>" + axes + "T-" + projection
+                + "</CTYPE2><CUNIT1>deg</CUNIT1><CUNIT2>deg</CUNIT2><CRPIX1>" + (width + 1) / 2.
+                + "</CRPIX1><CRPIX2>" + (height + 1) / 2. + "</CRPIX2><CDELT1>" + coverage * spanX / width
+                + "</CDELT1><CDELT2>" + coverage * spanY / height + "</CDELT2><PV2_1>0.5</PV2_1><DSUN_OBS>"
+                + distance * Sun.RadiusMeter + "</DSUN_OBS><CRLN_OBS>" + Math.toDegrees(-longitude)
+                + "</CRLN_OBS><HGLT_OBS>" + Math.toDegrees(latitude) + "</HGLT_OBS></meta>";
+        return new FitsMetaData(new XMLMetaDataContainer(xml), URI.create("test:layer-pose"));
+    }
+
+    private static double poseValue(FitsMetaData metadata, Vec3 world, Vec3 ray, MapMode mode) {
+        if (world == null)
+            return Double.NaN;
+        double u, v;
+        if (metadata.getGeometry().wcs.projection.isSurfaceMap()) {
+            double longitude = Math.atan2(world.x, world.z);
+            u = .5 + longitude / (2 * Math.PI);
+            v = .5 - (metadata.getGeometry().wcs.projection == WcsSolution.Projection.CAR
+                    ? Math.asin(world.y) / Math.PI : world.y / 2);
+        } else {
+            Position source = metadata.getViewpoint();
+            Vec3 sourcePoint = rotateX(rotateY(world, source.lon), source.lat);
+            if (mode == MapMode.Orthographic) {
+                u = .5 + sourcePoint.x / metadata.getGeometry().wcs.unitsPerRad;
+                v = .5 - sourcePoint.y / metadata.getGeometry().wcs.unitsPerRad;
+            } else if (mode == MapMode.Latitudinal) {
+                if (sourcePoint.z < 1 / source.distance)
+                    return Double.NaN;
+                u = .5 + sourcePoint.x / (source.distance - sourcePoint.z);
+                v = .5 - sourcePoint.y / (source.distance - sourcePoint.z);
+            } else {
+                double denominator = mode == MapMode.HPC ? -ray.z : source.distance;
+                u = .5 + ray.x / denominator;
+                v = .5 - ray.y / denominator;
+            }
+        }
+        return u < 0 || u > 1 || v < 0 || v > 1 ? Double.NaN : .1 + .35 * u + .3 * v;
+    }
+
+    private static Vec3 rotateX(Vec3 point, double angle) {
+        return new Vec3(point.x, Math.cos(angle) * point.y - Math.sin(angle) * point.z,
+                Math.sin(angle) * point.y + Math.cos(angle) * point.z);
+    }
+
+    private static Vec3 rotateY(Vec3 point, double angle) {
+        return new Vec3(Math.cos(angle) * point.x + Math.sin(angle) * point.z, point.y,
+                -Math.sin(angle) * point.x + Math.cos(angle) * point.z);
     }
 
     private static void rayIntersections(JHVTime time) {

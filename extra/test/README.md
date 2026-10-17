@@ -57,12 +57,12 @@ claim that a suite validates every behavior in those files.
 | Changed production area | Existing checks | Additional verification or limit |
 | --- | --- | --- |
 | `image/ImageBuffer*`, `image/DecodedImage`, `layers/FrameDecoder`, `layers/Frames`, `thread/LatestWorker` | `j2k`: [ImageBufferCacheTest](j2k/ImageBufferCacheTest.java) covers reference ownership, eviction and keyed worker requests; [FramesTest](j2k/FramesTest.java) covers selection, stale delivery, arrivals and sampling | Native JPEG 2000 decode coverage needs the native checks below. Rendering/processing changes also need `opengl`. |
-| `io/Load`, `layers/ImageLayerLoader`, `layers/ImageLayer`, `io/ImageRequestSettings` | `j2k`: [FramesLoadTest](uri/FramesLoadTest.java), [LayerLoadTest](uri/LayerLoadTest.java), [ImageRequestSettingsTest](j2k/ImageRequestSettingsTest.java) | These loader tests live under `uri/` but run in `j2k`. They use local FITS/ZIP/directory inputs; remote service behavior is separate. |
+| `io/Load`, `layers/ImageLayerLoader`, `layers/ImageLayer`, `io/ImageRequestSettings` | `j2k`: [FramesLoadTest](uri/FramesLoadTest.java), [LayerLoadTest](uri/LayerLoadTest.java), [ImageRequestSettingsTest](j2k/ImageRequestSettingsTest.java) | These loader tests live under `uri/` but run in `j2k`. `opengl`: [ImageRenderingTest.layerPose](opengl/ImageRenderingTest.java) covers actual layer pose selection, rendering and picking with independent geometry in all modes and mixed source types. Loader inputs are local; remote service behavior is separate. |
 | `source/jpip/`, `source/J2KReader`, `io/NetClientRemote`, `io/ProxySettings` | `j2k`: [JPIPCacheManagerTest](j2k/JPIPCacheManagerTest.java), [HTTPStreamTest](j2k/HTTPStreamTest.java), [JPIPSocketTest](j2k/JPIPSocketTest.java), [J2KReaderTest](j2k/J2KReaderTest.java) | Loopback checks cover direct connections, HTTP/SOCKS proxies, exclusions, failover/failure reports, socket options and cleanup after read timeout or 407 refusal, stored/system credentials, origin-authentication refusal and explicit CONNECT restrictions. Offline coverage uses HTTP and plain JPIP; it does not exercise JPIPS/TLS. Offline `J2KReaderTest` checks missing-native-library behavior. Real retrieval/decode requires the opt-in live runner. |
 | `source/J2KSource`, Java/native decode interface, repository-root `native/jpeg2000/` | [check_native_build.py](j2k/check_native_build.py) runs [J2KNativeTest](j2k/J2KNativeTest.java) against supplied native libraries and esajpip fixtures | Follow the [native build/validation guide](../jpeg2000/README.md) on each affected platform. `python3 extra/test/j2k/run_j2k_tests.py --live` adds `FrameDecoderTest` and `CallistoTest`; offline runs compile those classes but do not execute them. |
 | `source/FITSData`, `source/FITSSource`, `source/FastRice*` | `uri`: [FastRiceVerifier](uri/FastRiceVerifier.java) checks provider selection, decoder boundaries and compressed/uncompressed loading; `j2k` exercises local FITS frame loading | `uri` needs external nom-tam fixtures. Add `wcs` for metadata interpretation and `opengl` for displayed pixel/geometry changes. |
-| `metadata/WcsInterpreter`, `metadata/FitsMetaData`, `wcs/` (`WcsSolution` owns WCSLIB, `ObserverGeometry` handles observer rays), `native/wcs/`, `resources/glsl/image*.frag` (shared declarations/color, geometry and mode shaders) | `wcs`: [validation runner](wcs/run_jhv_wcs_hpc_validation_suite.py), including [WcsLibraryTest](wcs/WcsLibraryTest.java) and Java metadata comparisons; `opengl`: [ImageRenderingTest](opengl/ImageRenderingTest.java), [GridRenderingTest](opengl/GridRenderingTest.java); `shaders`: GLSL syntax/linking | Independent analytic geometry, FITS-to-buffer conversion, legacy CEA row scales and PC/CD precedence, effective PV families, inverse domains, coefficient rejection, concurrent ownership, adjusted native frames and packaged-JAR loading. Electron full-fragment checks use actual Java/native uniforms, including aligned Ortho/HPC comparisons with formal-TAN controls. Java checks also cover directed ray scaling/reversal, both warped-view picking paths, and mixed Orthographic surface/observer comparisons with distinct rotations, coefficients and decoded grids in both image orders. Native cross-build instructions are in [WCSLIB](../wcs/README.md). |
-| `opengl/`, `layers/grid/`, `display/` | `shaders` and `opengl`: image/grid/model/colored-vertex rendering, [GLGrabRenderingTest](opengl/GLGrabRenderingTest.java), [ContextRecoveryTest](opengl/ContextRecoveryTest.java) | Context recovery injects loss into a pbuffer renderer and explicitly recreates it. It does not exercise `AngleCanvas`'s automatic recovery or native window lifecycle. Verify affected platforms and GUI resize/show/hide behavior. |
+| `metadata/MetaData`, `metadata/WcsInterpreter`, `metadata/FitsMetaData`, `wcs/` (`WcsSolution` owns WCSLIB, `ObserverGeometry` handles observer rays), `native/wcs/`, `resources/glsl/image*.frag` (shared declarations/color, geometry and mode shaders) | `wcs`: [validation runner](wcs/run_jhv_wcs_hpc_validation_suite.py), including [WcsLibraryTest](wcs/WcsLibraryTest.java) and Java metadata comparisons; `opengl`: [ImageRenderingTest](opengl/ImageRenderingTest.java), [GridRenderingTest](opengl/GridRenderingTest.java); `shaders`: GLSL syntax/linking | Independent analytic geometry, FITS-to-buffer conversion, legacy CEA row scales and PC/CD precedence, effective PV families, inverse domains, coefficient rejection, concurrent ownership, adjusted native frames and packaged-JAR loading. Electron full-fragment checks use actual Java/native uniforms, including aligned Ortho/HPC comparisons with formal-TAN controls. Java checks also cover directed ray scaling/reversal, both warped-view picking paths, and mixed Orthographic surface/observer comparisons with distinct rotations, coefficients and decoded grids in both image orders. Native cross-build instructions are in [WCSLIB](../wcs/README.md). |
+| `opengl/`, `layers/grid/`, `display/`, `layers/ImageLayers` fitting | `shaders` and `opengl`: image/grid/model/colored-vertex rendering, [GLGrabRenderingTest](opengl/GLGrabRenderingTest.java), [ContextRecoveryTest](opengl/ContextRecoveryTest.java) | `ImageRenderingTest.layerScales()` checks actual HPC/warp scales, surface/observer one-to-one zoom and the rendered apparent limb against independent tangent geometry. `layerFit()` checks public Orthographic zoom-fit/reset, mixed-layer heights and fitted surface pixels against sphere geometry. Context recovery injects loss into a pbuffer renderer and explicitly recreates it. It does not exercise `AngleCanvas`'s automatic recovery or native window lifecycle. Verify affected platforms and GUI resize/show/hide behavior. |
 | `opengl/model/`, `layers/ModelLayer`, model detection in `io/DataUri` | `model`: [ModelDataUriTest](model/ModelDataUriTest.java), [AssimpMetaDataTest](model/AssimpMetaDataTest.java), [AssimpModelLoaderTest](model/AssimpModelLoaderTest.java); `opengl`: [ModelRenderingTest](opengl/ModelRenderingTest.java) | Loader/metadata assertions do not replace rendered-output checks. |
 | `timelines/band/`, `timelines/TimelineLayers`, `time/RequestCache`, `timelines/draw/`, `timelines/chart/` | `timelines`: [HapiCatalogTest](timelines/HapiCatalogTest.java) and [TimelineDataTest](timelines/TimelineDataTest.java), including request reuse, coverage, band restoration, data export/import and chart painting | Verify mouse interaction, chart show/hide/re-attach behavior, display scales and recorded chart output for relevant UI changes. Use the explicit benchmarks below for performance claims. |
 | `event/`, `plugins/swek/`, repository-root `resources/settings/SWEK.json` | `event`: [runner](event/run_event_tests.py) executes HEK parsing, database, cache, filter-request, integration and SWEK layer tests | Live HEK availability is a separate probe. Interactive event selection and overlay appearance need GUI verification when affected. |
@@ -105,41 +105,20 @@ python3 extra/test/wcs/test_wcs_rendering.py --backend default
 python3 extra/test/wcs/test_wcs_rendering.py --backend swiftshader
 ```
 
-Java, the syntax validator and the Electron harness concatenate `imageCommon.frag`, `imageGeometry.frag`
-and the mode fragment in that order, without inserting separators. The two shared fragments contain
-declarations/color processing and geometry respectively; neither is a standalone fragment shader.
+Java, the syntax validator and the Electron harness concatenate `imageCommon.frag`,
+`imageGeometry.frag` and the mode fragment in that order, without separators.
 
-The rendering cases cover source coordinates, color, difference sampling, depth, reduced-grid coverage,
-tilted native frames, pole/fiducial parameters, projection origins combined with user rotation,
-and dense float-input sine/cosine accuracy. Fragment shaders use built-in sine/cosine on hardware and
-select the polynomial through `JHV_SWIFTSHADER` only when the actual renderer name identifies SwiftShader.
-The Electron harness mirrors Java's compile-time selection. The dense probe checks the selected helper,
-a forced polynomial control and raw built-ins against exact float inputs; selected and polynomial errors
-must stay at or below `2e-7`, and the selected output must exactly match the backend's control. SwiftShader's
-raw built-in error is reported diagnostically. Coordinate tolerances are unchanged between backends.
-`ImageRenderingTest` separately exercises the actual Java uniform binding, including adjusted
-CAR/CEA native frames and origins, and the deliberate Orthographic simple-TAN affine mapping with
-user offsets/rotation, comparison images and reduced grids. Full-fragment simple-TAN cases check the
-AIA, EUI and COR2 headers from the validation note against independent affine solves; formal TAN is
-still checked against Astropy in the other modes. Each full backend run also includes nine direct
-Ortho/HPC cases at 513 × 513, retaining the headers' CRVAL and matching the disk scale. Independent
-references check all three paths, including a test-only formal-TAN Orthographic control. These cases
-require complete coverage and subpixel simple-TAN differences at least ten times smaller than formal-TAN
-on-disk and over the matched frame. Off-limb measurements are reported separately. Run just these cases
-with `--ortho-hpc-only`; `--output-dir` retains their coordinate buffers and `ortho-hpc-comparison.json`.
-Eight additional tilted-plane depth cases check depth calculation enabled/disabled and a comparison
-image with a different pose. The Java native tests independently check exported PV coefficient families,
-FITS-to-buffer conversion with signed scales/shear, and the already-rotated policy.
-The Java metadata comparison command also runs
-[WcsInterpreterTest](wcs/WcsInterpreterTest.java) against the original LASCO C3 XML and the
-[instrument fixtures](data/wcs-instruments/README.md). It checks legacy axis/unit spellings,
-SPICE/PUNCH cube-axis declarations, missing-scale rejection, angular matrices,
-buffer reference pixels and preserved LASCO derotation. Forward/inverse coordinates use direct
-TAN and ARC equations. These are offline fixtures; live service availability is separate.
-The Python validator's standalone projection model remains
-a mathematical reference, not a second executable Java implementation. The September
-[WCS validation note](../../docs/wcs-validation/jhv_wcs_hpc_validation_note.md) records earlier
-experiments. Diagnostic runs are reported separately from correctness assertions.
+`ImageRenderingTest` checks actual layer bindings, rendering and picking, HPC/warp scales,
+one-to-one zoom and Orthographic fit/reset against independent geometry. It covers observer and
+surface images, mixed comparisons, decoded grids, masks, slits and image processing.
+`WcsLibraryTest` checks native geometry, domains, parameters and ownership. `WcsInterpreterTest`
+checks the [captured instrument fixtures](data/wcs-instruments/README.md) and metadata conventions.
+
+Full-fragment checks cover native frames, surface geometry, depth and simple-TAN Orthographic
+sampling. Direct Ortho/HPC comparisons include an independent formal-TAN control. Use
+`--ortho-hpc-only` for that subset and `--output-dir` to retain coordinate buffers and
+`ortho-hpc-comparison.json`. Trigonometry probes check the selected hardware/SwiftShader helper
+and independent controls with a maximum error of `2e-7`; raw SwiftShader intrinsics are diagnostic.
 
 ANGLE updates and old/new image comparisons are documented in
 [the ANGLE updater guide](../angle/README.md).

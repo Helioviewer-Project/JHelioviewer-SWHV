@@ -1027,9 +1027,10 @@ def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float
 
 
 def image_radial_bound(meta: JHVMeta) -> float:
-    # Surface maps have no off-limb extent. Angular map coordinates are not solar radii.
+    # Apparent surface limb projected onto the plane through the Sun's center.
     if is_surface_map_projection(meta):
-        return 1.0
+        distance = meta.observer_distance
+        return distance / math.sqrt((distance - 1) * (distance + 1))
     radius = 0.0
     for plane in rotated_image_plane_edge_samples(meta):
         helioprojective = project_plane_internal_to_world(plane, meta)

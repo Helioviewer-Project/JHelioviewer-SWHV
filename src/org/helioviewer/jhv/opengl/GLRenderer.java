@@ -24,20 +24,21 @@ public final class GLRenderer {
 
     static MapView createMapView(Camera camera, Position viewpoint) {
         MapMode mode = Display.mode;
-        return MapView.create(camera, viewpoint, mode, Display.gridType, createScales(mode, Display.getViewports()));
+        return MapView.create(camera, viewpoint, mode, Display.gridType, createScales(mode, Display.getViewports(), viewpoint.distance));
     }
 
-    private static MapScale[] createScales(MapMode mode, Viewport[] viewports) {
+    private static MapScale[] createScales(MapMode mode, Viewport[] viewports, double viewDistance) {
         return switch (mode) {
             case Orthographic -> createConstantScales(viewports, MapScale.ortho);
-            case HPC -> createHpcScales(viewports);
+            case HPC -> createHpcScales(viewports, viewDistance);
             case Latitudinal -> createConstantScales(viewports, MapScale.lati);
-            case RadialWarp, RectWarp -> createConstantScales(viewports, MapScale.boxCoxRadial(ImageLayers.getLargestRadialSize(), Display.getWarpLambda()));
+            case RadialWarp, RectWarp ->
+                    createConstantScales(viewports, MapScale.boxCoxRadial(ImageLayers.getLargestRadialSize(viewDistance), Display.getWarpLambda()));
         };
     }
 
-    private static MapScale[] createHpcScales(Viewport[] viewports) {
-        Region bounds = ImageLayers.computeHpcScaleBounds();
+    private static MapScale[] createHpcScales(Viewport[] viewports, double viewDistance) {
+        Region bounds = ImageLayers.computeHpcScaleBounds(viewDistance);
         MapScale[] scales = new MapScale[viewports.length];
         double halfWidth = 0.5 * bounds.width;
         for (Viewport vp : viewports) {

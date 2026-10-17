@@ -8,8 +8,7 @@ This note documents the coordinate conventions and code ownership of JHV's five 
 - `RadialWarp`
 - `RectWarp`
 
-It describes the WCSLIB implementation. The September validation note records the preceding implementation
-and its experiments. Current native build instructions are in [the WCSLIB guide](../extra/wcs/README.md).
+Native build instructions are in [the WCSLIB guide](../extra/wcs/README.md).
 
 ## Code ownership
 
@@ -127,11 +126,9 @@ parameters.
 `DisplayBlock` has 25 meaningful floats and three trailing padding floats. Its std140 backing buffer therefore occupies
 112 bytes; Java and the WebGL runner must allocate all 28 floats.
 
-The Electron validation runner checks the reflected block sizes and active-member offsets against its WebGL buffer
-mirror.
-
 The meaning of `sourceViewQuat` depends on the sampling path. For observer images in `Latitudinal`, it rotates a
-solar-world point into that image's observer frame. For surface maps, `ImageLayer` uploads the displayed view rotation;
+solar-world point into that image's observer frame. For surface maps, `ImageLayer` uploads the displayed viewpoint
+rotation, including trackball rotation only in `Orthographic`, and the displayed observer distance;
 `Orthographic`, `HPC`, and the warp modes inverse-rotate their sphere intersection through it to keep the map attached
 to the visible sphere. Direct Latitudinal surface-map sampling does not need it. Observer images in `HPC` and the
 warp modes do not use `sourceViewQuat`; their viewpoint limitation is described below.
@@ -158,8 +155,7 @@ longitude and have no off-limb representation.
 
 For CEA, an explicit `CUNIT2` selects the angular FITS WCS convention used by wcslib/Astropy. Historical normalized
 maps with no `CUNIT2` retain JHV's compatibility convention in which the second plane coordinate is stored directly as
-`sin(latitude) / PV2_1`. This is a missing-unit compatibility assumption, not Astropy's interpretation of the original
-header; validation canonicalizes that legacy row to equivalent angular values before comparing it with Astropy.
+`sin(latitude) / PV2_1`. `WcsInterpreter` converts that normalized row to angular FITS values for WCSLIB.
 
 WCSLIB resolves CRVAL, LONPOLE, LATPOLE and native fiducial parameters together. CAR/CEA longitude equivalence
 is selected in that native plane against both original affine coordinates and the source slit, including rotated,
@@ -180,7 +176,8 @@ the source-image WCS.
 
 For CAR/CEA maps, the sphere intersection is inverse-rotated by the displayed view rotation and sampled through the
 same longitude/latitude mapping used by Orthographic. Longitude wraps; off-disk rays are discarded. The intersection
-uses the image's observer distance, also used to calculate its angular bounds.
+uses the displayed observer distance, matching Java mouse unprojection. Surface angular bounds and one-to-one zoom
+use that distance as well; observer-image bounds retain source distance.
 
 Java overlays are first rotated from solar world space into the displayed viewpoint frame, projected to `(Tx, Ty)`, and
 clipped using the current `view.z >= 0` front-hemisphere test. Lines terminate at hidden segments instead of wrapping
@@ -295,57 +292,10 @@ selected viewpoint while the image remains tied to its source observer.
 Changing this requires a defined reprojection policy and a corresponding Java-to-GLSL transform. A local scale factor or
 observer-distance normalization is insufficient.
 
-Surface maps follow the displayed orientation in all modes. Their HPC-derived ray intersections and angular bounds
-use the image's metadata observer distance, rather than a separately selected display distance.
+Surface-map sphere intersections use the displayed distance and orientation. Orthographic includes trackball rotation;
+HPC and warp sampling use the displayed viewpoint without it. Latitudinal uses its explicit angular origins.
+Surface angular/radial bounds use displayed distance, including the apparent limb's perspective plane radius.
+Orthographic fit/reset uses the unit-sphere diameter for surface maps, including partial maps,
+and retains observer-image heights in mixed-layer maxima.
 
-## Validation boundaries
-
-The validation suite in `extra/test` separates several questions:
-
-- Astropy validates the FITS WCS calculations and the modeled HPC source-sampling path for `TAN`, `ARC`, `AZP`, and
-  primary-branch six-term `ZPN`.
-- Astropy directly validates `CAR` and explicitly unit-labelled `CEA` source WCS and Latitudinal surface-map sampling.
-  Normalized CEA maps with no `CUNIT2` are first canonicalized to an equivalent angular CEA header.
-- Java/Python metadata tests validate the projection parameters and linear WCS transforms that Java derives for GLSL.
-- Independent Java geometry tests check all six projections, inverse domains, coefficient rejection, adjustment
-  defaults, concurrent native ownership and native-resource extraction from a JAR.
-- Electron/WebGL2 runs execute the production shaders on Metal/ANGLE and SwiftShader.
-- Full-fragment CAR/CEA tests cover HPC and both warp modes against independent ray/sphere intersections and Astropy
-  pixel coordinates, including view rotations, near-Sun and Earth distances, off-limb clipping, and difference images.
-- Orthographic and warp modes are compared with their independent CPU mirrors because Astropy does not define JHV's
-  display warps.
-- Native-frame fragment cases use the actual Java/native prepared uniforms and independently projected pixels,
-  including tilted references, explicit poles, native fiducials, origin offsets and user rotation in both image slots.
-- The actual Java ANGLE bindings are checked with adjusted CAR/CEA native frames, nonzero origins, reduced grids,
-  masks, slits and differences.
-
-The full production-fragment cases use the same coordinate tolerances on Metal/ANGLE and SwiftShader.
-On 32,768 exact float inputs across `[-4π,4π]`, including adjacent floats at quadrant boundaries, the
-polynomial control's maximum absolute sine/cosine error is below `1.1e-7` on both backends. Metal's built-ins
-reach about `1.3e-7`; SwiftShader's built-ins reach `1.90e-4`. The selected helper and polynomial control
-must each stay at or below `2e-7`, and the selected output must exactly match the appropriate backend control.
-The inaccurate SwiftShader intrinsic case remains a separate diagnostic. The Java OpenGL suite also runs
-with Metal and an external SwiftShader ICD, including context destruction/recreation. These are offscreen
-rendering checks, not an interactive picking/annotation acceptance run.
-The former SwiftShader-specific differential-rotation tolerance allowance is removed; both backends use the same
-catalog thresholds as well as the unchanged 0.05-source-pixel full-fragment threshold.
-
-Astropy agreement does not validate:
-
-- Java overlay projection or visible-hemisphere clipping;
-- mouse picking and annotation persistence;
-- arbitrary displayed viewpoints in HPC-derived image modes;
-- UI zoom/refit policy;
-- blending, rasterization, or other full-renderer state.
-
-## Change checklist
-
-When changing projection behavior:
-
-1. Identify the coordinate space being changed; do not treat map, observer, WCS-plane, and texture coordinates as
-   interchangeable.
-2. Review Java projection, unprojection, overlays, mouse mapping, GLSL sampling, and the Java-to-GLSL interface together.
-3. Preserve the inverse relationship between `MapScale.toMap*` and `MapScale.toUnit*`.
-4. Check both image slots, differential rotation, and source-view transforms.
-5. Validate WCS-defined behavior against Astropy and JHV-specific display geometry against the CPU and Electron paths.
-6. Do not infer support for arbitrary viewpoints or surface-map display modes from source-WCS agreement alone.
+Test commands and coverage are in [the test guide](../extra/test/README.md#graphics-and-wcs).

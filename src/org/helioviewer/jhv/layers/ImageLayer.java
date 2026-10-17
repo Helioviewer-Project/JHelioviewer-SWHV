@@ -254,14 +254,20 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
             deltaT1 = (float) ((renderViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
         }
 
-        Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
-        Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
+        boolean surface0 = wcs0.projection.isSurfaceMap();
+        boolean surface1 = wcs1.projection.isSurfaceMap();
+        // Projected views do not use the Orthographic trackball rotation.
+        Quat surfaceView = mv.isOrthographic() ? q : renderViewpoint.toQuat();
+        Quat sourceView0 = surface0 ? surfaceView : metaViewpoint0.toQuat();
+        Quat sourceView1 = surface1 ? surfaceView : metaViewpoint1.toQuat();
+        float distance0 = (float) meta0.getRenderDistance(renderViewpoint.distance);
+        float distance1 = (float) meta1.getRenderDistance(renderViewpoint.distance);
 
         GLSLImageShader.render(mv.mode(),
                 geometry0, wcs0,
-                (float) metaViewpoint0.distance, deltaT0, cameraDiff0, sourceView0,
+                distance0, deltaT0, cameraDiff0, sourceView0,
                 geometry1, wcs1,
-                (float) metaViewpoint1.distance, deltaT1, cameraDiff1, sourceView1, adjustment);
+                distance1, deltaT1, cameraDiff1, sourceView1, adjustment);
     }
 
     @Nonnull

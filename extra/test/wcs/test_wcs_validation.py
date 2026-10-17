@@ -28,8 +28,8 @@ from test_wcs_rendering import (
 
 
 class ValidationTest(unittest.TestCase):
-    def test_surface_radial_extent_is_the_unit_sphere(self):
-        # Longitude offsets, angular units and map coverage cannot create off-limb data.
+    def test_surface_bounds_follow_independent_tangent_rays(self):
+        # Surface coverage and angular units do not change the apparent limb geometry.
         for projection in ("CAR", "CEA"):
             for width, longitude, scale in ((128, 0, 1), (17, 354, 0.1), (129, -366, 2)):
                 header = image_header(projection)
@@ -45,10 +45,17 @@ class ValidationTest(unittest.TestCase):
                                 converted[f"CUNIT{axis}"] = units
                                 for keyword in ("CDELT", "CRVAL"):
                                     converted[f"{keyword}{axis}"] = math.radians(converted[f"{keyword}{axis}"])
-                        meta = cpu.build_jhv_meta(converted)
-                        self.assertEqual(cpu.image_radial_bound(meta), 1.0)
-                        radius = math.degrees(math.asin(1 / meta.observer_distance))
-                        self.assertEqual(cpu.raw_hpc_footprint_bounds_degrees(meta), (-radius, radius, -radius, radius))
+                        for distance in (2, 10, 215):
+                            converted["DSUN_OBS"] = distance * cpu.SUN_RADIUS_METER
+                            meta = cpu.build_jhv_meta(converted)
+                            # Tangency gives z=1/D on the sphere; intersect its ray with z=0.
+                            z = 1 / distance
+                            x = math.sqrt(1 - z * z)
+                            radius = distance * x / (distance - z)
+                            angle = math.degrees(math.atan2(x, distance - z))
+                            self.assertAlmostEqual(cpu.image_radial_bound(meta), radius, places=12)
+                            np.testing.assert_allclose(cpu.raw_hpc_footprint_bounds_degrees(meta),
+                                                       (-angle, angle, -angle, angle), rtol=0, atol=1e-12)
 
     def test_radial_fallback_is_centered_on_the_sun(self):
         # Astropy gives the Sun's FITS pixel independently of JHV's sun-shift helper.

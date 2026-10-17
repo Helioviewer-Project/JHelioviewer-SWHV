@@ -77,15 +77,21 @@ and the supported FITS subset are documented in [the WCSLIB guide](../extra/wcs/
 `ImageBounds` maps the image corners and edge midpoints through the geometry and projection to obtain the
 camera bounds. `ImageGeometry.bounds` is the original image's axis-aligned rectangle in plane units used
 for sizing; decoded geometries share that same footprint. The matrix and projection, not that rectangle,
-decide where the image lies in the scene. Radial bounds are
-one solar radius for CAR/CEA surface maps. Observer images use the projected boundary's largest radius,
+decide where the image lies in the scene. CAR/CEA radial bounds use the apparent limb projected onto the
+Sun-center plane: `D / sqrt((D-1)*(D+1))`, with displayed observer distance `D`.
+Observer images use the projected boundary's largest radius,
 falling back to rectangle corners relative to the Sun when no projected radius is usable. HPC bounds
 use the projected boundary for observer images. These sampled fitting extents are approximate. Invalid
 WCS samples are omitted; if no perimeter sample is valid, HPC fitting uses the full celestial angular
 domain rather than failing on an image whose valid region may lie inside its perimeter.
 CAR/CEA maps instead contribute the solar disk's angular
-extent, `asin(1 / distance)`, using the same image observer distance supplied to the shader. Their longitude
-and latitude coverage is not an observer-image field of view.
+extent, `asin(1 / D)`, with that same displayed distance. `GLRenderer` passes the displayed distance through
+`ImageLayers` for HPC/warp scales, and `DisplayController.zoomOneToOne()` uses it for the surface angular
+height. Observer-image bounds retain each source's metadata distance. Surface longitude and latitude coverage
+is not an observer-image field of view.
+
+Orthographic fit/reset uses diameter 2 for CAR/CEA, including partial maps. Observer images
+contribute their original plane height; enabled layers contribute their maximum height.
 
 ## Decoder output to original pixels
 
@@ -228,7 +234,9 @@ texture = source · scale + offset
 
 The binder derives scale and offset from the grid; the shader keeps them in `sampling.xy` and
 `sampling.zw`. At level 0 they are the identity. Each 160-byte image record also contains the native
-frame, pole conventions, source distance and observer transforms. The two-image uniform block is 320 bytes.
+frame, pole conventions, selected observer distance and observer transforms. `ImageLayer.render()` selects displayed
+distance/orientation for surface maps, including trackball rotation only in Orthographic. Observer images retain
+their source distance/orientation and existing camera-difference transform. The two-image uniform block is 320 bytes.
 
 [`imageGeometry.frag`](../resources/glsl/imageGeometry.frag) projects homogeneous 3D directions through the
 prepared native frame. Observer points and warp-plane inputs go directly to that frame without converting to angles and back. TAN uses the
@@ -239,12 +247,10 @@ otherwise it is the native projection origin. No additional image uniforms are n
 angular inputs and RectWarp's angular direction use `sinCos()`. It uses built-in sine/cosine on hardware
 renderers and the accurate polynomial only on SwiftShader. `GLSLShader` selects this at fragment-shader
 compilation from `GL.renderer`, adding `JHV_SWIFTSHADER` after the version directive; each new context
-uses its own renderer name. There is no runtime shader branch or additional uniform. Dense exact-float
-probes check the selected implementation and both independent controls on Metal and SwiftShader.
+uses its own renderer name. There is no runtime shader branch or additional uniform.
 
 Image shaders concatenate `imageCommon.frag` (declarations and color processing), `imageGeometry.frag`
-(shared geometry), and the mode fragment in that order. The split preserves the concatenated source
-exactly, including whitespace. The syntax validator and Electron renderer use the same order.
+(shared geometry), and the mode fragment in that order.
 
 The current and comparison images have independent mappings. Difference rendering sends the same scene
 point through each image's observer and WCS geometry, then subtracts the sampled values.
@@ -280,33 +286,6 @@ bottom = -(H - c.y) · py        height = H · py
 The callers convert to arcseconds and send the center and size. Nothing in it comes from the reduced
 texture, so a resolution change cannot alter the requested cutout.
 
-## Regression checks
-
-- `J2KNativeTest` compares native dimensions, grid positions and decoded pixels with Kakadu.
-- `J2KReaderTest` checks composition with even and odd sizes, nonzero origins and unequal spacings.
-- `FramesTest` checks reduced-grid RHEF, retained original cutout geometry and reuse on a cache hit.
-- `ImageRenderingTest` compares reduced ramps with full-resolution references in every mode, checks
-  detector masks, slits and reduced CAR/CEA wrapping, and compares sharpening with a CPU reference.
-  Its independent simple-TAN affine check includes user offsets/rotation, separate comparison-image
-  references and reduced grids, on-disk and off-limb.
-- `WcsLibraryTest` checks analytic 3D geometry and inverse domains for all six projections, parameter
-  rejection, adjusted pole defaults, concurrent use and unpacked/JAR native-resource loading.
-- The WCS metadata and rendering validators compare real headers and actual Java/native prepared uniforms
-  with independent geometry and Astropy. Native offsets and user plane rotation are exercised together.
-  Orthographic TAN is checked against a direct affine solve, including the AIA, EUI and COR2 headers
-  from the validation note; formal TAN remains covered in the other display modes. Direct 513 × 513
-  comparisons of aligned Ortho/HPC also retain a test-only formal-TAN Ortho control and separately
-  measure on-disk and off-limb displacement. All three paths have independent coordinate references.
-
-Run the offline and GPU suites from the repository root:
-
-```sh
-ant compile
-python3 extra/test/j2k/run_j2k_tests.py
-python3 extra/test/run_tests.py opengl shaders --no-build
-```
-
-Native build steps are in [Preparing JPEG 2000 native libraries](../extra/jpeg2000/README.md) and
-[WCSLIB](../extra/wcs/README.md). Current validation commands and coverage are in
-[the test guide](../extra/test/README.md#graphics-and-wcs). The September
-[WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md) records the earlier implementation.
+Native build instructions are in [JPEG 2000](../extra/jpeg2000/README.md) and
+[WCSLIB](../extra/wcs/README.md). Test commands and coverage are in
+[the test guide](../extra/test/README.md#graphics-and-wcs).
