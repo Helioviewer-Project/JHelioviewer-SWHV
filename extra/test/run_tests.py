@@ -23,7 +23,7 @@ SCRIPTS = {
 JAVA_TESTS = {
     "commands": ["io.samp.CommandStateTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
-    "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest", "opengl.ContextRecoveryTest"],
+    "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
 }
 
 

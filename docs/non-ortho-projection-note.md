@@ -298,4 +298,10 @@ Surface angular/radial bounds use displayed distance, including the apparent lim
 Orthographic fit/reset uses the unit-sphere diameter for surface maps, including partial maps,
 and retains observer-image heights in mixed-layer maxima.
 
+HPC and warp annotations use finite-distance sphere occlusion. Unit-sphere points are visible
+when `D*z >= 1` in observer coordinates; elevated loop vertices also remain visible when their
+observer ray clears the sphere. Hidden vertices terminate line strips. RectWarp and Latitudinal
+retain seam wrapping, and Latitudinal displays the whole surface. The annotation radius parameter
+is applied only in Orthographic drawing.
+
 Test commands and coverage are in [the test guide](../extra/test/README.md#graphics-and-wcs).

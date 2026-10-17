@@ -30,13 +30,12 @@ final class ProjectedView extends MapView {
                 ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y));
     }
 
-    private Vec2 project(MapScale scale, Vec3 v) {
+    private Vec2 projectObserverPoint(MapScale scale, Vec3 view) {
         return switch (mode) {
-            case HPC -> projectHpc(v, scale);
-            case Latitudinal -> projectLatitudinal(scale, v);
-            case RadialWarp -> projectRadialWarp(scale, v);
-            case RectWarp -> projectRectWarp(scale, v);
-            case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
+            case HPC -> projectHpcViewpointSpace(view, viewpoint.distance, scale);
+            case RadialWarp -> projectRadialWarp(scale, view);
+            case RectWarp -> projectRectWarp(scale, view);
+            case Orthographic, Latitudinal -> throw new IllegalArgumentException("Mode does not use observer projection");
         };
     }
 
@@ -89,15 +88,9 @@ final class ProjectedView extends MapView {
         return new Vec2(scale.toUnitX(Math.toDegrees(theta)) - 0.5, scale.toUnitY(r) - 0.5);
     }
 
-    private Vec2 projectToHpcPlane(Vec3 v0) {
-        Vec3 v = toHpcViewpointSpace(v0);
+    private Vec2 projectToHpcPlane(Vec3 v) {
         double fovScale = viewpoint.distance / (viewpoint.distance - v.z);
         return new Vec2(fovScale * v.x, fovScale * v.y);
-    }
-
-    private Vec2 projectHpc(Vec3 v, MapScale scale) {
-        // External solar points arrive in world space; HPC projection is defined in viewpoint space.
-        return projectHpcViewpointSpace(toHpcViewpointSpace(v), viewpoint.distance, scale);
     }
 
     private Vec3 unprojectHpc(double longitudeDeg, double latitudeDeg) {
@@ -107,95 +100,45 @@ final class ProjectedView extends MapView {
     @Override
     public Vec2 projectToScreen(Viewport vp, Vec3 v) {
         MapScale scale = scale(vp);
-        Vec2 pt = project(scale, v);
+        Vec2 pt = mode == MapMode.Latitudinal ? projectLatitudinal(scale, v)
+                : projectObserverPoint(scale, toHpcViewpointSpace(v));
         return mode == MapMode.RadialWarp ? pt : new Vec2(pt.x * vp.aspect, pt.y);
     }
 
     @Override
     public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
         MapScale scale = scale(vp);
-        if (vertices.isEmpty())
-            return;
-        if (mode == MapMode.HPC) {
-            emitHpcLine(scale, vp, vertices, color, vexBuf);
-            return;
-        }
-        if (mode == MapMode.RadialWarp) {
-            emitRadialWarpLine(scale, vertices, color, vexBuf);
-            return;
-        }
-
-        Vec2 current = project(scale, vertices.getFirst());
-        startProjectedLine(vp, current, color, vexBuf);
-        for (int i = 1; i < vertices.size(); i++) {
-            Vec2 previous = current;
-            current = project(scale, vertices.get(i));
-            emitWrappedVertex(vp, previous, current, color, vexBuf);
-        }
-        vexBuf.endLine();
-    }
-
-    private void emitRadialWarpLine(MapScale scale, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        Vec2 current = projectRadialWarp(scale, vertices.getFirst());
-        vexBuf.startLine((float) current.x, (float) current.y, 0, 1, color);
-        for (int i = 1; i < vertices.size(); i++) {
-            current = projectRadialWarp(scale, vertices.get(i));
-            vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, color);
-        }
-        vexBuf.endLine();
-    }
-
-    private void emitHpcLine(MapScale scale, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
-        boolean lineOpen = false;
+        double aspect = mode == MapMode.RadialWarp ? 1 : vp.aspect;
+        Vec2 previous = null;
         for (Vec3 vertex : vertices) {
-            Vec2 current = projectVisibleHpcSurfacePoint(vertex, scale);
+            Vec2 current = projectVisiblePoint(vertex, scale);
             if (current == null) {
-                if (lineOpen)
+                if (previous != null)
                     vexBuf.endLine();
-                lineOpen = false;
+                previous = null;
                 continue;
             }
-
-            if (lineOpen)
-                emitProjectedVertex(vp, current, color, vexBuf);
+            if (previous == null)
+                startProjectedLine(aspect, current, color, vexBuf);
+            else if (mode == MapMode.Latitudinal || mode == MapMode.RectWarp)
+                emitWrappedVertex(aspect, previous, current, color, vexBuf);
             else
-                startProjectedLine(vp, current, color, vexBuf);
-            lineOpen = true;
+                emitProjectedVertex(aspect, current, color, vexBuf);
+            previous = current;
         }
-        if (lineOpen)
+        if (previous != null)
             vexBuf.endLine();
     }
 
     @Override
     public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
         MapScale scale = scale(vp);
-        if (mode == MapMode.HPC) {
-            emitHpcPoints(scale, vp, vertices, size, color, vexBuf);
-            return;
-        }
-
-        float pointSize = (float) size;
-        if (mode == MapMode.RadialWarp) {
-            for (Vec3 vertex : vertices) {
-                Vec2 pt = projectRadialWarp(scale, vertex);
-                vexBuf.putVertex((float) pt.x, (float) pt.y, 0, pointSize, color);
-            }
-            return;
-        }
-        for (Vec3 vertex : vertices) {
-            Vec2 pt = project(scale, vertex);
-            vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
-        }
-    }
-
-    private void emitHpcPoints(MapScale scale, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
-        // Skip back-side surface points in HPC instead of projecting them through the map.
+        double aspect = mode == MapMode.RadialWarp ? 1 : vp.aspect;
         float pointSize = (float) size;
         for (Vec3 vertex : vertices) {
-            Vec2 pt = projectVisibleHpcSurfacePoint(vertex, scale);
+            Vec2 pt = projectVisiblePoint(vertex, scale);
             if (pt != null)
-                vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
+                vexBuf.putVertex((float) (pt.x * aspect), (float) pt.y, 0, pointSize, color);
         }
     }
 
@@ -230,20 +173,27 @@ final class ProjectedView extends MapView {
                 scale.toUnitY(Math.toDegrees(latitude)) - 0.5);
     }
 
-    private Vec2 projectVisibleHpcSurfacePoint(Vec3 vertex, MapScale scale) {
+    private Vec2 projectVisiblePoint(Vec3 vertex, MapScale scale) {
+        if (mode == MapMode.Latitudinal)
+            return projectLatitudinal(scale, vertex);
         Vec3 view = toHpcViewpointSpace(vertex);
-        if (view.z < 0)
+        double distance = viewpoint.distance;
+        double zeta = distance - view.z;
+        // Surface points face the observer when D*z >= 1. Below that tangent plane,
+        // elevated loop points remain visible if their observer ray clears the sphere.
+        // Ray clearance is (D*D - 1)*(x*x + y*y) >= (D - z)*(D - z).
+        if (distance * view.z < 1 && (distance - 1) * (distance + 1) * (view.x * view.x + view.y * view.y) < zeta * zeta)
             return null;
-        return projectHpcViewpointSpace(view, viewpoint.distance, scale);
+        return projectObserverPoint(scale, view);
     }
 
-    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, byte[] color, BufVertex vexBuf) {
+    private static void emitWrappedVertex(double aspect, Vec2 previous, Vec2 current, byte[] color, BufVertex vexBuf) {
         if (Math.abs(previous.x - current.x) > 0.5)
-            emitHorizontalWrap(vp, current, previous, color, vexBuf);
-        emitProjectedVertex(vp, current, color, vexBuf);
+            emitHorizontalWrap(aspect, current, previous, color, vexBuf);
+        emitProjectedVertex(aspect, current, color, vexBuf);
     }
 
-    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, byte[] color, BufVertex vexBuf) {
+    private static void emitHorizontalWrap(double aspect, Vec2 current, Vec2 previous, byte[] color, BufVertex vexBuf) {
         double edge;
         if (current.x <= 0 && previous.x >= 0)
             edge = 0.5;
@@ -255,18 +205,18 @@ final class ProjectedView extends MapView {
         double dx = current.x + 2 * edge - previous.x;
         // Opposite seam endpoints have the same unwrapped X coordinate.
         float y = (float) (dx == 0 ? current.y : previous.y + (edge - previous.x) / dx * (current.y - previous.y));
-        float x = (float) (edge * vp.aspect);
+        float x = (float) (edge * aspect);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.endLine();
         vexBuf.startLine(-x, y, 0, 1, color);
     }
 
-    private static void startProjectedLine(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
-        vexBuf.startLine((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
+    private static void startProjectedLine(double aspect, Vec2 projected, byte[] color, BufVertex vexBuf) {
+        vexBuf.startLine((float) (projected.x * aspect), (float) projected.y, 0, 1, color);
     }
 
-    private static void emitProjectedVertex(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
-        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
+    private static void emitProjectedVertex(double aspect, Vec2 projected, byte[] color, BufVertex vexBuf) {
+        vexBuf.putVertex((float) (projected.x * aspect), (float) projected.y, 0, 1, color);
     }
 
 }
