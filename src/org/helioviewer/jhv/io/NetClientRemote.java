@@ -5,12 +5,9 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-//import javax.annotation.Nonnull;
-
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 
-import okhttp3.Authenticator;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
@@ -34,11 +31,10 @@ class NetClientRemote implements NetClient {
 
     private static final int cacheSize = 1024 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
-    private static final OkHttpClient client = new OkHttpClient.Builder()
+    private static final OkHttpClient client = ProxySettings.configure(new OkHttpClient.Builder())
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .cache(new Cache(Directories.clientCacheDir, cacheSize))
-            .proxyAuthenticator(Authenticator.JAVA_NET_AUTHENTICATOR)
             //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
             .build();

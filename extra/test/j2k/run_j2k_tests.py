@@ -44,6 +44,12 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         print("Running " + name, flush=True)
         subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.source.jpip." + name],
                        check=True, timeout=60)
+    for proxy in ["http", "socks"]:
+        profiles = ["stored", "override", "partial", "missing", "wrong", "bypass", "failover"] + (["hostname", "blocked", "mixed"] if proxy == "http" else [])
+        for profile in profiles:
+            print(f"Running {proxy} proxy: {profile}", flush=True)
+            subprocess.run([*java, "-Xmx64m", "org.helioviewer.jhv.source.jpip.JPIPSocketTest", proxy, profile],
+                           check=True, timeout=60)
     print("Running ImageRequestSettingsTest", flush=True)
     subprocess.run([*java, "org.helioviewer.jhv.io.ImageRequestSettingsTest"], check=True, timeout=60)
     print("Running FramesTest", flush=True)

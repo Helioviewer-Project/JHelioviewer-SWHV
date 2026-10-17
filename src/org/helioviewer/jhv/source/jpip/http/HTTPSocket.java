@@ -3,7 +3,6 @@ package org.helioviewer.jhv.source.jpip.http;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -47,13 +46,9 @@ public class HTTPSocket {
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
             }
 
-            openSocket = new Socket(ProxySettings.proxy);
-            openSocket.setReceiveBufferSize(Math.max(262144 * 8, 2 * openSocket.getReceiveBufferSize()));
-            openSocket.setTrafficClass(0x10);
-            openSocket.setSoTimeout(TIMEOUT_READ);
-            openSocket.setKeepAlive(true);
-            openSocket.setTcpNoDelay(true);
-            openSocket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
+            // Use the same per-destination HTTP(S) proxy rules as NetClient.
+            URI destination = new URI(tls ? "https" : "http", null, host, port, null, null, null);
+            openSocket = ProxySettings.connectJpipSocket(destination, TIMEOUT_CONNECT, TIMEOUT_READ);
             if (tls) { // layered over the proxied connection
                 SSLSocket sslSocket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(openSocket, host, port, true);
                 openSocket = sslSocket;

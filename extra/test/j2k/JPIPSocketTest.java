@@ -3,29 +3,51 @@ package org.helioviewer.jhv.source.jpip;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.Authenticator;
 import java.net.InetAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.app.Settings;
+import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.NetClient;
+import org.helioviewer.jhv.io.ProxySettings;
 
 public final class JPIPSocketTest {
 
     private static final String CHANNEL = "JPIP-cnew: cid=test,transport=http,path=jpip\r\n";
 
     public static void main(String[] arguments) throws Exception {
+        if (arguments.length != 0) {
+            testProxy(arguments[0], arguments[1]);
+            return;
+        }
+        ProxySettings.init();
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
@@ -38,7 +60,255 @@ public final class JPIPSocketTest {
         testInterruptedHandshake();
         testClose(false);
         testClose(true);
+        for (boolean refused : new boolean[]{false, true})
+            testProxyFailover(refused);
         System.out.println("PASS: channel opening, plain/gzip/deflate chunked bodies in request order, buffer growth, graceful close, abort and cancelled handshake");
+    }
+
+    private static void testProxyFailover(boolean refused) throws Exception {
+        ProxySelector original = ProxySelector.getDefault();
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ServerSocket first = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ServerSocket second = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            Proxy primary = new Proxy(Proxy.Type.HTTP, first.getLocalSocketAddress());
+            Proxy backup = new Proxy(Proxy.Type.HTTP, second.getLocalSocketAddress());
+            second.close();
+            AtomicInteger closed = new AtomicInteger();
+            Future<?> serving = workers.submit(() -> {
+                while (!first.isClosed()) {
+                    try (Socket connection = first.accept()) {
+                        connection.setSoTimeout(5000);
+                        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+                        if (!readRequest(input).startsWith("CONNECT "))
+                            throw new AssertionError("Expected a proxy tunnel request");
+                        if (refused)
+                            connection.getOutputStream().write(("HTTP/1.1 407 Proxy Authentication Required\r\n"
+                                    + "Proxy-Authenticate: Basic realm=\"cleanup\"\r\nContent-Length: 0\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+                        // Leave the connection open so EOF proves the client closed it.
+                        if (input.read() != -1)
+                            throw new AssertionError("Failed proxy connection stayed open");
+                        closed.incrementAndGet();
+                    } catch (SocketException e) {
+                        if (!first.isClosed())
+                            throw e;
+                    }
+                }
+                return null;
+            });
+            URI destination = URI.create("http://127.0.0.1:" + listener.getLocalPort() + "/test");
+            listener.setSoTimeout(5000);
+            try {
+                for (List<Proxy> routes : List.of(List.of(Proxy.NO_PROXY), List.of(primary, Proxy.NO_PROXY), List.of(primary, backup))) {
+                    boolean succeeds = routes.getLast().type() == Proxy.Type.DIRECT;
+                    List<SocketAddress> reported = new ArrayList<>();
+                    ProxySelector.setDefault(new ProxySelector() {
+                        @Override
+                        public List<Proxy> select(URI uri) {
+                            if (!uri.equals(destination))
+                                throw new AssertionError("Wrong selection URI: " + uri);
+                            return routes;
+                        }
+
+                        @Override
+                        public void connectFailed(URI uri, SocketAddress address, IOException failure) {
+                            if (!uri.equals(destination))
+                                throw new AssertionError("Wrong failure URI: " + uri);
+                            if (refused && address.equals(primary.address()) && !failure.toString().contains("407"))
+                                throw new AssertionError("Expected proxy refusal", failure);
+                            reported.add(address);
+                        }
+                    });
+                    try (Socket connected = ProxySettings.connectJpipSocket(destination, 2000, 1234); Socket peer = listener.accept()) {
+                        if (!succeeds || connected.getSoTimeout() != 1234 || !connected.getTcpNoDelay() || !connected.getKeepAlive() || peer.getPort() != connected.getLocalPort())
+                            throw new AssertionError("Wrong fallback socket or socket options");
+                    } catch (IOException e) {
+                        if (succeeds)
+                            throw e;
+                    }
+                    List<SocketAddress> expected = new ArrayList<>();
+                    for (Proxy route : routes) {
+                        if (route.type() != Proxy.Type.DIRECT)
+                            expected.add(route.address());
+                    }
+                    if (!reported.equals(expected))
+                        throw new AssertionError("Wrong failure reports: " + reported);
+                }
+            } finally {
+                first.close();
+            }
+            serving.get(10, TimeUnit.SECONDS);
+            if (closed.get() != 2)
+                throw new AssertionError("Failed proxy sockets were not closed: " + closed.get());
+        } finally {
+            ProxySelector.setDefault(original);
+        }
+        System.out.println("PASS: direct connections, proxy failover, direct fallback, exhausted routes, socket options and cleanup after " + (refused ? "407 refusal" : "read timeout"));
+    }
+
+    // Each proxy profile runs in its own JVM: proxy selection and authentication
+    // policy are initialized once, just as at application startup.
+    private static void testProxy(String type, String profile) throws Exception {
+        Platform.init();
+        Directories.createPersistentDirs();
+        Directories.createCacheDirs();
+        boolean http = type.equals("http");
+        boolean allowed = !profile.equals("missing") && !profile.equals("wrong");
+        boolean bypass = profile.equals("bypass");
+        try (ServerSocket listener = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+                ExecutorService worker = Executors.newVirtualThreadPerTaskExecutor()) {
+            String host = profile.equals("hostname") ? "localhost" : "127.0.0.1";
+            System.setProperty(http ? "http.proxyHost" : "socksProxyHost", host);
+            System.setProperty(http ? "http.proxyPort" : "socksProxyPort", Integer.toString(listener.getLocalPort()));
+            System.setProperty("http.nonProxyHosts", bypass ? "127.*" : "");
+            System.setProperty("socksNonProxyHosts", "");
+            if (profile.equals("mixed")) {
+                System.setProperty("socksProxyHost", "127.0.0.1");
+                System.setProperty("socksProxyPort", "1");
+            }
+            if (!profile.equals("missing")) {
+                Settings.setProperty("proxy.username", "proxy-user");
+                ProxySettings.setPassword(profile.equals("wrong") || profile.equals("override") ? "wrong" : "proxy-pass");
+            }
+            if (profile.equals("override") || profile.equals("partial"))
+                System.setProperty(http ? "http.proxyUser" : "java.net.socks.username", profile.equals("partial") ? "ignored" : "proxy-user");
+            if (profile.equals("override"))
+                System.setProperty(http ? "http.proxyPassword" : "java.net.socks.password", "proxy-pass");
+            if (profile.equals("blocked"))
+                System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "Basic");
+            ProxySettings.init();
+            AtomicInteger failures = new AtomicInteger();
+            if (profile.equals("failover")) {
+                ProxySelector original = ProxySelector.getDefault();
+                try (ServerSocket refused = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))) {
+                    Proxy primary = new Proxy(http ? Proxy.Type.HTTP : Proxy.Type.SOCKS, refused.getLocalSocketAddress());
+                    ProxySelector.setDefault(new ProxySelector() {
+                        @Override
+                        public List<Proxy> select(URI uri) {
+                            return List.of(primary, original.select(uri).getFirst());
+                        }
+
+                        @Override
+                        public void connectFailed(URI uri, SocketAddress address, IOException failure) {
+                            if (!address.equals(primary.address()))
+                                throw new AssertionError("Reported the wrong proxy: " + address);
+                            failures.incrementAndGet();
+                        }
+                    });
+                }
+            }
+            if (Authenticator.requestPasswordAuthentication(host, null, listener.getLocalPort(), "http", "test", "Basic", null,
+                    Authenticator.RequestorType.SERVER) != null)
+                throw new AssertionError("Proxy credentials were supplied to an origin server");
+
+            int[] delivered = {0};
+            Future<?> serving = worker.submit(() -> {
+                while (!listener.isClosed()) {
+                    try (Socket connection = listener.accept()) {
+                        connection.setSoTimeout(5000);
+                        if (serveProxy(connection, bypass ? Proxy.Type.DIRECT : http ? Proxy.Type.HTTP : Proxy.Type.SOCKS))
+                            delivered[0]++;
+                    } catch (SocketException e) {
+                        if (!listener.isClosed())
+                            throw e;
+                    }
+                }
+                return null;
+            });
+            try {
+                for (boolean jpip : new boolean[]{false, true}) {
+                    int previousFailures = failures.get();
+                    boolean succeeded = false;
+                    URI target = URI.create((jpip ? "jpip" : "http") + "://127.0.0.1:" + (bypass ? listener.getLocalPort() : 1) + "/test");
+                    try {
+                        if (jpip) {
+                            JPIPSocket client = new JPIPSocket(target);
+                            try {
+                                if (!client.receive().equals(ByteBuffer.wrap(new byte[]{1, 2, 3})))
+                                    throw new AssertionError("Wrong proxied JPIP body");
+                            } finally {
+                                client.close();
+                            }
+                        } else {
+                            try (NetClient client = NetClient.of(target, false, NetClient.NetCache.BYPASS)) {
+                                if (!Arrays.equals(client.getStream().readAllBytes(), new byte[]{1, 2, 3}))
+                                    throw new AssertionError("Wrong proxied HTTP body");
+                            }
+                        }
+                        succeeded = true;
+                    } catch (IOException expected) {
+                        if (allowed && !(jpip && profile.equals("blocked")))
+                            throw expected;
+                    }
+                    if (succeeded != (allowed && !(jpip && profile.equals("blocked"))))
+                        throw new AssertionError("Wrong proxy result for " + type + '/' + profile + (jpip ? " JPIP" : " HTTP"));
+                    if (profile.equals("failover") && (jpip ? failures.get() - previousFailures != 1 : failures.get() == previousFailures))
+                        throw new AssertionError("Wrong failed-proxy reports for " + (jpip ? "JPIP" : "HTTP"));
+                }
+            } finally {
+                listener.close();
+            }
+            serving.get(10, TimeUnit.SECONDS);
+            int expected = !allowed ? 0 : profile.equals("blocked") ? 1 : 2;
+            if (delivered[0] != expected)
+                throw new AssertionError("Proxy did not deliver the expected requests: " + delivered[0]);
+        }
+        System.out.println("PASS: " + type + " proxy, " + profile + " profile, general HTTP and JPIP connections");
+    }
+
+    private static boolean serveProxy(Socket connection, Proxy.Type type) throws IOException {
+        if (type == Proxy.Type.SOCKS && !authenticateSocks(connection))
+            return false;
+        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.US_ASCII));
+        String request = input.readLine();
+        if (request == null)
+            return false;
+        String authorization = null;
+        String line;
+        while ((line = input.readLine()) != null && !line.isEmpty()) {
+            if (line.regionMatches(true, 0, "Proxy-Authorization:", 0, 20))
+                authorization = line.substring(20).trim();
+        }
+        if (type == Proxy.Type.DIRECT && (!request.startsWith("GET /") || authorization != null))
+            throw new IOException("Excluded destination was sent through a proxy: " + request);
+        if (type == Proxy.Type.HTTP && !("Basic " + Base64.getEncoder().encodeToString("proxy-user:proxy-pass".getBytes(StandardCharsets.US_ASCII))).equals(authorization)) {
+            connection.getOutputStream().write(("HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Basic realm=\"JHV test\"\r\n"
+                    + "Content-Length: 0\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+            return false;
+        }
+        if (request.startsWith("CONNECT ")) {
+            connection.getOutputStream().write("HTTP/1.1 200 Connection established\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            readRequest(input);
+        }
+        reply(connection, CHANNEL + "Connection: close\r\n", new byte[]{1, 2, 3});
+        return true;
+    }
+
+    private static boolean authenticateSocks(Socket connection) throws IOException {
+        InputStream input = connection.getInputStream();
+        OutputStream output = connection.getOutputStream();
+        if (input.read() != 5)
+            throw new IOException("Expected SOCKS5 greeting");
+        input.readNBytes(input.read());
+        output.write(new byte[]{5, 2});
+        if (input.read() != 1)
+            throw new IOException("Expected SOCKS password authentication");
+        String user = new String(input.readNBytes(input.read()), StandardCharsets.UTF_8);
+        String password = new String(input.readNBytes(input.read()), StandardCharsets.UTF_8);
+        boolean accepted = user.equals("proxy-user") && password.equals("proxy-pass");
+        output.write(new byte[]{1, (byte) (accepted ? 0 : 1)});
+        if (!accepted)
+            return false;
+        byte[] request = input.readNBytes(4);
+        int size = switch (request[3]) {
+            case 1 -> 4;
+            case 3 -> input.read();
+            case 4 -> 16;
+            default -> throw new IOException("Unknown SOCKS address type");
+        };
+        input.readNBytes(size + 2);
+        output.write(new byte[]{5, 0, 0, 1, 127, 0, 0, 1, 0, 0});
+        return true;
     }
 
     private interface Server {
