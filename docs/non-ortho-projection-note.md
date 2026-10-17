@@ -8,8 +8,8 @@ This note documents the coordinate conventions and code ownership of JHV's five 
 - `RadialWarp`
 - `RectWarp`
 
-It is an implementation guide. Detailed FITS WCS derivations, numerical results, and the distinction between
-`simple-TAN` and `formal-TAN` are documented in `docs/wcs-validation/jhv_wcs_hpc_validation_note.md`.
+It describes the WCSLIB implementation. The September validation note records the preceding implementation
+and its experiments. Current native build instructions are in [the WCSLIB guide](../extra/wcs/README.md).
 
 ## Code ownership
 
@@ -25,21 +25,25 @@ Java display geometry is organized as follows:
   and `Latitudinal`; the two warp modes share a limb-anchored Box-Cox radial scale.
 - `GLRenderer` constructs the per-viewport scales and chooses between 3D scene rendering and flat projected rendering.
 - `ImageBounds` derives image-side HPC and radial bounds through the parsed WCS.
-- `WcsHeader` stores the projection-specific WCS quantities consumed by Java and GLSL.
-- `WcsProjection` implements the Java forward and inverse `TAN`, `ARC`, `AZP`, and `ZPN` mappings used by
-  `ImageBounds`, plus the helioprojective ray and solar-surface conversions used by projected maps.
+- `WcsInterpreter` adapts Helioviewer metadata defaults and legacy units to FITS cards.
+- `WcsSolution` owns a native WCSLIB solution and exposes the same prepared native frame to Java and GLSL.
+  WCSLIB owns the linear FITS transform, native poles, fiducial offsets, domains and CPU projection conversions.
+- `ObserverGeometry` implements JHV's directed helioprojective ray, Sun-plane and solar-surface conversions.
 
 Image reprojection is split across:
 
 - `resources/glsl/imageCommon.frag`
+- `resources/glsl/imageGeometry.frag`
 - `resources/glsl/imageOrtho.frag`
 - `resources/glsl/imageHpc.frag`
 - `resources/glsl/imageLati.frag`
 - `resources/glsl/imageRadialWarp.frag`
 - `resources/glsl/imageRectWarp.frag`
 
-`imageCommon.frag` owns the shared observer geometry, WCS projections, image-coordinate conversion, masks, texture
-sampling, and the common HPC-derived sampling path used by `HPC`, `RadialWarp`, and `RectWarp`.
+`imageCommon.frag` contains shared declarations and texture/color processing. `imageGeometry.frag` contains
+the shared observer geometry, WCS projections, image-coordinate conversion, masks, and the common HPC-derived
+sampling path used by `HPC`, `RadialWarp`, and `RectWarp`. Java and both test harnesses concatenate these
+two files in that order, followed by the mode fragment, without adding separators.
 
 ## Coordinate spaces
 
@@ -68,9 +72,8 @@ The implementation crosses several coordinate spaces. Keeping them distinct is e
 
 5. WCS plane and image space
    - Projection coordinates defined by `TAN`, `ARC`, `AZP`, `ZPN`, `CAR`, or `CEA`.
-   - `imageToPlane` is the effective FITS linear transform: either `CD`, or `CDELT` combined with `PC`/`CROTA`.
-     `planeToImage` is its inverse.
-   - Texture coordinates additionally apply the FITS-to-texture Y inversion.
+   - `ImageGeometry.pixelToPlane` includes the FITS matrix, internal plane units and buffer Y convention;
+     `planeToPixel` is its inverse. The original footprint remains independent of decode level.
 
 6. Normalized map and screen space
    - `MapScale` maps display coordinates to the normalized domain used by flat shaders and Java overlays.
@@ -83,19 +86,29 @@ The projection-related uniform blocks separate per-image mapping, screen, and di
 `ImageBlock` contains two per-image records, one for the primary image and one for the difference image. Each record
 contains the fixed-layout state used to map rendered solar coordinates into that image:
 
-- image rectangle
-- row-major `planeToImage` matrix
-- `crval` in the internal WCS plane units
+- two affine rows from the raw native projection plane to original normalized image pixels
+- original-to-decoded sampling scale and offset
 - projection code and plane units per radian
-- upper limit of the primary monotonic `ZPN` branch
+- three native-frame rows, with AZP constants and the WCSLIB ZPN branch limit in their unused W components
+- WCSLIB's exact native-pole direction conventions
 - source-observer distance
 - relative display/source-observer rotation (`cameraDiff`)
 - differential-rotation interval (`deltaT`)
 - source-view quaternion
 
-Each std140 image record occupies 96 bytes, including one padding float, so the two-record block occupies 192 bytes.
+Each std140 image record occupies 160 bytes, so the two-record block occupies 320 bytes.
 The six `PV2` coefficients remain ordinary uniforms for direct indexed access rather than becoming padded std140
 scalar arrays.
+
+The binder folds native plane-origin subtraction and user plane rotation into the affine rows, in double precision
+before upload. User CRVAL adjustments instead create a cached WCSLIB solution with resolved pole defaults.
+The shader projects homogeneous directions through that solution's basis; it does not reconstruct celestial
+rotations from CRVAL per fragment. Observer points and warp rays avoid angle roundtrips. HPC and Latitudinal
+inputs and RectWarp's angular direction use `sinCos()`. `GLSLShader` defines `JHV_SWIFTSHADER` when
+compiling fragment shaders for a renderer whose name contains `SwiftShader`; the helper then uses split
+quadrant reduction and polynomials. Other renderers use built-in sine/cosine. The choice is compiled into
+the program, with no additional uniform or per-fragment backend test. Dense exact-float probes cover
+both rendering backends and independently retain the polynomial and intrinsic controls.
 
 `ScreenBlock` contains display-map state shared by both image slots:
 
@@ -130,15 +143,15 @@ warp modes do not use `sourceViewQuat`; their viewpoint limitation is described 
 `Orthographic` is the only 3D display path. It intersects the view with the unit sphere on-disk and uses an image-view
 plane for off-limb observer images.
 
-For source images marked `TAN`, the current shader intentionally uses `simple-TAN`: the orthographic point's planar
-`(x, y)` coordinates are passed directly to the linear image transform. Other zenithal projections use the formal
-world-to-helioprojective-to-WCS path.
+TAN retains the intentional simple-TAN display policy: the source point's XY coordinates minus celestial
+CRVAL scaled by `unitsPerRad` form the plane input. The existing affine mapping then applies user rotation
+and the inverse pixel transform. `GLSLImageShader.putImage()` folds this subtraction into the affine
+offset for Orthographic TAN. WCSLIB still supplies its metadata, angular scale and pixel matrix.
 
-This distinction explains the apparent geometry when switching between `Orthographic` and `HPC`:
-
-- formal-TAN in Orthographic and HPC differ visibly because they are different display geometries;
-- for the tested TAN files, the current simple-TAN Orthographic path is extremely close to HPC and produces no visible
-  bulge.
+ARC, AZP and ZPN use the formal WCS from the scene point's observer direction. TAN also uses formal WCS
+in every other display mode. Orthographic and HPC select different display geometry; the simple-TAN
+policy preserves their close visual agreement on the validated solar images, as explained in the
+[WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md#summary).
 
 `CAR` and `CEA` surface maps are sampled directly from longitude and latitude on the visible sphere. They wrap in
 longitude and have no off-limb representation.
@@ -148,10 +161,9 @@ maps with no `CUNIT2` retain JHV's compatibility convention in which the second 
 `sin(latitude) / PV2_1`. This is a missing-unit compatibility assumption, not Astropy's interpretation of the original
 header; validation canonicalizes that legacy row to equivalent angular values before comparing it with Astropy.
 
-The supported solar WCS subset also assumes the canonical native poles used by the current data: observer-image
-`HPLN/HPLT` projections use `LONPOLE=180°`, while `CRLN/CRLT` surface maps use `LONPOLE=0°` and `LATPOLE=90°`. JHV
-does not implement arbitrary FITS celestial/native pole rotations; in particular, a noncanonical surface `CRVAL2`
-cannot be interpreted independently of `LONPOLE` and `LATPOLE`.
+WCSLIB resolves CRVAL, LONPOLE, LATPOLE and native fiducial parameters together. CAR/CEA longitude equivalence
+is selected in that native plane against both original affine coordinates and the source slit, including rotated,
+sheared and partial footprints. Longitude equivalence is not an image-width wrap.
 
 ### HPC
 
@@ -196,10 +208,12 @@ display latitude  = solar latitude  - latitude origin
 
 For observer images, GLSL reconstructs the solar-world point from the displayed map and rotates it with that image
 slot's `sourceViewQuat` before applying observer-image geometry and WCS. Differential rotation is also applied per
-image slot. The source quaternion maps into an image observer's frame; it does not define the displayed map origin.
+image slot. Source visibility requires `sourceWorld.z >= 1 / observerDistance`. The source quaternion maps into
+an image observer's frame; it does not define the displayed map origin.
 
 For `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps, GLSL samples longitude and latitude directly and
-wraps the source texture in X. These are surface coordinates, not observer-image helioprojective coordinates.
+selects a native-longitude equivalent admitted by the original image footprint. These are surface coordinates,
+not observer-image helioprojective coordinates.
 
 ### RadialWarp
 
@@ -249,7 +263,12 @@ The shared formal observer-image WCS path supports:
 - `AZP`
 - six-term `ZPN` on its primary monotonic branch
 
-`WcsHeader.Projection.fromCtype` defaults unrecognized projection codes to `TAN`.
+An absent CTYPE defaults to HPLN-TAN/HPLT-TAN. The legacy SOHO SOLAR-X/SOLAR-Y pair is normalized to
+HPLN-TAN/HPLT-TAN before WCSLIB. Unsupported explicit projection codes are rejected.
+The native adapter retains a primary two-axis affine celestial WCS. Nonzero ZPN terms above PV2_5 are rejected,
+and CEA lambda must be in `(0,1]` after float encoding. The same effective coefficients feed CPU and GLSL.
+WCSLIB's ZPN derivative scan can miss a constructed narrow fold; this integration retains that known library
+limitation rather than adding another independent branch solver.
 
 Surface-map sampling supports:
 
@@ -288,19 +307,28 @@ The validation suite in `extra/test` separates several questions:
 - Astropy directly validates `CAR` and explicitly unit-labelled `CEA` source WCS and Latitudinal surface-map sampling.
   Normalized CEA maps with no `CUNIT2` are first canonicalized to an equivalent angular CEA header.
 - Java/Python metadata tests validate the projection parameters and linear WCS transforms that Java derives for GLSL.
+- Independent Java geometry tests check all six projections, inverse domains, coefficient rejection, adjustment
+  defaults, concurrent native ownership and native-resource extraction from a JAR.
 - Electron/WebGL2 runs execute the production shaders on Metal/ANGLE and SwiftShader.
 - Full-fragment CAR/CEA tests cover HPC and both warp modes against independent ray/sphere intersections and Astropy
   pixel coordinates, including view rotations, near-Sun and Earth distances, off-limb clipping, and difference images.
 - Orthographic and warp modes are compared with their independent CPU mirrors because Astropy does not define JHV's
   display warps.
-- Dedicated internal comparisons distinguish formal-TAN Orthographic geometry, simple-TAN Orthographic geometry, and
-  HPC geometry.
+- Native-frame fragment cases use the actual Java/native prepared uniforms and independently projected pixels,
+  including tilted references, explicit poles, native fiducials, origin offsets and user rotation in both image slots.
+- The actual Java ANGLE bindings are checked with adjusted CAR/CEA native frames, nonzero origins, reduced grids,
+  masks, slits and differences.
 
-The 220 full-fragment cases pass on Metal/ANGLE. On the tested SwiftShader backend, all color and footprint checks
-pass, but 24 CAR/CEA coordinate checks exceed the unchanged 0.05-source-pixel limit, reaching 0.35 pixels near the limb
-on a 128-pixel-wide map. Direct ray probes show sine/cosine approximation errors. The sphere intersection accounts
-for the resulting non-unit rays and avoids cancellation at large observer distances; it cannot recover the exact
-input angles from the approximated ray direction. The SwiftShader coordinate failures remain visible in the test.
+The full production-fragment cases use the same coordinate tolerances on Metal/ANGLE and SwiftShader.
+On 32,768 exact float inputs across `[-4π,4π]`, including adjacent floats at quadrant boundaries, the
+polynomial control's maximum absolute sine/cosine error is below `1.1e-7` on both backends. Metal's built-ins
+reach about `1.3e-7`; SwiftShader's built-ins reach `1.90e-4`. The selected helper and polynomial control
+must each stay at or below `2e-7`, and the selected output must exactly match the appropriate backend control.
+The inaccurate SwiftShader intrinsic case remains a separate diagnostic. The Java OpenGL suite also runs
+with Metal and an external SwiftShader ICD, including context destruction/recreation. These are offscreen
+rendering checks, not an interactive picking/annotation acceptance run.
+The former SwiftShader-specific differential-rotation tolerance allowance is removed; both backends use the same
+catalog thresholds as well as the unchanged 0.05-source-pixel full-fragment threshold.
 
 Astropy agreement does not validate:
 

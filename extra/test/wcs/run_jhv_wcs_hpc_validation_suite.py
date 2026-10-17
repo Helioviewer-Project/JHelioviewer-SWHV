@@ -480,10 +480,6 @@ def reduced_cpu_variant(run: ValidationRun) -> ValidationRun:
 
 def swiftshader_variant(run: ValidationRun) -> ValidationRun:
     args = tuple("swiftshader" if arg == "default" else arg for arg in run.args)
-    if run.name == "electron_default_differential_rotation":
-        # Existing SwiftShader latitude/trigonometry error is about 0.81 source
-        # pixel here. Declare the allowance in the command, not the evaluator.
-        args += ("--max-error-px", "1.0")
     if run.name in SWIFTSHADER_DIAGNOSTIC_SOURCE_NAMES:
         args += ("--report-validity-mismatches",)
     return ValidationRun(run.name.replace("electron_default_", "electron_swiftshader_"), args, run.validator)

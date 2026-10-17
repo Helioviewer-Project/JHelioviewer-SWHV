@@ -23,23 +23,31 @@ have their origin at the lower left and belong to the viewport and screen transf
 
 ## Metadata to original image geometry
 
-[`WcsInterpreter`](../src/org/helioviewer/jhv/metadata/WcsInterpreter.java) reads the FITS linear transform.
-PC with CDELT takes precedence over CD, and CD over CDELT with CROTA. The result is the full matrix,
-rotation and signed scales included, in angular units.
+[`WcsInterpreter`](../src/org/helioviewer/jhv/metadata/WcsInterpreter.java) selects the two image axes;
+SPICE and PUNCH JP2 headers can retain additional WCS axes from their original FITS cubes. It adapts
+missing units, the known legacy axis pairs `Solar-X`/`Solar-Y` (also underscore spellings), `GONGX`/`GONGY`,
+`arcsec`/`arcsec` and LASCO's `0`/`0` to `HPLN-TAN`/`HPLT-TAN`, ignoring case. Unit aliases include
+`degree(s)` and LASCO's `0` (arcseconds). Historical CEA rows with missing `CUNIT2`
+are normalized Y coordinates; their celestial `CRVAL2` remains in degrees. Observer CROTA fallbacks
+are also adapted into FITS cards. Missing CDELT scales still require a CD matrix, preserving the loader's
+`BasicMetaData` fallback for images without calibrated geometry. WCSLIB interprets the
+linear transform, projection parameters and celestial/native frame. PC with CDELT takes precedence over
+CD, and CD over CDELT with CROTA. Rotation and signed scales remain in the full matrix.
 
-[`FitsMetaData`](../src/org/helioviewer/jhv/metadata/FitsMetaData.java) converts the FITS convention, where
-pixel centers are integers from one and Y increases upward. For image height `H` the reference pixel in
-buffer coordinates is:
+[`ImageGeometry`](../src/org/helioviewer/jhv/wcs/ImageGeometry.java) converts the FITS convention when
+constructed from a WCS solution: pixel centers are integers from one and Y increases upward. For image
+height `H` the reference pixel in buffer coordinates is:
 
 ```text
 c.x = CRPIX1 - 0.5
 c.y = H - (CRPIX2 - 0.5)
 ```
 
-The second matrix column changes sign for the downward Y. The matrix is then scaled into plane units:
-solar radii for observer images, radians of longitude and latitude for CAR maps, and longitude with the
-equal-area latitude coordinate for CEA maps. LASCO keeps its rule that drops the metadata rotation, because
-its pixels are already rotated.
+The native solution supplies the matrix in plane units: solar radii for observer images, radians of
+longitude and latitude for CAR maps, and longitude with the equal-area latitude coordinate for CEA maps.
+`ImageGeometry` changes the second matrix column's sign for downward Y. LASCO keeps its rule that drops
+the metadata rotation, because its pixels are already rotated. `FitsMetaData` selects that policy;
+`ImageGeometry` performs the conversion.
 
 [`ImageGeometry`](../src/org/helioviewer/jhv/wcs/ImageGeometry.java) holds the complete linear mapping.
 With pixel coordinate `P`, reference pixel `c`, matrix `A = pixelToPlane` and plane point `p`:
@@ -49,11 +57,21 @@ p = A · (P - c)
 P = inverse(A) · p + c
 ```
 
-[`WcsHeader`](../src/org/helioviewer/jhv/wcs/WcsHeader.java) holds the projection parameters: projection
-kind, CRVAL, PV coefficients and plane units per radian. `unitsPerArcsec()` derives the arcsecond scale
-from the same value, also for images without observational metadata. The nonlinear step between the plane
-and helioprojective angles lives in `WcsProjection` on the CPU and in `imageCommon.frag` on the GPU.
-CRVAL belongs to that step; it is not the pixel reference `c`.
+[`WcsSolution`](../src/org/helioviewer/jhv/wcs/WcsSolution.java) owns a prepared native WCSLIB solution.
+Its exported coefficient and frame arrays are read-only by convention.
+Its FITS linear transform and reference pixel remain package-private for `ImageGeometry` to consume.
+It exposes the celestial reference in radians, effective float PV coefficients,
+native-frame basis, projection-plane origin offset and plane units per radian. CPU `worldToPlane()` and
+batched `planeToWorld()` use that same owner. `unitsPerArcsec()` derives the arcsecond scale from it.
+CRVAL describes a celestial reference; it is separate from both pixel reference `c` and native plane origin.
+
+Decoded geometries share the native owner with their original geometry. An automatic FFM arena releases
+the native solution after its last Java owner becomes unreachable. User CRVAL adjustments make a native
+copy, recompute pole defaults and cache the last adjustment; ordinary frames reuse the solution.
+[`ObserverGeometry`](../src/org/helioviewer/jhv/wcs/ObserverGeometry.java) retains only JHV's directed observer
+ray, sphere intersection and Sun-plane conversions. HPC supplies an angular ray; warped-view picking
+supplies its Sun-plane ray directly to the same intersection, without an angular round trip. Native builds
+and the supported FITS subset are documented in [the WCSLIB guide](../extra/wcs/README.md).
 
 `BasicMetaData` supplies a centered geometry with uniform pixel spacing when metadata is missing.
 `ImageBounds` maps the image corners and edge midpoints through the geometry and projection to obtain the
@@ -62,7 +80,10 @@ for sizing; decoded geometries share that same footprint. The matrix and project
 decide where the image lies in the scene. Radial bounds are
 one solar radius for CAR/CEA surface maps. Observer images use the projected boundary's largest radius,
 falling back to rectangle corners relative to the Sun when no projected radius is usable. HPC bounds
-use the projected boundary for observer images. CAR/CEA maps instead contribute the solar disk's angular
+use the projected boundary for observer images. These sampled fitting extents are approximate. Invalid
+WCS samples are omitted; if no perimeter sample is valid, HPC fitting uses the full celestial angular
+domain rather than failing on an image whose valid region may lie inside its perimeter.
+CAR/CEA maps instead contribute the solar disk's angular
 extent, `asin(1 / distance)`, using the same image observer distance supplied to the shader. Their longitude
 and latitude coverage is not an observer-image field of view.
 
@@ -168,15 +189,17 @@ original extent by the decoded size would place the samples elsewhere.
 ## Scene coordinates to texture reads
 
 [`ImageLayer.render`](../src/org/helioviewer/jhv/layers/ImageLayer.java) passes both image geometries,
-the observer orientations, the time differences and the display adjustments to `GLSLImageShader`. A user
-CROTA adjustment rotates the plane point before the inverse mapping. CRVAL adjustments go into the
-projection step. Neither rewrites cached geometry.
+the observer orientations, the time differences and the display adjustments to `GLSLImageShader.render()`.
+It uploads both image records, binds the matching WCS coefficients and draws the selected mode in one
+operation. A user CROTA adjustment rotates the plane point before the inverse mapping. CRVAL adjustments change the
+celestial reference, or the scaled reference subtraction for Orthographic TAN. Neither rewrites cached geometry.
 
 The mapping mode decides how a fragment reaches the source plane:
 
 - **Orthographic** starts on the visible solar sphere or the image plane. Observer rotation and
-  differential rotation pick the source point. TAN subtracts CRVAL from the point's X and Y directly;
-  the other observer projections go through helioprojective angles.
+  differential rotation pick the source point. TAN deliberately uses simple-TAN: subtract the celestial
+  CRVAL scaled by `unitsPerRad` from the point's X and Y directly. ARC, AZP and ZPN project the observer
+  direction through the formal WCS.
 - **HPC** starts from helioprojective longitude and latitude inside the displayed angular bounds.
 - **Latitudinal** starts from longitude and latitude on the sphere, rotated into the image observer's frame.
 - **RadialWarp and RectWarp** build a warped HPC plane point and derive the angles from it.
@@ -204,7 +227,24 @@ texture = source · scale + offset
 ```
 
 The binder derives scale and offset from the grid; the shader keeps them in `sampling.xy` and
-`sampling.zw`. At level 0 they are the identity. The two-image uniform block is 224 bytes.
+`sampling.zw`. At level 0 they are the identity. Each 160-byte image record also contains the native
+frame, pole conventions, source distance and observer transforms. The two-image uniform block is 320 bytes.
+
+[`imageGeometry.frag`](../resources/glsl/imageGeometry.frag) projects homogeneous 3D directions through the
+prepared native frame. Observer points and warp-plane inputs go directly to that frame without converting to angles and back. TAN uses the
+formal WCS except in Orthographic, which keeps the simple-TAN display policy described above. The
+binder receives the display mode and folds the appropriate offset and user plane rotation into
+`sourceX/sourceY` before converting to float. For Orthographic TAN the offset is scaled CRVAL;
+otherwise it is the native projection origin. No additional image uniforms are needed. HPC and Latitudinal
+angular inputs and RectWarp's angular direction use `sinCos()`. It uses built-in sine/cosine on hardware
+renderers and the accurate polynomial only on SwiftShader. `GLSLShader` selects this at fragment-shader
+compilation from `GL.renderer`, adding `JHV_SWIFTSHADER` after the version directive; each new context
+uses its own renderer name. There is no runtime shader branch or additional uniform. Dense exact-float
+probes check the selected implementation and both independent controls on Metal and SwiftShader.
+
+Image shaders concatenate `imageCommon.frag` (declarations and color processing), `imageGeometry.frag`
+(shared geometry), and the mode fragment in that order. The split preserves the concatenated source
+exactly, including whitespace. The syntax validator and Electron renderer use the same order.
 
 The current and comparison images have independent mappings. Difference rendering sends the same scene
 point through each image's observer and WCS geometry, then subtracts the sampled values.
@@ -216,8 +256,11 @@ Detector masks, slits, edge clipping and dithering use `source`. They do not dep
 Radius masks, sectors and the LASCO linear cutoff act earlier, on the mode's scene or HPC plane point in
 `clipPlanarMasks`. They never see decoded coordinates.
 
-CAR and CEA longitude wrapping wraps `source.x` before the sampling conversion. The conversion then carries
-the wrapped position onto the decoded texture; no second correction is needed.
+CAR and CEA longitude equivalence is resolved in the native projection plane. The shader intersects the
+integer-turn intervals admitted by both original affine coordinates and the source slit. It prefers the
+principal turn, then the nearest admitted turn. This handles partial maps, shear, rotated axes and
+footprints several turns away without wrapping an image-width interval. The decoded sampling conversion
+is applied only after that source position is selected.
 
 Sharpening blurs nine taps around the decoded coordinate, with offsets in current-image texels. In
 difference mode the comparison offsets are scaled by `comparison.sampling.xy / current.sampling.xy`, which
@@ -244,7 +287,16 @@ texture, so a resolution change cannot alter the requested cutout.
 - `FramesTest` checks reduced-grid RHEF, retained original cutout geometry and reuse on a cache hit.
 - `ImageRenderingTest` compares reduced ramps with full-resolution references in every mode, checks
   detector masks, slits and reduced CAR/CEA wrapping, and compares sharpening with a CPU reference.
-- The WCS metadata and rendering validators check the projection geometry against independent references.
+  Its independent simple-TAN affine check includes user offsets/rotation, separate comparison-image
+  references and reduced grids, on-disk and off-limb.
+- `WcsLibraryTest` checks analytic 3D geometry and inverse domains for all six projections, parameter
+  rejection, adjusted pole defaults, concurrent use and unpacked/JAR native-resource loading.
+- The WCS metadata and rendering validators compare real headers and actual Java/native prepared uniforms
+  with independent geometry and Astropy. Native offsets and user plane rotation are exercised together.
+  Orthographic TAN is checked against a direct affine solve, including the AIA, EUI and COR2 headers
+  from the validation note; formal TAN remains covered in the other display modes. Direct 513 × 513
+  comparisons of aligned Ortho/HPC also retain a test-only formal-TAN Ortho control and separately
+  measure on-disk and off-limb displacement. All three paths have independent coordinate references.
 
 Run the offline and GPU suites from the repository root:
 
@@ -254,5 +306,7 @@ python3 extra/test/j2k/run_j2k_tests.py
 python3 extra/test/run_tests.py opengl shaders --no-build
 ```
 
-Native build steps are in [Preparing JPEG 2000 native libraries](../extra/jpeg2000/README.md). WCS
-validation is in [the WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md).
+Native build steps are in [Preparing JPEG 2000 native libraries](../extra/jpeg2000/README.md) and
+[WCSLIB](../extra/wcs/README.md). Current validation commands and coverage are in
+[the test guide](../extra/test/README.md#graphics-and-wcs). The September
+[WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md) records the earlier implementation.

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<meta>
+<fits>
+<SIMPLE>1</SIMPLE>
+<BITPIX>-32</BITPIX>
+<NAXIS>2</NAXIS>
+<NAXIS1>101</NAXIS1>
+<NAXIS2>101</NAXIS2>
+<EXTEND>1</EXTEND>
+<DATE>2024-04-25T02:54:27.000</DATE>
+<ORIGIN>RHESSI</ORIGIN>
+<OBSERVER>atolbert</OBSERVER>
+<TELESCOP>RHESSI</TELESCOP>
+<INSTRUME>RHESSI</INSTRUME>
+<OBJECT>Sun</OBJECT>
+<DATE_OBS>2017-09-10T16:05:56.330</DATE_OBS>
+<DATE_END>2017-09-10T16:06:34.330</DATE_END>
+<TIME_UNI>1</TIME_UNI>
+<ENERGY_L>100.00000</ENERGY_L>
+<ENERGY_H>300.00000</ENERGY_H>
+<TIMESYS>1979.00</TIMESYS>
+<TIMEUNIT>s</TIMEUNIT>
+<CRPIX1>-594.11446</CRPIX1>
+<CRPIX2>142.77475</CRPIX2>
+<CRVAL1>0.0000000</CRVAL1>
+<CRVAL2>0.0000000</CRVAL2>
+<CDELT1>1.5000000</CDELT1>
+<CDELT2>1.5000000</CDELT2>
+<CTYPE1>arcsec</CTYPE1>
+<CTYPE2>arcsec</CTYPE2>
+<XCEN>967.67200</XCEN>
+<YCEN>-137.66200</YCEN>
+<CROTACN1>0.0000000</CROTACN1>
+<CROTACN2>0.0000000</CROTACN2>
+<CROTA>0.0000000</CROTA>
+<RSUN>635.39658</RSUN>
+<DSUN>1.5062363e+11</DSUN>
+<history>
+FITSHEAD2STRUCT run at: Thu Apr 25 02:53:47 2024
+</history>
+<comment>
+FITSHEAD2STRUCT
+</comment>
+</fits>
+<helioviewer>
+<HV_CRVAL1_ORIGINAL>0</HV_CRVAL1_ORIGINAL>
+<HV_CRVAL2_ORIGINAL>0</HV_CRVAL2_ORIGINAL>
+<HV_CRPIX1_ORIGINAL>-594.11446</HV_CRPIX1_ORIGINAL>
+<HV_CRPIX2_ORIGINAL>142.77475</HV_CRPIX2_ORIGINAL>
+<HV_RECALCULATE_CRPIX>FALSE</HV_RECALCULATE_CRPIX>
+<HV_COMMENT>HV_RHESSI_MAKE_JP2: ran HV_RECALCULATE_CRPIX. HV_RHESSI_MAKE_JP2: added in RSUN FITS header tag (units are pixels). : added in DSUN FITS header tag (units are meters).</HV_COMMENT>
+<HV_RHESSI_FLARE_ID>17091069</HV_RHESSI_FLARE_ID>
+<HV_RHESSI_IMAGE_RECONSTRUCTION_METHOD>Back_Projection</HV_RHESSI_IMAGE_RECONSTRUCTION_METHOD>
+<HV_COMMENT>HV_RHESSI_MAKE_JP2: ran HV_RECALCULATE_CRPIX. HV_RHESSI_MAKE_JP2: added in RSUN FITS header tag (units are pixels). : added in DSUN FITS header tag (units are meters). 
+JP2 file created locally at NASA-GSFC using HV_WRITE_JP2_LWG at Thu Apr 25 02:54:27 2024.(ASCII character value=10)Contact Helioviewer Project (webmaster@helioviewer.org) for more details/questions/comments regarding this JP2 file.(ASCII character value=10)HVS (Helioviewer setup) file used to create this JP2 file: hvs_rhessi.pro (version 1.0).(ASCII character value=10)FITS to JP2 source code provided by ESA/NASA Helioviewer Project [contact the Helioviewer Project at webmaster@helioviewer.org][NASA-GSFC] and is available for download at https://launchpad.net/jp2gen.(ASCII character value=10)Please contact the source code providers if you suspect an error in the source code.(ASCII character value=10)Full source code for the entire Helioviewer Project can be found at https://launchpad.net/helioviewer.</HV_COMMENT>
+<HV_SUPPORTED>TRUE</HV_SUPPORTED>
+<HV_REVERSIBLE>0</HV_REVERSIBLE><HV_QUICKLOOK>FALSE</HV_QUICKLOOK>
+</helioviewer>
+</meta>

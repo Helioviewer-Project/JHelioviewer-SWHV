@@ -88,12 +88,13 @@ function setUniformInt(gl, program, name, value) {
 
 const uniformBlockLayouts = {
   ImageBlock: {
-    byteLength: 224,
+    byteLength: 320,
     offsets: Object.fromEntries([0, 1].flatMap(i => Object.entries({
-      sourceX: 0, sourceY: 16, sampling: 32, crval: 48,
-      planeUnitsPerRadian: 56, projectionCode: 60, zpnUpperEta: 64,
-      observerDistance: 68, deltaT: 72, cameraDiff: 80, sourceViewQuat: 96,
-    }).map(([field, offset]) => [`images[${i}].${field}`, i * 112 + offset]))),
+      sourceX: 0, sourceY: 16, sampling: 32,
+      planeUnitsPerRadian: 48, projectionCode: 52, observerDistance: 56, deltaT: 60,
+      nativeX: 64, nativeY: 80, nativeZ: 96, nativePoles: 112,
+      cameraDiff: 128, sourceViewQuat: 144,
+    }).map(([field, offset]) => [`images[${i}].${field}`, i * 160 + offset]))),
   },
   ScreenBlock: {
     byteLength: 96,
@@ -153,32 +154,41 @@ function putVec4(block, offset, values) {
 
 function imageBlock(job) {
   const secondary = job.secondary || job;
-  const block = new Float32Array(56);
-  putImage(block, 0, job);
-  putImage(block, 28, secondary);
+  const block = new Float32Array(80);
+  putImage(block, 0, job, job.mode, job.formalTanControl);
+  putImage(block, 40, secondary, job.mode, job.formalTanControl);
   return block;
 }
 
-function putImage(block, offset, image) {
+function putImage(block, offset, image, mode, formalTanControl) {
   // Independent reference metadata still provides the old physical rectangle and
   // normalized inverse. Compose those into the production pixel mapping here.
   const [x, y, sx, sy] = image.rect;
   const [a, b, c, d] = image.planeToImage;
   const rowX = [a * sx, b * sx, -x * sx, 0];
   const rowY = [-c * sy, -d * sy, -y * sy, 0];
+  if (image.planeAdjustment) {
+    const [[a, b], [c, d]] = image.planeAdjustment;
+    for (const row of [rowX, rowY]) {
+      const [x, y] = row;
+      row[0] = x * a + y * c;
+      row[1] = x * b + y * d;
+    }
+  }
+  const [ox, oy] = mode === "ortho" && image.projectionCode === 0 && !formalTanControl ? image.reference : image.nativeOffset;
+  rowX[2] -= rowX[0] * ox + rowX[1] * oy;
+  rowY[2] -= rowY[0] * ox + rowY[1] * oy;
   putVec4(block, offset, rowX);
   putVec4(block, offset + 4, rowY);
   putVec4(block, offset + 8, [1, 1, 0, 0]); // These reference jobs use full-resolution textures.
-  block[offset + 12] = image.crval[0];
-  block[offset + 13] = image.crval[1];
-  block[offset + 14] = image.planeUnitsPerRadian;
-  block[offset + 15] = image.projectionCode;
-  block[offset + 16] = image.zpnUpperEta;
-  block[offset + 17] = image.observerDistance;
-  block[offset + 18] = image.deltaT || 0;
-  block[offset + 19] = 0;
-  putVec4(block, offset + 20, image.cameraDiff || [0, 0, 0, 1]);
-  putVec4(block, offset + 24, image.sourceViewQuat || [0, 0, 0, 1]);
+  block[offset + 12] = image.planeUnitsPerRadian;
+  block[offset + 13] = image.projectionCode;
+  block[offset + 14] = image.observerDistance;
+  block[offset + 15] = image.deltaT || 0;
+  block.set(image.nativeBasis, offset + 16);
+  putVec4(block, offset + 28, image.nativePoles);
+  putVec4(block, offset + 32, image.cameraDiff || [0, 0, 0, 1]);
+  putVec4(block, offset + 36, image.sourceViewQuat || [0, 0, 0, 1]);
 }
 
 function screenBlock(job) {
@@ -211,10 +221,10 @@ function displayBlock(job) {
   block[11] = 1;     // upsilon.y
   putVec4(block, 12, [...(job.userSector || [0, 0]), ...(job.metadataSector || [0, 0])]);
   putVec4(block, 16, [...(job.cutOff || [0, 0, -1]), 0]);
+  block[19] = job.calculateDepth ? 1 : 0;
   block[20] = radii[0];
   block[21] = radii[1];
-  block[22] = 0;     // slit.x
-  block[23] = 1;     // slit.y
+  block.set(job.slit || [0, 1], 22);
   return block;
 }
 
@@ -248,13 +258,14 @@ ${commonDiagnosticUniforms()}
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
-    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, images[0].observerDistance);
+    vec3 ray = helioprojectiveToObserverRay(helioprojective);
+    vec2 hpcXY = observerRayToHpcXY(ray, images[0].observerDistance);
     clipPlanarMasks(hpcXY);
 
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(
         images[0],
-        helioprojective,
+        ray,
         hpcXY,
         uPv,
         enhancementFactor);
@@ -270,27 +281,28 @@ ${stripMain(hpcSource)}
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
+    vec3 ray = helioprojectiveToObserverRay(helioprojective);
 
     float observerDistance = images[0].observerDistance;
-    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
+    vec2 hpcXY = observerRayToHpcXY(ray, observerDistance);
     clipPlanarMasks(hpcXY);
 
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(
         images[0],
-        helioprojective,
+        ray,
         hpcXY,
         pv0,
         enhancementFactor);
 
     float diffObserverDistance = images[1].observerDistance;
-    vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, diffObserverDistance);
+    vec2 diffHpcXY = observerRayToHpcXY(ray, diffObserverDistance);
     clipPlanarMasks(diffHpcXY);
 
     float diffEnhancementFactor;
     vec2 diffTexCoord = sampleHpcTexcoord(
         images[1],
-        helioprojective,
+        ray,
         diffHpcXY,
         pv1,
         diffEnhancementFactor);
@@ -428,10 +440,10 @@ ${commonDiagnosticUniforms()}
 
 void main(void) {
     vec2 hpcXY = warpHpcXY();
-    vec2 helioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[0].observerDistance);
+    vec3 ray = vec3(hpcXY, -images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, uPv, enhancementFactor);
+    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, uPv, enhancementFactor);
     diagnosticOutput(texCoord, length(hpcXY));
 }
 `;
@@ -443,13 +455,13 @@ ${stripMain(warpSource)}
 
 void main(void) {
     vec2 hpcXY = warpHpcXY();
-    vec2 helioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[0].observerDistance);
+    vec3 ray = vec3(hpcXY, -images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, pv0, enhancementFactor);
-    vec2 diffHelioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[1].observerDistance);
+    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, pv0, enhancementFactor);
+    vec3 diffRay = vec3(hpcXY, -images[1].observerDistance);
     float diffEnhancementFactor;
-    vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
+    vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffRay, hpcXY, pv1, diffEnhancementFactor);
     outColor = vec4(texCoord, diffTexCoord);
 }
 `;
@@ -458,8 +470,18 @@ void main(void) {
 function productionFragment(job, commonSource) {
   if (job.mode === "hpc")
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageHpc.frag"), "utf8")}`;
-  if (job.mode === "ortho")
-    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8")}`;
+  if (job.mode === "ortho") {
+    let source = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8");
+    if (job.formalTanControl) {
+      // Test-only formal-TAN control: remove exactly the shortcut from an
+      // in-memory copy. The production file and its main() remain intact.
+      const shortcut = "    if (img.projectionCode == WCS_PROJECTION_TAN)\n        return wcsPlaneToTexcoord(world.xy, img);\n";
+      if (source.split(shortcut).length !== 2)
+        throw new Error("Formal TAN control requires exactly one Orthographic TAN shortcut");
+      source = source.replace(shortcut, "");
+    }
+    return `${commonSource}\n${source}`;
+  }
   if (job.mode === "lati_zenithal")
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageLati.frag"), "utf8")}`;
   if (job.mode === "radial_warp")
@@ -480,9 +502,10 @@ function bindSyntheticSourceTexture(gl, job, errors) {
   }
   const bytes = job.sourceTexture ? fs.readFileSync(job.sourceTexture.path) : null;
   const byteTexture = job.sourceTexture?.format === "R8";
+  const floatTexture = job.sourceTexture?.format === "R32F";
   if (bytes) {
     const storage = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    data = byteTexture ? new Uint8Array(storage) : new Uint16Array(storage);
+    data = byteTexture ? new Uint8Array(storage) : floatTexture ? new Float32Array(storage) : new Uint16Array(storage);
     if (data.length !== width * height)
       throw new Error("Source texture dimensions do not match its data");
   }
@@ -491,17 +514,17 @@ function bindSyntheticSourceTexture(gl, job, errors) {
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
   errors.sourceBind = gl.getError();
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, floatTexture ? gl.NEAREST : gl.LINEAR);
   errors.sourceMinFilter = gl.getError();
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, floatTexture ? gl.NEAREST : gl.LINEAR);
   errors.sourceMagFilter = gl.getError();
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   errors.sourceWrapS = gl.getError();
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   errors.sourceWrapT = gl.getError();
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, byteTexture ? gl.R8 : gl.R16F, width, height, 0,
-      gl.RED, byteTexture ? gl.UNSIGNED_BYTE : gl.HALF_FLOAT, data);
+  gl.texImage2D(gl.TEXTURE_2D, 0, byteTexture ? gl.R8 : floatTexture ? gl.R32F : gl.R16F, width, height, 0,
+      gl.RED, byteTexture ? gl.UNSIGNED_BYTE : floatTexture ? gl.FLOAT : gl.HALF_FLOAT, data);
   errors.sourceImage = gl.getError();
   // A second source upload must not overwrite errors from the first one.
   if (Object.values(errors).some(value => value !== gl.NO_ERROR))
@@ -580,6 +603,15 @@ function floatToHalf(value) {
 }
 
 function diagnosticFragment(job, commonSource) {
+  // Keep the polynomial control independently testable on hardware backends.
+  if (job.trigPolynomial && !commonSource.includes("#define JHV_SWIFTSHADER\n"))
+    commonSource = commonSource.replace("\n", "\n#define JHV_SWIFTSHADER\n");
+  if (job.mode === "trig")
+    return commonSource + `
+      void main() {
+        float angle = texelFetch(image, ivec2(gl_FragCoord.xy), 0).r;
+        outColor = vec4(${job.trigBuiltin ? "vec2(sin(angle), cos(angle))" : "sinCos(angle)"}, angle, 1.);
+      }`;
   if (job.productionCoordinates) {
     // Keep the production main, including sphere/plane selection and discards.
     // Replace only the color calculation to expose its selected source pixels.
@@ -721,6 +753,18 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   }
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   const drawError = gl.getError();
+  let millisecondsPerFrame;
+  if (job.benchmarkFrames) {
+    // WebGL finish() may only flush Chromium's command buffer. A readback
+    // makes both endpoints include completed rendering rather than enqueue time.
+    const fence = new Float32Array(4);
+    for (let i = 0; i < 10; i++) gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, fence);
+    const start = process.hrtime.bigint();
+    for (let i = 0; i < job.benchmarkFrames; i++) gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, fence);
+    millisecondsPerFrame = Number(process.hrtime.bigint() - start) / (1e6 * job.benchmarkFrames);
+  }
   if (job.depthProbe !== undefined) {
     const probe = createProgram(gl, vertexSource, `#version 300 es
       precision highp float;
@@ -759,6 +803,7 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
     ok: true,
     name: job.name,
     renderer,
+    millisecondsPerFrame,
     version: gl.getParameter(gl.VERSION),
     clearError,
     drawError,
@@ -789,7 +834,11 @@ async function main() {
 
   const quadVao = prepareFullscreenQuad(gl);
 
-  const commonSource = fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl/imageCommon.frag"), "utf8");
+  let commonSource = ["imageCommon.frag", "imageGeometry.frag"]
+    .map(fragment => fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl", fragment), "utf8"))
+    .join("");
+  if (renderer.includes("SwiftShader"))
+    commonSource = commonSource.replace("\n", "\n#define JHV_SWIFTSHADER\n");
   const vertexSource = fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl/screen.vert"), "utf8");
   const results = [];
   for (const job of jobs)

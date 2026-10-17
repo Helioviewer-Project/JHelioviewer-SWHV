@@ -87,6 +87,8 @@ abstract class GLSLShader {
     private static int compileShader(int shaderType, String description, String text) {
         int id = GL.glCreateShader(shaderType);
         try {
+            if (shaderType == GL.FRAGMENT_SHADER && GL.renderer.contains("SwiftShader"))
+                text = text.replaceFirst("\n", "\n#define JHV_SWIFTSHADER\n");
             GL.glShaderSource(id, text);
             GL.glCompileShader(id);
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<meta>
+<fits>
+<SIMPLE>1</SIMPLE>
+<BITPIX>16</BITPIX>
+<NAXIS>2</NAXIS>
+<NAXIS1>1024</NAXIS1>
+<NAXIS2>1024</NAXIS2>
+<DATE-OBS>11-Jan-2011</DATE-OBS>
+<TIME-OBS>22:39:00</TIME-OBS>
+<REFTIME>2011/01/11 22:39:00.000</REFTIME>
+<DPC>1212616640</DPC>
+<SEQID>-963376423</SEQID>
+<DPC_STR>0x48470fc0</DPC_STR>
+<SQID>0xc6940ad9</SQID>
+<FRAMEN>8</FRAMEN>
+<CCDTEMP>-63.250000</CCDTEMP>
+<X_OFFSET>0</X_OFFSET>
+<Y_OFFSET>0</Y_OFFSET>
+<X_SCALE>1</X_SCALE>
+<Y_SCALE>1</Y_SCALE>
+<CTYPE1>solar-x</CTYPE1>
+<CTYPE2>solar-y</CTYPE2>
+<CDELT1>1.9779000</CDELT1>
+<CDELT2>1.9779000</CDELT2>
+<CRPIX1>511.50000</CRPIX1>
+<CRPIX2>511.50000</CRPIX2>
+<X0>511.50000</X0>
+<Y0>511.50000</Y0>
+<RADIUS>498.26822</RADIUS>
+<REFLECT>0</REFLECT>
+<CROT>-174.163</CROT>
+<RESCALE>1.0000000</RESCALE>
+<TELESCOP>SOHO</TELESCOP>
+<INSTRUME>MDI</INSTRUME>
+<DATEOBS>11-Jan-2011 22:39:00.00</DATEOBS>
+<INPUTFIL>/sas12/log/sci160k/110111_010006</INPUTFIL>
+<DATASET>51</DATASET>
+<OUTFIL>/soho-archive/private/data/planning/mdi/smdi_maglc_fd_20110111_2239.</OUTFIL>
+<PROGVER>MK_MDI_FITS  Ver 4.07  07-Jul-2003</PROGVER>
+<CREATED>12-Jan-2011 02:30:21.00</CREATED>
+<DATE_OBS>2011-01-11T22:39:00.000Z</DATE_OBS>
+<R_SUN>498.26822</R_SUN>
+<DPC_OBSR>FD_Magnetogram</DPC_OBSR>
+<history>
+The data is uncalibrated and is not suitable for analysis
+FITSHEAD2STRUCT run at: Tue Jan 11 21:36:33 2011
+</history>
+<comment>
+FITSHEAD2STRUCT
+</comment>
+</fits>
+<helioviewer>
+<HV_ROTATION>-174.163</HV_ROTATION>
+<HV_ERROR_REPORT>R_SUN tag inserted and value copied from FITS value &quot;RADIUS&quot;; tag added by hv_mdi_prep2jp2_ql. DATE_OBS tag modified hv_mdi_prep2jp2_ql as follows: took FITS value &quot;REFTIME&quot; and manipulated it to conform to CCSDS format.  The original value of DATE_OBS is =11-Jan-2011. DPC_OBSR tag inserted and value set by hv_mdi_prep2jp2_ql.</HV_ERROR_REPORT>
+<HV_QUICKLOOK>TRUE</HV_QUICKLOOK>
+<HV_COMMENT>JP2 file created locally at NASA-GSFC using HV_WRITE_JP2_LWG at Tue Jan 11 21:36:35 2011.
+Contact Helioviewer Project (webmaster@helioviewer.org) for more details/questions/comments regarding this JP2 file.
+HVS (Helioviewer setup) file used to create this JP2 file: hvs_highbitrate_mdi.pro (version 1.0).
+FITS to JP2 source code provided by ESA/NASA Helioviewer Project [contact the Helioviewer Project at webmaster@helioviewer.org][NASA-GSFC] and is available for download at https://launchpad.net/jp2gen.
+Please contact the source code providers if you suspect an error in the source code.
+Full source code for the entire Helioviewer Project can be found at https://launchpad.net/helioviewer.</HV_COMMENT>
+<HV_SUPPORTED>TRUE</HV_SUPPORTED>
+<HV_QUICKLOOK>TRUE</HV_QUICKLOOK>
+<HV_ERROR_REPORT>R_SUN tag inserted and value copied from FITS value &quot;RADIUS&quot;; tag added by hv_mdi_prep2jp2_ql. DATE_OBS tag modified hv_mdi_prep2jp2_ql as follows: took FITS value &quot;REFTIME&quot; and manipulated it to conform to CCSDS format.  The original value of DATE_OBS is =11-Jan-2011. DPC_OBSR tag inserted and value set by hv_mdi_prep2jp2_ql.</HV_ERROR_REPORT>
+</helioviewer>
+</meta>

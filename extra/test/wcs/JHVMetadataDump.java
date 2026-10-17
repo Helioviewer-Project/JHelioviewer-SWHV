@@ -1,7 +1,11 @@
 package org.helioviewer.jhv.metadata;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
@@ -10,7 +14,7 @@ import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.ImageBounds;
 import org.helioviewer.jhv.wcs.ImageGeometry;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsSolution;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,6 +26,7 @@ import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
+import nom.tam.util.Cursor;
 
 public final class JHVMetadataDump {
 
@@ -30,6 +35,14 @@ public final class JHVMetadataDump {
 
         private FitsMetaDataContainer(Header header) {
             this.header = header;
+        }
+
+        @Override
+        public Set<String> keys() {
+            Set<String> keys = new HashSet<>();
+            for (Cursor<String, HeaderCard> cursor = header.iterator(); cursor.hasNext(); )
+                keys.add(cursor.next().getKey());
+            return keys;
         }
 
         @Override
@@ -107,9 +120,9 @@ public final class JHVMetadataDump {
         int pixelHeight = (int) header.getLongValue("ZNAXIS2", header.getLongValue("NAXIS2"));
 
         ImageGeometry geometry = meta.getGeometry();
-        WcsHeader wcs = geometry.wcs;
+        WcsSolution wcs = geometry.wcs;
         double unitsPerArcsec = wcs.unitsPerArcsec();
-        double arcsecPerPixelY = wcs.projection == WcsHeader.Projection.CEA
+        double arcsecPerPixelY = wcs.projection == WcsSolution.Projection.CEA
                 ? geometry.pixelSizeY
                 : geometry.pixelSizeY / unitsPerArcsec;
         Region hpcBounds = ImageBounds.hpc(geometry, meta.viewpoint.distance);
@@ -126,8 +139,11 @@ public final class JHVMetadataDump {
                 .put("unit_per_pixel_x", geometry.pixelSizeX)
                 .put("unit_per_pixel_y", geometry.pixelSizeY)
                 .put("plane_units_per_rad", wcs.unitsPerRad)
-                .put("crval_internal_x", wcs.crval.x)
-                .put("crval_internal_y", wcs.crval.y)
+                .put("crval_internal_x", wcs.reference.x * wcs.unitsPerRad)
+                .put("crval_internal_y", (wcs.projection == WcsSolution.Projection.CEA
+                        ? Math.sin(wcs.reference.y) / wcs.pv2[1] : wcs.reference.y) * wcs.unitsPerRad)
+                .put("native_basis", new JSONArray(wcs.nativeBasis))
+                .put("native_offset", new JSONArray(new double[]{wcs.offset.x, wcs.offset.y}))
                 .put("image_to_plane", new JSONArray(new double[]{
                         geometry.pixelToPlane.m00 / geometry.pixelSizeX,
                         -geometry.pixelToPlane.m01 / geometry.pixelSizeY,
@@ -147,7 +163,7 @@ public final class JHVMetadataDump {
                 .put("sun_shift_x", sunShift.x)
                 .put("sun_shift_y", sunShift.y)
                 .put("projection", wcs.projection.name())
-                .put("zpn_upper_eta", wcs.zpnUpperEta)
+                .put("zpn_upper_eta", wcs.nativeBasis[11])
                 .put("pv2", new JSONArray(wcs.pv2));
     }
 
@@ -159,6 +175,29 @@ public final class JHVMetadataDump {
     }
 
     public static void main(String[] args) throws Exception {
+        if (args.length == 3 && args[0].equals("--prepare")) {
+            JSONArray inputs = new JSONArray(Files.readString(Path.of(args[1])));
+            JSONArray output = new JSONArray();
+            for (int i = 0; i < inputs.length(); i++) {
+                JSONObject input = inputs.getJSONObject(i);
+                String cards = input.getString("header");
+                String[] records = new String[cards.length() / 80];
+                for (int j = 0; j < records.length; j++)
+                    records[j] = cards.substring(j * 80, (j + 1) * 80);
+                Header header = new Header(records);
+                WcsSolution wcs = WcsInterpreter.read(new FitsMetaDataContainer(header),
+                        input.getInt("width"), input.getInt("height"), input.getDouble("unitsPerRad"));
+                wcs = wcs.adjusted(input.optDouble("deltaCRVAL1", 0), input.optDouble("deltaCRVAL2", 0));
+                output.put(new JSONObject()
+                        .put("nativeBasis", new JSONArray(wcs.nativeBasis))
+                        .put("nativePoles", new JSONArray(wcs.nativePoles))
+                        .put("reference", new JSONArray(new double[]{wcs.reference.x * wcs.unitsPerRad, wcs.reference.y * wcs.unitsPerRad}))
+                        .put("nativeOffset", new JSONArray(new double[]{wcs.offset.x, wcs.offset.y}))
+                        .put("pv2", new JSONArray(wcs.pv2)));
+            }
+            Files.writeString(Path.of(args[2]), output.toString());
+            return;
+        }
         if (args.length != 1 && args.length != 3)
             throw new IllegalArgumentException("usage: JHVMetadataDump <fits> [--hdu <index>]");
 

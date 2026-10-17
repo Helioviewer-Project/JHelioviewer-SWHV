@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<meta>
+<fits>
+<DATE>10/06/17, 23:59:27.000</DATE>
+<MJD>55364</MJD>
+<DAY>11491</DAY>
+<TIME>86367000</TIME>
+<IMG_TIME>17-JUN-10  23:59:27</IMG_TIME>
+<TIME_OBS>23:59:27.000</TIME_OBS>
+<DATE_OBS>2010-06-17T23:59:27.000</DATE_OBS>
+<ORIGIN>TRACE</ORIGIN>
+<TELESCOP>TRACE</TELESCOP>
+<INSTRUME>TRACE</INSTRUME>
+<OBJECT>??</OBJECT>
+<SCI_OBJ>??</SCI_OBJ>
+<OBS_PROG>STD.dynamics</OBS_PROG>
+<NAXIS1>1024</NAXIS1>
+<NAXIS2>1024</NAXIS2>
+<CTYPE1>Solar-x</CTYPE1>
+<CTYPE2>Solar-y</CTYPE2>
+<CDELT1>0.500000</CDELT1>
+<CDELT2>0.500000</CDELT2>
+<CRPIX1>1404.35</CRPIX1>
+<CRPIX2>-281.093</CRPIX2>
+<CRVAL1>0.00000</CRVAL1>
+<CRVAL2>0.00000</CRVAL2>
+<XCEN>-445.927</XCEN>
+<YCEN>396.797</YCEN>
+<AMP>A</AMP>
+<SUM_CCDX>(ASCII character value=1)</SUM_CCDX>
+<SUM_CCDY>(ASCII character value=1)</SUM_CCDY>
+<BIN_CCD>1</BIN_CCD>
+<TBIN_CCD>1</TBIN_CCD>
+<SRI_LLEX>0.00000</SRI_LLEX>
+<SRI_LLEY>0.00000</SRI_LLEY>
+<SRI_FOVX>511.500</SRI_FOVX>
+<SRI_FOVY>511.500</SRI_FOVY>
+<T_FSTR>16.657645</T_FSTR>
+<T_SPIDER>21.604696</T_SPIDER>
+<T_CCD_A>-61.000000</T_CCD_A>
+<MSEQID>4957</MSEQID>
+<MSEQ_NAM>STD.dynamics</MSEQ_NAM>
+<SEQID>4957</SEQID>
+<SEQ_NAM>STD.dynamics</SEQ_NAM>
+<FRMID>757</FRMID>
+<FRM_NAM>cjs.stdaecfull171</FRM_NAM>
+<TRGID>139</TRGID>
+<TRG_NAM>top2.pos1</TRG_NAM>
+<FN_INSEQ>1681</FN_INSEQ>
+<FRM_NUM>118969</FRM_NUM>
+<SHT_NOM>55.1080</SHT_NOM>
+<SHT_MDUR>55.1079</SHT_MDUR>
+<WAVE_LEN>171</WAVE_LEN>
+<MFILT1>[</MFILT1>
+<MFILT2>}</MFILT2>
+<APID>2108</APID>
+<SOU_AREA>0</SOU_AREA>
+<PERCENTD>100.000</PERCENTD>
+<IMG_MIN>82.0000</IMG_MIN>
+<IMG_MAX>4098.00</IMG_MAX>
+<IMG_AVG>130.356</IMG_AVG>
+<IMG_DEV>35.7457</IMG_DEV>
+<DP_HEADER>13614,   -1965,       1,   20256,  -26785,   14240,     309,    8047,    4095,    1792,    2048,  -32768,       0,     203,       0,       1,       0,  -18604,       0,       0,    8960,   20256,  -26786,       0,     133,      64,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,  -13148,  -14399,  -15680,     190,  -15419,  -16127,  -30976,   16240,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,   26230,   23655,   25716,   25700,   23908,   31077,   26745,  -15714,  -18008,  -15682,     186,     257,     257,     257,   25858,   25957,   24158,  -16539,   25700,   22628,   25688,     181,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,    2049,     420,    -692,     692,     115,      78,     116,      67,     117,    -244,    -244,      44,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,    9733,     301,    1352,       0,   14336,  -25984,  -32651,     354,   13507,     263,    1708,     229,       8,       2,   16876,       0,       0,      64,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,     102,   26467,   25470,   32126,       0,  -32640,  -31354,  -31427,   14912,   16448,    -257,    -232,    6181,    5888,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,    4957,       0,       1,    1681,       1,  -12103,     757,     139,       0,   13231,       1,   22017,    4631,     200,  -19924,     219,       0,       0,       0,       4,       0,       1,      77,     989,     104,       0,       0,      96,       0,       0,       0,       0,       4,       0,      30,      -1,       1,       0,     170,     915,       0,       0,       1,       1,       3,       1,    4957,       0,       2,     800,       4,       0,       0,    2304,      40,       0,    1000,     641,      50,       3,       0,       0,      76,     585,   28763,   32109,  -26660,   13777,     768,   21502,    -256,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,     757,     251,    4352,      65,       0,      22,      28,     256,    2515,    4048,       0,       0,    1728,       0,       0,       0,       0,       0,       0,    1024,    1300,       0,    1024,    1024,    1040,       8,       1,      49,       4,       0,       1,      38,       4,       0,       1,      13,     163,       0,       6,     163,       0,       0,       0,       0,       0,       0,       1,       0,       1,       1,       0,       0,       0,       0,       0,       0,       1,       0,       0,    1300,       0,    1024,    1024,    1040,       0,      60,       1,       1,       3,       3,       0,       0,       1,       0,       0,    1300,       0,    1024,    1024,    1040,       8,      60,       1,       1,       3,       0,       0,       0,       0,       0,       0,    1300,       0,    1024,    1024,    1040,       8,       0,       0,      12,       0,       0,       0,       0,       0,       0,       0,       0,     416,    8374,       0,      98,     121,       0,       0,       0,  -27599,       1,       1,       0,    2048,       0,       0,    6144,       7,     366,       0,       0,   16384,       0,       0,       0,   11570,       0,      13,      13,    4096,    4096,    4096,    4096,      46,      46,      46,      46,    4096,       0,      20,       0,     163,       0,       0,      20,       0,       0,       0,     696,       0,     512,       0,       0,       2,      32,       0,       0,       0,       2,      16,       0,    1024,       0,      64,       0,       1,       0,     256,      64,       0,       0,       0,       8,       8,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       1,       0,  -32768,       0,       0,    2048,    8192,       2,       0,       0,       0,       0,       2,       2,       0,     576,       0,       0,       0,       0</DP_HEADER>
+<history>
+trace_prep  Replaced     9 saturated pixels with value &amp;gt; 4100
+tr_dark_sub VERSION:  2.10 Subtracted dark pedestal and current 
+tr_flat_sub VERSION:  1.60 Image divided by corrected flat field
+trace_unspike  Unspiked EUV image   1 time(s) 
+trace_destreak  Destreaked image 
+trace_knoise  Removed readout noise from image 
+trace_wave2point  XYOffsets:   2.10 -4.35
+</history>
+</fits>
+<helioviewer>
+<HV_COMMENT>JP2 file created locally at NASA-GSFC using HV_WRITE_JP2_LWG at Mon Nov 21 10:03:05 2016.(ASCII character value=10)Contact Helioviewer Project (webmaster@helioviewer.org) for more details/questions/comments regarding this JP2 file.(ASCII character value=10)HVS (Helioviewer setup) file used to create this JP2 file: hvs_trace.pro (version 1.0).(ASCII character value=10)FITS to JP2 source code provided by ESA/NASA Helioviewer Project [contact the Helioviewer Project at webmaster@helioviewer.org][NASA-GSFC] and is available for download at https://launchpad.net/jp2gen.(ASCII character value=10)Please contact the source code providers if you suspect an error in the source code.(ASCII character value=10)Full source code for the entire Helioviewer Project can be found at https://launchpad.net/helioviewer.</HV_COMMENT>
+<HV_SUPPORTED>TRUE</HV_SUPPORTED>
+<HV_REVERSIBLE>0</HV_REVERSIBLE><HV_QUICKLOOK>FALSE</HV_QUICKLOOK>
+</helioviewer>
+</meta>

@@ -14,7 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 GLSL_DIR = REPO_ROOT / "resources" / "glsl"
 
-COMMON_FRAGMENT = GLSL_DIR / "imageCommon.frag"
+COMMON_FRAGMENTS = (GLSL_DIR / "imageCommon.frag", GLSL_DIR / "imageGeometry.frag")
 IMAGE_FRAGMENTS = (
     "imageOrtho.frag",
     "imageHpc.frag",
@@ -76,19 +76,21 @@ def validate_program(glslang: str, label: str, vertex: Path, fragment: Path) -> 
 
 
 def write_combined_image_fragments(temp_dir: Path) -> list[Path]:
-    common = COMMON_FRAGMENT.read_text()
+    common = "".join(fragment.read_text() for fragment in COMMON_FRAGMENTS)
     combined: list[Path] = []
     for fragment in IMAGE_FRAGMENTS:
         source = GLSL_DIR / fragment
-        target = temp_dir / fragment
-        target.write_text(common + source.read_text())
-        combined.append(target)
+        for prefix in ("", "swiftshader_"):
+            target = temp_dir / (prefix + fragment)
+            header = common if not prefix else common.replace("\n", "\n#define JHV_SWIFTSHADER\n", 1)
+            target.write_text(header + source.read_text())
+            combined.append(target)
     return combined
 
 
 def build_shader_list(temp_dir: Path) -> list[Path]:
     image_fragments = {GLSL_DIR / fragment for fragment in IMAGE_FRAGMENTS}
-    ignored = image_fragments | {COMMON_FRAGMENT}
+    ignored = image_fragments | set(COMMON_FRAGMENTS)
     standalone = sorted(path for path in GLSL_DIR.iterdir() if path.suffix in {".frag", ".vert"} and path not in ignored)
     return standalone + write_combined_image_fragments(temp_dir)
 
@@ -119,8 +121,8 @@ def main() -> int:
             ("solar sphere", GLSL_DIR / "screen.vert", GLSL_DIR / "sphere.frag"),
         ]
         programs.extend(
-            (Path(fragment).stem, GLSL_DIR / "screen.vert", by_name[fragment])
-            for fragment in IMAGE_FRAGMENTS
+            (Path(prefix + fragment).stem, GLSL_DIR / "screen.vert", by_name[prefix + fragment])
+            for prefix in ("", "swiftshader_") for fragment in IMAGE_FRAGMENTS
         )
         for label, vertex, fragment in programs:
             ok = validate_program(glslang, label, vertex, fragment) and ok

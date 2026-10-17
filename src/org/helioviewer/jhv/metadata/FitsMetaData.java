@@ -9,11 +9,9 @@ import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.math.Mat2;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsSolution;
 
 public final class FitsMetaData extends CommonMetaData {
 
@@ -265,27 +263,10 @@ public final class FitsMetaData extends CommonMetaData {
             pixelH = (int) m.getRequiredLong("NAXIS2");
         }
 
-        WcsInterpreter.Result wcs = WcsInterpreter.read(m);
-        WcsHeader.Projection projection = wcs.projection();
-        double planeScale;
-
-        if (projection.isSurfaceMap()) {
-            planeScale = 1;
-        } else {
-            double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-            planeScale = Sun.Radius / radiusSunInArcsec;
-        }
-        // Convert FITS centers and upward Y once, into buffer edge coordinates.
-        double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
-        double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
-        Mat2 transform = wcs.pixelToPlane();
-        if (CROTABlockSet.contains(instrument))
-            transform = new Mat2(Math.hypot(transform.m00, transform.m10), 0, 0, Math.hypot(transform.m01, transform.m11));
-        Mat2 pixelToPlane = new Mat2(transform.m00 * planeScale, -transform.m01 * planeScale,
-                transform.m10 * planeScale, -transform.m11 * planeScale);
-        Vec2 crval = new Vec2(wcs.crval().x * planeScale, wcs.crval().y * planeScale);
-        WcsHeader header = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval);
-        geometry = new ImageGeometry(pixelW, pixelH, header, pixelToPlane, new Vec2(crpix1, pixelH - crpix2));
+        double observerUnitsPerRad = Sun.Radius / Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance);
+        WcsSolution wcs = WcsInterpreter.read(m, pixelW, pixelH, observerUnitsPerRad);
+        boolean pixelsAlreadyRotated = CROTABlockSet.contains(instrument);
+        geometry = new ImageGeometry(pixelW, pixelH, wcs, pixelsAlreadyRotated);
     }
 
     private double getSolarRadiusFactor() {

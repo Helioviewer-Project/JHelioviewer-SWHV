@@ -440,6 +440,19 @@
       ]
     },
     {
+      "path": "lib/jhv/linux-amd64/libjhvwcs.so",
+      "sha256": "d1c12dcc7ecc1f777667e28916112314d4c390fdb69ec65b0342fba764a993c7",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/WCSLIB.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/linux-amd64/libjhvwcs.so"
+      ]
+    },
+    {
       "path": "lib/jhv/linux-amd64/libkdu_jni.so",
       "sha256": "43131d1001129a049e19c6168b101e074ca6c88b1da084bfa94f6981f53602b7",
       "embedded_notices": [],
@@ -515,6 +528,19 @@
       "external_notices": [],
       "native_members": [
         "lib/jhv/macos-amd64/libjhvj2k.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libjhvwcs.dylib",
+      "sha256": "32e864265b4b38d1a3106ae3ecdfda059228f6a8df03b49b13d53aad461fd646",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/WCSLIB.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libjhvwcs.dylib"
       ]
     },
     {
@@ -596,6 +622,19 @@
       ]
     },
     {
+      "path": "lib/jhv/macos-arm64/libjhvwcs.dylib",
+      "sha256": "40f3995301340fc94833cb2305fbc6cfecfa64d08505eeb8f54ef7b5c109f3e9",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/WCSLIB.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libjhvwcs.dylib"
+      ]
+    },
+    {
       "path": "lib/jhv/macos-arm64/libkdu_jni.dylib",
       "sha256": "8ce86f5ed5b9119aa5b9221ed143d646372b21cbb3d61a9b54a18568d955bdaa",
       "embedded_notices": [],
@@ -645,6 +684,19 @@
       "external_notices": [],
       "native_members": [
         "lib/jhv/windows-amd64/jhvj2k.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/jhvwcs.dll",
+      "sha256": "95088d77924d03ba6064459c373a5d8654ddd800687c387ca3372290c49c53e6",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/WCSLIB.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/jhvwcs.dll"
       ]
     },
     {

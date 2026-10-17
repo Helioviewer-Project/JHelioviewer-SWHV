@@ -1,0 +1,7 @@
+{
+  "version": "8.10",
+  "upstream": "https://github.com/astropy/astropy/tree/fa8bb7a799a601a7e4ae32529c66d82e3d2e6d8f/cextern/wcslib",
+  "astropy_revision": "fa8bb7a799a601a7e4ae32529c66d82e3d2e6d8f",
+  "archive_sha256": "0d99b9361fa6e6a24011f5b0bdc2dc50c4fcd9961ea19ae927c7f8f7f15db5af",
+  "zig": "0.17.0"
+}

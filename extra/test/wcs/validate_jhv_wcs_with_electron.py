@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import fcntl
+import functools
 import json
 import math
 import os
@@ -39,7 +40,6 @@ from validate_jhv_wcs_against_astropy import (
     texcoord_to_pixel_center,
     worldToHelioprojective,
     wcsRect,
-    zpn_primary_branch_upper_eta,
 )
 
 
@@ -93,6 +93,7 @@ TAN_SCREEN_CASES = (
 
 
 def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
+    prepare_native_wcs(job_path)
     env = os.environ.copy()
     env["JHV_ELECTRON_GL_BACKEND"] = backend
     attempt_count = 0
@@ -177,15 +178,46 @@ def run_electron_jobs(electron: Path, jobs: list[dict], backend: str) -> list[di
 
 def wcs_job_fields(meta) -> dict:
     return {
+        "wcsHeader": {"header": meta.header_cards, "width": meta.pixel_width,
+                      "height": meta.pixel_height, "unitsPerRad": meta.plane_units_per_rad},
         "rect": list(wcsRect(meta)),
         "planeToImage": list(meta.plane_to_image),
-        "crval": [meta.crval_internal_x, meta.crval_internal_y],
-        "zpnUpperEta": zpn_primary_branch_upper_eta(meta) if meta.projection == "ZPN" else 0.0,
         "projectionCode": PROJECTION_CODES[meta.projection],
         "planeUnitsPerRadian": meta.plane_units_per_rad,
         "observerDistance": meta.observer_distance,
         "pv2": list(meta.pv2),
     }
+
+
+@functools.lru_cache(maxsize=1)
+def native_helper():
+    from compare_java_metadata_to_validator import java_classpath
+    temporary = TemporaryDirectory(prefix="jhv-wcs-prepared-")
+    classpath = java_classpath(Path(temporary.name))
+    subprocess.run(["javac", "-cp", classpath, "-d", temporary.name,
+                    str(SCRIPT_DIR / "JHVMetadataDump.java")], cwd=REPO_ROOT, check=True)
+    return temporary, classpath
+
+
+def prepare_native_wcs(job_path):
+    payload = json.loads(job_path.read_text())
+    images = []
+    for job in payload.get("jobs", [payload]):
+        images.extend(image for image in (job, job.get("secondary"))
+                      if image is not None and "wcsHeader" in image)
+    if not images:
+        return
+    temporary, classpath = native_helper()
+    requests = [image["wcsHeader"] for image in images]
+    input_path = Path(temporary.name) / "input.json"
+    output_path = Path(temporary.name) / "output.json"
+    input_path.write_text(json.dumps(requests))
+    subprocess.run(["java", "--enable-native-access=ALL-UNNAMED", "-cp", classpath,
+                    "org.helioviewer.jhv.metadata.JHVMetadataDump", "--prepare",
+                    str(input_path), str(output_path)], cwd=REPO_ROOT, check=True)
+    for image, prepared in zip(images, json.loads(output_path.read_text()), strict=True):
+        image.update(prepared)
+    job_path.write_text(json.dumps(payload))
 
 
 def common_job(
@@ -655,7 +687,7 @@ def expected_world_deg_for_mode(
         if job.get("deltaT", 0.0) != 0.0:
             world = differential(job["deltaT"], world)
         source_world = rotate_vector(tuple(job.get("sourceViewQuat", (0.0, 0.0, 0.0, 1.0))), world)
-        if source_world[2] < 0.0:
+        if source_world[2] < 1.0 / meta.observer_distance:
             return (math.nan, math.nan)
         helioprojective = worldToHelioprojective(source_world, meta.observer_distance)
         return (math.degrees(helioprojective[0]), math.degrees(helioprojective[1]))

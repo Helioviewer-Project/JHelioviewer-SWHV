@@ -11,7 +11,7 @@ public final class ImageGeometry {
 
     public final ImageGeometry original;
     public final ImageGrid grid;
-    public final WcsHeader wcs;
+    public final WcsSolution wcs;
     public final Mat2 pixelToPlane;
     public final Mat2 planeToPixel;
     public final Vec2 referencePixel;
@@ -21,15 +21,24 @@ public final class ImageGeometry {
     public final Region bounds; // Original image footprint, independent of the decoded grid.
 
     public ImageGeometry(int width, int height, double pixelSize) {
-        this(width, height, new WcsHeader(WcsHeader.Projection.TAN, new float[6], Sun.MeanEarthDistance, Vec2.ZERO),
+        this(width, height, new WcsSolution(WcsSolution.Projection.TAN, new float[6], Sun.MeanEarthDistance),
                 new Mat2(pixelSize, 0, 0, -pixelSize), new Vec2(.5 * width, .5 * height));
     }
 
-    public ImageGeometry(int width, int height, WcsHeader _wcs, Mat2 _pixelToPlane, Vec2 _referencePixel) {
+    // Convert FITS centers and upward Y once, into buffer edge coordinates.
+    public ImageGeometry(int width, int height, WcsSolution _wcs, boolean pixelsAlreadyRotated) {
+        Mat2 transform = _wcs.pixelToPlane;
+        if (pixelsAlreadyRotated)
+            transform = new Mat2(Math.hypot(transform.m00, transform.m10), 0, 0, Math.hypot(transform.m01, transform.m11));
+        this(width, height, _wcs, new Mat2(transform.m00, -transform.m01, transform.m10, -transform.m11),
+                new Vec2(_wcs.referencePixel.x - .5, height - (_wcs.referencePixel.y - .5)));
+    }
+
+    public ImageGeometry(int width, int height, WcsSolution _wcs, Mat2 _pixelToPlane, Vec2 _referencePixel) {
         this(null, new ImageGrid(0, width, height), _wcs, _pixelToPlane, _referencePixel);
     }
 
-    private ImageGeometry(ImageGeometry source, ImageGrid _grid, WcsHeader _wcs, Mat2 _pixelToPlane, Vec2 _referencePixel) {
+    private ImageGeometry(ImageGeometry source, ImageGrid _grid, WcsSolution _wcs, Mat2 _pixelToPlane, Vec2 _referencePixel) {
         original = source == null ? this : source;
         grid = _grid;
         wcs = _wcs;
@@ -44,8 +53,7 @@ public final class ImageGeometry {
             double step = grid.step();
             sunPixel = new Vec2((source.sunPixel.x - grid.firstX()) / step + .5, (source.sunPixel.y - grid.firstY()) / step + .5);
         } else {
-            Vec2 sun = !wcs.projection.isSurfaceMap() && (wcs.crval.x != 0 || wcs.crval.y != 0)
-                    ? WcsProjection.helioprojectiveToPlane(wcs, 0, 0) : null;
+            Vec2 sun = !wcs.projection.isSurfaceMap() ? wcs.worldToPlane(0, 0) : null;
             sunPixel = sun == null ? referencePixel : toPixel(sun.x, sun.y);
         }
     }

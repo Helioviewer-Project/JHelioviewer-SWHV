@@ -20,6 +20,7 @@ from test_electron_wcs_reference import reference_header
 from test_wcs_rendering import (
     image_header,
     orthographic_geometry,
+    reference_pixels,
     verify_colors,
     verify_coordinates,
     verify_footprint,
@@ -329,12 +330,47 @@ class ValidationTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             verify_coordinates(good, uv, valid)
 
-    def test_observer_image_does_not_wrap(self):
+    def test_coordinates_do_not_wrap(self):
         pixels = np.array([[[1, 0.5, 0, 1]]])
         uv, valid = np.array([[[0, 0.5]]]), np.ones((1, 1), dtype=bool)
         with self.assertRaises(AssertionError):
             verify_coordinates(pixels, uv, valid)
-        verify_coordinates(pixels, uv, valid, wrap_longitude=True)
+
+    def test_surface_coverage_reference(self):
+        for projection in ("CAR", "CEA"):
+            header = image_header(projection)
+            header["CRVAL1"] = header["CRVAL2"] = 0
+            header["CDELT1"] = 60 / 128
+            header["CDELT2"] = 120 / 128
+            invalid = cpu.wcsPlaneToSurfaceTexcoord((math.nan, 0), cpu.build_jhv_meta(header), np.zeros((128, 128)))
+            self.assertTrue(all(math.isnan(value) for value in invalid))
+            for center in (0, 230, 1440):
+                header["CRPIX1"] = 64.5 - center / header["CDELT1"]
+                longitude = np.radians([center, center + 40])
+                world = np.column_stack((np.sin(longitude), np.zeros(2), np.cos(longitude)))
+                uv, valid = reference_pixels(header, world)
+                np.testing.assert_array_equal(valid, [True, False])
+                np.testing.assert_allclose(uv[0], [.5, .5], rtol=0, atol=1e-12)
+                _, valid = reference_pixels(header, world, slit=(.6, .9))
+                np.testing.assert_array_equal(valid, [False, False])
+            header["CDELT1"] = 360 / 128
+            header["CRPIX1"] = 64.5
+            uv, valid = reference_pixels(header, np.array([0., 0., -1.]))
+            self.assertTrue(valid)
+            np.testing.assert_allclose(uv, [0, .5], rtol=0, atol=1e-12)
+
+    def test_observer_plane_rotation_reference(self):
+        header = image_header("TAN", distance=10)
+        header["CRVAL1"] = header["CRVAL2"] = 0
+        header["CDELT1"] = header["CDELT2"] = 1
+        for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2"):
+            header.remove(key)
+        rotation = np.array([[.96, -.28], [.28, .96]])
+        uv, valid = reference_pixels(header, np.array([1., 2., 0.]), adjustment=rotation)
+        # Central TAN is a direct tangent-plane intersection: (x/D,y/D).
+        plane = rotation @ np.degrees([.1, .2])
+        self.assertTrue(valid)
+        np.testing.assert_allclose(uv, [.5 + plane[0]/128, .5 - plane[1]/128], rtol=0, atol=1e-12)
 
     def test_footprint_limits(self):
         valid = np.ones((40, 40), dtype=bool)

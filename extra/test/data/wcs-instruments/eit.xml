@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<meta>
+<fits>
+<SIMPLE>1</SIMPLE>
+<BITPIX>16</BITPIX>
+<NAXIS>2</NAXIS>
+<NAXIS1>1024</NAXIS1>
+<NAXIS2>1024</NAXIS2>
+<DATE>2026-08-25</DATE>
+<TIME-OBS>13:00:23</TIME-OBS>
+<DATE-OBS>2026-08-25T13:00:23.930</DATE-OBS>
+<ORIGIN>Rocket Science</ORIGIN>
+<DATASRC>realtime telemetry</DATASRC>
+<TELESCOP>SOHO</TELESCOP>
+<INSTRUME>EIT</INSTRUME>
+<OBJECT>full FOV</OBJECT>
+<BSCALE>1.00000</BSCALE>
+<BZERO>0.00000</BZERO>
+<BUNIT>counts / pixel</BUNIT>
+<WAVELNTH>171</WAVELNTH>
+<FILTER>Al +1</FILTER>
+<DATE_OBS>2026-08-25T13:00:23.930Z</DATE_OBS>
+<SCI_OBJ>FULL SUN 171</SCI_OBJ>
+<OBS_PROG>171_10S_Al_1.000</OBS_PROG>
+<CMP_NO>1</CMP_NO>
+<EXPTIME>12.5960</EXPTIME>
+<EXPMODE>backside</EXPMODE>
+<FILENAME>efr20260825.130023</FILENAME>
+<CFTEMP>-67.5700</CFTEMP>
+<CCDTEMP>7.24000</CCDTEMP>
+<CTYPE1>Solar-X</CTYPE1>
+<CTYPE2>Solar-Y</CTYPE2>
+<CRPIX1>513.180</CRPIX1>
+<CRPIX2>521.460</CRPIX2>
+<CRVAL1>0.00000</CRVAL1>
+<CRVAL2>0.00000</CRVAL2>
+<CDELT1>2.63000</CDELT1>
+<CDELT2>2.63000</CDELT2>
+<SOLAR_R>365.160</SOLAR_R>
+<SOLAR_B0>7.02000</SOLAR_B0>
+<SC_X0>0.00000</SC_X0>
+<SC_Y0>0.00000</SC_Y0>
+<SC_ROLL>178.270</SC_ROLL>
+<HEC_X>1.3203026e+08</HEC_X>
+<HEC_Y>-70184760.</HEC_Y>
+<HEC_Z>-122381.28</HEC_Z>
+<CAR_ROT>2314.0000</CAR_ROT>
+<history>
+Version 3.0, 2001 December 10
+Replaced missing blocks with EIT_DARK
+Subtracted dark current, EIT_DARK
+Degridded image with EIT_DEGRID
+Flat fielded image with EIT_FLAT
+Exposure normalized (per sec)
+Flux normalized to CLEAR Filter
+Flux normalized for time response changes
+FITSHEAD2STRUCT run at: Tue Aug 25 09:21:53 2026
+</history>
+<comment>
+CORRECTED DATE_OBS = '2026-08-25T12:59:45.984Z'
+COMMANDED EXPOSURE TIME =   10.000 s
+SHUTTER CLOSE TIME =    2.596 s
+LINE_SYNC = 'no'
+CAMERA_ERR = 'yes'
+IMAGE_OF_SEQ =                    0
+READOUT PORT = 'B'
+NUM_LEB_PROC =                    3
+LEB_PROC = 26 (no ROI)
+LEB_PROC = 27 (no occ mask)
+LEB_PROC = 12 (Rice)
+BLOCKS_HORZ =   32
+BLOCKS_VERT =   32
+P1_X =           1
+P2_X =        1024
+P1_Y =          20
+P2_Y =        1043
+N_MISSING_BLOCKS =    0
+FITSHEAD2STRUCT
+</comment>
+</fits>
+<helioviewer>
+<HV_MEASUREMENT>171</HV_MEASUREMENT>
+<HV_DATE_OBS>2026-08-25T13:00:23.930Z</HV_DATE_OBS>
+<HV_ROTATION>178.270</HV_ROTATION>
+<HV_COMMENT>JP2 file created locally at NASA-GSFC using HV_WRITE_JP2_LWG at Tue Aug 25 09:21:53 2026.(ASCII character value=10)Contact Helioviewer Project (webmaster@helioviewer.org) for more details/questions/comments regarding this JP2 file.(ASCII character value=10)HVS (Helioviewer setup) file used to create this JP2 file: hvs_default_eit.pro (version 1.0).(ASCII character value=10)FITS to JP2 source code provided by ESA/NASA Helioviewer Project [contact the Helioviewer Project at webmaster@helioviewer.org][NASA-GSFC] and is available for download at https://github.com/Helioviewer-Project/jp2gen.(ASCII character value=10)Please contact the source code providers if you suspect an error in the source code.(ASCII character value=10)Full source code for the entire Helioviewer Project can be found at https://github.com/Helioviewer-Project.</HV_COMMENT>
+<HV_SUPPORTED>TRUE</HV_SUPPORTED>
+<HV_REVERSIBLE>0</HV_REVERSIBLE><HV_QUICKLOOK>FALSE</HV_QUICKLOOK>
+</helioviewer>
+</meta>

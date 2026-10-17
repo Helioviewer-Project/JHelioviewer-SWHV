@@ -8,7 +8,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsSolution;
 
 public final class GLSLImageShader extends GLSLScreenShader {
 
@@ -25,7 +25,7 @@ public final class GLSLImageShader extends GLSLScreenShader {
     private int pv1Ref;
 
     private GLSLImageShader(String fragment) {
-        super(COMMON_FRAGMENT, fragment);
+        super(COMMON_FRAGMENT, "/glsl/imageGeometry.frag", fragment);
     }
 
     private static final UniformBufferObject imageBuffer = new UniformBufferObject(UniformBlockLayout.IMAGE, GL.STREAM_DRAW);
@@ -65,23 +65,38 @@ public final class GLSLImageShader extends GLSLScreenShader {
         displayBuffer.dispose();
     }
 
-    public static void bindImages(
-            ImageGeometry image0, float[] crval0,
-            float observerDistance0, float deltaT0, Quat cameraDiff0, Quat sourceView0,
-            ImageGeometry image1, float[] crval1,
-            float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1, Mat2 adjustment) {
+    public static void render(MapMode mode,
+                              ImageGeometry image0, WcsSolution wcs0,
+                              float observerDistance0, float deltaT0, Quat cameraDiff0, Quat sourceView0,
+                              ImageGeometry image1, WcsSolution wcs1,
+                              float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1, Mat2 adjustment) {
         FloatBuffer values = imageBuffer.begin();
-        putImage(values, image0, crval0, observerDistance0, deltaT0, cameraDiff0, sourceView0, adjustment);
-        putImage(values, image1, crval1, observerDistance1, deltaT1, cameraDiff1, sourceView1, adjustment);
+        putImage(values, mode, image0, wcs0, observerDistance0, deltaT0, cameraDiff0, sourceView0, adjustment);
+        putImage(values, mode, image1, wcs1, observerDistance1, deltaT1, cameraDiff1, sourceView1, adjustment);
 
         imageBuffer.uploadIfChanged();
+
+        GLSLImageShader shader = switch (mode) {
+            case Orthographic -> ortho;
+            case HPC -> hpc;
+            case Latitudinal -> lati;
+            case RadialWarp -> radialWarp;
+            case RectWarp -> rectWarp;
+        };
+        shader.use();
+        GL.glUniform1fv(shader.pv0Ref, wcs0.pv2);
+        GL.glUniform1fv(shader.pv1Ref, wcs1.pv2);
+        shader.draw();
     }
 
-    private static void putImage(FloatBuffer values, ImageGeometry image, float[] crval,
+    private static void putImage(FloatBuffer values, MapMode mode, ImageGeometry image, WcsSolution wcs,
                                  float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView, Mat2 adjustment) {
         ImageGeometry original = image.original;
         int width = original.grid.width(), height = original.grid.height();
-        putTransform(values, original.planeToPixel, original.referencePixel, width, height, adjustment);
+        // Orthographic TAN deliberately uses source XY as a small-angle plane.
+        Vec2 offset = mode == MapMode.Orthographic && wcs.projection == WcsSolution.Projection.TAN
+                ? new Vec2(wcs.reference.x * wcs.unitsPerRad, wcs.reference.y * wcs.unitsPerRad) : wcs.offset;
+        putTransform(values, original.planeToPixel, original.referencePixel, width, height, adjustment, offset);
         ImageGrid grid = image.grid;
         double step = grid.step();
         // Original normalized pixels -> decoded normalized pixels: scale, then offset.
@@ -89,21 +104,21 @@ public final class GLSLImageShader extends GLSLScreenShader {
         values.put((float) (height / (step * grid.height())));
         values.put((float) ((.5 - grid.firstX() / step) / grid.width()));
         values.put((float) ((.5 - grid.firstY() / step) / grid.height()));
-        WcsHeader wcs = image.wcs;
-        values.put(crval).put((float) wcs.unitsPerRad).put(wcs.projection.ordinal());
-        values.put((float) wcs.zpnUpperEta).put(observerDistance).put(deltaT).put(0);
+        values.put((float) wcs.unitsPerRad).put(wcs.projection.ordinal()).put(observerDistance).put(deltaT);
+        values.put(wcs.nativeBasis);
+        values.put(wcs.nativePoles);
         cameraDiff.setFloatBuffer(values);
         sourceView.setFloatBuffer(values);
     }
 
     // WCS plane -> normalized original pixels; the user rotation acts on the plane first.
-    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, int width, int height, Mat2 adjustment) {
-        values.put((float) ((matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10) / width));
-        values.put((float) ((matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11) / width));
-        values.put((float) (reference.x / width)).put(0);
-        values.put((float) ((matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10) / height));
-        values.put((float) ((matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11) / height));
-        values.put((float) (reference.y / height)).put(0);
+    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, int width, int height, Mat2 adjustment, Vec2 offset) {
+        double a = (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10) / width;
+        double b = (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11) / width;
+        double c = (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10) / height;
+        double d = (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11) / height;
+        values.put((float) a).put((float) b).put((float) (reference.x / width - a * offset.x - b * offset.y)).put(0);
+        values.put((float) c).put((float) d).put((float) (reference.y / height - c * offset.x - d * offset.y)).put(0);
     }
 
     static void bindDisplay(float[] color,
@@ -124,24 +139,6 @@ public final class GLSLImageShader extends GLSLScreenShader {
         values.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
         values.put(enhanced).put(0).put(0).put(0);
         displayBuffer.uploadIfChanged();
-    }
-
-    public static void render(MapMode mode, float[] pv0, float[] pv1) {
-        GLSLImageShader shader = switch (mode) {
-            case Orthographic -> ortho;
-            case HPC -> hpc;
-            case Latitudinal -> lati;
-            case RadialWarp -> radialWarp;
-            case RectWarp -> rectWarp;
-        };
-        shader.use();
-        shader.bindPV(pv0, pv1);
-        shader.draw();
-    }
-
-    private void bindPV(float[] pv0, float[] pv1) {
-        GL.glUniform1fv(pv0Ref, pv0);
-        GL.glUniform1fv(pv1Ref, pv1);
     }
 
 }

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.metadata;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -32,6 +33,12 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             if (child instanceof CharacterData cd)
                 values.putIfAbsent(element.getNodeName(), cd.getData());
         }
+    }
+
+    @Nonnull
+    @Override
+    public Set<String> keys() {
+        return values.keySet();
     }
 
     @Nonnull

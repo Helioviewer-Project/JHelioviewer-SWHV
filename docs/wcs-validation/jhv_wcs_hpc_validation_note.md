@@ -11,6 +11,15 @@ lot: false
 
 `id: \exec{git hash-object \file}`
 
+This dated note records the pre-WCSLIB implementation and its historical experiments. Its decision to
+keep simple-TAN for TAN images in Orthographic remains current with WCSLIB: the binder folds scaled
+CRVAL into the affine mapping, and the shader samples the source point's XY coordinates directly.
+Earlier implementation details and results remain historical. The current WCSLIB GPU measurements
+are recorded in [Direct production-shader Ortho/HPC regression](#direct-production-shader-orthohpc-regression-2026-10-17).
+Current ownership and coordinate contracts are in [image coordinates](../image-coordinates.md) and
+[map projection architecture](../non-ortho-projection-note.md); current build and validation commands
+are in [the WCSLIB guide](../../extra/wcs/README.md).
+
 # Summary
 
 This note describes the zenithal WCS and `HPC` work in JHV and the validation
@@ -1102,6 +1111,112 @@ whether `simple-TAN` behaves more like `HPC` or like `formal-TAN` in JHV
   samples all WCS projections from the same flat image-view plane, so the
   off-limb part of the comparison reflects the difference between that flat
   `Orthographic` off-limb geometry and the `HPC` display geometry.
+
+## Direct production-shader Ortho/HPC regression (2026-10-17)
+
+This is a fresh GPU measurement of the WCSLIB implementation with restored simple-TAN,
+separate from the historical Python-model results above. The measurements below are rerun with
+backend-specific sine/cosine selection: native intrinsics on Metal, the polynomial on SwiftShader.
+The regression lives in
+`extra/test/wcs/test_wcs_rendering.py::run_ortho_hpc_comparison()` and runs automatically
+with both full production-fragment backend commands. It can also run independently:
+
+```sh
+python3 extra/test/wcs/test_wcs_rendering.py --backend default --ortho-hpc-only
+python3 extra/test/wcs/test_wcs_rendering.py --backend swiftshader --ortho-hpc-only
+```
+
+Each backend renders nine cases: simple-TAN Orthographic, HPC and a formal-TAN Orthographic
+control for each of the AIA, EUI and COR2 headers named above. The observer and camera are
+aligned, differential rotation and user adjustments are zero, and the original header CRVAL
+values are retained. The raster is 513 × 513: Orthographic spans ±1 solar radius in X/Y and
+HPC spans ±atan(1/D) in each angle. This is a matched solar-disk comparison frame, not the
+full instrument field of view. There are 263,169 samples per image, including 206,709
+on-disk and 56,460 off-limb samples.
+
+The test keeps production `main()`, geometry selection, clipping and WCS projection. Only
+`getColor()` is instrumented to expose the sampled source coordinates. A white detector mask and
+unrestricted radial/sector masks isolate the coordinate mapping. Native uniforms are prepared through the current Java/WCSLIB adapter. The formal-TAN control removes exactly
+the TAN shortcut from an in-memory shader copy and uses the native projection origin in
+its affine binding. It does not add a production option or edit the production shader file.
+
+All three paths are checked against independent coordinates: a direct affine solve for
+simple-TAN, and independently constructed observer rays/points followed by Astropy FITS
+conversion for HPC and formal-TAN. Every sample must remain present. The existing 0.05
+source-pixel coordinate tolerance is unchanged for both backends. Separately, the direct
+comparison asserts that simple-TAN remains subpixel and at least ten times closer to HPC
+than formal-TAN on the disk and over the complete comparison frame. No such ordering is
+required off-limb.
+
+For each sample, displacement is max(|ΔsourceX|, |ΔsourceY|), in original source-image pixels.
+The maximum and RMS below use that displacement, before color interpolation, LUT or dithering.
+The measured full-frame maximum/RMS results are:
+
+1. AIA (`sample.171.fits`): Metal simple-TAN 0.0280761719 / 0.00824598891 px, formal-TAN 3.6706543 / 2.40252941 px. SwiftShader simple-TAN 0.0280761719 / 0.00828184261 px, formal-TAN 3.67089844 / 2.40250472 px.
+
+2. EUI (`solo_L2_eui-fsi174-image_20251002T150055171_V00.fits`): Metal simple-TAN 0.116102695 / 0.032665082 px, formal-TAN 2.52590179 / 1.65287143 px. SwiftShader simple-TAN 0.116147995 / 0.0326651515 px, formal-TAN 2.5258112 / 1.65286466 px.
+
+3. COR2 (`20241224_194245_d4c2A.fts`): Metal simple-TAN 0.00146484375 / 0.000399666295 px, formal-TAN 0.162963867 / 0.106656492 px. SwiftShader simple-TAN 0.00152587891 / 0.000401104454 px, formal-TAN 0.162963867 / 0.10665543 px.
+
+The largest GPU/reference error across all nine cases and both backends was below 0.00080
+source pixels. On the disk, the worst-backend simple/formal maximum displacements were
+0.01171875 / 3.67089844 px for AIA, 0.0833058357 / 2.52590179 px for EUI, and
+0.000732421875 / 0.162963867 px for COR2. The formal-TAN discrepancy is therefore primarily
+on-disk. Off-limb, both mappings remain close to HPC and formal-TAN is closer on these fixtures.
+
+All nine cases passed on both Metal (Apple M3 Pro) and SwiftShader. With `--output-dir`, the
+runner saves raw RGBA32F coordinate buffers and `ortho-hpc-comparison.json`, containing
+per-backend maximum/RMS measurements for disk, off-limb and full-frame regions, sample counts,
+renderer identification and each path's maximum independent-reference error.
+
+## SwiftShader-specific sine/cosine selection (2026-10-17)
+
+`sinCos()` now uses native sine/cosine on non-SwiftShader renderers. `GLSLShader.compileShader()`
+checks the actual renderer name at fragment compilation and inserts `JHV_SWIFTSHADER` after
+`#version` only for SwiftShader. That define enables the existing split-reduction polynomial;
+otherwise the helper is `vec2(sin(angle), cos(angle))`. No uniform, cached backend state or
+per-fragment backend condition is added. Context creation refreshes `GL.renderer` before shader
+initialization, so programs rebuilt after context loss select from the new context. The Electron
+runner uses the same renderer-name rule.
+
+The independent 32,768-input test retains both polynomial and intrinsic controls and also tests
+the normally selected helper. Selected and polynomial errors must not exceed `2e-7` against the
+exact float-input reference. The selected output must additionally match the appropriate control
+bit-for-bit: built-ins on Metal, polynomial on SwiftShader. The large SwiftShader intrinsic error
+remains diagnostic; the selected-path threshold and the 0.05-source-pixel rendering threshold
+are unchanged. Shader syntax/link tests compile both image-shader variants.
+
+The reason for the specialization is measured accuracy and cost. A controlled A/B comparison
+changed only the helper body, using eight alternating trials per variant, 1024 × 1024 offscreen
+production fragment draws, completed readbacks at both timing endpoints, and independent
+513 × 513 coordinate probes. On the Apple M3 Pro, median native/polynomial draw times were:
+
+1. AIA HPC: 0.06274 / 0.07074 ms, an increase of 0.00800 ms (12.75%).
+2. AIA Latitudinal: 0.04154 / 0.04982 ms, an increase of 0.00827 ms (19.92%).
+3. WISPR RectWarp: 0.05524 / 0.05909 ms, an increase of 0.00385 ms (6.98%).
+
+These are individual offscreen draw costs, not whole-application frame times. Both variants
+stayed below 0.001 source pixels of independent coordinate error on Metal. SwiftShader's
+native/polynomial maximum source-coordinate errors were 0.22630 / 0.00065 px for AIA HPC,
+0.59247 / 0.00071 px for AIA Latitudinal, and 0.15711 / 0.00072 px for WISPR RectWarp.
+Five RectWarp coverage mismatches with native SwiftShader trig disappeared with the polynomial.
+Its raw intrinsic sine/cosine error reaches about `1.9e-4`, compared with about `1.1e-7` for
+the polynomial; Metal's intrinsics are already near `1.3e-7`.
+
+SwiftShader timing differences were small relative to software-renderer variation: HPC measured
+23.83 / 24.36 ms, Latitudinal 16.33 / 16.27 ms and RectWarp 23.57 / 23.56 ms. The Orthographic
+control, which never calls this helper, also varied by 0.49 ms. No reliable general SwiftShader
+performance penalty is inferred from that run. D3D11 and Linux OpenGL were not measured here.
+
+The helper is evaluated twice per fragment in HPC and Latitudinal and once in RectWarp. Neither
+Orthographic nor RadialWarp calls it. The independent Ortho/HPC comparison above remains part of
+both full backend runs, with Metal now using intrinsics and SwiftShader using the polynomial.
+
+After specialization, all 378 rendering cases passed per backend (369 general cases plus nine
+Ortho/HPC cases). Selected dense-probe errors were `1.25344306e-7` on Metal and `1.08115121e-7`
+on SwiftShader, with bit-exact agreement to their corresponding controls. The Java OpenGL suite
+passed on both Metal and external SwiftShader, including context recovery; both shader variants
+also passed all 23 syntax and 17 program-link checks. The 28 validator/reference unit tests passed.
 
 ## `CAR` surface-map validation
 

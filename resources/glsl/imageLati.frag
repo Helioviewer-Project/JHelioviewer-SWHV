@@ -3,11 +3,12 @@ vec3 latitudinalWorld(const vec2 mapPos) {
     float latitude = radians(mix(screen.mapBounds.z, screen.mapBounds.w, mapPos.y)) + screen.latiOrigin.y;
     if (latitude < -HALFPI || latitude > HALFPI)
         discard;
-    float cosLatitude = cos(latitude);
+    vec2 lon = sinCos(longitude);
+    vec2 lat = sinCos(latitude);
     return vec3(
-        cosLatitude * sin(longitude),
-        sin(latitude),
-        cosLatitude * cos(longitude));
+        lat.y * lon.x,
+        lat.x,
+        lat.y * lon.y);
 }
 
 vec2 sampleLatiTexcoord(vec3 world, const Image img, const float[6] PV) {
@@ -18,11 +19,10 @@ vec2 sampleLatiTexcoord(vec3 world, const Image img, const float[6] PV) {
         world = differential(img.deltaT, world);
 
     vec3 sourceWorld = rotate_vector(img.sourceViewQuat, world);
-    if (sourceWorld.z < 0.)
+    if (sourceWorld.z < 1. / img.observerDistance)
         discard;
 
-    vec2 helioprojective = worldToHelioprojective(sourceWorld, img.observerDistance);
-    return helioprojectiveToTexcoord(helioprojective, img, PV);
+    return observerToTexcoord(sourceWorld, img, PV);
 }
 
 void main(void) {

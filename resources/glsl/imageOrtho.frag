@@ -2,22 +2,15 @@
 const vec3 zAxis = vec3(0, 0, 1);
 const float PLANE_Z_EPS = 1e-8;
 
-// TAN choice for ortho only
-// 0 = formal-TAN
-// 1 = simple-TAN
-#define SIMPLE_TAN 1
-
 // Source-image sampling from the orthographic scene point.
 vec2 sampleOrthoTexcoord(const vec3 world, const Image img, const float[6] PV) {
     // Surface maps sample directly from world lon/lat, without observer-image geometry.
     if (isSurfaceMap(img))
         return sampleSurfaceMapTexcoord(world, img, PV);
-#if SIMPLE_TAN
+    // Preserve the simple-TAN display policy; its scaled CRVAL is in the affine offset.
     if (img.projectionCode == WCS_PROJECTION_TAN)
-        return wcsPlaneToTexcoord(world.xy - img.crval, img);
-#endif
-    vec2 helioprojective = worldToHelioprojective(world, img.observerDistance);
-    return helioprojectiveToTexcoord(helioprojective, img, PV);
+        return wcsPlaneToTexcoord(world.xy, img);
+    return observerToTexcoord(world, img, PV);
 }
 
 vec3 intersectImagePlane(const vec4 quat, const vec2 viewPosition, const bool onDisk, out vec3 hitPoint) {
@@ -35,10 +28,13 @@ vec3 intersectImagePlane(const vec4 quat, const vec2 viewPosition, const bool on
     return rotatedHitPoint;
 }
 
-vec3 rotateOnDiskPoint(const Image img, const vec3 hitPoint) {
+vec3 sourceOnDiskPoint(const Image img, const vec3 hitPoint) {
+    // Surface maps stay attached to the visible sphere under drag/view rotation.
+    if (isSurfaceMap(img))
+        return rotate_vector_inverse(img.sourceViewQuat, hitPoint);
     vec3 rotated = rotate_vector_inverse(img.cameraDiff, hitPoint);
     if (img.deltaT != 0.)
-        rotated = differential(img.deltaT, rotated);
+        rotated = differentialInSourceFrame(img, rotated);
     return rotated;
 }
 
@@ -57,19 +53,14 @@ void main(void) {
         discard;
 
     float enhancementFactor;
-    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
+    vec3 spherePoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        hitPoint = vec3(viewPosition, sqrt(1. - radius2));
-        if (surfaceMapMode) {
-            // CAR/CEA stay attached to the visible sphere under drag/view rotation.
-            rotatedHitPoint = rotate_vector_inverse(images[0].sourceViewQuat, hitPoint);
-        } else {
-            rotatedHitPoint = rotateOnDiskPoint(images[0], hitPoint);
-        }
+        spherePoint = vec3(viewPosition, sqrt(1. - radius2));
+        rotatedHitPoint = sourceOnDiskPoint(images[0], spherePoint);
 
         enhancementFactor = 1.;
-        gl_FragDepth = getDepth(hitPoint.z);
+        gl_FragDepth = getDepth(spherePoint.z);
     } else {
         enhancementFactor = sqrt(radius2);
         gl_FragDepth = 1.;
@@ -77,6 +68,7 @@ void main(void) {
 
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
+        vec3 hitPoint;
         rotatedHitPoint = intersectImagePlane(images[0].cameraDiff, viewPosition, onDisk, hitPoint);
         if (display.calculateDepth != 0.) // intersecting Euhforia planes
             gl_FragDepth = getDepth(hitPoint.z);
@@ -87,19 +79,13 @@ void main(void) {
 
     vec2 diffTexCoord = texCoord;
     if (diffMode) {
-        vec3 diffHitPoint = vec3(0.);
         vec3 diffRotatedHitPoint = vec3(0.);
 
-        if (onDisk) {
-            diffHitPoint = vec3(viewPosition, sqrt(1. - radius2));
-            if (diffSurfaceMapMode) {
-                diffRotatedHitPoint = rotate_vector_inverse(images[1].sourceViewQuat, diffHitPoint);
-            } else {
-                diffRotatedHitPoint = rotateOnDiskPoint(images[1], diffHitPoint);
-            }
-        }
+        if (onDisk)
+            diffRotatedHitPoint = sourceOnDiskPoint(images[1], spherePoint);
 
         if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
+            vec3 diffHitPoint;
             diffRotatedHitPoint = intersectImagePlane(images[1].cameraDiff, viewPosition, onDisk, diffHitPoint);
         }
 

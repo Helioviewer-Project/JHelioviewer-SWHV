@@ -9,6 +9,7 @@ run the complete, unchanged shader, using known R8/R16F images and a colored LUT
 """
 
 import argparse
+import json
 import math
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -77,36 +78,68 @@ def orthographic_geometry(x, y, rotation, surface=False):
     return world, valid, on_disk
 
 
-def reference_pixels(header, world, simple_tan=True):
+def reference_pixels(header, world, slit=(0, 1), adjustment=None, mode=None):
     """Convert independently constructed 3D points through the input FITS WCS."""
     meta = cpu.build_jhv_meta(header)
     wcs = cpu.build_astropy_pixel_wcs(header)
     shape = world.shape[:-1]
     points = world.reshape(-1, 3)
-    if meta.projection == "TAN" and simple_tan:
-        # JHV's simple-TAN convention is affine in the image-aligned x/y plane.
-        plane = np.degrees(points[:, :2] / meta.plane_units_per_rad) - wcs.wcs.crval
-        pixels = np.linalg.solve(wcs.pixel_scale_matrix, plane.T).T + wcs.wcs.crpix
-    else:
-        if meta.projection in ("CAR", "CEA"):
-            angles = np.column_stack(
-                (
-                    np.arctan2(points[:, 0], points[:, 2]),
-                    np.arcsin(np.clip(points[:, 1], -1, 1)),
-                )
-            )
-        else:
-            delta = points - [0, 0, meta.observer_distance]
-            angles = np.column_stack(
-                (
-                    np.arctan2(delta[:, 0], -delta[:, 2]),
-                    np.arcsin(delta[:, 1] / np.linalg.norm(delta, axis=1)),
-                )
-            )
-        pixels = wcs.wcs_world2pix(np.degrees(angles), 1)
-    pixels = cpu.fits_pixel_to_texture_pixel(pixels, meta)
     if meta.projection in ("CAR", "CEA"):
-        pixels[:, 0] %= meta.pixel_width
+        angles = np.column_stack(
+            (
+                np.arctan2(points[:, 0], points[:, 2]),
+                np.arcsin(np.clip(points[:, 1], -1, 1)),
+            )
+        )
+    else:
+        delta = points - [0, 0, meta.observer_distance]
+        angles = np.column_stack(
+            (
+                np.arctan2(delta[:, 0], -delta[:, 2]),
+                np.arcsin(delta[:, 1] / np.linalg.norm(delta, axis=1)),
+            )
+        )
+    if meta.projection in ("CAR", "CEA"):
+        # WCSLIB supplies the native projection plane. Enumerate whole turns;
+        # the production shader instead intersects integer-turn intervals.
+        native = wcs.wcs.s2p(np.degrees(angles), 1)
+        plane = native["imgcrd"]
+        # Use [-180, 180) for the principal native longitude, including
+        # WCSLIB's exact +180 endpoint; this is not a pixel-width wrap.
+        plane[:, 0] -= 360 * np.floor((native["phi"] + 180) / 360)
+        rotation = np.eye(2) if adjustment is None else np.asarray(adjustment)
+        corners = np.array([[.5, .5], [meta.pixel_width + .5, .5],
+                            [.5, meta.pixel_height + .5], [meta.pixel_width + .5, meta.pixel_height + .5]])
+        native_corners = np.linalg.solve(rotation, ((corners - wcs.wcs.crpix) @ wcs.pixel_scale_matrix.T).T).T
+        finite = np.isfinite(plane).all(axis=1)
+        uv = np.full((len(points), 2), np.nan)
+        valid = np.zeros(len(points), dtype=bool)
+        if finite.any():
+            first = math.floor((native_corners[:, 0].min() - plane[finite, 0].max()) / 360)
+            last = math.ceil((native_corners[:, 0].max() - plane[finite, 0].min()) / 360)
+            for turn in sorted(range(first, last + 1), key=abs):
+                candidate_plane = (plane + [360 * turn, 0]) @ rotation.T
+                candidate = np.linalg.solve(wcs.pixel_scale_matrix, candidate_plane.T).T + wcs.wcs.crpix
+                candidate = cpu.fits_pixel_to_texture_pixel(candidate, meta) / [meta.pixel_width, meta.pixel_height]
+                inside = (np.isfinite(candidate).all(axis=1) &
+                          (candidate >= [slit[0], 0]).all(axis=1) & (candidate <= [slit[1], 1]).all(axis=1))
+                take = inside & ~valid
+                uv[take] = candidate[take]
+                valid |= inside
+        return uv.reshape((*shape, 2)), valid.reshape(shape)
+    if mode == "ortho" and meta.projection == "TAN":
+        # Independent display policy: source XY is the small-angle plane, not
+        # a perspective direction. Apply CRVAL before the user plane rotation.
+        plane = np.degrees(points[:, :2] / meta.plane_units_per_rad) - wcs.wcs.crval
+        if adjustment is not None:
+            plane = plane @ np.asarray(adjustment).T
+        pixels = np.linalg.solve(wcs.pixel_scale_matrix, plane.T).T + wcs.wcs.crpix
+    elif adjustment is None:
+        pixels = wcs.wcs_world2pix(np.degrees(angles), 1)
+    else:
+        plane = wcs.wcs.s2p(np.degrees(angles), 1)["imgcrd"] @ np.asarray(adjustment).T
+        pixels = np.linalg.solve(wcs.pixel_scale_matrix, plane.T).T + wcs.wcs.crpix
+    pixels = cpu.fits_pixel_to_texture_pixel(pixels, meta)
     uv = pixels / [meta.pixel_width, meta.pixel_height]
     valid = np.isfinite(uv).all(axis=1) & (uv >= 0).all(axis=1) & (uv <= 1).all(axis=1)
     return uv.reshape((*shape, 2)), valid.reshape(shape)
@@ -164,18 +197,13 @@ def verify_footprint(actual, valid, boundary=None):
     return valid & actual
 
 
-def verify_coordinates(
-    pixels, uv, valid, width=128, tolerance=0.05, boundary=None, wrap_longitude=False
-):
+def verify_coordinates(pixels, uv, valid, source_size=(128, 128), tolerance=0.05, boundary=None):
     if not np.isfinite(pixels).all():
         raise AssertionError("Non-finite coordinate output")
     valid = verify_footprint(pixels[..., 3] > 0.5, valid, boundary)
     if not valid.any():
         raise AssertionError("Empty reference footprint")
-    error = np.abs(pixels[..., :2] - uv) * width
-    if wrap_longitude:
-        # Only a full-longitude surface map has equivalent coordinates at this seam.
-        error[..., 0] = np.minimum(error[..., 0], np.abs(width - error[..., 0]))
+    error = np.abs(pixels[..., :2] - uv) * source_size
     if np.max(error[valid]) > tolerance:
         raise AssertionError(
             f"Coordinate error {np.max(error[valid]):.6g} px exceeds {tolerance}"
@@ -206,7 +234,402 @@ def verify_colors(
         )
 
 
-def run_cases(root, backend, size, electron):
+def local_geometry_cases(root, backend):
+    # Constant screen points exercise production main() without raster-edge ambiguity.
+    # Expected motion advances heliographic longitude, independently of shader quaternions.
+    jobs, checks = [], []
+
+    def add(name, mode, bounds, points, orientations, times=(0, 0), inverse=None, projection="TAN", distance=10, reference_longitude=0):
+        header = image_header(projection, distance)
+        header["CRVAL1"], header["CRVAL2"] = reference_longitude, 0
+        for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2"):
+            header.remove(key, ignore_missing=True)
+        meta = cpu.build_jhv_meta(header)
+        job = gpu.common_job(mode, Path(name), 1, root, meta, bounds, True, backend, name)
+        secondary_header = header.copy()
+        secondary_header["CRPIX1"] += 3
+        fields = []
+        expected = []
+        for index, (point, quat, dt) in enumerate(zip(points, orientations, times, strict=True)):
+            fields.append({**gpu.wcs_job_fields(meta if index == 0 else cpu.build_jhv_meta(secondary_header)),
+                           "sourceViewQuat": quat, "cameraDiff": [-quat[0], -quat[1], -quat[2], quat[3]],
+                           "deltaT": dt})
+            if point is not None:
+                uv, valid = reference_pixels(header if index == 0 else secondary_header,
+                                             np.array(point), mode=mode)
+                assert valid, (name, point, uv)
+                expected.extend(uv)
+        if any(point is None for point in points):
+            expected = [0, 0, 0, 0]
+        job.update(fields[0])
+        job.update({"secondary": fields[1], "difference": True, "productionCoordinates": True})
+        if inverse is not None:
+            job["inverseMVP"] = inverse.T.ravel().tolist()
+        jobs.append(job)
+        checks.append(("local", np.array(expected), None, None))
+
+    tilts = np.radians([7, 15])
+    rotations = [np.array([[1, 0, 0], [0, math.cos(a), -math.sin(a)],
+                           [0, math.sin(a), math.cos(a)]]) for a in tilts]
+    quats = [[math.sin(a / 2), 0, 0, math.cos(a / 2)] for a in tilts]
+    for latitude in (90, 30):
+        lat, lon = math.radians(latitude), math.radians(20)
+        # Use the exact Y-axis pole rather than cos(pi/2) residue.
+        world = (np.array([0., 1., 0.]) if latitude == 90 else
+                 np.array([math.cos(lat) * math.sin(lon), math.sin(lat), math.cos(lat) * math.cos(lon)]))
+        for mode in gpu.ALL_MODES:
+            # HPC and warp inputs start in source-observer coordinates; Ortho/Lati start in solar-world.
+            start = world if mode in ("ortho", "lati_zenithal") else rotations[0] @ world
+            for moving in (False, True):
+                # Elapsed milliseconds * 1e-9 is elapsed seconds * 1e-6.
+                times = (86400e-6, -2 * 86400e-6) if moving else (0, 0)
+                points = []
+                for rotation, dt in zip(rotations, times, strict=True):
+                    solar = world if mode in ("ortho", "lati_zenithal") else rotation.T @ start
+                    source_lat = math.atan2(solar[1], math.hypot(solar[0], solar[2]))
+                    source_lon = math.atan2(solar[0], solar[2])
+                    sin_lat2 = math.sin(source_lat) ** 2
+                    advance = dt * (0.01367 - 0.339 * sin_lat2 - 0.485 * sin_lat2 ** 2)
+                    moved = [math.cos(source_lat) * math.sin(source_lon - advance),
+                             math.sin(source_lat), math.cos(source_lat) * math.cos(source_lon - advance)]
+                    points.append(rotation @ moved)
+                inverse = np.eye(4)
+                if mode == "ortho":
+                    inverse[:2, :2] = 0
+                    inverse[:2, 3] = world[:2]
+                    bounds = (0, 1, 0, 1)
+                elif mode == "lati_zenithal":
+                    bounds = (20, 20, latitude, latitude)
+                else:
+                    phi = math.atan2(start[0], 10 - start[2])
+                    theta = math.atan2(start[1], math.hypot(start[0], 10 - start[2]))
+                    bounds = (*([math.degrees(phi)] * 2), *([math.degrees(theta)] * 2))
+                    if mode in gpu.WARP_MODES:
+                        plane = 10 * start[:2] / (10 - start[2])
+                        radius = np.linalg.norm(plane)
+                        if mode == "radial_warp":
+                            inverse[:2, :2] = 0
+                            inverse[:2, 3] = plane / (2 * 2)
+                            bounds = (0, 360, 0, 2)
+                        else:
+                            angle = math.degrees(math.atan2(-plane[0], plane[1])) % 360
+                            inverse[:2, :2] = 0
+                            inverse[:2, 3] = [angle / 360 - .5, radius / 2 - .5]
+                            bounds = (0, 360, 0, 2)  # lambda=1 gives a linear radial map.
+                add(f"local_rotation_{mode}_{latitude}_{moving}", mode, bounds, points, quats, times, inverse)
+
+    for distance, z in ((2, .75), (2, .5), (2, .25), (10, .2), (10, .05), (215, .01), (215, .002)):
+        # At D=2,z=.5 the encoded Y quaternion has q.y=.5, so source.z is exactly .5.
+        quat = [0, math.sqrt((1 - z) / 2), 0, math.sqrt((1 + z) / 2)]
+        point = [math.sqrt(1 - z*z), 0, z]
+        for slot in (0, 1):
+            orientations = [[0, 0, 0, 1], [0, 0, 0, 1]]
+            points = [[0, 0, 1], [0, 0, 1]]
+            orientations[slot] = quat
+            points[slot] = point if distance*z >= 1 else None
+            add(f"local_visibility_{distance}_{z}_{slot}", "lati_zenithal", (0, 0, 0, 0),
+                points, orientations, distance=distance)
+    for projection in ("CAR", "CEA"):
+        add(f"local_full_surface_{projection}", "lati_zenithal", (0, 0, 0, 0),
+            [[0, 0, 1]] * 2, [[0, 1, 0, 0]] * 2, projection=projection)
+
+    for angle in (0, 178, 180):
+        add(f"local_directed_ray_{angle}", "hpc", (angle, angle, 0, 0),
+            [[0, 0, 1]] * 2 if angle == 0 else [None, None], [[0, 0, 0, 1]] * 2, projection="CAR")
+    # HPC is an angular display: wide-angle images remain valid beyond the Sun-plane horizon.
+    # An arbitrary point on each outgoing ray supplies independent WCSLIB image coordinates.
+    for degrees in (110, 178):
+        angle = math.radians(degrees)
+        point = [math.sin(angle), 0, 10 - math.cos(angle)]
+        add(f"local_image_{degrees}", "hpc", (degrees, degrees, 0, 0),
+            [point, point], [[0, 0, 0, 1]] * 2, times=(86400e-6, -2 * 86400e-6),
+            reference_longitude=degrees)
+    return jobs, checks
+
+
+def surface_coverage_cases(root, backend, size):
+    jobs, checks = [], []
+    yy, xx = np.indices((size, size), dtype=float)
+    lon, lat = np.radians(360 * (xx + .5) / size - 180), np.radians(160 * (yy + .5) / size - 80)
+    world = np.stack((np.cos(lat)*np.sin(lon), np.sin(lat), np.cos(lat)*np.cos(lon)), axis=-1)
+    # Degrees per pixel. Include a vertical turn displacement and footprints
+    # several turns away, so neither texture-X modulo nor +/- one turn suffices.
+    cases = (
+        ("partial", [[60/128, 0], [0, 120/128]], [64.5, 64.5], (0, 1), None),
+        ("shifted", [[60/128, 0], [0, 120/128]], [-450.5, 64.5], (0, 1), None),
+        ("negative", [[-60/128, 0], [0, -120/128]], [64.5, 64.5], (.2, .8), None),
+        ("sheared", [[300/128, 80/128], [40/128, 120/128]], [160.5, 70.5], (.15, .85), None),
+        ("vertical", [[0, -360/128], [120/128, 0]], [64.5, 200.5], (.2, .8), None),
+        ("wide_slit", [[720/128, 0], [0, 120/128]], [96.5, 64.5], (.05, .3), None),
+        ("far_shift", [[60/128, 0], [0, 120/128]], [-3007.5, 64.5], (0, 1), None),
+        ("user_rotation", [[120/128, 0], [0, 360/128]], [64.5, 200.5], (.2, .8), [[0, -1], [1, 0]]),
+    )
+    for projection in ("CAR", "CEA"):
+        for name, matrix, reference, slit, adjustment in cases:
+            header = image_header(projection)
+            header["CRVAL1"] = header["CRVAL2"] = 0
+            header["CRPIX1"], header["CRPIX2"] = reference
+            for row in range(2):
+                for col in range(2):
+                    header[f"CD{row+1}_{col+1}"] = matrix[row][col]
+            secondary = header.copy()
+            secondary["CRPIX1"] += 11
+            secondary["CRPIX2"] -= 9
+            uv, valid = reference_pixels(header, world, slit=slit, adjustment=adjustment)
+            other_uv, other_valid = reference_pixels(secondary, world, slit=slit, adjustment=adjustment)
+            # The existing map entry point also applies this slit to map X.
+            domain = ((xx + .5) / size >= slit[0]) & ((xx + .5) / size <= slit[1])
+            valid &= domain
+            other_valid &= domain
+            name = f"coverage_{projection}_{name}"
+            meta = cpu.build_jhv_meta(header)
+            job = gpu.common_job("lati_zenithal", Path(name), size, root, meta, (-180, 180, -80, 80), True, backend, name)
+            job.update(productionCoordinates=True, slit=slit, planeAdjustment=adjustment,
+                       coordinateSize=[meta.pixel_width, meta.pixel_height])
+            jobs.append(job)
+            checks.append(("coordinates", uv, valid, None))
+            jobs.append({**job, "name": name + "_comparison", "difference": True,
+                         "secondary": {**gpu.wcs_job_fields(cpu.build_jhv_meta(secondary)), "planeAdjustment": adjustment},
+                         "outputPath": str(root / f"{name}_comparison.rgba32f")})
+            assert (valid & other_valid).any(), name
+            checks.append(("comparison", np.concatenate((uv, other_uv), axis=-1), valid & other_valid, None))
+        for name, matrix, reference, slit, expected in (
+            ("right_edge", [[360/128, 0], [0, 180/128]], [128.5, 64.5], (0, 1), [1, .5]),
+            ("shift_to_edge", [[360/128, 0], [0, 180/128]], [-127.5, 64.5], (0, 1), [0, .5]),
+            ("vertical_edge", [[0, 360/128], [180/128, 0]], [64.5, 256.5], (0, 1), [.5, 0]),
+            ("slit_point", [[360/128, 0], [0, 180/128]], [64.5, 64.5], (.5, .5), [.5, .5]),
+            ("empty_slit_turns", [[360/128, 0], [0, 180/128]], [32.5, 64.5], (.5, .5), None),
+            ("longitude_seam", [[360/128, 0], [0, 180/128]], [64.5, 64.5], (0, 1), [0, .5]),
+        ):
+            header = image_header(projection)
+            header["CRVAL1"] = header["CRVAL2"] = 0
+            header["CRPIX1"], header["CRPIX2"] = reference
+            for row in range(2):
+                for col in range(2):
+                    header[f"CD{row+1}_{col+1}"] = matrix[row][col]
+            seam = name == "longitude_seam"
+            uv, valid = reference_pixels(header, np.array([0., 0., -1. if seam else 1.]), slit=slit)
+            assert bool(valid) == (expected is not None), name
+            if expected is not None:
+                np.testing.assert_allclose(uv, expected, rtol=0, atol=1e-12)
+            name = f"coverage_{projection}_{name}"
+            job = gpu.common_job("ortho" if seam else "lati_zenithal", Path(name), 1, root, cpu.build_jhv_meta(header), (0, 0, 0, 0), True, backend, name)
+            job.update(productionCoordinates=True, difference=True, slit=slit)
+            if seam:
+                job["sourceViewQuat"] = [0, 1, 0, 0]
+            jobs.append(job)
+            checks.append(("local", np.tile(uv, 2) if valid else np.zeros(4), None, None))
+    # Retain the real AIA header, including its half-pixel longitude origin.
+    with fits.open(gpu.REPO_ROOT / "extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits") as hdul:
+        header = cpu.find_image_hdu(hdul, None).header
+        meta = cpu.build_jhv_meta(header)
+        uv, valid = reference_pixels(header, world)
+        job = gpu.common_job("lati_zenithal", Path("coverage_AIA"), size, root, meta, (-180, 180, -80, 80), True, backend, "coverage_AIA")
+        job.update(productionCoordinates=True, coordinateSize=[meta.pixel_width, meta.pixel_height])
+        jobs.append(job)
+        checks.append(("coordinates", uv, valid, None))
+    return jobs, checks
+
+
+def native_frame_cases(root, backend, size):
+    jobs, checks = [], []
+    yy, xx = np.indices((size, size), dtype=float)
+    for projection in ("TAN", "ARC", "AZP", "ZPN", "CAR", "CEA"):
+        surface = projection in ("CAR", "CEA")
+        bounds = (-179.123, 179.987, -84.321, 84.987) if surface else (15.123, 54.987, 4.321, 35.987)
+        lon = np.radians(bounds[0] + (xx + .5) / size * (bounds[1] - bounds[0]))
+        lat = np.radians(bounds[2] + (yy + .5) / size * (bounds[3] - bounds[2]))
+        if surface:
+            world = np.stack((np.cos(lat)*np.sin(lon), np.sin(lat), np.cos(lat)*np.cos(lon)), axis=-1)
+        else:
+            # A point on each directed observer ray, independently constructed.
+            world = np.stack((np.cos(lat)*np.sin(lon), np.sin(lat), 10-np.cos(lat)*np.cos(lon)), axis=-1)
+        for variant in ("tilted", "pole", "fiducial", "offset"):
+            header = image_header(projection)
+            header["CRVAL1"], header["CRVAL2"] = 35., 20.
+            if variant == "pole":
+                header["LONPOLE"] = 30. if surface else 90.
+            if variant in ("fiducial", "offset"):
+                header["PV1_1"], header["PV1_2"] = 10., 15. if surface else 75.
+            if variant == "offset":
+                header["PV1_0"] = 1.
+            if projection == "ZPN":
+                header["PV2_0"] = .004
+            secondary = header.copy()
+            secondary["CRVAL1"] += 3
+            secondary["CRVAL2"] -= 2
+            adjustment = [[.96, -.28], [.28, .96]] if variant == "offset" else None
+            uv, valid = reference_pixels(header, world, adjustment=adjustment)
+            other_uv, other_valid = reference_pixels(secondary, world, adjustment=adjustment)
+            name = f"native_{projection}_{variant}"
+            job = gpu.common_job("lati_zenithal" if surface else "hpc", Path(name), size, root,
+                                 cpu.build_jhv_meta(header), bounds, True, backend, name)
+            job.update(productionCoordinates=True)
+            if adjustment is not None:
+                job["planeAdjustment"] = adjustment
+            assert valid.any(), name
+            jobs.append(job)
+            checks.append(("coordinates", uv, valid, None))
+            jobs.append({**job, "name": name + "_comparison", "difference": True,
+                         "secondary": {**gpu.wcs_job_fields(cpu.build_jhv_meta(secondary)),
+                                       **({"planeAdjustment": adjustment} if adjustment is not None else {})},
+                         "outputPath": str(root / f"{name}_comparison.rgba32f")})
+            assert (valid & other_valid).any(), name
+            checks.append(("comparison", np.concatenate((uv, other_uv), axis=-1), valid & other_valid, None))
+    return jobs, checks
+
+
+def simple_tan_cases(root, backend):
+    # Real validation-note headers retain their original image scale and CRVAL.
+    # Compare source pixels directly with an affine solve, independently of WCSLIB.
+    jobs, checks = [], []
+    data = Path(__file__).resolve().parent.parent / "data"
+    for filename in ("sample.171.fits", "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits", "20241224_194245_d4c2A.fts"):
+        with fits.open(data / filename) as hdul:
+            header = cpu.find_image_hdu(hdul, None).header.copy()
+        meta = cpu.build_jhv_meta(header)
+        for adjusted in (False, True):
+            delta = np.array([60., -45.]) if adjusted else np.zeros(2)
+            adjustment = [[.96, -.28], [.28, .96]] if adjusted else None
+            name = f"simple_TAN_{filename}_{adjusted}"
+            job = gpu.common_job("ortho", Path(name), 1, root, meta, (0, 1, 0, 1), True, backend, name)
+            inverse = np.eye(4)
+            inverse[:2, :2] = 0
+            inverse[:2, 3] = [.48, -.36]
+            job.update(productionCoordinates=True, inverseMVP=inverse.T.ravel().tolist(),
+                       coordinateSize=[meta.pixel_width, meta.pixel_height])
+            if adjustment is not None:
+                job["planeAdjustment"] = adjustment
+            job["wcsHeader"].update(deltaCRVAL1=float(delta[0]), deltaCRVAL2=float(delta[1]))
+            secondary = header.copy()
+            secondary["CRPIX1"] += 7
+            secondary["CRPIX2"] -= 3
+            job["secondary"] = gpu.wcs_job_fields(cpu.build_jhv_meta(secondary))
+            job["secondary"]["wcsHeader"].update(deltaCRVAL1=float(delta[0]), deltaCRVAL2=float(delta[1]))
+            if adjustment is not None:
+                job["secondary"]["planeAdjustment"] = adjustment
+            coordinates = []
+            for image_header in (header, secondary):
+                expected_header = image_header.copy()
+                # Convert the user arcseconds into the header's own angular units.
+                for axis in (1, 2):
+                    degree_per_unit = cpu.angular_header_value_to_deg(1., cpu.default_angular_cunit(header, axis))
+                    expected_header[f"CRVAL{axis}"] = header.get(f"CRVAL{axis}", 0.) + delta[axis - 1] / 3600 / degree_per_unit
+                uv, valid = reference_pixels(expected_header, np.array([.48, -.36, .8]),
+                                             adjustment=adjustment, mode="ortho")
+                assert valid, (name, uv)
+                coordinates.append(uv)
+            jobs.append(job)
+            checks.append(("coordinates", coordinates[0].reshape(1, 1, 2), np.ones((1, 1), bool), None))
+            jobs.append({**job, "name": name + "_comparison", "difference": True,
+                         "outputPath": str(root / f"{name}_comparison.rgba32f")})
+            checks.append(("comparison", np.concatenate(coordinates).reshape(1, 1, 4), np.ones((1, 1), bool), None))
+    return jobs, checks
+
+
+def run_ortho_hpc_comparison(root, backend, electron):
+    # Match a straight-ahead +/-1-Rsun Ortho frame to HPC angles +/-atan(1/D).
+    # Use the same fixed dense raster on both backends, independently of the
+    # smaller raster used by the general production-fragment cases.
+    size = 513
+    yy, xx = np.indices((size, size), dtype=float)
+    x, y = 2 * (xx + .5) / size - 1, 2 * (yy + .5) / size - 1
+    disk = x*x + y*y <= 1
+    world = np.stack((x, y, np.sqrt(np.maximum(0, 1-x*x-y*y))), axis=-1)
+    jobs, contexts = [], []
+    for label, filename, hdu_index in gpu.TAN_SCREEN_CASES:
+        with fits.open(gpu.REPO_ROOT / "extra/test/data" / filename) as hdul:
+            header = cpu.find_image_hdu(hdul, hdu_index).header.copy()
+        meta = cpu.build_jhv_meta(header)
+        alpha = math.atan2(1., meta.observer_distance)
+        bounds = np.degrees([-alpha, alpha, -alpha, alpha]).tolist()
+        # A point on each HPC observer ray. Astropy supplies the FITS conversion;
+        # reference_pixels() independently solves the simple-TAN affine mapping.
+        hpc_world = np.stack((meta.observer_distance * np.tan(x*alpha),
+                              meta.observer_distance * np.tan(y*alpha) / np.cos(x*alpha),
+                              np.zeros_like(x)), axis=-1)
+        references = []
+        for variant in ("simple", "hpc", "formal"):
+            mode = "hpc" if variant == "hpc" else "ortho"
+            name = f"ortho_hpc_{label}_{variant}"
+            job = gpu.common_job(mode, Path(filename), size, root, meta,
+                                 bounds if mode == "hpc" else (0, 1, 0, 1), False, backend, name)
+            job.update(productionCoordinates=True, formalTanControl=variant == "formal")
+            jobs.append(job)
+            uv, valid = reference_pixels(header, hpc_world if mode == "hpc" else world,
+                                         mode="ortho" if variant == "simple" else None)
+            if not valid.all():
+                raise AssertionError(f"{label}: fixture no longer covers the complete comparison frame")
+            references.append(uv)
+        contexts.append((label, meta, references))
+
+    results = gpu.run_electron_jobs(electron, jobs, backend)
+    summary = {"backend": backend, "render_size": size,
+               "alignment": "identity camera/source rotations, zero time and user adjustments; Ortho +/-1 Rsun, HPC +/-atan(1/D)",
+               "images": []}
+    for index, (label, meta, references) in enumerate(contexts):
+        image_jobs = jobs[3*index:3*index+3]
+        pixels = [gpu.read_job_pixels(job) for job in image_jobs]
+        source_size = np.array([meta.pixel_width, meta.pixel_height])
+        entry = {"image": label, "source_size": source_size.tolist(),
+                 "renderer": results[3*index]["renderer"], "reference_max_source_px": {}, "regions": {}}
+        for variant, actual, expected in zip(("simple", "hpc", "formal"), pixels, references, strict=True):
+            # Keep the existing 0.05-source-pixel coordinate tolerance. Coverage
+            # must match everywhere, so jointly discarded pixels cannot hide errors.
+            verify_coordinates(actual, expected, np.ones((size, size), bool), source_size=source_size)
+            entry["reference_max_source_px"][variant] = float(np.max(np.abs(actual[..., :2] - expected) * source_size))
+        for region, mask in (("disk", disk), ("off_limb", ~disk), ("full_frame", np.ones_like(disk))):
+            metrics = {"samples": int(mask.sum())}
+            for variant, actual in (("simple", pixels[0]), ("formal", pixels[2])):
+                error = np.max(np.abs(actual[..., :2].astype(float) - pixels[1][..., :2]) * source_size, axis=-1)
+                metrics[variant + "_vs_hpc"] = {"max_source_px": float(error[mask].max()),
+                                                "rms_source_px": float(np.sqrt(np.mean(error[mask]**2)))}
+            entry["regions"][region] = metrics
+            print(f"Ortho/HPC {label} {region}: simple max/RMS "
+                  f"{metrics['simple_vs_hpc']['max_source_px']:.9g}/{metrics['simple_vs_hpc']['rms_source_px']:.9g} px; "
+                  f"formal max/RMS {metrics['formal_vs_hpc']['max_source_px']:.9g}/{metrics['formal_vs_hpc']['rms_source_px']:.9g} px")
+        summary["images"].append(entry)
+    (root / "ortho-hpc-comparison.json").write_text(json.dumps(summary, indent=2) + "\n")
+    for entry in summary["images"]:
+        for region in ("disk", "full_frame"):
+            metrics = entry["regions"][region]
+            # This is the display-policy regression: the aligned simple-TAN
+            # mapping stays subpixel and much closer to HPC than formal TAN.
+            simple = metrics["simple_vs_hpc"]["max_source_px"]
+            formal = metrics["formal_vs_hpc"]["max_source_px"]
+            if simple >= 1 or simple >= formal / 10:
+                raise AssertionError(f"{entry['image']} {region}: simple TAN {simple} px, formal TAN {formal} px")
+    print(f"PASS: {len(jobs)} Ortho/HPC production-fragment cases with independent references and formal-TAN controls")
+
+
+def trig_cases(root, backend):
+    # Dense float inputs plus adjacent floats at every quadrant and range-reduction boundary.
+    angles = np.linspace(-4*np.pi, 4*np.pi, 256*128, dtype=np.float32)
+    critical = np.array([k*np.pi/4 for k in range(-16, 17)], np.float32)
+    critical = np.concatenate((critical, np.nextafter(critical, np.float32(np.inf)),
+                               np.nextafter(critical, np.float32(-np.inf))))
+    angles[:len(critical)] = critical
+    angles = angles.reshape(128, 256)
+    path = root / "trig-input.f32"
+    angles.tofile(path)
+    expected = np.stack((np.sin(angles.astype(float)), np.cos(angles.astype(float))), axis=-1)
+    jobs, checks = [], []
+    for variant in ("selected", "polynomial", "builtin"):
+        name = "input_trig_" + variant
+        job = gpu.common_job("trig", Path(name), 256, root, cpu.build_jhv_meta(image_header("TAN")),
+                             (0, 1, 0, 1), True, backend, name)
+        job.update(height=128, textureWidth=256, textureHeight=128,
+                   sourceTexture={"path": str(path), "format": "R32F"},
+                   trigBuiltin=variant == "builtin", trigPolynomial=variant == "polynomial")
+        jobs.append(job)
+        checks.append(("trig", expected, angles, variant == "builtin"))
+    return jobs, checks
+
+
+def run_cases(root, backend, size, electron, local_only=False, coverage_only=False, ortho_hpc_only=False):
+    if ortho_hpc_only:
+        run_ortho_hpc_comparison(root, backend, electron)
+        return 0
     jobs, checks = [], []
     yy, xx = np.indices((size, size), dtype=float)
     nx, ny = 2 * (xx + 0.5) / size - 1, 2 * (yy + 0.5) / size - 1
@@ -221,7 +644,7 @@ def run_cases(root, backend, size, electron):
         ("ortho", 215, 50, 1.4, "R16F"),
         ("ortho", 10, 120, 1.6, "R16F"),
     )
-    for projection in ("TAN", "ARC", "AZP", "ZPN", "CAR", "CEA"):
+    for projection in (() if local_only or coverage_only else ("TAN", "ARC", "AZP", "ZPN", "CAR", "CEA")):
         surface = projection in ("CAR", "CEA")
         other_modes = ("hpc", "lati_zenithal", "radial_warp", "rect_warp")
         for mode, distance, degrees, scale, format in (
@@ -268,7 +691,7 @@ def run_cases(root, backend, size, electron):
                     axis=-1,
                 )
                 geometry_valid = (
-                    np.ones(nx.shape, dtype=bool) if surface else world[..., 2] >= 0
+                    np.ones(nx.shape, dtype=bool) if surface else distance * world[..., 2] >= 1
                 )
             elif mode == "hpc":
                 longitude = np.radians(
@@ -306,7 +729,7 @@ def run_cases(root, backend, size, electron):
                 geometry_valid &= discriminant >= 0
                 near = -b - np.sqrt(np.maximum(0, discriminant))
                 world = (observer + near[..., None] * ray) @ rotation
-            uv, image_valid = reference_pixels(header, world, mode == "ortho")
+            uv, image_valid = reference_pixels(header, world, mode=mode)
             valid = geometry_valid & image_valid
             name = f"{projection}_{mode}_{distance}_{degrees}_{format}"
             source, image = texture(root, name, format)
@@ -353,7 +776,7 @@ def run_cases(root, backend, size, electron):
             secondary_header["CRPIX1"] += 7
             secondary_header["CRPIX2"] -= 3
             secondary_uv, secondary_valid = reference_pixels(
-                secondary_header, world, mode == "ortho"
+                secondary_header, world, mode=mode
             )
             diff_valid = valid & secondary_valid
             difference = (
@@ -394,20 +817,75 @@ def run_cases(root, backend, size, electron):
                             ("depth", probe <= depth, None, None),
                         )
 
+            if projection == "ZPN" and degrees == 50 and mode == "ortho":
+                # A tilted source plane replaces some sphere hits. Its depth must
+                # use the view-space plane hit, independently of the comparison's pose.
+                sphere_z = np.sqrt(np.maximum(0, 1 - x*x - y*y))
+                fallback = ~on_disk | (math.sin(angle)*x + math.cos(angle)*sphere_z <= 0)
+                initial_depth = np.where(on_disk, .5 - sphere_z / 20, 1)
+                plane_depth = .5 + math.tan(angle)*x / 20
+                other_world, other_geometry_valid, _ = orthographic_geometry(x, y, np.eye(3))
+                _, other_valid = reference_pixels(secondary_header, other_world, mode=mode)
+                for calculate_depth in (False, True):
+                    image_depth = np.where(fallback, plane_depth, initial_depth) if calculate_depth else initial_depth
+                    for difference_mode in (False, True):
+                        present = valid & other_geometry_valid & other_valid if difference_mode else valid
+                        depth = np.where(present, image_depth, 1)
+                        for probe in (.47, .51):
+                            add(f"_tilted_depth_{calculate_depth}_{difference_mode}_{probe}", {
+                                "colorSmoke": True, "calculateDepth": calculate_depth,
+                                "difference": difference_mode, "depthProbe": probe,
+                                "secondary": {**secondary, "cameraDiff": [0, 0, 0, 1]},
+                                "diffSourceTexture": diff_source,
+                            }, ("depth", probe <= depth, None, None))
+
+    if not coverage_only:
+        new_jobs, new_checks = local_geometry_cases(root, backend)
+        jobs.extend(new_jobs)
+        checks.extend(new_checks)
+    if not local_only:
+        new_jobs, new_checks = surface_coverage_cases(root, backend, size)
+        jobs.extend(new_jobs)
+        checks.extend(new_checks)
+    if not local_only and not coverage_only:
+        for new_jobs, new_checks in (native_frame_cases(root, backend, size), simple_tan_cases(root, backend), trig_cases(root, backend)):
+            jobs.extend(new_jobs)
+            checks.extend(new_checks)
     results = gpu.run_electron_jobs(electron, jobs, backend)
     failed = []
     for job, result, check in zip(jobs, results, checks, strict=True):
         pixels = gpu.read_job_pixels(job)
         kind, expected, valid, boundary = check
         try:
-            if kind == "coordinates":
+            if kind == "trig":
+                np.testing.assert_array_equal(pixels[..., 2], valid)
+                error = float(np.max(np.abs(pixels[..., :2] - expected)))
+                print(f"{job['name']}: max absolute error {error:.9g}")
+                if not boundary and error > 2e-7:
+                    raise AssertionError(f"Input sine/cosine error {error} exceeds 2e-7")
+                if job["name"] == "input_trig_selected":
+                    control = "input_trig_polynomial" if "SwiftShader" in result["renderer"] else "input_trig_builtin"
+                    control_job = next(item for item in jobs if item["name"] == control)
+                    np.testing.assert_array_equal(pixels, gpu.read_job_pixels(control_job))
+            elif kind == "local":
+                if np.all(expected == 0):
+                    np.testing.assert_array_equal(pixels, 0)
+                else:
+                    np.testing.assert_allclose(pixels[0, 0], expected, rtol=0, atol=0.05 / 128)
+            elif kind == "comparison":
+                # Both UVs may legitimately contain zero; alpha is a coordinate
+                # in this diagnostic, so classify discards from the whole pixel.
+                present = np.any(pixels != 0, axis=-1)
+                verify_footprint(present, valid)
+                source_size = np.tile(job.get("coordinateSize", (128, 128)), 2)
+                np.testing.assert_allclose(pixels[valid] * source_size, expected[valid] * source_size, rtol=0, atol=.05)
+            elif kind == "coordinates":
                 verify_coordinates(
                     pixels,
                     expected,
                     valid,
+                    source_size=job.get("coordinateSize", (128, 128)),
                     boundary=boundary,
-                    wrap_longitude=job["projectionCode"]
-                    in (gpu.PROJECTION_CODES["CAR"], gpu.PROJECTION_CODES["CEA"]),
                 )
             elif kind == "color":
                 # Each source lookup can round to half precision on Metal.
@@ -428,6 +906,8 @@ def run_cases(root, backend, size, electron):
             print(f"FAIL {job['name']}: {error}")
             failed.append(job["name"])
     print(f"{len(jobs)} production-fragment cases, {len(failed)} failures")
+    if not local_only and not coverage_only:
+        run_ortho_hpc_comparison(root, backend, electron)
     return int(bool(failed))
 
 
@@ -438,13 +918,17 @@ def main():
     )
     parser.add_argument("--electron", type=Path, default=gpu.DEFAULT_ELECTRON)
     parser.add_argument("--render-size", type=int, default=96)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--local-geometry-only", action="store_true")
+    group.add_argument("--surface-coverage-only", action="store_true")
+    group.add_argument("--ortho-hpc-only", action="store_true", help="Compare aligned TAN Ortho/HPC mappings and formal-TAN controls at 513x513")
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     if args.output_dir:
         args.output_dir.mkdir(parents=True, exist_ok=True)
-        return run_cases(args.output_dir, args.backend, args.render_size, args.electron)
+        return run_cases(args.output_dir, args.backend, args.render_size, args.electron, args.local_geometry_only, args.surface_coverage_only, args.ortho_hpc_only)
     with TemporaryDirectory(prefix="jhv-wcs-rendering-") as directory:
-        return run_cases(Path(directory), args.backend, args.render_size, args.electron)
+        return run_cases(Path(directory), args.backend, args.render_size, args.electron, args.local_geometry_only, args.surface_coverage_only, args.ortho_hpc_only)
 
 
 if __name__ == "__main__":

@@ -1,154 +1,89 @@
 package org.helioviewer.jhv.metadata;
 
-import java.util.Optional;
+import java.util.regex.Pattern;
 
-import org.helioviewer.jhv.math.Mat2;
-import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsSolution;
 
+import nom.tam.fits.Header;
+import nom.tam.fits.HeaderCardException;
+
+// Adapt Helioviewer metadata conventions; WCSLIB owns FITS WCS interpretation.
 final class WcsInterpreter {
+    private static final Pattern WCS_KEY = Pattern.compile(
+            "LONPOLE|LATPOLE|(?:CRPIX|CRVAL|CDELT|CROTA)[12]|(?:PC|CD)[12]_[12]|PV[12]_\\d+");
 
-    private static final double ARCSEC_PER_RAD = 180. * 3600. / Math.PI;
+    static WcsSolution read(MetaDataContainer metadata, int width, int height, double observerUnitsPerRad) {
+        try {
+            Header header = new Header();
+            // JHV displays a two-dimensional image. SPICE and PUNCH JP2 headers
+            // can retain WCSAXES and non-spatial axes from their original FITS cube.
+            header.addValue("NAXIS", 2, null);
+            for (String key : metadata.keys()) {
+                if (WCS_KEY.matcher(key).matches())
+                    header.addValue(key, metadata.getRequiredDouble(key), null);
+            }
+            // Without recorded pixel scales, a FITS default of one angular unit
+            // per pixel would invent solar geometry instead of using BasicMetaData.
+            boolean useCd = hasMatrix(header, "CD") && !hasMatrix(header, "PC");
+            if (!useCd && (!header.containsKey("CDELT1") || !header.containsKey("CDELT2")))
+                throw new IllegalArgumentException("Image WCS requires CDELT1 and CDELT2 or a CD matrix");
+            String ctype1 = metadata.getString("CTYPE1").orElse("HPLN-TAN").strip().toUpperCase();
+            String ctype2 = metadata.getString("CTYPE2").orElse("HPLT-TAN").strip().toUpperCase();
+            // Known legacy solar image axes, without a FITS projection suffix.
+            // Early LASCO images use zero placeholders for both labels and units.
+            if ((ctype1.replace('_', '-').equals("SOLAR-X") && ctype2.replace('_', '-').equals("SOLAR-Y")) ||
+                    (ctype1.equals("GONGX") && ctype2.equals("GONGY")) ||
+                    (ctype1.equals("ARCSEC") && ctype2.equals("ARCSEC")) ||
+                    (ctype1.equals("0") && ctype2.equals("0"))) {
+                ctype1 = "HPLN-TAN";
+                ctype2 = "HPLT-TAN";
+            }
+            boolean surface = ctype1.endsWith("CAR") || ctype1.endsWith("CEA");
+            header.addValue("CTYPE1", ctype1, null);
+            header.addValue("CTYPE2", ctype2, null);
+            for (int axis = 1; axis <= 2; axis++) {
+                String unit = metadata.getString("CUNIT" + axis).orElse(surface ? "deg" : "arcsec").strip().toLowerCase();
+                if (unit.equals("0"))
+                    unit = "arcsec";
+                else if (unit.equals("degree") || unit.equals("degrees"))
+                    unit = "deg";
+                header.addValue("CUNIT" + axis, unit, null);
+            }
+            if (!header.containsKey("CRPIX1"))
+                header.addValue("CRPIX1", (width + 1) / 2., null);
+            if (!header.containsKey("CRPIX2"))
+                header.addValue("CRPIX2", (height + 1) / 2., null);
 
-    record Result(
-            WcsHeader.Projection projection,
-            float[] pv2,
-            Vec2 crval,
-            Mat2 pixelToPlane,
-            double unitsPerRad) {}
+            if (ctype1.endsWith("CEA") && metadata.getString("CUNIT2").isEmpty())
+                convertLegacyCeaLatitude(header, useCd);
 
-    private record AxisUnits(
-            double arcsecX,
-            double arcsecY) {}
+            // CROTA2 is the standard latitude-axis rotation. Preserve the observer
+            // images' historical fallbacks only when that keyword is absent.
+            if (!surface && !header.containsKey("CROTA2")) {
+                metadata.getDouble("CROTA").or(() -> metadata.getDouble("CROTA1"))
+                        .ifPresent(rotation -> header.addValue("CROTA2", rotation, null));
+            }
+            return new WcsSolution(header, surface ? 1 : observerUnitsPerRad);
+        } catch (HeaderCardException e) {
+            throw new IllegalArgumentException("Invalid WCS metadata", e);
+        }
+    }
 
-    private record MatrixKeywords(boolean present, Mat2 matrix) {}
-
-    static Result read(MetaDataContainer m) {
-        String ctype1 = m.getString("CTYPE1").orElse("");
-        String ctype2 = m.getString("CTYPE2").orElse("");
-        WcsHeader.Projection projection = WcsHeader.Projection.fromCtype(ctype1, ctype2);
-        boolean isSurfaceMap = projection.isSurfaceMap();
-
-        AxisUnits units = readAxisUnits(m, isSurfaceMap);
-        double pv2_1 = m.getDouble("PV2_1").orElse(1.);
-        float[] pv2 = readPv2(m, projection, pv2_1);
-        Mat2 transform = computeLinearTransform(m, units, projection);
-        double crval1 = m.getDouble("CRVAL1").orElse(0.);
-        double crval2 = m.getDouble("CRVAL2").orElse(0.);
-        Vec2 crval;
-        double unitsPerRad;
-
-        if (isSurfaceMap) {
-            boolean isCea = projection == WcsHeader.Projection.CEA;
-            double longitude = crval1 * units.arcsecX / ARCSEC_PER_RAD;
-            double latitude = crval2 * units.arcsecY / ARCSEC_PER_RAD;
-            crval = new Vec2(longitude, isCea ? ceaLatitudeCoordinate(latitude, pv2_1) : latitude);
-            unitsPerRad = 1;
+    // Historical CEA maps without CUNIT2 store the plane's normalized Y row.
+    // CRVAL2 remains a celestial latitude in degrees.
+    private static void convertLegacyCeaLatitude(Header header, boolean useCd) throws HeaderCardException {
+        if (useCd) {
+            for (String key : new String[]{"CD2_1", "CD2_2"})
+                if (header.containsKey(key))
+                    header.addValue(key, Math.toDegrees(header.getDoubleValue(key)), null);
         } else {
-            crval = new Vec2(crval1 * units.arcsecX, crval2 * units.arcsecY);
-            unitsPerRad = ARCSEC_PER_RAD;
+            header.addValue("CDELT2", Math.toDegrees(header.getDoubleValue("CDELT2")), null);
         }
-
-        return new Result(projection, pv2, crval, transform, unitsPerRad);
     }
 
-    private static MatrixKeywords readMatrix(MetaDataContainer m, String prefix, double diagonalDefault) {
-        Optional<Double> m11 = m.getDouble(prefix + "1_1");
-        Optional<Double> m12 = m.getDouble(prefix + "1_2");
-        Optional<Double> m21 = m.getDouble(prefix + "2_1");
-        Optional<Double> m22 = m.getDouble(prefix + "2_2");
-        boolean present = m11.isPresent() || m12.isPresent() || m21.isPresent() || m22.isPresent();
-        return new MatrixKeywords(present, new Mat2(
-                m11.orElse(diagonalDefault), m12.orElse(0.),
-                m21.orElse(0.), m22.orElse(diagonalDefault)));
-    }
-
-    private static AxisUnits readAxisUnits(MetaDataContainer m, boolean isSurfaceMap) {
-        return new AxisUnits(
-                readAngularAxisScaleArcsec(m, "CUNIT1", isSurfaceMap),
-                readAngularAxisScaleArcsec(m, "CUNIT2", isSurfaceMap));
-    }
-
-    private static double readAngularAxisScaleArcsec(MetaDataContainer m, String cunitKey, boolean defaultDegrees) {
-        return m.getString(cunitKey)
-                .map(WcsInterpreter::arcsecPerUnit)
-                .orElse(defaultDegrees ? 3600. : 1.);
-    }
-
-    private static double arcsecPerUnit(String unit) {
-        return switch (unit.strip().toLowerCase()) {
-            case "deg", "degree", "degrees" -> 3600.; // Accept alternative non-standard spellings.
-            case "arcmin" -> 60.;
-            case "mas" -> .001;
-            case "rad" -> 180. * 3600. / Math.PI;
-            default -> 1.;
-        };
-    }
-
-    private static float[] readPv2(MetaDataContainer m, WcsHeader.Projection projection, double pv2_1) {
-        float[] pv2 = new float[6];
-        if (!projection.usesPv2())
-            return pv2;
-        for (int i = 0; i < pv2.length; i++)
-            pv2[i] = m.getDouble("PV2_" + i).map(Double::floatValue).orElse(0f);
-        if (projection == WcsHeader.Projection.CEA) // Thompson (2006): CEA defaults PV2_1 to 1 when omitted.
-            pv2[1] = (float) pv2_1;
-        return pv2;
-    }
-
-    private static Mat2 computeLinearTransform(
-            MetaDataContainer m, AxisUnits units, WcsHeader.Projection projection) {
-        // Surface-map X is angular longitude. Y is angular latitude for CAR and equal-area Y for CEA.
-        boolean isSurfaceMap = projection.isSurfaceMap();
-        double axis1Scale = units.arcsecX;
-        double axis2Scale = units.arcsecY;
-        if (isSurfaceMap) {
-            axis1Scale /= ARCSEC_PER_RAD;
-            // Historical normalized CEA maps omit CUNIT2 and store the second plane coordinate
-            // directly as sin(latitude) / lambda. An explicit CUNIT2 selects the FITS angular
-            // convention used by wcslib/Astropy, which JHV converts to the same internal coordinate.
-            // This deliberately overrides the FITS default of degrees when CUNIT2 is absent.
-            boolean normalizedCeaY = projection == WcsHeader.Projection.CEA && m.getString("CUNIT2").isEmpty();
-            axis2Scale = normalizedCeaY ? 1 : axis2Scale / ARCSEC_PER_RAD;
-        }
-
-        // FITS WCS/wcslib gives PC precedence over CD when both are present.
-        MatrixKeywords pc = readMatrix(m, "PC", 1.);
-        if (pc.present)
-            return scaleRows(
-                    pc.matrix,
-                    m.getRequiredDouble("CDELT1") * axis1Scale,
-                    m.getRequiredDouble("CDELT2") * axis2Scale);
-
-        // Any CD card selects a zero-defaulted CD matrix and makes CDELT and CROTA irrelevant.
-        MatrixKeywords cd = readMatrix(m, "CD", 0.);
-        if (cd.present)
-            return scaleRows(cd.matrix, axis1Scale, axis2Scale);
-
-        double unitPerPixelX = m.getRequiredDouble("CDELT1") * axis1Scale;
-        double unitPerPixelY = m.getRequiredDouble("CDELT2") * axis2Scale;
-        if (isSurfaceMap)
-            return new Mat2(unitPerPixelX, 0, 0, unitPerPixelY);
-
-        double crota = m.getDouble("CROTA").or(() -> m.getDouble("CROTA1")).or(() -> m.getDouble("CROTA2"))
-                .map(Math::toRadians).orElse(0.);
-        double c = Math.cos(crota);
-        double s = Math.sin(crota);
-        return new Mat2(
-                unitPerPixelX * c,
-                -unitPerPixelY * s,
-                unitPerPixelX * s,
-                unitPerPixelY * c);
-    }
-
-    private static Mat2 scaleRows(Mat2 matrix, double rowScaleX, double rowScaleY) {
-        return new Mat2(rowScaleX * matrix.m00, rowScaleX * matrix.m01, rowScaleY * matrix.m10, rowScaleY * matrix.m11);
-    }
-
-    private static double ceaLatitudeCoordinate(double latitude, double pv2_1) {
-        // JHV stores the CEA second axis as the equal-area latitude coordinate y = sin(lat) / lambda.
-        double lambda = Math.max(pv2_1, 1e-12);
-        return Math.sin(latitude) / lambda;
+    private static boolean hasMatrix(Header header, String prefix) {
+        return header.containsKey(prefix + "1_1") || header.containsKey(prefix + "1_2") ||
+                header.containsKey(prefix + "2_1") || header.containsKey(prefix + "2_2");
     }
 
     private WcsInterpreter() {}

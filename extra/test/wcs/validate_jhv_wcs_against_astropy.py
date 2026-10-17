@@ -40,6 +40,7 @@ ZPN_BISECTION_STEPS = 50
 
 @dataclass(frozen=True)
 class JHVMeta:
+    header_cards: str
     pixel_width: int
     pixel_height: int
     arcsec_per_pixel_x: float
@@ -190,6 +191,12 @@ def scale_matrix_rows(
     )
 
 
+def cdelt_crota_matrix(cdelt1, cdelt2, degrees):
+    angle = math.radians(float(degrees))
+    c, s = math.cos(angle), math.sin(angle)
+    return (cdelt1 * c, -cdelt2 * s, cdelt1 * s, cdelt2 * c)
+
+
 def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
     if matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC"):
         matrix = read_matrix_keywords(header, "CD", 0.0)
@@ -201,6 +208,8 @@ def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
             float(header.get("CDELT1", 1.0)), default_angular_cunit(header, 1)))
         axis2_scale = math.radians(angular_header_value_to_deg(
             float(header.get("CDELT2", 1.0)), default_angular_cunit(header, 2)))
+    if not matrix_keywords_present(header, "PC") and not matrix_keywords_present(header, "CD"):
+        return cdelt_crota_matrix(axis1_scale, axis2_scale, header.get("CROTA2", 0.0))
     return scale_matrix_rows(matrix, axis1_scale, axis2_scale)
 
 
@@ -218,6 +227,8 @@ def cea_effective_cd(header) -> tuple[float, float, float, float]:
         axis2_scale = float(header.get("CDELT2", 1.0)) if normalized_y else math.radians(
             angular_header_value_to_deg(
                 float(header.get("CDELT2", 1.0)), default_angular_cunit(header, 2)))
+    if not matrix_keywords_present(header, "PC") and not matrix_keywords_present(header, "CD"):
+        return cdelt_crota_matrix(axis1_scale, axis2_scale, header.get("CROTA2", 0.0))
     return scale_matrix_rows(matrix, axis1_scale, axis2_scale)
 
 
@@ -232,10 +243,7 @@ def observer_effective_cd_arcsec(header) -> tuple[float, float, float, float]:
     if matrix_keywords_present(header, "CD"):
         return scale_matrix_rows(read_matrix_keywords(header, "CD", 0.0), axis1_scale, axis2_scale)
 
-    crota = math.radians(float(header.get("CROTA", header.get("CROTA1", header.get("CROTA2", 0.0)))))
-    c = math.cos(crota)
-    s = math.sin(crota)
-    return (cdelt1 * c, -cdelt2 * s, cdelt1 * s, cdelt2 * c)
+    return cdelt_crota_matrix(cdelt1, cdelt2, header.get("CROTA2", header.get("CROTA", header.get("CROTA1", 0.0))))
 
 
 def build_astropy_wcs_base(header, projection: str, crval1_deg: float, crval2_deg: float) -> WCS:
@@ -303,6 +311,7 @@ def build_jhv_meta(header) -> JHVMeta:
         pv2[1] = float(np.float32(header.get("PV2_1", 1.0)))
 
     return JHVMeta(
+        header_cards=header.tostring(sep="", endcard=False, padding=False),
         pixel_width=pixel_width,
         pixel_height=pixel_height,
         arcsec_per_pixel_x=arcsec_per_pixel_x,
@@ -372,7 +381,7 @@ def quat_rotate_vector_inverse(quat: tuple[float, float, float, float], vec: tup
     )
 
 
-# CPU mirror of the shared GLSL helpers in imageCommon.frag.
+# CPU mirror of the shared GLSL helpers in imageGeometry.frag.
 def wrapDeltaLongitude(lon: float, lon0: float) -> float:
     return wrap_delta_lon_rad(lon, lon0)
 
@@ -716,11 +725,10 @@ def helioprojective_to_observer_ray(world_rad: tuple[float, float]) -> np.ndarra
     lon, lat = world_rad
     cos_lon = math.cos(lon)
     cos_lat = math.cos(lat)
-    sign = -1.0 if cos_lon * cos_lat < 0.0 else 1.0
     ray = np.array([
-        sign * math.sin(lon) * cos_lat,
-        sign * math.sin(lat),
-        -sign * cos_lon * cos_lat,
+        math.sin(lon) * cos_lat,
+        math.sin(lat),
+        -cos_lon * cos_lat,
     ], dtype=np.float64)
     return ray
 
@@ -972,8 +980,13 @@ def astropy_compatible_header(header):
 
 
 def build_astropy_pixel_wcs(header) -> WCS:
-    """Build the reference, canonicalizing only the documented legacy CEA convention."""
-    header = astropy_compatible_header(header)
+    """Canonicalize JHV's unit spelling and legacy CEA metadata before FITS evaluation."""
+    header = astropy_compatible_header(header).copy()
+    for axis in (1, 2):
+        key = f"CUNIT{axis}"
+        if key in header:
+            unit = str(header[key]).strip().lower()
+            header[key] = "deg" if unit in ("degree", "degrees") else unit
     return WCS(header, naxis=2)
 
 
@@ -1087,14 +1100,31 @@ def wcsPlaneToTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image
     return texcoord if normalized_coord_visible(texcoord) else (math.nan, math.nan)
 
 
-def wcsPlaneToWrappedXTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
+def wcsPlaneToSurfaceTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
+    if not all(math.isfinite(value) for value in plane_internal):
+        return (math.nan, math.nan)
     centered = transform_mat2(meta.plane_to_image, plane_internal)
     rect = wcsRect(meta)
     texcoord = (
-        (rect[2] * (centered[0] - rect[0])) % 1.0,
+        rect[2] * (centered[0] - rect[0]),
         rect[3] * (-centered[1] - rect[1]),
     )
-    return texcoord if normalized_coord_visible(texcoord) else (math.nan, math.nan)
+    displacement = (2 * math.pi * meta.plane_units_per_rad * rect[2] * meta.plane_to_image[0],
+                    -2 * math.pi * meta.plane_units_per_rad * rect[3] * meta.plane_to_image[2])
+    first, last = -math.inf, math.inf
+    for coordinate, step in zip(texcoord, displacement):
+        if step == 0:
+            if coordinate < 0 or coordinate > 1:
+                return (math.nan, math.nan)
+        else:
+            endpoints = (-coordinate / step, (1 - coordinate) / step)
+            first = max(first, math.ceil(min(endpoints)))
+            last = min(last, math.floor(max(endpoints)))
+    if first > last:
+        return (math.nan, math.nan)
+    turn = min(max(0, first), last)
+    result = tuple(coordinate + turn * step for coordinate, step in zip(texcoord, displacement))
+    return result if normalized_coord_visible(result) else (math.nan, math.nan)
 
 
 def sample_texture_linear(image2d: np.ndarray, texcoord: tuple[float, float], wrap_x: bool = False) -> float:
@@ -1391,7 +1421,7 @@ def sampleHpcTexcoord(
         return sampleOrthoTexcoord(world, meta, image2d), enhancement_factor
     if hit:
         if delta_t != 0.0:
-            world = differential(delta_t, world)
+            world = rotate_vector(source_view_quat, differential(delta_t, rotate_vector_inverse(source_view_quat, world)))
         hp = worldToHelioprojective(world, meta.observer_distance)
     else:
         enhancement_factor = max(1.0, math.hypot(hpc_xy[0], hpc_xy[1]))
@@ -1486,11 +1516,10 @@ def helioprojectiveToObserverRayFloat32(helioprojective: tuple[float, float]) ->
     phi, theta = helioprojective
     cos_phi = cos32(phi)
     cos_theta = cos32(theta)
-    ray_sign = -1.0 if f32(cos_phi * cos_theta) < 0.0 else 1.0
     return (
-        f32(ray_sign * f32(sin32(phi) * cos_theta)),
-        f32(ray_sign * sin32(theta)),
-        f32(-ray_sign * f32(cos_phi * cos_theta)),
+        f32(sin32(phi) * cos_theta),
+        sin32(theta),
+        f32(-cos_phi * cos_theta),
     )
 
 
@@ -1709,7 +1738,7 @@ def sampleLatiSurfaceTexcoord(
 ) -> tuple[float, float]:
     world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
     plane = projectCarToWcsPlane(world, meta) if meta.projection == "CAR" else projectCeaToWcsPlane(world, meta)
-    return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
+    return wcsPlaneToSurfaceTexcoord(plane, meta, image2d)
 
 
 def sampleLatiZenithalTexcoord(
@@ -1729,7 +1758,7 @@ def sampleLatiZenithalTexcoord(
         world = differential(delta_t, world)
 
     source_world = rotate_vector(source_view_quat, world)
-    if source_world[2] < 0.0:
+    if source_world[2] < 1.0 / meta.observer_distance:
         return (math.nan, math.nan)
 
     helioprojective = worldToHelioprojective(source_world, meta.observer_distance)
@@ -1828,10 +1857,10 @@ def sampleOrthoTexcoord(
 ) -> tuple[float, float]:
     if meta.projection == "CAR":
         plane = projectCarToWcsPlane(world_xyz, meta)
-        return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
+        return wcsPlaneToSurfaceTexcoord(plane, meta, image2d)
     if meta.projection == "CEA":
         plane = projectCeaToWcsPlane(world_xyz, meta)
-        return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
+        return wcsPlaneToSurfaceTexcoord(plane, meta, image2d)
     if simple_tan and meta.projection == "TAN":
         return wcsPlaneToTexcoord((world_xyz[0] - meta.crval_internal_x, world_xyz[1] - meta.crval_internal_y), meta, image2d)
     helioprojective = worldToHelioprojective(world_xyz, meta.observer_distance)
@@ -1844,10 +1873,11 @@ def rotateOnDiskPoint(
     meta: JHVMeta,
     camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
 ) -> tuple[float, float, float]:
     rotated = rotate_vector_inverse(camera_diff_quat, hit_point)
     if delta_t != 0.0:
-        rotated = differential(delta_t, rotated)
+        rotated = rotate_vector(source_view_quat, differential(delta_t, rotate_vector_inverse(source_view_quat, rotated)))
     return rotated
 
 
@@ -1916,7 +1946,7 @@ def renderOrthographicTexcoords(
         world_xyz = (
             rotate_vector_inverse(source_view_quat, hit_point)
             if surface_map_mode
-            else rotateOnDiskPoint(hit_point, meta, camera_diff_quat, delta_t)
+            else rotateOnDiskPoint(hit_point, meta, camera_diff_quat, delta_t, source_view_quat)
         )
     else:
         hit_point = (math.nan, math.nan, math.nan)
@@ -1942,7 +1972,7 @@ def renderOrthographicTexcoords(
         diff_world_xyz = (
             rotate_vector_inverse(diff_source_view_quat, diff_hit_point)
             if diff_surface_map_mode
-            else rotateOnDiskPoint(diff_hit_point, diff_meta, diff_camera_diff_quat, diff_delta_t)
+            else rotateOnDiskPoint(diff_hit_point, diff_meta, diff_camera_diff_quat, diff_delta_t, diff_source_view_quat)
         )
     else:
         diff_hit_point = (math.nan, math.nan, math.nan)

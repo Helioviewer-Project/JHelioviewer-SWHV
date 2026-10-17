@@ -7,6 +7,7 @@ import json
 import math
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -37,14 +38,37 @@ def java_classpath(java_out: Path) -> str:
 def compile_java_helper(java_out: Path) -> None:
     subprocess.run(["ant", "compile"], cwd=REPO_ROOT, check=True)
     subprocess.run(
-        ["javac", "-cp", java_classpath(java_out), "-d", str(java_out), str(JAVA_SOURCE)],
+        ["javac", "-cp", java_classpath(java_out), "-d", str(java_out), str(JAVA_SOURCE),
+         str(SCRIPT_DIR / "WcsLibraryTest.java"), str(SCRIPT_DIR / "WcsInterpreterTest.java")],
         cwd=REPO_ROOT,
         check=True,
+    )
+    subprocess.run(
+        ["java", "--enable-native-access=ALL-UNNAMED", "-cp", java_classpath(java_out),
+         "org.helioviewer.jhv.wcs.WcsLibraryTest"], cwd=REPO_ROOT, check=True,
+    )
+    subprocess.run(
+        ["java", "--enable-native-access=ALL-UNNAMED", f"-Duser.home={java_out}",
+         "-Djava.awt.headless=true", "-cp", java_classpath(java_out),
+         "org.helioviewer.jhv.metadata.WcsInterpreterTest", str(SCRIPT_DIR.parent / "data/lasco_c3_legacy.xml")],
+        cwd=REPO_ROOT, check=True,
+    )
+    # Distribution resources are extracted from a JAR by LibraryResource. Exercise
+    # that path without the unpacked native-resource directory on the classpath.
+    resources = java_out / "wcs-native.jar"
+    with zipfile.ZipFile(resources, "w") as archive:
+        for binary in sorted((REPO_ROOT / "lib/jhv").glob("*/*jhvwcs*")):
+            archive.write(binary, binary.relative_to(REPO_ROOT / "lib"))
+    classpath = java_classpath(java_out).split(":")
+    classpath.remove(str(REPO_ROOT / "lib"))
+    subprocess.run(
+        ["java", "--enable-native-access=ALL-UNNAMED", "-cp", ":".join([*classpath, str(resources)]),
+         "org.helioviewer.jhv.wcs.WcsLibraryTest"], cwd=REPO_ROOT, check=True,
     )
 
 
 def java_dump(java_out: Path, file_path: Path, hdu: int | None) -> dict:
-    cmd = ["java", f"-Duser.home={java_out}", "-cp", java_classpath(java_out), JAVA_CLASS, str(file_path)]
+    cmd = ["java", "--enable-native-access=ALL-UNNAMED", f"-Duser.home={java_out}", "-cp", java_classpath(java_out), JAVA_CLASS, str(file_path)]
     if hdu is not None:
         cmd.extend(["--hdu", str(hdu)])
     completed = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)
@@ -142,8 +166,8 @@ def generated_matrix_cases(
         (
             "pc_mixed_angular_units",
             {
-                "CUNIT1": "arcmin",
-                "CUNIT2": "mas",
+                "CUNIT1": " ARCMIN ",
+                "CUNIT2": "MAS",
                 "CDELT1": -0.012,
                 "CDELT2": 730.0,
                 "CRVAL1": 0.03,
@@ -229,6 +253,10 @@ def generated_matrix_cases(
             },
         ),
     )
+
+    observer_cases += (("crota2_precedes_legacy", {
+        "CDELT1": -.7, "CDELT2": 1.1, "CROTA": -17., "CROTA1": 0., "CROTA2": 30.,
+    }),)
 
     generated: list[tuple[Path, int | None]] = []
     astropy_cases: set[Path] = set()
@@ -352,11 +380,20 @@ def generated_matrix_cases(
             },
         ),
     )
+    for projection, source in (("car", "sunerf_map.fits"), ("cea", "mrzqs260301t2314c2308_169.fits")):
+        for name, extra in (("crota2", {"CROTA2": 30.}),
+                            ("crota2_mixed_units", {"CUNIT1": "rad", "CDELT1": math.radians(-.08), "CROTA2": 30.}),
+                            ("irrelevant_crota", {"CROTA": 60., "CROTA1": -45.}),
+                            ("pc_over_crota", {"PC1_2": .1, "CROTA2": 30.}),
+                            ("cd_over_crota", {"CD1_1": -.08, "CD2_2": .05, "CROTA2": 30.})):
+            surface_cases += ((f"{projection}_{name}", SCRIPT_DIR.parent / "data" / source,
+                               {"CUNIT1": "deg", "CUNIT2": "deg", "CRVAL1": 0., "CRVAL2": 0.,
+                                "CDELT1": -.08, "CDELT2": .05, **extra}),)
     for name, source, values in surface_cases:
         with validator.fits.open(source) as hdul:
             source_hdu = validator.find_image_hdu(hdul, None)
             header = source_hdu.header.copy()
-        for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2", "CD1_1", "CD1_2", "CD2_1", "CD2_2"):
+        for key in ("CROTA", "CROTA1", "CROTA2", "PC1_1", "PC1_2", "PC2_1", "PC2_2", "CD1_1", "CD1_2", "CD2_1", "CD2_2"):
             header.remove(key, ignore_missing=True, remove_all=True)
         header["CRPIX1"] = 4.5
         header["CRPIX2"] = 4.5

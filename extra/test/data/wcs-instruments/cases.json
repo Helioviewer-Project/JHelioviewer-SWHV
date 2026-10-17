@@ -1,0 +1,288 @@
+[
+  {
+    "file": "eit.xml",
+    "instrument": "EIT",
+    "sourceId": 0,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=191430605",
+    "requestedDate": "2026-08-25 13:00:24",
+    "projection": "TAN",
+    "matrixRadians": [
+      1.2750599813180796e-05,
+      -0.0,
+      0.0,
+      1.2750599813180796e-05
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      513.18,
+      521.46
+    ],
+    "size": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "file": "mdi.xml",
+    "instrument": "MDI",
+    "sourceId": 6,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=99378005",
+    "requestedDate": "2011-01-11 22:39:00",
+    "projection": "TAN",
+    "matrixRadians": [
+      9.589129798665511e-06,
+      -0.0,
+      0.0,
+      9.589129798665511e-06
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      511.5,
+      511.5
+    ],
+    "size": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "file": "trace.xml",
+    "instrument": "TRACE",
+    "sourceId": 75,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=99068713",
+    "requestedDate": "2010-06-17 23:59:27",
+    "projection": "TAN",
+    "matrixRadians": [
+      2.42406840554768e-06,
+      -0.0,
+      0.0,
+      2.42406840554768e-06
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      1404.35,
+      -281.093
+    ],
+    "size": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "file": "xrt.xml",
+    "instrument": "XRT",
+    "sourceId": 42,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=192513289",
+    "requestedDate": "2026-09-13 06:30:14",
+    "projection": "TAN",
+    "matrixRadians": [
+      9.97357877886168e-06,
+      1.2842958855003006e-08,
+      -1.2842958855003006e-08,
+      9.97357877886168e-06
+    ],
+    "referenceRadians": [
+      -7.36528023195613e-05,
+      1.2911355303190458e-05
+    ],
+    "referencePixelFits": [
+      512.5,
+      512.5
+    ],
+    "size": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "file": "sxt.xml",
+    "instrument": "SXT",
+    "sourceId": 33,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=99367787",
+    "requestedDate": "2001-12-14 21:06:33",
+    "projection": "TAN",
+    "matrixRadians": [
+      2.3804351742478217e-05,
+      -0.0,
+      0.0,
+      2.3804351742478217e-05
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      257.25,
+      281.69
+    ],
+    "size": [
+      512,
+      512
+    ]
+  },
+  {
+    "file": "gong.xml",
+    "instrument": "GONG",
+    "sourceId": 94,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=144610133",
+    "requestedDate": "2015-12-22 00:08:14",
+    "projection": "TAN",
+    "matrixRadians": [
+      5.254847777777777e-06,
+      -0.0,
+      0.0,
+      5.254847777777777e-06
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      1024.5,
+      1024.5
+    ],
+    "size": [
+      2048,
+      2048
+    ]
+  },
+  {
+    "file": "rhessi.xml",
+    "instrument": "RHESSI",
+    "sourceId": 100,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=159097553",
+    "requestedDate": "2017-09-10 16:05:56",
+    "projection": "TAN",
+    "matrixRadians": [
+      7.27220521664304e-06,
+      -0.0,
+      0.0,
+      7.27220521664304e-06
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      -594.11446,
+      142.77475
+    ],
+    "size": [
+      101,
+      101
+    ]
+  },
+  {
+    "file": "spice.xml",
+    "instrument": "SPICE",
+    "sourceId": 603,
+    "source": "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Header/?id=173826308",
+    "requestedDate": "2026-10-16 06:19:24",
+    "projection": "TAN",
+    "matrixRadians": [
+      1.9067833256752337e-05,
+      9.700623197711155e-07,
+      -3.5339246621891764e-06,
+      5.2341202289785675e-06
+    ],
+    "referenceRadians": [
+      -0.0007706307929457415,
+      -7.905702062602622e-05
+    ],
+    "referencePixelFits": [
+      96.5,
+      305.5
+    ],
+    "size": [
+      192,
+      609
+    ]
+  },
+  {
+    "file": "punch.xml",
+    "instrument": "WFI+NFI Mosaic",
+    "sourceId": 134,
+    "source": "https://api.helioviewer.org/v2/getJP2Header/?id=192919580",
+    "requestedDate": "2026-09-14 23:44:00",
+    "projection": "ARC",
+    "matrixRadians": [
+      0.0003926990816987241,
+      -0.0,
+      0.0,
+      0.0003926990816987241
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      2048.0,
+      2048.0
+    ],
+    "size": [
+      4096,
+      4096
+    ]
+  },
+  {
+    "file": "kanzelhoehe.xml",
+    "instrument": "H-alpha",
+    "sourceId": 100,
+    "source": "jpip://jpip.swhv.oma.be/kanzelhoehe/2026/10/11/2026_10_11__07_54_14__Kanzelhoehe_H-alpha_H-alpha_6562.jp2",
+    "requestedDate": "2026-10-11 07:54:14",
+    "projection": "TAN",
+    "matrixRadians": [
+      4.400026055192379e-06,
+      2.169547225106023e-06,
+      -2.169547225106023e-06,
+      4.400026055192379e-06
+    ],
+    "referenceRadians": [
+      2.4526724127331427e-06,
+      2.4526724127331427e-06
+    ],
+    "referencePixelFits": [
+      1024.5,
+      1024.5
+    ],
+    "size": [
+      2048,
+      2048
+    ]
+  },
+  {
+    "file": "lasco-zero.xml",
+    "instrument": "LASCO",
+    "sourceId": 4,
+    "source": "jpip://jpip.swhv.oma.be/lasco_c2/1996/04/01/1996_04_01__01_12_15_686__SOHO_LASCO_C2_white-light.jp2",
+    "requestedDate": "1996-04-01 01:12:16",
+    "projection": "TAN",
+    "matrixRadians": [
+      5.5268759646487105e-05,
+      -0.0,
+      0.0,
+      5.5268759646487105e-05
+    ],
+    "referenceRadians": [
+      0.0,
+      0.0
+    ],
+    "referencePixelFits": [
+      512.0,
+      512.0
+    ],
+    "size": [
+      1024,
+      1024
+    ]
+  }
+]

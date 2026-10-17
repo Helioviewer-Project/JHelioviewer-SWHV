@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.wcs.WcsProjection;
+import org.helioviewer.jhv.wcs.ObserverGeometry;
 
 final class ProjectedView extends MapView {
 
@@ -69,10 +69,7 @@ final class ProjectedView extends MapView {
         double theta = Math.toRadians(angleDeg);
         double x = PolarBasis.x(radius, theta);
         double y = PolarBasis.y(radius, theta);
-        return WcsProjection.helioprojectiveToWorld(
-                viewpoint,
-                Math.atan2(x, viewpoint.distance),
-                Math.atan2(y, Math.sqrt(x * x + viewpoint.distance * viewpoint.distance)));
+        return ObserverGeometry.observerRayToWorld(viewpoint, new Vec3(x, y, -viewpoint.distance));
     }
 
     private Vec2 projectRadialWarp(MapScale scale, Vec3 v0) {
@@ -104,7 +101,7 @@ final class ProjectedView extends MapView {
     }
 
     private Vec3 unprojectHpc(double longitudeDeg, double latitudeDeg) {
-        return WcsProjection.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
+        return ObserverGeometry.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
     @Override

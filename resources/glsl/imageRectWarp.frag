@@ -3,7 +3,8 @@ vec2 warpHpcXY() {
 
     float angle = mapPos.x * TWOPI;
     float radialCoordinate = unwarpRadius(mapPos.y);
-    return radialCoordinate * vec2(-sin(angle), cos(angle));
+    vec2 direction = sinCos(angle);
+    return radialCoordinate * vec2(-direction.x, direction.y);
 }
 
 void main(void) {

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.source.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.source.jpip.JPIPSocket;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
-import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsSolution;
 
 // Raw reader pixels, independent of the view's delivery and filtering path.
 // Arguments: Kakadu library, bridge library, single-frame JPIP URI, movie JPIP URI.
@@ -80,7 +80,7 @@ public final class J2KReaderTest {
         // One mapping from original pixels; every reduced grid composes with it.
         for (int[] dimensions : new int[][]{{128, 96, 0, 0}, {129, 97, 0, 0}, {129, 97, 3, 5}}) {
             int width = dimensions[0], height = dimensions[1], x = dimensions[2], y = dimensions[3];
-            WcsHeader wcs = new WcsHeader(WcsHeader.Projection.TAN, new float[6], 215, Vec2.ZERO);
+            WcsSolution wcs = new WcsSolution(WcsSolution.Projection.TAN, new float[6], 215);
             ImageGeometry original = new ImageGeometry(width, height, wcs, new Mat2(2, 0, 0, -3), new Vec2(18.5, 17));
             if (original.forGrid(new ImageGrid(0, width, height)) != original)
                 throw new AssertionError("Level zero changed the geometry");

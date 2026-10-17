@@ -399,6 +399,11 @@ lib/jhv/linux-amd64/libjhvj2k.so
 
 Supplemental notices: esajpip.txt.
 
+lib/jhv/linux-amd64/libjhvwcs.so
+--------------------------------
+
+Supplemental notices: WCSLIB.txt.
+
 lib/jhv/linux-amd64/libkdu_jni.so
 ---------------------------------
 
@@ -428,6 +433,11 @@ lib/jhv/macos-amd64/libjhvj2k.dylib
 -----------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/macos-amd64/libjhvwcs.dylib
+-----------------------------------
+
+Supplemental notices: WCSLIB.txt.
 
 lib/jhv/macos-amd64/libkdu_jni.dylib
 ------------------------------------
@@ -459,6 +469,11 @@ lib/jhv/macos-arm64/libjhvj2k.dylib
 
 Supplemental notices: esajpip.txt.
 
+lib/jhv/macos-arm64/libjhvwcs.dylib
+-----------------------------------
+
+Supplemental notices: WCSLIB.txt.
+
 lib/jhv/macos-arm64/libkdu_jni.dylib
 ------------------------------------
 
@@ -478,6 +493,11 @@ lib/jhv/windows-amd64/jhvj2k.dll
 --------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/windows-amd64/jhvwcs.dll
+--------------------------------
+
+Supplemental notices: WCSLIB.txt.
 
 lib/jhv/windows-amd64/kdu_jni.dll
 ---------------------------------
