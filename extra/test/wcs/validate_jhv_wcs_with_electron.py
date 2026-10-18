@@ -844,14 +844,24 @@ def compare_differential_rotation(
             job["latiOrigin"] = [display_longitude, display_latitude]
         jobs.append(job)
 
+    rates = make_mode_job("ortho", fits_file, 1, output_dir, False, meta, backend, name="rotation_rates")
+    rates.update({"rotationRates": True, "deltaT": 86400e-6})
+    jobs.append(rates)
     results = run_electron_jobs(electron, jobs, backend)
     failed = False
     for job, result in zip(jobs, results, strict=True):
         pixels = read_job_pixels(job)
-        code = evaluate_shader_to_cpu(
-            job["mode"], fits_file, render_size, max_error_px, max_sample_error,
-            True, image_data, meta, projection_wcs, pixel_wcs, job, result, pixels)
-        failed = failed or code != 0
+        if job.get("rotationRates"):
+            # Snodgrass Table 1 magnetic model, in radians/day relative to Carrington.
+            sin_lat2 = np.array([0., .25, .75, 1.])
+            expected = (2.879 - .339 * sin_lat2 - .485 * sin_lat2**2) * 86400e-6 - math.radians(14.1844)
+            np.testing.assert_allclose(pixels[0, 0], expected, rtol=2e-7, atol=1e-10)
+            print("PASS: differential rotation rates at 0, 30, 60 and 90 degrees match the published magnetic model")
+        else:
+            code = evaluate_shader_to_cpu(
+                job["mode"], fits_file, render_size, max_error_px, max_sample_error,
+                True, image_data, meta, projection_wcs, pixel_wcs, job, result, pixels)
+            failed = failed or code != 0
     return 1 if failed else 0
 
 

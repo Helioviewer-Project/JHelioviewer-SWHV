@@ -7,7 +7,7 @@ precision highp float;
 #define HALFPI (PI / 2.)
 #define TWOPI  (2. * PI)
 
-#define BOOST 1. / (0.2 * 2.)
+#define BOOST (1. / (0.2 * 2.))
 
 const float WCS_PROJECTION_TAN = 0.;
 const float WCS_PROJECTION_ARC = 1.;
@@ -104,23 +104,17 @@ float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    if (texture(mask, texcoord).r == 0.)
-        discard;
-
     vec2 imageCoord = texcoord * images[0].sampling.xy + images[0].sampling.zw;
     vec2 diffImageCoord = difftexcoord * images[1].sampling.xy + images[1].sampling.zw;
     vec2 brightness = display.brightness;
     if (display.enhanced != 0. && factor != 1.)
         brightness.y *= pow(factor, display.enhanced);
 
-    float value;
     bool diffMode = display.isDiff != NODIFFERENCE;
-    if (!diffMode) {
-        value = fetch(image, imageCoord, brightness);
-    } else {
-        value = fetch(image, imageCoord, brightness) - fetch(diffImage, diffImageCoord, brightness);
-        value = value * BOOST + 0.5;
-    }
+    float centerValue = fetch(image, imageCoord, brightness);
+    if (diffMode)
+        centerValue -= fetch(diffImage, diffImageCoord, brightness);
+    float value = diffMode ? centerValue * BOOST + 0.5 : centerValue;
 
     vec2 sharpenStep = display.sharpen.xy;
     float sharpenMix = display.sharpen.z;
@@ -129,13 +123,13 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
         if (!diffMode) {
             for (int i = 0; i < BLUR_TAP_COUNT; i++) {
                 vec2 offset = blurOffset[i] * sharpenStep;
-                blurredValue += fetch(image, imageCoord + offset, brightness) * blurKernel[i];
+                blurredValue += (i == BLUR_TAP_COUNT / 2 ? centerValue : fetch(image, imageCoord + offset, brightness)) * blurKernel[i];
             }
         } else {
             vec2 diffScale = images[1].sampling.xy / images[0].sampling.xy;
             for (int i = 0; i < BLUR_TAP_COUNT; i++) {
                 vec2 offset = blurOffset[i] * sharpenStep;
-                blurredValue += (fetch(image, imageCoord + offset, brightness) - fetch(diffImage, diffImageCoord + offset * diffScale, brightness)) * blurKernel[i];
+                blurredValue += (i == BLUR_TAP_COUNT / 2 ? centerValue : fetch(image, imageCoord + offset, brightness) - fetch(diffImage, diffImageCoord + offset * diffScale, brightness)) * blurKernel[i];
             }
             blurredValue = blurredValue * BOOST + 0.5;
         }
@@ -152,4 +146,11 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     value += dither(texcoord);
 
     return texture(lut, vec2(value, 0.5)) * display.color;
+}
+
+// Detector-mask rejection and color output are shared by every image mode.
+void renderImage(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
+    if (texture(mask, texcoord).r == 0.)
+        discard;
+    outColor = getColor(texcoord, difftexcoord, factor);
 }

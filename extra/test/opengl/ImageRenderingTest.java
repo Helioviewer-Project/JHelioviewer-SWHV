@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -651,6 +652,8 @@ public final class ImageRenderingTest {
             }
             FITSSource source = new FITSSource(path.toFile());
             FitsMetaData metadata = new FitsMetaData(new XMLMetaDataContainer(source.xml(0)), path.toUri());
+            if (metadata.getOuterRadius() != Float.POSITIVE_INFINITY)
+                throw new AssertionError("Unmasked FITS image must have an unlimited outer radius");
             ImageGeometry geometry = metadata.getGeometry();
             DecodedImage image = new DecodedImage(source.decode(0, 0, ImageFilter.NONE, null, null), geometry);
             try {
@@ -769,7 +772,143 @@ public final class ImageRenderingTest {
         wrapping(texture, difference, mask, centeredView, size);
         simpleTan(texture, difference, mask, centeredView, size);
         orthoComparison(texture, difference, mask, centeredView, size);
+        clipping(texture, difference, lut, mask, wcs, centeredView, size);
         System.out.println("PASS: reduced-grid alignment, fixed detector masks and slits, CAR/CEA wrapping, and nonlinear sharpening against a CPU reference");
+    }
+
+    private static void clipping(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture lut, GLTexture mask,
+                                 WcsSolution wcs, Position viewpoint, int size) {
+        short[] pixels = new short[64 * 64];
+        Arrays.fill(pixels, Float.floatToFloat16(.5f));
+        ImageBuffer image = ImageBuffer.fromShorts(64, 64, pixels, ImageFilter.NONE);
+        DecodedImage decoded = new DecodedImage(image, new ImageGeometry(64, 64, wcs,
+                new Mat2(16. / 64, 0, 0, -16. / 64), new Vec2(32, 32)));
+        try {
+            texture.upload(image);
+            difference.upload(image);
+            lut.upload2D(GLTexture.Format.RGBA8, 256, 1, GL.NEAREST, LUT.gray().rgba());
+            mask.upload2D(GLTexture.Format.R8, 1, 1, GL.NEAREST, BufferUtils.newByteBuffer(1).put(0, (byte) 255));
+            mask.bind();
+            difference.bind();
+            texture.bind();
+            for (MapMode mode : MapMode.values()) {
+                MapScale scale = switch (mode) {
+                    case Orthographic -> MapScale.ortho;
+                    case HPC -> MapScale.hpc(.6, .6);
+                    case Latitudinal -> MapScale.lati;
+                    case RadialWarp, RectWarp -> MapScale.boxCoxRadial(3, 0);
+                };
+                MapView view = MapView.create(Display.getCamera(), viewpoint, mode, GridType.Viewpoint, new MapScale[]{scale});
+                if (mode == MapMode.Orthographic)
+                    Transform.ortho(1, 4, 0, 0, Quat.ZERO);
+                else
+                    Transform.ortho2D(1, 1, 0, 0);
+                GLSLScreenShader.setView(view, Display.getViewport(0));
+                int x = switch (mode) {
+                    case Orthographic -> 224;
+                    case HPC -> 51;
+                    case Latitudinal -> 149;
+                    case RadialWarp -> 192;
+                    case RectWarp -> 192;
+                };
+                int y = mode == MapMode.RectWarp ? 170 : size / 2;
+                double radius = switch (mode) {
+                    case Orthographic -> 4 * ((x + .5) / size - .5);
+                    case HPC -> 215 * Math.abs(Math.tan(Math.toRadians(scale.toMapX((x + .5) / size))));
+                    case Latitudinal -> 1;
+                    case RadialWarp -> scale.toMapY(2 * Math.abs((x + .5) / size - .5));
+                    case RectWarp -> scale.toMapY((y + .5) / size);
+                };
+                // All chosen points have source X within [.375,.625]. HPC's
+                // map X is .20: applying the source slit to it would reject it.
+                for (int effect = 0; effect < 8; effect++) {
+                    GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 1f / 64, 1f / 64, 0, 0,
+                            0, 1, 1, 1, mode == MapMode.HPC ? (float) Math.PI : 0,
+                            effect == 3 ? (float) Math.PI / 4 : effect == 6 ? (float) Math.PI : 0,
+                            effect == 7 ? (mode == MapMode.HPC ? 0 : (float) Math.PI) : 0, effect == 7 ? (float) Math.PI / 4 : 0,
+                            1, 0, effect == 4 ? .1f : -1, 0,
+                            effect == 2 ? 2 : 0, effect == 1 ? .1f : 100, .375f, .625f, effect == 5 ? 1 : 0);
+                    GL.glClearColor(0, 0, 0, 1);
+                    GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                    GLSLImageShader.render(mode, decoded.geometry(), wcs, 215, 0, Quat.ZERO, Quat.ZERO,
+                            decoded.geometry(), wcs, 215, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                    ByteBuffer pixel = BufferUtils.newByteBuffer(4);
+                    GL.glReadPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+                    if (GLException.checkErrors("ImageRenderingTest clipping"))
+                        throw new AssertionError("Clipping render failed: " + mode);
+                    int value = pixel.get(0) & 255;
+                    int expected = effect == 0 || effect == 7 ? 128 : effect == 5 ? (int) Math.round(128 * Math.max(1, radius)) : 0;
+                    if (Math.abs(value - expected) > (expected == 0 ? 0 : 2))
+                        throw new AssertionError("Source slit / masks / enhancement mismatch: " + mode + " effect " + effect + ": " + value);
+                }
+            }
+            // A surface-map mask is in displayed observer coordinates, even
+            // when its sampling point is in heliographic coordinates.
+            for (WcsSolution.Projection projection : new WcsSolution.Projection[]{WcsSolution.Projection.CAR, WcsSolution.Projection.CEA}) {
+                WcsSolution surfaceWcs = new WcsSolution(projection, new float[]{0, 1, 0, 0, 0, 0}, 1);
+                ImageGeometry surface = new ImageGeometry(64, 64, surfaceWcs,
+                        new Mat2(2 * Math.PI / 64, 0, 0, -(projection == WcsSolution.Projection.CAR ? Math.PI : 2) / 64), new Vec2(32, 32));
+                for (double longitude : new double[]{0, Math.PI / 3}) {
+                    Position displayed = new Position(viewpoint.time, 215, longitude, 0);
+                    for (MapMode mode : new MapMode[]{MapMode.Orthographic, MapMode.Latitudinal}) {
+                        MapView view = MapView.create(Display.getCamera(), displayed, mode, GridType.Viewpoint,
+                                new MapScale[]{mode == MapMode.Orthographic ? MapScale.ortho : MapScale.lati});
+                        if (mode == MapMode.Orthographic) Transform.ortho(1, 4, 0, 0, displayed.toQuat());
+                        else Transform.ortho2D(1, 1, 0, 0);
+                        GLSLScreenShader.setView(view, Display.getViewport(0));
+                        for (int effect = 0; effect < 3; effect++) {
+                            GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, 0, 0, 1, 1, 1,
+                                    0, 0, 0, 0, 0, 0, -1, 0, effect == 1 ? .5f : 0, effect == 2 ? .5f : 100, 0, 1, 0);
+                            GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                            GLSLImageShader.render(mode, surface, surfaceWcs, 215, 0, Quat.ZERO, displayed.toQuat(),
+                                    surface, surfaceWcs, 215, 0, Quat.ZERO, displayed.toQuat(), Mat2.IDENTITY);
+                            assertPixel(size / 2, size / 2, effect == 1 ? 0 : 128, "Rotated surface mask: " + projection + " " + mode);
+                        }
+                    }
+                }
+            }
+            // Exercise both sides of the Sun-plane horizon, with the same
+            // outer radii used by Show corona, the user mask and unmasked metadata.
+            WcsSolution arc = new WcsSolution(WcsSolution.Projection.ARC, new float[6], 1);
+            ImageGeometry wide = new ImageGeometry(64, 64, arc, new Mat2(2 * Math.PI / 64, 0, 0, -Math.PI / 64), new Vec2(32, 32));
+            for (double longitude : new double[]{-178, -110, -90, -89.9, 89.9, 90, 110, 178}) {
+                MapScale scale = MapScale.hpc(180, .1);
+                MapView hpc = MapView.create(Display.getCamera(), viewpoint, MapMode.HPC, GridType.Viewpoint, new MapScale[]{scale});
+                Transform.ortho2D(1, 1, -longitude / 360, 0);
+                GLSLScreenShader.setView(hpc, Display.getViewport(0));
+                for (float outer : new float[]{1, 32, Float.POSITIVE_INFINITY}) {
+                    for (int enhanced : new int[]{0, 1, 3}) {
+                        for (int diffMode : new int[]{0, 1}) {
+                            for (int effect = 0; effect < 4; effect++) {
+                                // Rear-facing rays retain their XY sector direction, with no mirrored plane point.
+                                float sector = effect == 1 ? 0 : effect == 2 ? (float) Math.PI : 0;
+                                GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, diffMode, 0, 1, 1, 1,
+                                        sector, effect == 1 || effect == 2 ? .1f : 0, 0, 0,
+                                        1, 0, effect == 3 ? 32 : -1, 0, 0, outer, 0, 1, enhanced);
+                                GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                                GLSLImageShader.render(MapMode.HPC, wide, arc, 10, 0, Quat.ZERO, Quat.ZERO,
+                                        wide, arc, 10, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                                boolean masked = !Float.isInfinite(outer) || effect == 3
+                                        || effect == 1 && longitude > 0 || effect == 2 && longitude < 0;
+                                int expected = masked ? 0 : Math.abs(longitude) >= 90 || enhanced == 0 || diffMode != 0 ? 128 : 255;
+                                assertPixel(size / 2, size / 2, expected, "HPC horizon: " + longitude + " outer " + outer
+                                        + " enhancement " + enhanced + " difference " + diffMode + " mask " + effect);
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            decoded.release();
+        }
+        System.out.println("PASS: source slits independent of map bounds, inner/outer radius, sector and cutoff masks, and coronal enhancement in every image mode");
+    }
+
+    private static void assertPixel(int x, int y, int expected, String context) {
+        ByteBuffer pixel = BufferUtils.newByteBuffer(4);
+        GL.glReadPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+        if (GLException.checkErrors(context) || Math.abs((pixel.get(0) & 255) - expected) > (expected == 0 ? 0 : 2))
+            throw new AssertionError(context + ": " + (pixel.get(0) & 255) + " vs " + expected);
     }
 
     private static void warpPicking(JHVTime time) {
@@ -1058,7 +1197,7 @@ public final class ImageRenderingTest {
                                 double longitude = 2 * Math.PI * (mapX - .5);
                                 Vec2 p = surfacePixel(full, adjustment, longitude, latitude);
                                 Vec2 q = surfacePixel(other, adjustment, longitude, latitude);
-                                boolean present = mapX >= .375 && mapX <= .625 && p != null &&
+                                boolean present = p != null &&
                                         (int) (8 * p.y / 97) >= 3 && (int) (8 * p.y / 97) < 5 &&
                                         (effect == 0 || q != null);
                                 double expected = 0;

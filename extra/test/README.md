@@ -113,11 +113,16 @@ Java, the syntax validator and the Electron harness concatenate `imageCommon.fra
 `ImageRenderingTest` checks actual layer bindings, rendering and picking, HPC/warp scales,
 one-to-one zoom and Orthographic fit/reset against independent geometry. It covers observer and
 surface images, mixed comparisons, decoded grids, masks, slits and image processing.
+Regressions cover surface-map texture lookup with rotated display-frame masks, and wide-field HPC rays
+on both sides of 90°,
+including infinite/finite outer radii, sector direction, square cut-off, enhancement disabled
+at and beyond the Sun-plane horizon, and difference mode.
 `WcsLibraryTest` checks native geometry, domains, parameters and ownership. `WcsInterpreterTest`
 checks the [captured instrument fixtures](data/wcs-instruments/README.md) and metadata conventions.
 
 Full-fragment checks cover native frames, surface geometry, depth and simple-TAN Orthographic
-sampling. Direct Ortho/HPC comparisons include an independent formal-TAN control. Use
+sampling. Coordinate diagnostics reuse the production geometry helpers. The differential-rotation check validates rates against the published magnetic model at 0°, 30°, 60° and 90° latitude. Local cases also check finite-distance source horizons, differential rotation across the limb,
+and both image slots. Direct Ortho/HPC comparisons include an independent formal-TAN control. Use
 `--ortho-hpc-only` for that subset and `--output-dir` to retain coordinate buffers and
 `ortho-hpc-comparison.json`. Trigonometry probes check the selected hardware/SwiftShader helper
 and independent controls with a maximum error of `2e-7`; raw SwiftShader intrinsics are diagnostic.

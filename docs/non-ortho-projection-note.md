@@ -40,8 +40,8 @@ Image reprojection is split across:
 - `resources/glsl/imageRectWarp.frag`
 
 `imageCommon.frag` contains shared declarations and texture/color processing. `imageGeometry.frag` contains
-the shared observer geometry, WCS projections, image-coordinate conversion, masks, and the common HPC-derived
-sampling path used by `HPC`, `RadialWarp`, and `RectWarp`. Java and both test harnesses concatenate these
+the shared observer geometry, WCS projections, image-coordinate conversion, mask predicates, and HPC rendering
+used by `HPC`, `RadialWarp`, and `RectWarp`. Java and both test harnesses concatenate these
 two files in that order, followed by the mode fragment, without adding separators.
 
 ## Coordinate spaces
@@ -105,9 +105,7 @@ The shader projects homogeneous directions through that solution's basis; it doe
 rotations from CRVAL per fragment. Observer points and warp rays avoid angle roundtrips. HPC and Latitudinal
 inputs and RectWarp's angular direction use `sinCos()`. `GLSLShader` defines `JHV_SWIFTSHADER` when
 compiling fragment shaders for a renderer whose name contains `SwiftShader`; the helper then uses split
-quadrant reduction and polynomials. Other renderers use built-in sine/cosine. The choice is compiled into
-the program, with no additional uniform or per-fragment backend test. Dense exact-float probes cover
-both rendering backends and independently retain the polynomial and intrinsic controls.
+quadrant reduction and polynomials. Other renderers use built-in sine/cosine.
 
 `ScreenBlock` contains display-map state shared by both image slots:
 
@@ -239,7 +237,7 @@ the `0°/360°` seam.
 
 ## Planar masks
 
-`Orthographic`, `HPC`, `RadialWarp`, and `RectWarp` use the shared `clipPlanarMasks` predicate:
+All five modes use the shared `insidePlanarMasks` predicate:
 
 - `userSector` and `metadataSector` are independent `(center, half-width)` angular openings;
 - a point is discarded when it lies inside either opening;
@@ -247,10 +245,11 @@ the `0°/360°` seam.
 - inner and outer radius limits are applied in solar-radius plane coordinates;
 - the optional cut-off limits distance along two perpendicular planar axes.
 
-The point supplied to the common predicate is the image-aligned plane point in `Orthographic` and the HPC-plane point
-in the three HPC-derived modes. The two sector tuples must remain independent: metadata cropping and the user's mask
-are separate constraints. `Latitudinal` does not apply these planar masks; it discards the layer when the effective
-inner radius exceeds `1`.
+Observer-image masks use the source-observer XY point in `Orthographic` and `Latitudinal`, and the HPC-plane
+point in the three HPC-derived modes. Surface-map masks use displayed observer coordinates. HPC rays at
+or beyond 90° from Sun center still sample wide-field images. Their mask radius is infinite,
+so finite outer masks and the square cut-off reject them; sectors use the ray’s XY direction.
+The two sector tuples remain independent: metadata cropping and the user's mask are separate constraints.
 
 ## Supported source WCS
 

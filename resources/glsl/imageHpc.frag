@@ -1,33 +1,29 @@
-vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
-    return vec2(
-        radians(screen.mapBounds.x + mapPos.x * (screen.mapBounds.y - screen.mapBounds.x)),
-        radians(screen.mapBounds.z + mapPos.y * (screen.mapBounds.w - screen.mapBounds.z)));
-}
-
-vec2 observerRayToHpcXY(const vec3 ray, const float observerDistance) {
-    // Wide-angle images can extend beyond the Sun-plane horizon.
-    if (ray.z == 0.)
-        discard;
-    return -observerDistance * ray.xy / ray.z;
+bool hpcMaskAndEnhancement(const vec3 ray, const float observerDistance, out float offDiskFactor) {
+    if (ray.z >= 0.) {
+        // No forward plane: infinite mask radius and no radial enhancement.
+        offDiskFactor = 1.;
+        return isinf(display.radii.y) && display.cutOff.z < 0. && insideSectorMasks(ray.xy);
+    }
+    vec2 hpcXY = -observerDistance * ray.xy / ray.z;
+    if (!insidePlanarMasks(hpcXY))
+        return false;
+    offDiskFactor = display.enhanced == 0. ? 1. : max(1., length(hpcXY));
+    return true;
 }
 
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
-    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
-    vec3 ray = helioprojectiveToObserverRay(helioprojective);
-    bool diffMode = display.isDiff != NODIFFERENCE;
-    vec2 hpcXY = observerRayToHpcXY(ray, images[0].observerDistance);
-    float enhancementFactor;
-    clipPlanarMasks(hpcXY);
-    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, pv0, enhancementFactor);
-    if (!diffMode) {
-        outColor = getColor(texCoord, texCoord, enhancementFactor);
-        return;
+    if (!insideMap(mapPos))
+        discard;
+    vec2 angles = radians(mix(screen.mapBounds.xz, screen.mapBounds.yw, mapPos));
+    vec3 ray = helioprojectiveToObserverRay(angles);
+    float offDiskFactor;
+    if (!hpcMaskAndEnhancement(ray, images[0].observerDistance, offDiskFactor))
+        discard;
+    float diffOffDiskFactor = offDiskFactor;
+    if (display.isDiff != NODIFFERENCE) {
+        if (!hpcMaskAndEnhancement(ray, images[1].observerDistance, diffOffDiskFactor))
+            discard;
     }
-
-    vec2 diffHpcXY = observerRayToHpcXY(ray, images[1].observerDistance);
-    float diffEnhancementFactor;
-    clipPlanarMasks(diffHpcXY);
-    vec2 diffTexCoord = sampleHpcTexcoord(images[1], ray, diffHpcXY, pv1, diffEnhancementFactor);
-    outColor = getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
+    renderHpc(ray, offDiskFactor, ray, diffOffDiskFactor);
 }

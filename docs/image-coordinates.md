@@ -205,15 +205,21 @@ The mapping mode decides how a fragment reaches the source plane:
 - **Orthographic** starts on the visible solar sphere or the image plane. Observer rotation and
   differential rotation pick the source point. TAN deliberately uses simple-TAN: subtract the celestial
   CRVAL scaled by `unitsPerRad` from the point's X and Y directly. ARC, AZP and ZPN project the observer
-  direction through the formal WCS.
+  direction through the formal WCS. Their source horizon is `z >= 1/D`; simple-TAN keeps `z > 0`.
 - **HPC** starts from helioprojective longitude and latitude inside the displayed angular bounds.
+  Rays at or beyond 90° from Sun center still sample wide-field images along their direction.
+  An unlimited outer mask is represented by positive infinity. Masks treat these rays as having infinite
+  plane radius; sectors use the ray’s XY direction.
+  This domain decision supplies the off-disk enhancement factor explicitly: radial enhancement for
+  forward rays, where the Sun-plane radius is defined, and factor 1 for rear-facing rays.
 - **Latitudinal** starts from longitude and latitude on the sphere, rotated into the image observer's frame.
 - **RadialWarp and RectWarp** build a warped HPC plane point and derive the angles from it.
 
 CAR and CEA sources use the point's solar longitude and latitude directly, CEA with its equal-area
 latitude. In HPC and both warp modes, the point comes from the ray's intersection with the solar sphere,
 inverse-rotated by the displayed view rotation; off-limb rays have no map data and are discarded.
-The display mode and the source projection are independent choices.
+The display mode and the source projection are independent choices. When differential rotation carries
+an observer-image surface point behind its source horizon (`z < 1/D`), HPC, Latitudinal and the warps reject it.
 
 From the plane point every mode computes original normalized coordinates:
 
@@ -250,7 +256,9 @@ compilation from `GL.renderer`, adding `JHV_SWIFTSHADER` after the version direc
 uses its own renderer name. There is no runtime shader branch or additional uniform.
 
 Image shaders concatenate `imageCommon.frag` (declarations and color processing), `imageGeometry.frag`
-(shared geometry), and the mode fragment in that order.
+(shared geometry), and the mode fragment in that order. Coordinate helpers return validity;
+rendering code owns fragment rejection. Orthographic uses the same per-image calculation for both
+image slots and writes only the primary image's depth. HPC and the warps share `renderHpc`.
 
 The current and comparison images have independent mappings. Difference rendering sends the same scene
 point through each image's observer and WCS geometry, then subtracts the sampled values.
@@ -260,7 +268,9 @@ point through each image's observer and WCS geometry, then subtracts the sampled
 Detector masks, slits, edge clipping and dithering use `source`. They do not depend on the decoded size.
 
 Radius masks, sectors and the LASCO linear cutoff act earlier, on the mode's scene or HPC plane point in
-`clipPlanarMasks`. They never see decoded coordinates.
+`insidePlanarMasks`. Orthographic and Latitudinal observer-image masks follow the source-observer point.
+In both modes, CAR/CEA texture lookup uses heliographic coordinates while masks use displayed-observer
+coordinates. Planar masks never see decoded coordinates.
 
 CAR and CEA longitude equivalence is resolved in the native projection plane. The shader intersects the
 integer-turn intervals admitted by both original affine coordinates and the source slit. It prefers the
@@ -269,8 +279,7 @@ footprints several turns away without wrapping an image-width interval. The deco
 is applied only after that source position is selected.
 
 Sharpening blurs nine taps around the decoded coordinate, with offsets in current-image texels. In
-difference mode the comparison offsets are scaled by `comparison.sampling.xy / current.sampling.xy`, which
-keeps the same displacement in original coordinates when the two textures have different sizes. Brightness,
+difference mode the comparison offsets are scaled by `comparison.sampling.xy / current.sampling.xy`. Brightness,
 enhancement, difference contrast, sharpening, gamma, dithering and the LUT then give the fragment color.
 
 ## Cutouts

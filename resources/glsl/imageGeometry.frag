@@ -1,7 +1,10 @@
 
-void clipNormalizedCoord(const vec2 coord) {
-    if (coord.x < display.slit.x || coord.y < 0. || coord.x > display.slit.y || coord.y > 1.)
-        discard;
+bool insideImage(const vec2 coord) {
+    return coord.x >= display.slit.x && coord.x <= display.slit.y && coord.y >= 0. && coord.y <= 1.;
+}
+
+bool insideMap(const vec2 coord) {
+    return coord.x >= 0. && coord.x <= 1. && coord.y >= 0. && coord.y <= 1.;
 }
 
 // Convert normalized screen coordinates to the view-aligned plane in scene units.
@@ -15,12 +18,10 @@ float getDepth(const float viewZ) {
 }
 
 // Map the centered view plane to the [0, 1] map domain: remove the viewport's
-// horizontal aspect scaling, move the origin to the lower-left, and discard outside it.
+// horizontal aspect scaling and move the origin to the lower-left.
 vec2 getNormalizedMapPos(void) {
     vec2 pos = getViewPosition();
-    pos = vec2(screen.iaspect * pos.x, pos.y) + .5;
-    clipNormalizedCoord(pos);
-    return pos;
+    return vec2(screen.iaspect * pos.x, pos.y) + .5;
 }
 
 // Convert a normalized warp radius back to radial distance in solar radii.
@@ -50,7 +51,7 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
 float differentialRotation(const float dt, const float sinLatitude) {
     float sinLat2 = sinLatitude * sinLatitude;
     // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
-    return dt * (0.01367 - 0.339 * sinLat2 - 0.485 * sinLat2 * sinLat2); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
+    return dt * (0.01367034236 - 0.339 * sinLat2 - 0.485 * sinLat2 * sinLat2); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
 }
 
 vec3 differential(const float dt, const vec3 v) {
@@ -109,22 +110,24 @@ float zpnRadial(const float eta, const float[6] PV) {
     return (((((PV[5] * eta + PV[4]) * eta + PV[3]) * eta + PV[2]) * eta + PV[1]) * eta + PV[0]);
 }
 
-vec2 nativeToWcsPlane(const vec3 q, const Image img, const float[6] PV) {
+bool nativeToWcsPlane(const vec3 q, const Image img, const float[6] PV, out vec2 plane) {
     float scale = img.planeUnitsPerRadian;
     if (img.projectionCode == WCS_PROJECTION_TAN) {
         if (q.z <= 0.)
-            discard;
-        return scale * q.xy / q.z;
+            return false;
+        plane = scale * q.xy / q.z;
+        return true;
     }
     if (img.projectionCode == WCS_PROJECTION_AZP) {
         float lengthQ = length(q);
         float mu = PV[1];
         float denominator = mu * lengthQ + q.z - q.y * img.nativeX.w;
         if (denominator * (mu + 1.) <= 0.)
-            discard;
+            return false;
         if (abs(mu) > 1. && q.z < -lengthQ / mu)
-            discard;
-        return scale * (mu + 1.) * vec2(q.x, q.y * img.nativeY.w) / denominator;
+            return false;
+        plane = scale * (mu + 1.) * vec2(q.x, q.y * img.nativeY.w) / denominator;
+        return true;
     }
     float radius = length(q.xy);
     vec2 direction = radius == 0. ? (q.z >= 0. ? img.nativePoles.xy : img.nativePoles.zw) : q.xy / radius;
@@ -135,36 +138,24 @@ vec2 nativeToWcsPlane(const vec3 q, const Image img, const float[6] PV) {
             longitude = -PI;
         float latitude = img.projectionCode == WCS_PROJECTION_CAR
                 ? atan(q.z, radius) : q.z / (length(q) * PV[1]);
-        return scale * vec2(longitude, latitude);
+        plane = scale * vec2(longitude, latitude);
+        return true;
     }
     float eta = atan(radius, q.z);
     float radial = eta;
     if (img.projectionCode == WCS_PROJECTION_ZPN) {
         if (eta > img.nativeZ.w)
-            discard;
+            return false;
         radial = zpnRadial(eta, PV);
     }
     // Nonzero ZPN P0 is a radius, including at the north pole.
-    return scale * radial * direction;
-}
-
-vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const Image img) {
-    vec3 p = vec3(plane, 1.);
-    return vec2(dot(img.sourceX.xyz, p), dot(img.sourceY.xyz, p));
+    plane = scale * radial * direction;
+    return true;
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const Image img) {
-    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, img);
-    clipNormalizedCoord(texcoord);
-    return texcoord;
-}
-
-vec2 observerDirectionToTexcoord(const vec3 direction, const Image img, const float[6] PV) {
-    return wcsPlaneToTexcoord(nativeToWcsPlane(nativeCoordinates(direction, img), img, PV), img);
-}
-
-vec2 observerToTexcoord(const vec3 world, const Image img, const float[6] PV) {
-    return observerDirectionToTexcoord(vec3(world.xy, img.observerDistance - world.z), img, PV);
+    vec3 p = vec3(plane, 1.);
+    return vec2(dot(img.sourceX.xyz, p), dot(img.sourceY.xyz, p));
 }
 
 vec2 longitudeTurnRange(const float coordinate, const float displacement, const vec2 bounds) {
@@ -172,15 +163,13 @@ vec2 longitudeTurnRange(const float coordinate, const float displacement, const 
     return vec2(ceil(min(turns.x, turns.y)), floor(max(turns.x, turns.y)));
 }
 
-vec2 wcsPlaneToSurfaceTexcoord(const vec2 plane, const Image img) {
-    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, img);
-    // A longitude turn follows the effective affine transform, including user
-    // rotation. It need not equal one image width or follow texture X.
+bool wrapSurfaceTexcoord(const Image img, inout vec2 texcoord) {
+    // A longitude turn follows the image affine transform, including user rotation.
     vec2 displacement = TWOPI * img.planeUnitsPerRadian * vec2(img.sourceX.x, img.sourceY.x);
     vec2 turns;
     if (displacement.x == 0.) {
         if (texcoord.x < display.slit.x || texcoord.x > display.slit.y)
-            discard;
+            return false;
         turns = longitudeTurnRange(texcoord.y, displacement.y, vec2(0., 1.));
     } else {
         turns = longitudeTurnRange(texcoord.x, displacement.x, display.slit);
@@ -188,15 +177,13 @@ vec2 wcsPlaneToSurfaceTexcoord(const vec2 plane, const Image img) {
             vec2 vertical = longitudeTurnRange(texcoord.y, displacement.y, vec2(0., 1.));
             turns = vec2(max(turns.x, vertical.x), min(turns.y, vertical.y));
         } else if (texcoord.y < 0. || texcoord.y > 1.) {
-            discard;
+            return false;
         }
     }
     if (turns.x > turns.y)
-        discard;
-    // Keep the principal longitude when available, otherwise the nearest turn.
+        return false;
     texcoord += clamp(0., turns.x, turns.y) * displacement;
-    clipNormalizedCoord(texcoord);
-    return texcoord;
+    return true;
 }
 
 bool isSurfaceMap(const Image img) {
@@ -204,9 +191,14 @@ bool isSurfaceMap(const Image img) {
         || img.projectionCode == WCS_PROJECTION_CEA;
 }
 
-vec2 sampleSurfaceMapTexcoord(const vec3 world, const Image img, const float[6] PV) {
-    vec2 plane = nativeToWcsPlane(nativeCoordinates(world, img), img, PV);
-    return wcsPlaneToSurfaceTexcoord(plane, img);
+bool imageTexcoord(const vec3 direction, const Image img, const float[6] PV, out vec2 texcoord) {
+    vec2 plane;
+    if (!nativeToWcsPlane(nativeCoordinates(direction, img), img, PV, plane))
+        return false;
+    texcoord = wcsPlaneToTexcoord(plane, img);
+    if (isSurfaceMap(img) && !wrapSurfaceTexcoord(img, texcoord))
+        return false;
+    return insideImage(texcoord);
 }
 
 bool observerRayToWorld(const vec3 ray, const float observerDistance, out vec3 world) {
@@ -215,93 +207,96 @@ bool observerRayToWorld(const vec3 ray, const float observerDistance, out vec3 w
     // Avoid subtracting terms of order distance^2; trig approximations need not give a unit ray.
     vec2 impact = observerDistance * ray.xy;
     float discriminant = a - dot(impact, impact);
-    if (discriminant < 0.) {
-        world = vec3(0.);
+    if (discriminant < 0.)
         return false;
-    }
 
     float root = sqrt(discriminant);
     float signedRoot = -b - root > 0. ? -root : root;
     float t = (-b + signedRoot) / a;
-    if (t <= 0.) {
-        world = vec3(0.);
+    if (t <= 0.)
         return false;
-    }
 
     // Expand Z to avoid cancelling the observer distance against t * ray.z.
     world = vec3(t * ray.xy, (dot(impact, ray.xy) + signedRoot * ray.z) / a);
     return true;
 }
 
-void clipSectorOpening(const float theta, const vec2 sector) {
+bool insideSector(const float theta, const vec2 sector) {
     if (sector.y <= 0.)
-        return;
-
+        return false;
     float delta = abs(theta - sector.x);
-    float angularDistance = min(delta, TWOPI - delta);
-    if (angularDistance < sector.y)
-        discard;
+    return sector.y >= PI || min(delta, TWOPI - delta) < sector.y;
 }
 
-void clipSectors(const vec2 point) {
-    if (display.metadataSector.y <= 0. && display.userSector.y <= 0.)
-        return;
-
-    float theta = atan(point.y, point.x);
-    clipSectorOpening(theta, display.metadataSector);
-    clipSectorOpening(theta, display.userSector);
+bool insideSectorMasks(const vec2 point) {
+    if (display.metadataSector.y > 0. || display.userSector.y > 0.) {
+        if (dot(point, point) == 0.)
+            return false;
+        float theta = atan(point.y, point.x);
+        if (insideSector(theta, display.metadataSector) || insideSector(theta, display.userSector))
+            return false;
+    }
+    return true;
 }
 
-void clipPlanarMasks(const vec2 point) {
-    clipSectors(point);
-
+bool insidePlanarMasks(const vec2 point) {
     float radial2 = dot(point, point);
-    float minRadius2 = display.radii.x * display.radii.x;
-    float maxRadius2 = display.radii.y * display.radii.y;
-    if (radial2 > maxRadius2 || radial2 < minRadius2)
-        discard;
-
+    if (radial2 > display.radii.y * display.radii.y || radial2 < display.radii.x * display.radii.x)
+        return false;
+    if (!insideSectorMasks(point))
+        return false;
     if (display.cutOff.z >= 0.) {
-        float flatDist = abs(dot(point, display.cutOff.xy));
-        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float flatDistAlt = abs(dot(point, cutOffAlt));
-        if (flatDist > display.cutOff.z || flatDistAlt > display.cutOff.z)
-            discard;
+        vec2 perpendicular = vec2(-display.cutOff.y, display.cutOff.x);
+        if (abs(dot(point, display.cutOff.xy)) > display.cutOff.z || abs(dot(point, perpendicular)) > display.cutOff.z)
+            return false;
     }
+    return true;
 }
 
-vec2 sampleHpcTexcoord(const Image img, const vec3 ray, const vec2 hpcXY, const float[6] PV, out float enhancementFactor) {
+bool hpcTexcoord(const Image img, const vec3 ray, const float offDiskFactor, const float[6] PV,
+                 out vec2 texcoord, out float enhancementFactor) {
     enhancementFactor = 1.;
-    float observerDistance = img.observerDistance;
-
-    vec3 world;
-    bool onDisk = observerRayToWorld(ray, observerDistance, world);
-    if (isSurfaceMap(img)) {
-        if (!onDisk)
-            discard;
-        return sampleSurfaceMapTexcoord(rotate_vector_inverse(img.sourceViewQuat, world), img, PV);
+    // Observer rays face -Z; WCS directions face +Z.
+    vec3 direction = vec3(ray.xy, -ray.z);
+    bool surface = isSurfaceMap(img);
+    if (surface || img.deltaT != 0. || display.enhanced != 0.) {
+        vec3 world;
+        bool onDisk = observerRayToWorld(ray, img.observerDistance, world);
+        if (surface) {
+            if (!onDisk)
+                return false;
+            direction = rotate_vector_inverse(img.sourceViewQuat, world);
+        } else if (onDisk && img.deltaT != 0.) {
+            vec3 rotated = differentialInSourceFrame(img, world);
+            if (rotated.z < 1. / img.observerDistance)
+                return false;
+            direction = vec3(rotated.xy, img.observerDistance - rotated.z);
+        } else if (!onDisk) {
+            enhancementFactor = offDiskFactor;
+        }
     }
-    if (onDisk && img.deltaT != 0.) {
-        vec3 rotatedWorld = differentialInSourceFrame(img, world);
-        return observerToTexcoord(rotatedWorld, img, PV);
-    }
-    if (!onDisk)
-        enhancementFactor = max(1., length(hpcXY));
-
-    // Observer rays use -Z at helioprojective (0,0); WCS directions use +Z with the same X/Y.
-    return observerDirectionToTexcoord(vec3(ray.xy, -ray.z), img, PV);
+    return imageTexcoord(direction, img, PV, texcoord);
 }
 
-vec4 sampleWarpedHpcColor(const vec2 hpcXY) {
-    vec3 ray = vec3(hpcXY, -images[0].observerDistance);
-    clipPlanarMasks(hpcXY);
+// Rendering owns fragment rejection; coordinate helpers only report validity.
+void renderHpc(const vec3 ray, const float offDiskFactor, const vec3 diffRay, const float diffOffDiskFactor) {
+    vec2 texCoord;
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, pv0, enhancementFactor);
-    if (display.isDiff == NODIFFERENCE)
-        return getColor(texCoord, texCoord, enhancementFactor);
+    if (!hpcTexcoord(images[0], ray, offDiskFactor, pv0, texCoord, enhancementFactor))
+        discard;
+    vec2 diffTexCoord = texCoord;
+    if (display.isDiff != NODIFFERENCE) {
+        float diffEnhancementFactor;
+        if (!hpcTexcoord(images[1], diffRay, diffOffDiskFactor, pv1, diffTexCoord, diffEnhancementFactor))
+            discard;
+        enhancementFactor = max(enhancementFactor, diffEnhancementFactor);
+    }
+    renderImage(texCoord, diffTexCoord, enhancementFactor);
+}
 
-    vec3 diffRay = vec3(hpcXY, -images[1].observerDistance);
-    float diffEnhancementFactor;
-    vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffRay, hpcXY, pv1, diffEnhancementFactor);
-    return getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
+void renderWarpedHpc(const vec2 hpcXY) {
+    if (!insidePlanarMasks(hpcXY))
+        discard;
+    float offDiskFactor = display.enhanced == 0. ? 1. : max(1., length(hpcXY));
+    renderHpc(vec3(hpcXY, -images[0].observerDistance), offDiskFactor, vec3(hpcXY, -images[1].observerDistance), offDiskFactor);
 }

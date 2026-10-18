@@ -66,15 +66,6 @@ Replaced copies become eligible for cleanup when no longer referenced.
 Image shader draws use prepared values. HPC and warped-view scale preparation
 also calls the batched native conversion through `ImageBounds` on each redraw.
 
-A warmed local probe on 2026-10-17 measured about 27 microseconds per new
-`WcsSolution`, 7.4 microseconds per changed CRVAL adjustment and 0.7 microseconds
-per eight-point `ImageBounds.hpc()` calculation, including Java allocations and
-FFM. These are median operation timings on an Apple M3 Pro using the normalized
-TAN header from `extra/test/data/sample.171.fits`. Construction starts from an
-in-memory header; FITS/XML reading, metadata normalization and native-library/JIT
-startup are outside these measurements. They do not measure the incremental
-movie-loading cost over the previous implementation.
-
 Native construction is separate from platform execution: cross-compilation and
 the ABI's compile-time assertions do not replace running the Java checks on each
 target platform. WebAssembly is not included in this desktop build. The generated

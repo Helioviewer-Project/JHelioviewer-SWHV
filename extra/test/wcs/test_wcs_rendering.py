@@ -55,7 +55,7 @@ def image_header(projection, distance=10.0):
     return header
 
 
-def orthographic_geometry(x, y, rotation, surface=False):
+def orthographic_geometry(x, y, rotation, surface=False, horizon=0):
     """Intersect parallel display rays, then express the hit in image coordinates."""
     x, y = np.broadcast_arrays(x, y)
     on_disk = x * x + y * y <= 1
@@ -63,7 +63,7 @@ def orthographic_geometry(x, y, rotation, surface=False):
     world = points @ rotation
     valid = on_disk.copy()
     if not surface:
-        plane = ~on_disk | (world[..., 2] <= 0)
+        plane = ~on_disk | ((world[..., 2] <= 0) if horizon == 0 else (world[..., 2] < horizon))
         normal = rotation[:, 2]
         if abs(normal[2]) < 1e-8:
             valid &= ~plane
@@ -289,7 +289,7 @@ def local_geometry_cases(root, backend):
                     source_lat = math.atan2(solar[1], math.hypot(solar[0], solar[2]))
                     source_lon = math.atan2(solar[0], solar[2])
                     sin_lat2 = math.sin(source_lat) ** 2
-                    advance = dt * (0.01367 - 0.339 * sin_lat2 - 0.485 * sin_lat2 ** 2)
+                    advance = dt * (2.879 - math.radians(14.1844) / 86400 * 1e6 - 0.339 * sin_lat2 - 0.485 * sin_lat2 ** 2)
                     moved = [math.cos(source_lat) * math.sin(source_lon - advance),
                              math.sin(source_lat), math.cos(source_lat) * math.cos(source_lon - advance)]
                     points.append(rotation @ moved)
@@ -329,6 +329,51 @@ def local_geometry_cases(root, backend):
             points[slot] = point if distance*z >= 1 else None
             add(f"local_visibility_{distance}_{z}_{slot}", "lati_zenithal", (0, 0, 0, 0),
                 points, orientations, distance=distance)
+    # Perspective projections use the source observer's tangent plane, while
+    # Orthographic TAN deliberately keeps its parallel-ray display policy.
+    for projection in ("TAN", "ARC", "AZP", "ZPN"):
+        for z in (.05, .2):
+            quat = [0, math.sqrt((1 - z) / 2), 0, math.sqrt((1 + z) / 2)]
+            point = [math.sqrt(1 - z*z), 0, z]
+            expected = point if projection == "TAN" or z >= .1 else None
+            for slot in (0, 1):
+                points = [[0, 0, 1], [0, 0, 1]]
+                orientations = [[0, 0, 0, 1], [0, 0, 0, 1]]
+                points[slot], orientations[slot] = expected, quat
+                add(f"local_ortho_horizon_{projection}_{z}_{slot}", "ortho", (0, 0, 0, 0),
+                    points, orientations, projection=projection)
+
+    # A week of the actual differential correction carries this initially visible
+    # equatorial point across the source horizon. Both image slots must reject it.
+    theta = -math.acos(.1) + .003
+    start = np.array([math.sin(theta), 0, math.cos(theta)])
+    phi = math.atan2(start[0], 10 - start[2])
+    plane = 10 * start[:2] / (10 - start[2])
+    for mode in gpu.ALL_MODES:
+        inverse = np.eye(4)
+        if mode == "ortho":
+            inverse[:2, :2] = 0
+            inverse[:2, 3] = start[:2]
+            bounds = (0, 1, 0, 1)
+        elif mode == "lati_zenithal":
+            bounds = (math.degrees(theta), math.degrees(theta), 0, 0)
+        elif mode == "hpc":
+            bounds = (math.degrees(phi), math.degrees(phi), 0, 0)
+        else:
+            inverse[:2, :2] = 0
+            bounds = (0, 360, 0, 2)
+            if mode == "radial_warp":
+                inverse[:2, 3] = plane / 4
+            else:
+                inverse[:2, 3] = [.25 - .5, np.linalg.norm(plane) / 2 - .5]
+        for slot in (0, 1):
+            points = [start, start]
+            points[slot] = None
+            times = [0, 0]
+            times[slot] = 7 * 86400e-6
+            add(f"local_differential_horizon_{mode}_{slot}", mode, bounds,
+                points, [[0, 0, 0, 1]] * 2, times, inverse, projection="ARC")
+
     for projection in ("CAR", "CEA"):
         add(f"local_full_surface_{projection}", "lati_zenithal", (0, 0, 0, 0),
             [[0, 0, 1]] * 2, [[0, 1, 0, 0]] * 2, projection=projection)
@@ -336,9 +381,9 @@ def local_geometry_cases(root, backend):
     for angle in (0, 178, 180):
         add(f"local_directed_ray_{angle}", "hpc", (angle, angle, 0, 0),
             [[0, 0, 1]] * 2 if angle == 0 else [None, None], [[0, 0, 0, 1]] * 2, projection="CAR")
-    # HPC is an angular display: wide-angle images remain valid beyond the Sun-plane horizon.
-    # An arbitrary point on each outgoing ray supplies independent WCSLIB image coordinates.
-    for degrees in (110, 178):
+    # Wide-field observer images retain rear-facing rays. A point on each ray
+    # supplies independent WCSLIB coordinates, without requiring a Sun-plane hit.
+    for degrees in (45, 89, 90, 110, 178):
         angle = math.radians(degrees)
         point = [math.sin(angle), 0, 10 - math.cos(angle)]
         add(f"local_image_{degrees}", "hpc", (degrees, degrees, 0, 0),
@@ -377,10 +422,6 @@ def surface_coverage_cases(root, backend, size):
             secondary["CRPIX2"] -= 9
             uv, valid = reference_pixels(header, world, slit=slit, adjustment=adjustment)
             other_uv, other_valid = reference_pixels(secondary, world, slit=slit, adjustment=adjustment)
-            # The existing map entry point also applies this slit to map X.
-            domain = ((xx + .5) / size >= slit[0]) & ((xx + .5) / size <= slit[1])
-            valid &= domain
-            other_valid &= domain
             name = f"coverage_{projection}_{name}"
             meta = cpu.build_jhv_meta(header)
             job = gpu.common_job("lati_zenithal", Path(name), size, root, meta, (-180, 180, -80, 80), True, backend, name)
@@ -673,7 +714,7 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
             if mode == "ortho":
                 x, y = nx * scale + 0.12, ny * scale - 0.08
                 world, geometry_valid, on_disk = orthographic_geometry(
-                    x, y, rotation, surface
+                    x, y, rotation, surface, 0 if projection == "TAN" else 1 / distance
                 )
             elif mode == "lati_zenithal":
                 longitude = np.radians(
@@ -821,10 +862,10 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
                 # A tilted source plane replaces some sphere hits. Its depth must
                 # use the view-space plane hit, independently of the comparison's pose.
                 sphere_z = np.sqrt(np.maximum(0, 1 - x*x - y*y))
-                fallback = ~on_disk | (math.sin(angle)*x + math.cos(angle)*sphere_z <= 0)
+                fallback = ~on_disk | (math.sin(angle)*x + math.cos(angle)*sphere_z < 1 / distance)
                 initial_depth = np.where(on_disk, .5 - sphere_z / 20, 1)
                 plane_depth = .5 + math.tan(angle)*x / 20
-                other_world, other_geometry_valid, _ = orthographic_geometry(x, y, np.eye(3))
+                other_world, other_geometry_valid, _ = orthographic_geometry(x, y, np.eye(3), horizon=1 / distance)
                 _, other_valid = reference_pixels(secondary_header, other_world, mode=mode)
                 for calculate_depth in (False, True):
                     image_depth = np.where(fallback, plane_depth, initial_depth) if calculate_depth else initial_depth

@@ -213,7 +213,7 @@ function screenBlock(job) {
 
 function displayBlock(job) {
   const block = new Float32Array(28);
-  const radii = job.radii || [0, 1e30];
+  const radii = job.radii || [0, Infinity];
   block.set(job.color || [1, 1, 1, 1], 0);
   block[7] = job.diffSelfcheck || job.colorDiffSmoke || job.difference ? 1 : 0;
   block.set(job.brightness || [0, 1], 8);
@@ -249,222 +249,89 @@ void diagnosticOutput(const vec2 texCoord, const float aux) {
 `;
 }
 
-function hpcDiagnostic(commonSource, hpcSource) {
+function hpcDiagnostic(commonSource, hpcSource, difference = false) {
   return `${commonSource}
 ${stripMain(hpcSource)}
-
 ${commonDiagnosticUniforms()}
-
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
-    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
-    vec3 ray = helioprojectiveToObserverRay(helioprojective);
-    vec2 hpcXY = observerRayToHpcXY(ray, images[0].observerDistance);
-    clipPlanarMasks(hpcXY);
-
+    if (!insideMap(mapPos)) discard;
+    vec3 ray = helioprojectiveToObserverRay(radians(mix(screen.mapBounds.xz, screen.mapBounds.yw, mapPos)));
+    float offDiskFactor;
+    if (!hpcMaskAndEnhancement(ray, images[0].observerDistance, offDiskFactor)) discard;
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(
-        images[0],
-        ray,
-        hpcXY,
-        uPv,
-        enhancementFactor);
-    diagnosticOutput(texCoord, enhancementFactor);
-}
-`;
-}
-
-function hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) {
-  return `${commonSource}
-${stripMain(hpcSource)}
-
-void main(void) {
-    vec2 mapPos = getNormalizedMapPos();
-    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
-    vec3 ray = helioprojectiveToObserverRay(helioprojective);
-
-    float observerDistance = images[0].observerDistance;
-    vec2 hpcXY = observerRayToHpcXY(ray, observerDistance);
-    clipPlanarMasks(hpcXY);
-
-    float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(
-        images[0],
-        ray,
-        hpcXY,
-        pv0,
-        enhancementFactor);
-
-    float diffObserverDistance = images[1].observerDistance;
-    vec2 diffHpcXY = observerRayToHpcXY(ray, diffObserverDistance);
-    clipPlanarMasks(diffHpcXY);
-
+    vec2 texCoord;
+    if (!hpcTexcoord(images[0], ray, offDiskFactor, ${difference ? "pv0" : "uPv"}, texCoord, enhancementFactor)) discard;
+    ${difference ? `
+    float diffOffDiskFactor;
+    if (!hpcMaskAndEnhancement(ray, images[1].observerDistance, diffOffDiskFactor)) discard;
     float diffEnhancementFactor;
-    vec2 diffTexCoord = sampleHpcTexcoord(
-        images[1],
-        ray,
-        diffHpcXY,
-        pv1,
-        diffEnhancementFactor);
-
-    outColor = vec4(texCoord, diffTexCoord);
+    vec2 diffTexCoord;
+    if (!hpcTexcoord(images[1], ray, diffOffDiskFactor, pv1, diffTexCoord, diffEnhancementFactor)) discard;
+    outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, enhancementFactor);"}
 }
 `;
 }
 
-function orthoDiagnostic(commonSource, orthoSource) {
+function orthoDiagnostic(commonSource, orthoSource, difference = false) {
   return `${commonSource}
 ${stripMain(orthoSource)}
-
 ${commonDiagnosticUniforms()}
-
 void main(void) {
     vec2 viewPosition = getViewPosition();
-    float radius2 = dot(viewPosition, viewPosition);
-    if (radius2 > 1.)
-        discard;
-
-    vec3 hitPoint = vec3(viewPosition, sqrt(1. - radius2));
-    vec3 world = rotateOnDiskPoint(images[0], hitPoint);
-    clipPlanarMasks(world.xy);
-    vec2 texCoord = sampleOrthoTexcoord(world, images[0], uPv);
-    diagnosticOutput(texCoord, world.z);
-}
-`;
-}
-
-function orthoDiffSelfcheckDiagnostic(commonSource, orthoSource) {
-  return `${commonSource}
-${stripMain(orthoSource)}
-
-void main(void) {
-    vec2 viewPosition = getViewPosition();
-    bool surfaceMapMode = isSurfaceMap(images[0]);
-    bool diffSurfaceMapMode = isSurfaceMap(images[1]);
-
     float radius2 = dot(viewPosition, viewPosition);
     bool onDisk = radius2 <= 1.;
-    if (surfaceMapMode && !onDisk)
-        discard;
-    if (diffSurfaceMapMode && !onDisk)
-        discard;
-
-    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
-
-    if (onDisk) {
-        hitPoint = vec3(viewPosition, sqrt(1. - radius2));
-        if (surfaceMapMode)
-            rotatedHitPoint = rotate_vector_inverse(images[0].sourceViewQuat, hitPoint);
-        else
-            rotatedHitPoint = rotateOnDiskPoint(images[0], hitPoint);
-    }
-
-    if (!surfaceMapMode && rotatedHitPoint.z <= 0.) {
-        rotatedHitPoint = intersectImagePlane(images[0].cameraDiff, viewPosition, onDisk, hitPoint);
-    }
-
-    clipPlanarMasks(rotatedHitPoint.xy);
-    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, images[0], pv0);
-
-    vec3 diffHitPoint = vec3(0.);
-    vec3 diffRotatedHitPoint = vec3(0.);
-
-    if (onDisk) {
-        diffHitPoint = vec3(viewPosition, sqrt(1. - radius2));
-        if (diffSurfaceMapMode)
-            diffRotatedHitPoint = rotate_vector_inverse(images[1].sourceViewQuat, diffHitPoint);
-        else
-            diffRotatedHitPoint = rotateOnDiskPoint(images[1], diffHitPoint);
-    }
-
-    if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
-        diffRotatedHitPoint = intersectImagePlane(images[1].cameraDiff, viewPosition, onDisk, diffHitPoint);
-    }
-
-    clipPlanarMasks(diffRotatedHitPoint.xy);
-    vec2 diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, images[1], pv1);
-
-    outColor = vec4(texCoord, diffTexCoord);
+    ${difference ? "" : "if (!onDisk) discard;"}
+    vec3 spherePoint = onDisk ? vec3(viewPosition, sqrt(1. - radius2)) : vec3(0.);
+    float depth;
+    vec2 texCoord;
+    if (!orthoSample(images[0], viewPosition, spherePoint, onDisk, ${difference ? "pv0" : "uPv"}, texCoord, depth)) discard;
+    ${difference ? `
+    vec2 diffTexCoord;
+    if (!orthoSample(images[1], viewPosition, spherePoint, onDisk, pv1, diffTexCoord, depth)) discard;
+    outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, depth);"}
 }
 `;
 }
 
-function latiDiagnostic(commonSource, latiSource) {
+function latiDiagnostic(commonSource, latiSource, mode = "normal", difference = false) {
+  const comparison = mode === "assign" ? "" : `
+    if (!latiSample(world, images[${mode === "same-slot" ? 0 : 1}], ${mode === "same-slot" ? "pv0" : "pv1"}, diffTexCoord)) discard;`;
   return `${commonSource}
 ${stripMain(latiSource)}
-
 ${commonDiagnosticUniforms()}
-
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
-    vec3 world = latitudinalWorld(mapPos);
-    vec2 texCoord = sampleLatiTexcoord(world, images[0], pv0);
-    diagnosticOutput(texCoord, 1.);
+    if (!insideMap(mapPos)) discard;
+    vec3 world;
+    if (!latitudinalWorld(mapPos, world)) discard;
+    vec2 texCoord;
+    if (!latiSample(world, images[0], pv0, texCoord)) discard;
+    ${difference ? `vec2 diffTexCoord = texCoord; ${comparison} outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, 1.);"}
 }
 `;
 }
 
-function latiTexcoordExpression(index, pv) {
-  return `sampleLatiTexcoord(world, images[${index}], ${pv})`;
-}
-
-function latiDiffSelfcheckDiagnostic(commonSource, latiSource, mode) {
-  const texcoordExpression = latiTexcoordExpression(0, "pv0");
-  const diffExpression = mode === "assign"
-      ? "texCoord"
-      : mode === "same-slot"
-      ? texcoordExpression
-      : latiTexcoordExpression(1, "pv1");
-
-  return `${commonSource}
-${stripMain(latiSource)}
-
-void main(void) {
-    if (display.radii.x > 1.)
-        discard;
-
-    vec2 mapPos = getNormalizedMapPos();
-    vec3 world = latitudinalWorld(mapPos);
-    vec2 texCoord = ${texcoordExpression};
-    vec2 diffTexCoord = ${diffExpression};
-    outColor = vec4(texCoord, diffTexCoord);
-}
-`;
-}
-
-function warpDiagnostic(commonSource, warpSource) {
-  return `${commonSource}
-${stripMain(warpSource)}
-
-${commonDiagnosticUniforms()}
-
-void main(void) {
-    vec2 hpcXY = warpHpcXY();
+function warpDiagnostic(commonSource, warpSource, difference = false) {
+  const render = "renderWarpedHpc(hpcXY);";
+  if (warpSource.split(render).length !== 2)
+    throw new Error("Warp diagnostic requires exactly one render call");
+  const diagnostic = `
+    if (!insidePlanarMasks(hpcXY)) discard;
+    float offDiskFactor = display.enhanced == 0. ? 1. : max(1., length(hpcXY));
     vec3 ray = vec3(hpcXY, -images[0].observerDistance);
-    clipPlanarMasks(hpcXY);
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, uPv, enhancementFactor);
-    diagnosticOutput(texCoord, length(hpcXY));
-}
-`;
-}
-
-function warpDiffSelfcheckDiagnostic(commonSource, warpSource) {
-  return `${commonSource}
-${stripMain(warpSource)}
-
-void main(void) {
-    vec2 hpcXY = warpHpcXY();
-    vec3 ray = vec3(hpcXY, -images[0].observerDistance);
-    clipPlanarMasks(hpcXY);
-    float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(images[0], ray, hpcXY, pv0, enhancementFactor);
+    vec2 texCoord;
+    if (!hpcTexcoord(images[0], ray, offDiskFactor, ${difference ? "pv0" : "uPv"}, texCoord, enhancementFactor)) discard;
+    ${difference ? `
     vec3 diffRay = vec3(hpcXY, -images[1].observerDistance);
     float diffEnhancementFactor;
-    vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffRay, hpcXY, pv1, diffEnhancementFactor);
-    outColor = vec4(texCoord, diffTexCoord);
-}
-`;
+    vec2 diffTexCoord;
+    if (!hpcTexcoord(images[1], diffRay, offDiskFactor, pv1, diffTexCoord, diffEnhancementFactor)) discard;
+    outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, length(hpcXY));"}`;
+  return `${commonSource}
+${commonDiagnosticUniforms()}
+${warpSource.replace(render, diagnostic)}`;
 }
 
 function productionFragment(job, commonSource) {
@@ -475,7 +342,7 @@ function productionFragment(job, commonSource) {
     if (job.formalTanControl) {
       // Test-only formal-TAN control: remove exactly the shortcut from an
       // in-memory copy. The production file and its main() remain intact.
-      const shortcut = "    if (img.projectionCode == WCS_PROJECTION_TAN)\n        return wcsPlaneToTexcoord(world.xy, img);\n";
+      const shortcut = "    if (simpleTan) {\n        texcoord = wcsPlaneToTexcoord(point.xy, img);\n        return insideImage(texcoord);\n    }\n";
       if (source.split(shortcut).length !== 2)
         throw new Error("Formal TAN control requires exactly one Orthographic TAN shortcut");
       source = source.replace(shortcut, "");
@@ -603,6 +470,13 @@ function floatToHalf(value) {
 }
 
 function diagnosticFragment(job, commonSource) {
+  if (job.rotationRates)
+    return commonSource + `
+      void main() {
+        float dt = images[0].deltaT;
+        outColor = vec4(differentialRotation(dt, 0.), differentialRotation(dt, .5),
+                        differentialRotation(dt, sqrt(.75)), differentialRotation(dt, 1.));
+      }`;
   // Keep the polynomial control independently testable on hardware backends.
   if (job.trigPolynomial && !commonSource.includes("#define JHV_SWIFTSHADER\n"))
     commonSource = commonSource.replace("\n", "\n#define JHV_SWIFTSHADER\n");
@@ -630,20 +504,20 @@ function diagnosticFragment(job, commonSource) {
     return productionFragment(job, commonSource);
   if (job.mode === "hpc") {
     const hpcSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageHpc.frag"), "utf8");
-    return job.diffSelfcheck ? hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) : hpcDiagnostic(commonSource, hpcSource);
+    return hpcDiagnostic(commonSource, hpcSource, !!job.diffSelfcheck);
   }
   if (job.mode === "ortho")
     return job.diffSelfcheck
-        ? orthoDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8"))
+        ? orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8"), true)
         : orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8"));
   if (job.mode === "lati_zenithal")
     return job.diffSelfcheck
-        ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageLati.frag"), "utf8"), job.latiDiffSelfcheckMode || "normal")
+        ? latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageLati.frag"), "utf8"), job.latiDiffSelfcheckMode || "normal", true)
         : latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageLati.frag"), "utf8"));
   if (job.mode === "radial_warp" || job.mode === "rect_warp") {
     const warpShader = job.mode === "radial_warp" ? "imageRadialWarp.frag" : "imageRectWarp.frag";
     const warpSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl", warpShader), "utf8");
-    return job.diffSelfcheck ? warpDiffSelfcheckDiagnostic(commonSource, warpSource) : warpDiagnostic(commonSource, warpSource);
+    return warpDiagnostic(commonSource, warpSource, !!job.diffSelfcheck);
   }
   throw new Error(`Unsupported mode: ${job.mode}`);
 }

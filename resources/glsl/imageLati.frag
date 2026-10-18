@@ -1,39 +1,41 @@
-vec3 latitudinalWorld(const vec2 mapPos) {
-    float longitude = radians(mix(screen.mapBounds.x, screen.mapBounds.y, mapPos.x)) - screen.latiOrigin.x;
-    float latitude = radians(mix(screen.mapBounds.z, screen.mapBounds.w, mapPos.y)) + screen.latiOrigin.y;
-    if (latitude < -HALFPI || latitude > HALFPI)
-        discard;
-    vec2 lon = sinCos(longitude);
-    vec2 lat = sinCos(latitude);
-    return vec3(
-        lat.y * lon.x,
-        lat.x,
-        lat.y * lon.y);
+bool latitudinalWorld(const vec2 mapPos, out vec3 world) {
+    vec2 angles = radians(mix(screen.mapBounds.xz, screen.mapBounds.yw, mapPos)) + vec2(-screen.latiOrigin.x, screen.latiOrigin.y);
+    if (angles.y < -HALFPI || angles.y > HALFPI)
+        return false;
+    vec2 lon = sinCos(angles.x);
+    vec2 lat = sinCos(angles.y);
+    world = vec3(lat.y * lon.x, lat.x, lat.y * lon.y);
+    return true;
 }
 
-vec2 sampleLatiTexcoord(vec3 world, const Image img, const float[6] PV) {
-    if (isSurfaceMap(img))
-        return sampleSurfaceMapTexcoord(world, img, PV);
-
-    if (img.deltaT != 0.)
+bool latiSample(vec3 world, const Image img, const float[6] PV, out vec2 texcoord) {
+    bool surface = isSurfaceMap(img);
+    if (!surface && img.deltaT != 0.)
         world = differential(img.deltaT, world);
-
-    vec3 sourceWorld = rotate_vector(img.sourceViewQuat, world);
-    if (sourceWorld.z < 1. / img.observerDistance)
-        discard;
-
-    return observerToTexcoord(sourceWorld, img, PV);
+    vec3 sourcePoint = rotate_vector(img.sourceViewQuat, world);
+    vec3 direction = world;
+    if (!surface) {
+        if (sourcePoint.z < 1. / img.observerDistance)
+            return false;
+        direction = vec3(sourcePoint.xy, img.observerDistance - sourcePoint.z);
+    }
+    return imageTexcoord(direction, img, PV, texcoord) && insidePlanarMasks(sourcePoint.xy);
 }
 
 void main(void) {
-    if (display.radii.x > 1.) // coronagraphs
-        discard;
-
     vec2 mapPos = getNormalizedMapPos();
-    bool diffMode = display.isDiff != NODIFFERENCE;
-    vec3 world = latitudinalWorld(mapPos);
-
-    vec2 texCoord = sampleLatiTexcoord(world, images[0], pv0);
-    vec2 diffTexCoord = diffMode ? sampleLatiTexcoord(world, images[1], pv1) : texCoord;
-    outColor = getColor(texCoord, diffTexCoord, 1.0);
+    if (!insideMap(mapPos))
+        discard;
+    vec3 world;
+    if (!latitudinalWorld(mapPos, world))
+        discard;
+    vec2 texCoord;
+    if (!latiSample(world, images[0], pv0, texCoord))
+        discard;
+    vec2 diffTexCoord = texCoord;
+    if (display.isDiff != NODIFFERENCE) {
+        if (!latiSample(world, images[1], pv1, diffTexCoord))
+            discard;
+    }
+    renderImage(texCoord, diffTexCoord, 1.);
 }

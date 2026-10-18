@@ -23,7 +23,7 @@ class CommonMetaData implements MetaData {
 
     protected Position viewpoint = Sun.StartEarth;
     protected float innerRadius = 0;
-    protected float outerRadius = Float.MAX_VALUE;
+    protected float outerRadius = Float.POSITIVE_INFINITY;
 
     protected float sector0 = 0;
     protected float sector1 = 0;

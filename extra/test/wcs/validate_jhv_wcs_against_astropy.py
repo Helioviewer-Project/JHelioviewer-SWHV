@@ -400,7 +400,8 @@ def rotate_vector_inverse(quat: tuple[float, float, float, float], vec: tuple[fl
 
 def differentialRotation(delta_t: float, sin_latitude: float) -> float:
     sin_latitude2 = sin_latitude * sin_latitude
-    return delta_t * (0.01367 - 0.339 * sin_latitude2 - 0.485 * sin_latitude2 * sin_latitude2)
+    carrington_rate = math.radians(14.1844) / 86400 * 1e6
+    return delta_t * (2.879 - carrington_rate - 0.339 * sin_latitude2 - 0.485 * sin_latitude2 * sin_latitude2)
 
 
 def differential(delta_t: float, vector: tuple[float, float, float]) -> tuple[float, float, float]:
