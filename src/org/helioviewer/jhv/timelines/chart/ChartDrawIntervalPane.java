@@ -427,7 +427,4 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         repaint();
     }
 
-    @Override
-    public void drawMovieLineRequest() {}
-
 }
