@@ -39,7 +39,8 @@ public final class SdfTextRenderer {
 
     private final GLTexture texture;
     private final Map<Integer, Glyph> glyphs = new HashMap<>();
-    private final Map<Long, Float> kerning = new HashMap<>();
+    private final float[] kerning;
+    private final int glyphCount;
     private final Set<Integer> missingGlyphs = new HashSet<>();
     private final float fontSize;
     private final float unitRangeX;
@@ -60,6 +61,8 @@ public final class SdfTextRenderer {
     public SdfTextRenderer() {
         try {
             AtlasMetadata atlas = loadAtlas();
+            kerning = atlas.kerning;
+            glyphCount = atlas.glyphCount;
             validateCharset();
             texture = loadAtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
             fontSize = atlas.size;
@@ -82,7 +85,7 @@ public final class SdfTextRenderer {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
             if (previousGlyph != null)
-                width += getKerning(previousGlyph.codePoint, glyph.codePoint);
+                width += getKerning(previousGlyph, glyph);
             width += glyph.advance;
             previousGlyph = glyph;
             offset += Character.charCount(codePoint);
@@ -110,7 +113,7 @@ public final class SdfTextRenderer {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
             if (previousGlyph != null)
-                x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
+                x += getKerning(previousGlyph, glyph) * scaleFactor;
             float advance = glyph.draw(x, y, z, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
@@ -126,7 +129,7 @@ public final class SdfTextRenderer {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
             if (previousGlyph != null)
-                x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
+                x += getKerning(previousGlyph, glyph) * scaleFactor;
             float advance = glyph.draw(origin, basisX, basisY, x, 0, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
@@ -201,15 +204,17 @@ public final class SdfTextRenderer {
         float size = atlasJson.getFloat("size");
 
         JSONArray glyphArray = json.getJSONArray("glyphs");
-        for (int i = 0; i < glyphArray.length(); i++) {
+        int atlasGlyphCount = glyphArray.length();
+        float[] atlasKerning = new float[atlasGlyphCount * atlasGlyphCount];
+        for (int i = 0; i < atlasGlyphCount; i++) {
             JSONObject glyphJson = glyphArray.getJSONObject(i);
             int codePoint = glyphJson.getInt("unicode");
             float advance = glyphJson.getFloat("advance") * size;
             JSONObject planeBounds = glyphJson.optJSONObject("planeBounds");
             JSONObject atlasBounds = glyphJson.optJSONObject("atlasBounds");
             Glyph glyph = planeBounds == null || atlasBounds == null
-                    ? new Glyph(codePoint, advance)
-                    : new Glyph(codePoint, advance, size, width, height, planeBounds, atlasBounds);
+                    ? new Glyph(i, advance)
+                    : new Glyph(i, advance, size, width, height, planeBounds, atlasBounds);
             glyphs.put(codePoint, glyph);
         }
 
@@ -220,14 +225,14 @@ public final class SdfTextRenderer {
                 int left = kerningJson.getInt("unicode1");
                 int right = kerningJson.getInt("unicode2");
                 float kerningAdvance = kerningJson.getFloat("advance") * size;
-                kerning.put(kerningKey(left, right), kerningAdvance);
+                atlasKerning[glyphs.get(left).index * atlasGlyphCount + glyphs.get(right).index] = kerningAdvance;
             }
         }
 
         if (!glyphs.containsKey(FALLBACK_CODE_POINT))
             throw new IOException(ATLAS_JSON + " is missing fallback glyph " + describeCodePoint(FALLBACK_CODE_POINT));
 
-        return new AtlasMetadata(width, height, distanceRange, size);
+        return new AtlasMetadata(width, height, distanceRange, size, atlasGlyphCount, atlasKerning);
     }
 
     private void validateCharset() throws IOException {
@@ -258,12 +263,8 @@ public final class SdfTextRenderer {
         return "'" + new String(Character.toChars(codePoint)) + "' (U+" + Integer.toHexString(codePoint).toUpperCase() + ")";
     }
 
-    private float getKerning(int leftCodePoint, int rightCodePoint) {
-        return kerning.getOrDefault(kerningKey(leftCodePoint, rightCodePoint), 0f);
-    }
-
-    private static long kerningKey(int leftCodePoint, int rightCodePoint) {
-        return ((long) leftCodePoint << Integer.SIZE) | Integer.toUnsignedLong(rightCodePoint);
+    private float getKerning(Glyph left, Glyph right) {
+        return kerning[left.index * glyphCount + right.index];
     }
 
     private void putDirect(float x, float y, float z, float w, float c0, float c1) {
@@ -302,10 +303,10 @@ public final class SdfTextRenderer {
         void put(float x, float y, float z, float w, float c0, float c1);
     }
 
-    private record AtlasMetadata(int width, int height, float distanceRange, float size) {}
+    private record AtlasMetadata(int width, int height, float distanceRange, float size, int glyphCount, float[] kerning) {}
 
     private final class Glyph {
-        private final int codePoint;
+        private final int index;
         private final float advance;
         private final boolean drawable;
         private final float x0;
@@ -317,16 +318,16 @@ public final class SdfTextRenderer {
         private final float u1;
         private final float v1;
 
-        private Glyph(int glyphCodePoint, float glyphAdvance) { // glyph which only advances the pen.
-            codePoint = glyphCodePoint;
+        private Glyph(int glyphIndex, float glyphAdvance) { // glyph which only advances the pen.
+            index = glyphIndex;
             advance = glyphAdvance;
             drawable = false;
             x0 = y0 = x1 = y1 = u0 = v0 = u1 = v1 = 0;
         }
 
-        private Glyph(int glyphCodePoint, float glyphAdvance, float size, int atlasWidth, int atlasHeight,
+        private Glyph(int glyphIndex, float glyphAdvance, float size, int atlasWidth, int atlasHeight,
                       JSONObject planeBounds, JSONObject atlasBounds) {
-            codePoint = glyphCodePoint;
+            index = glyphIndex;
             advance = glyphAdvance;
             drawable = true;
             x0 = planeBounds.getFloat("left") * size;
