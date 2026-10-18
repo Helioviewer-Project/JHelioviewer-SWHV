@@ -131,7 +131,8 @@ solar-world point into that image's observer frame. For surface maps, `ImageLaye
 rotation, including trackball rotation only in `Orthographic`, and the displayed observer distance;
 `Orthographic`, `HPC`, and the warp modes inverse-rotate their sphere intersection through it to keep the map attached
 to the visible sphere. Direct Latitudinal surface-map sampling does not need it. Observer images in `HPC` and the
-warp modes do not use `sourceViewQuat`; their viewpoint limitation is described below.
+warp modes use `sourceViewQuat` for differential rotation through the solar frame, but not for reprojection
+between displayed and source viewpoints; that limitation is described below.
 
 ## Display modes
 
@@ -179,9 +180,9 @@ same longitude/latitude mapping used by Orthographic. Longitude wraps; off-disk 
 uses the displayed observer distance, matching Java mouse unprojection. Surface angular bounds and one-to-one zoom
 use that distance as well; observer-image bounds retain source distance.
 
-Java overlays are first rotated from solar world space into the displayed viewpoint frame, projected to `(Tx, Ty)`, and
-clipped using the current `view.z >= 0` front-hemisphere test. Lines terminate at hidden segments instead of wrapping
-through the back of the Sun.
+Java overlays are rotated into the displayed viewpoint frame and projected to `(Tx, Ty)`.
+Surface points are visible when `D*z >= 1`; elevated loop points also remain visible when their
+observer ray clears the sphere. Hidden vertices terminate line strips.
 
 Mouse unprojection returns the unit-sphere intersection. It therefore returns `null` off-disk; the current HPC mouse
 path does not invent a solar surface point for an off-limb ray.
