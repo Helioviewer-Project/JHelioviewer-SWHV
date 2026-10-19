@@ -39,11 +39,6 @@ public interface MetaData {
     @Nonnull
     Position getViewpoint();
 
-    default double getRenderDistance(double viewDistance) {
-        double imageDistance = getViewpoint().distance;
-        return getGeometry().wcs.projection.isSurfaceMap() ? viewDistance : imageDistance;
-    }
-
     boolean getCalculateDepth();
 
     @Nonnull

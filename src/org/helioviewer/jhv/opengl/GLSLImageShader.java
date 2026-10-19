@@ -2,10 +2,12 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.ImageGrid;
 import org.helioviewer.jhv.wcs.WcsSolution;
@@ -21,8 +23,8 @@ public final class GLSLImageShader extends GLSLScreenShader {
     private static final GLSLImageShader rectWarp = new GLSLImageShader("/glsl/imageRectWarp.frag");
     private static final GLSLImageShader[] imagePrograms = {ortho, hpc, lati, radialWarp, rectWarp};
 
-    private int pv0Ref;
-    private int pv1Ref;
+    // JHV Orthographic TAN display policy (ORTHOGRAPHIC_TAN in imageCommon.frag).
+    private static final float ORTHOGRAPHIC_TAN = 6;
 
     private GLSLImageShader(String fragment) {
         super(COMMON_FRAGMENT, "/glsl/imageGeometry.frag", fragment);
@@ -48,8 +50,6 @@ public final class GLSLImageShader extends GLSLScreenShader {
     @Override
     protected void initUniforms(int id) {
         super.initUniforms(id);
-        pv0Ref = requiredUniform(id, "pv0");
-        pv1Ref = requiredUniform(id, "pv1");
         setupUniformBlock(id, UniformBlockLayout.IMAGE);
         setupUniformBlock(id, UniformBlockLayout.DISPLAY);
         setTextureUnit(id, "image", GLTexture.Unit.ZERO);
@@ -65,14 +65,14 @@ public final class GLSLImageShader extends GLSLScreenShader {
         displayBuffer.dispose();
     }
 
-    public static void render(MapMode mode,
-                              ImageGeometry image0, WcsSolution wcs0,
-                              float observerDistance0, float deltaT0, Quat cameraDiff0, Quat sourceView0,
-                              ImageGeometry image1, WcsSolution wcs1,
-                              float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1, Mat2 adjustment) {
+    // Observer images are traced from their own viewpoint, maps from the display viewpoint.
+    public static void render(MapMode mode, Quat displayRotation, Position display,
+                              ImageGeometry image0, Position source0,
+                              ImageGeometry image1, Position source1,
+                              Mat2 adjustment, double longitudeOffset, double latitudeOffset, boolean differentialRotation) {
         FloatBuffer values = imageBuffer.begin();
-        putImage(values, mode, image0, wcs0, observerDistance0, deltaT0, cameraDiff0, sourceView0, adjustment);
-        putImage(values, mode, image1, wcs1, observerDistance1, deltaT1, cameraDiff1, sourceView1, adjustment);
+        putImage(values, mode, displayRotation, display, image0, source0, adjustment, longitudeOffset, latitudeOffset, differentialRotation);
+        putImage(values, mode, displayRotation, display, image1, source1, adjustment, longitudeOffset, latitudeOffset, differentialRotation);
 
         imageBuffer.uploadIfChanged();
 
@@ -84,41 +84,80 @@ public final class GLSLImageShader extends GLSLScreenShader {
             case RectWarp -> rectWarp;
         };
         shader.use();
-        GL.glUniform1fv(shader.pv0Ref, wcs0.pv2);
-        GL.glUniform1fv(shader.pv1Ref, wcs1.pv2);
         shader.draw();
     }
 
-    private static void putImage(FloatBuffer values, MapMode mode, ImageGeometry image, WcsSolution wcs,
-                                 float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView, Mat2 adjustment) {
+    private static void putImage(FloatBuffer values, MapMode mode, Quat displayRotation, Position display, ImageGeometry image,
+                                 Position source, Mat2 adjustment, double longitudeOffset, double latitudeOffset, boolean differentialRotation) {
+        WcsSolution wcs = image.adjustedWcs(longitudeOffset, latitudeOffset);
         ImageGeometry original = image.original;
         int width = original.grid.width(), height = original.grid.height();
+        boolean surface = wcs.projection.isSurfaceMap();
+        Position tracing = image.tracingViewpoint(display, source);
+        Quat solarToImage = surface ? displayRotation : source.toQuat();
+        float observerDistance = (float) tracing.distance;
+        float deltaT = differentialRotation ? (float) ((display.time.milli - tracing.time.milli) * 1e-9) : 0;
         // Orthographic TAN deliberately uses source XY as a small-angle plane.
-        Vec2 offset = mode == MapMode.Orthographic && wcs.projection == WcsSolution.Projection.TAN
-                ? new Vec2(wcs.reference.x * wcs.unitsPerRad, wcs.reference.y * wcs.unitsPerRad) : wcs.offset;
-        putTransform(values, original.planeToPixel, original.referencePixel, width, height, adjustment, offset);
-        ImageGrid grid = image.grid;
-        double step = grid.step();
-        // Original normalized pixels -> decoded normalized pixels: scale, then offset.
-        values.put((float) (width / (step * grid.width())));
-        values.put((float) (height / (step * grid.height())));
-        values.put((float) ((.5 - grid.firstX() / step) / grid.width()));
-        values.put((float) ((.5 - grid.firstY() / step) / grid.height()));
-        values.put((float) wcs.unitsPerRad).put(wcs.projection.ordinal()).put(observerDistance).put(deltaT);
-        values.put(wcs.nativeBasis);
-        values.put(wcs.nativePoles);
-        cameraDiff.setFloatBuffer(values);
-        sourceView.setFloatBuffer(values);
-    }
-
-    // WCS plane -> normalized original pixels; the user rotation acts on the plane first.
-    private static void putTransform(FloatBuffer values, Mat2 matrix, Vec2 reference, int width, int height, Mat2 adjustment, Vec2 offset) {
+        boolean orthographicTan = mode == MapMode.Orthographic && wcs.projection == WcsSolution.Projection.TAN;
+        double offsetX = orthographicTan ? wcs.reference.x * wcs.unitsPerRad : wcs.offset.x;
+        double offsetY = orthographicTan ? wcs.reference.y * wcs.unitsPerRad : wcs.offset.y;
+        Mat2 matrix = original.planeToPixel;
+        Vec2 reference = original.referencePixel;
         double a = (matrix.m00 * adjustment.m00 + matrix.m01 * adjustment.m10) / width;
         double b = (matrix.m00 * adjustment.m01 + matrix.m01 * adjustment.m11) / width;
         double c = (matrix.m10 * adjustment.m00 + matrix.m11 * adjustment.m10) / height;
         double d = (matrix.m10 * adjustment.m01 + matrix.m11 * adjustment.m11) / height;
-        values.put((float) a).put((float) b).put((float) (reference.x / width - a * offset.x - b * offset.y)).put(0);
-        values.put((float) c).put((float) d).put((float) (reference.y / height - c * offset.x - d * offset.y)).put(0);
+        // Formal projections return radians; compose their unit conversion into the affine coefficients.
+        double scale = orthographicTan ? 1 : wcs.unitsPerRad;
+        float imageXFromPlaneX = (float) (a * scale);
+        float imageXFromPlaneY = (float) (b * scale);
+        float imageXOffset = (float) (reference.x / width - a * offsetX - b * offsetY);
+        float imageYFromPlaneX = (float) (c * scale);
+        float imageYFromPlaneY = (float) (d * scale);
+        float imageYOffset = (float) (reference.y / height - c * offsetX - d * offsetY);
+        float minSurfaceZ = surface ? Float.NEGATIVE_INFINITY : orthographicTan ? 0 : 1 / observerDistance;
+        float projectionOriginZ = surface ? 0 : observerDistance;
+        float projectionCode = orthographicTan ? ORTHOGRAPHIC_TAN : wcs.projection.ordinal();
+
+        ImageGrid grid = image.grid;
+        double step = grid.step();
+        float texScaleX = (float) (width / (step * grid.width()));
+        float texScaleY = (float) (height / (step * grid.height()));
+        float texOffsetX = (float) ((.5 - grid.firstX() / step) / grid.width());
+        float texOffsetY = (float) ((.5 - grid.firstY() / step) / grid.height());
+
+        Vec3 toProjectionX = wcs.toProjectionX;
+        Vec3 toProjectionY = wcs.toProjectionY;
+        Vec3 toProjectionZ = wcs.toProjectionZ;
+        if (surface) {
+            toProjectionX = solarToImage.rotateVector(toProjectionX);
+            toProjectionY = solarToImage.rotateVector(toProjectionY);
+            toProjectionZ = solarToImage.rotateVector(toProjectionZ);
+        }
+        float projectionZSign = surface ? -1 : 1;
+        Quat imageToView = Quat.rotateWithConjugate(displayRotation, solarToImage);
+
+        // Column-major std140 mat3: each three-component column occupies four floats.
+        values.put((float) toProjectionX.x).put((float) toProjectionY.x).put((float) toProjectionZ.x).put(0);
+        values.put((float) toProjectionX.y).put((float) toProjectionY.y).put((float) toProjectionZ.y).put(0);
+        values.put((float) (projectionZSign * toProjectionX.z)).put((float) (projectionZSign * toProjectionY.z))
+                .put((float) (projectionZSign * toProjectionZ.z)).put(0);
+        values.put(projectionCode).put(wcs.azpTanTilt).put(wcs.azpSecTilt).put(wcs.zpnMaxAngle);
+        values.put(wcs.pv2);
+        values.put((float) wcs.northPole.x).put((float) wcs.northPole.y);
+        values.put((float) wcs.southPole.x).put((float) wcs.southPole.y);
+
+        // Image mapping: affine columns and offset, then decoded texture mapping.
+        values.put(imageXFromPlaneX).put(imageYFromPlaneX);
+        values.put(imageXFromPlaneY).put(imageYFromPlaneY);
+        values.put(imageXOffset).put(imageYOffset);
+        values.put(texScaleX).put(texScaleY);
+        values.put(texOffsetX).put(texOffsetY);
+
+        // Tracing viewpoint and frame rotations.
+        values.put(observerDistance).put(projectionOriginZ).put(minSurfaceZ).put(deltaT);
+        imageToView.setFloatBuffer(values);
+        solarToImage.setFloatBuffer(values);
     }
 
     static void bindDisplay(float[] color,

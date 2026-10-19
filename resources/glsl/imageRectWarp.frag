@@ -4,5 +4,5 @@ void main(void) {
         discard;
     vec2 direction = sinCos(mapPos.x * TWOPI);
     vec2 hpcXY = unwarpRadius(mapPos.y) * vec2(-direction.x, direction.y);
-    renderWarpedHpc(hpcXY);
+    renderHpc(vec3(hpcXY, -images[0].observerDistance), vec3(hpcXY, -images[1].observerDistance));
 }

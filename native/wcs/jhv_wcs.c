@@ -10,7 +10,11 @@
 #include "sph.h"
 #include "wcstrig.h"
 
-_Static_assert(sizeof(jhv_wcs_info) == 264 && offsetof(jhv_wcs_info, native_basis) == 72,
+_Static_assert(sizeof(jhv_wcs_info) == 264 && offsetof(jhv_wcs_info, to_projection_x) == 72 &&
+               offsetof(jhv_wcs_info, azp_tan_tilt) == 96 && offsetof(jhv_wcs_info, to_projection_y) == 104 &&
+               offsetof(jhv_wcs_info, azp_sec_tilt) == 128 && offsetof(jhv_wcs_info, to_projection_z) == 136 &&
+               offsetof(jhv_wcs_info, zpn_max_angle) == 160 && offsetof(jhv_wcs_info, north_pole) == 232 &&
+               offsetof(jhv_wcs_info, south_pole) == 248,
                "Java/native WCS layout");
 
 struct jhv_wcs {
@@ -94,9 +98,9 @@ static jhv_wcs *prepare(jhv_wcs *handle, jhv_wcs_info *info, size_t info_size,
         sincosd(phi[j], &sp, &cp);
         sincosd(theta[j], &st, &ct);
         int column = (j+2)%3;
-        info->native_basis[column] = ct*sp;
-        info->native_basis[4+column] = -ct*cp;
-        info->native_basis[8+column] = st;
+        info->to_projection_x[column] = ct*sp;
+        info->to_projection_y[column] = -ct*cp;
+        info->to_projection_z[column] = st;
     }
     info->offset[0] = w->cel.prj.x0*radians;
     info->offset[1] = w->cel.prj.y0*radians;
@@ -104,10 +108,10 @@ static jhv_wcs *prepare(jhv_wcs *handle, jhv_wcs_info *info, size_t info_size,
         if (uses_pv(projection, i))
             info->pv[i] = w->cel.prj.pv[i];
     if (projection == JHV_WCS_AZP) {
-        info->native_basis[3] = w->cel.prj.w[1];
-        info->native_basis[7] = w->cel.prj.w[2];
+        info->azp_tan_tilt = w->cel.prj.w[1];
+        info->azp_sec_tilt = w->cel.prj.w[2];
     }
-    if (projection == JHV_WCS_ZPN) info->native_basis[11] = w->cel.prj.w[0];
+    if (projection == JHV_WCS_ZPN) info->zpn_max_angle = w->cel.prj.w[0];
     // A Cartesian point at a native pole carries no native longitude. Preserve
     // WCSLIB's convention, using longitude zero at a celestial Cartesian pole.
     for (int i = 0; i < 2; i++) {
@@ -117,8 +121,9 @@ static jhv_wcs *prepare(jhv_wcs *handle, jhv_wcs_info *info, size_t info_size,
         sphs2x(w->cel.euler, 1, 0, 1, 1, &longitude, &latitude, &p, &t);
         double sp, cp;
         sincosd(p, &sp, &cp);
-        info->native_poles[2*i] = sp;
-        info->native_poles[2*i+1] = -cp;
+        double *pole = i == 0 ? info->north_pole : info->south_pole;
+        pole[0] = sp;
+        pole[1] = -cp;
     }
     return handle;
 }

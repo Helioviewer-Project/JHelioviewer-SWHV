@@ -1,17 +1,28 @@
 package org.helioviewer.jhv.metadata;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.opengl.GLSLImageShader;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageBounds;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsSolution;
@@ -142,7 +153,7 @@ public final class JHVMetadataDump {
                 .put("crval_internal_x", wcs.reference.x * wcs.unitsPerRad)
                 .put("crval_internal_y", (wcs.projection == WcsSolution.Projection.CEA
                         ? Math.sin(wcs.reference.y) / wcs.pv2[1] : wcs.reference.y) * wcs.unitsPerRad)
-                .put("native_basis", new JSONArray(wcs.nativeBasis))
+                .put("native_basis", projectionBasis(wcs))
                 .put("native_offset", new JSONArray(new double[]{wcs.offset.x, wcs.offset.y}))
                 .put("image_to_plane", new JSONArray(new double[]{
                         geometry.pixelToPlane.m00 / geometry.pixelSizeX,
@@ -163,8 +174,62 @@ public final class JHVMetadataDump {
                 .put("sun_shift_x", sunShift.x)
                 .put("sun_shift_y", sunShift.y)
                 .put("projection", wcs.projection.name())
-                .put("zpn_upper_eta", wcs.nativeBasis[11])
+                .put("zpn_upper_eta", wcs.zpnMaxAngle)
                 .put("pv2", new JSONArray(wcs.pv2));
+    }
+
+    private static JSONArray projectionBasis(WcsSolution wcs) {
+        return new JSONArray(new double[]{
+                wcs.toProjectionX.x, wcs.toProjectionX.y, wcs.toProjectionX.z, wcs.azpTanTilt,
+                wcs.toProjectionY.x, wcs.toProjectionY.y, wcs.toProjectionY.z, wcs.azpSecTilt,
+                wcs.toProjectionZ.x, wcs.toProjectionZ.y, wcs.toProjectionZ.z, wcs.zpnMaxAngle});
+    }
+
+    private static Quat quaternion(JSONObject input, String key) {
+        JSONArray values = input.optJSONArray(key);
+        return values == null ? Quat.ZERO : new Quat(values.getDouble(3), values.getDouble(0), values.getDouble(1), values.getDouble(2));
+    }
+
+    private static String packedImage(Method packer, JSONObject input, WcsSolution wcs) throws Exception {
+        ImageGeometry geometry = new ImageGeometry(input.getInt("width"), input.getInt("height"), wcs, false);
+        MapMode mode = switch (input.getString("mode")) {
+            case "ortho" -> MapMode.Orthographic;
+            case "hpc", "trig" -> MapMode.HPC;
+            case "lati_zenithal" -> MapMode.Latitudinal;
+            case "radial_warp" -> MapMode.RadialWarp;
+            case "rect_warp" -> MapMode.RectWarp;
+            default -> throw new IllegalArgumentException("Unknown test mode: " + input.getString("mode"));
+        };
+        Quat solarToSource = quaternion(input, "solarToSource");
+        Quat displayRotation = wcs.projection.isSurfaceMap() ? solarToSource
+                : Quat.rotate(quaternion(input, "sourceToView"), solarToSource);
+        long deltaMillis = Math.round(input.optDouble("deltaT", 0) * 1e9);
+        double distance = input.getDouble("observerDistance");
+        // Diagnostic cases supply arbitrary rotations; use the same production Position interface.
+        Position source = new Position(new JHVTime(Math.max(0, -deltaMillis)), distance, 0, 0) {
+            @Override
+            public Quat toQuat() {
+                return solarToSource;
+            }
+        };
+        Position display = new Position(new JHVTime(Math.max(0, deltaMillis)), distance, 0, 0);
+        Mat2 adjustment = Mat2.IDENTITY;
+        JSONArray matrix = input.optJSONArray("planeAdjustment");
+        if (matrix != null)
+            adjustment = new Mat2(matrix.getJSONArray(0).getDouble(0), matrix.getJSONArray(0).getDouble(1),
+                    matrix.getJSONArray(1).getDouble(0), matrix.getJSONArray(1).getDouble(1));
+        ByteBuffer bytes = ByteBuffer.allocate(192).order(ByteOrder.LITTLE_ENDIAN);
+        FloatBuffer values = bytes.asFloatBuffer();
+        boolean formalTanControl = input.optBoolean("formalTanControl") && wcs.projection == WcsSolution.Projection.TAN
+                && mode == MapMode.Orthographic;
+        // Control renders formal TAN through Ortho geometry, retaining its parallel-ray horizon.
+        packer.invoke(null, values, formalTanControl ? MapMode.HPC : mode, displayRotation, display,
+                geometry, source, adjustment, input.optDouble("deltaCRVAL1", 0), input.optDouble("deltaCRVAL2", 0), deltaMillis != 0);
+        if (formalTanControl)
+            values.put(38, 0); // minSurfaceZ at byte 152, diagnostic control only.
+        if (values.position() != 48)
+            throw new AssertionError("Incomplete Java image record: " + values.position());
+        return Base64.getEncoder().encodeToString(bytes.array());
     }
 
     private static void initSpice() throws Exception {
@@ -178,6 +243,9 @@ public final class JHVMetadataDump {
         if (args.length == 3 && args[0].equals("--prepare")) {
             JSONArray inputs = new JSONArray(Files.readString(Path.of(args[1])));
             JSONArray output = new JSONArray();
+            Method packer = GLSLImageShader.class.getDeclaredMethod("putImage", FloatBuffer.class, MapMode.class,
+                    Quat.class, Position.class, ImageGeometry.class, Position.class, Mat2.class, double.class, double.class, boolean.class);
+            packer.setAccessible(true);
             for (int i = 0; i < inputs.length(); i++) {
                 JSONObject input = inputs.getJSONObject(i);
                 String cards = input.getString("header");
@@ -187,12 +255,8 @@ public final class JHVMetadataDump {
                 Header header = new Header(records);
                 WcsSolution wcs = WcsInterpreter.read(new FitsMetaDataContainer(header),
                         input.getInt("width"), input.getInt("height"), input.getDouble("unitsPerRad"));
-                wcs = wcs.adjusted(input.optDouble("deltaCRVAL1", 0), input.optDouble("deltaCRVAL2", 0));
                 output.put(new JSONObject()
-                        .put("nativeBasis", new JSONArray(wcs.nativeBasis))
-                        .put("nativePoles", new JSONArray(wcs.nativePoles))
-                        .put("reference", new JSONArray(new double[]{wcs.reference.x * wcs.unitsPerRad, wcs.reference.y * wcs.unitsPerRad}))
-                        .put("nativeOffset", new JSONArray(new double[]{wcs.offset.x, wcs.offset.y}))
+                        .put("imageRecord", packedImage(packer, input, wcs))
                         .put("pv2", new JSONArray(wcs.pv2)));
             }
             Files.writeString(Path.of(args[2]), output.toString());

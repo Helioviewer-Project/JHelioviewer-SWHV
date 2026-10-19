@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.wcs;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Region;
@@ -8,6 +9,8 @@ import org.helioviewer.jhv.math.Vec2;
 // Complete buffer-pixel <-> WCS-plane mapping. Pixel Y follows buffer rows.
 // The original geometry owns the image footprint; a decoded grid composes with it.
 public final class ImageGeometry {
+
+    private static final WcsSolution PLAIN_IMAGE_WCS = new WcsSolution(WcsSolution.Projection.TAN, new float[6], Sun.MeanEarthDistance);
 
     public final ImageGeometry original;
     public final ImageGrid grid;
@@ -20,8 +23,12 @@ public final class ImageGeometry {
     public final Vec2 sunPixel;
     public final Region bounds; // Original image footprint, independent of the decoded grid.
 
+    private volatile Adjustment adjustment;
+
+    private record Adjustment(double longitude, double latitude, WcsSolution wcs) {}
+
     public ImageGeometry(int width, int height, double pixelSize) {
-        this(width, height, new WcsSolution(WcsSolution.Projection.TAN, new float[6], Sun.MeanEarthDistance),
+        this(width, height, PLAIN_IMAGE_WCS,
                 new Mat2(pixelSize, 0, 0, -pixelSize), new Vec2(.5 * width, .5 * height));
     }
 
@@ -73,6 +80,24 @@ public final class ImageGeometry {
         Vec2 reference = new Vec2((source.referencePixel.x - decoded.firstX()) / step + .5,
                 (source.referencePixel.y - decoded.firstY()) / step + .5);
         return new ImageGeometry(source, decoded, source.wcs, transform, reference);
+    }
+
+    // Cache adjustments per original image; decoded grids reuse them even when base WCS solutions are shared.
+    public WcsSolution adjustedWcs(double longitudeArcsec, double latitudeArcsec) {
+        ImageGeometry source = original;
+        if (longitudeArcsec == 0 && latitudeArcsec == 0)
+            return source.wcs;
+        Adjustment cached = source.adjustment;
+        if (cached != null && cached.longitude == longitudeArcsec && cached.latitude == latitudeArcsec)
+            return cached.wcs;
+        WcsSolution result = source.wcs.adjusted(longitudeArcsec, latitudeArcsec);
+        source.adjustment = new Adjustment(longitudeArcsec, latitudeArcsec, result);
+        return result;
+    }
+
+    // Observer images use their recorded viewpoint; surface maps use the displayed viewpoint.
+    public Position tracingViewpoint(Position display, Position source) {
+        return wcs.projection.isSurfaceMap() ? display : source;
     }
 
     public Vec2 toPlane(double x, double y) {

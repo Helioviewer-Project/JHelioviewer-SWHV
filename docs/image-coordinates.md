@@ -67,7 +67,8 @@ CRVAL describes a celestial reference; it is separate from both pixel reference 
 
 Decoded geometries share the native owner with their original geometry. An automatic FFM arena releases
 the native solution after its last Java owner becomes unreachable. User CRVAL adjustments make a native
-copy, recompute pole defaults and cache the last adjustment; ordinary frames reuse the solution.
+copy and recompute pole defaults. Each original image geometry caches its last adjustment; decoded grids
+share that cache, while plain images can share the unadjusted native solution.
 [`ObserverGeometry`](../src/org/helioviewer/jhv/wcs/ObserverGeometry.java) retains only JHV's directed observer
 ray, sphere intersection and Sun-plane conversions. HPC supplies an angular ray; warped-view picking
 supplies its Sun-plane ray directly to the same intersection, without an angular round trip. Native builds
@@ -194,32 +195,56 @@ original extent by the decoded size would place the samples elsewhere.
 
 ## Scene coordinates to texture reads
 
-[`ImageLayer.render`](../src/org/helioviewer/jhv/layers/ImageLayer.java) passes both image geometries,
-the observer orientations, the time differences and the display adjustments to `GLSLImageShader.render()`.
-It uploads both image records, binds the matching WCS coefficients and draws the selected mode in one
-operation. A user CROTA adjustment rotates the plane point before the inverse mapping. CRVAL adjustments change the
+[`ImageLayer.render`](../src/org/helioviewer/jhv/layers/ImageLayer.java) passes the display mode, rotation
+and viewpoint, both image geometries with their source viewpoints, and the display adjustments to
+`GLSLImageShader.render()`. The binder traces each image from one viewpoint: observer images from their
+own source viewpoint, surface maps from the display viewpoint. That choice supplies the observer distance,
+the solar-to-source rotation, the time difference and the source-to-view rotation. It uploads both image
+records, binds the matching WCS coefficients and draws the selected mode in one operation. A user CROTA adjustment rotates the plane point before the inverse mapping. CRVAL adjustments change the
 celestial reference, or the scaled reference subtraction for Orthographic TAN. Neither rewrites cached geometry.
 
-The mapping mode decides how a fragment reaches the source plane:
+The mode supplies a point `p` in the prepared image frame. Observer images use their source observer's
+axes. Surface maps use the displayed observer's axes, with the displayed orientation folded into the
+projection transform. In either case the projection receives:
+
+```text
+direction = (p.x, p.y, projectionOriginZ - p.z)
+```
+
+`projectionOriginZ` locates the projection center along image-frame +Z. It is the source observer distance
+for observer images and zero for surface maps, whose longitude and latitude are measured around Sun
+center. `observerDistance` remains the actual observer distance used for ray/sphere intersection and
+Sun-plane masks; it is not replaced by `projectionOriginZ`.
+
+`minSurfaceZ` applies only to solar-surface points. With solar radius 1, observer `(0,0,D)` and surface
+point `p`, the point faces the observer when `p · (observer - p) = D*p.z - 1 >= 0`. The threshold is
+therefore `1/D`. Orthographic TAN uses parallel viewing rays and threshold zero. A surface map has no
+source-observer visibility restriction, so its threshold is negative infinity. The display geometry
+still determines the visible part of the sphere. Because surface maps are traced from the display
+viewpoint, their `imageToView` is the identity and their `deltaT` is zero; their displayed orientation is
+composed into the projection matrix.
+
+The mapping mode decides how a fragment reaches that source point:
 
 - **Orthographic** starts on the visible solar sphere or the image plane. Observer rotation and
-  differential rotation pick the source point. TAN deliberately uses simple-TAN: subtract the celestial
-  CRVAL scaled by `unitsPerRad` from the point's X and Y directly. ARC, AZP and ZPN project the observer
-  direction through the formal WCS. Their source horizon is `z >= 1/D`; simple-TAN keeps `z > 0`.
+  differential rotation pick the source point; a point below `minSurfaceZ` falls back to the image plane.
+  Orthographic TAN takes the point's X and Y directly, after subtracting the celestial CRVAL scaled by `unitsPerRad`. ARC, AZP and ZPN project the observer
+  direction through the formal WCS from the source distance.
 - **HPC** starts from helioprojective longitude and latitude inside the displayed angular bounds.
   Rays at or beyond 90° from Sun center still sample wide-field images along their direction.
   An unlimited outer mask is represented by positive infinity. Masks treat these rays as having infinite
   plane radius; sectors use the ray’s XY direction.
-  This domain decision supplies the off-disk enhancement factor explicitly: radial enhancement for
-  forward rays, where the Sun-plane radius is defined, and factor 1 for rear-facing rays.
+  Off-limb forward rays take their radial enhancement from the Sun-plane radius; rear-facing rays have
+  no such radius and keep factor 1.
 - **Latitudinal** starts from longitude and latitude on the sphere, rotated into the image observer's frame.
 - **RadialWarp and RectWarp** build a warped HPC plane point and derive the angles from it.
 
 CAR and CEA sources use the point's solar longitude and latitude directly, CEA with its equal-area
-latitude. In HPC and both warp modes, the point comes from the ray's intersection with the solar sphere,
-inverse-rotated by the displayed view rotation; off-limb rays have no map data and are discarded.
+latitude. In HPC and both warp modes, the point comes from the ray's intersection with the solar sphere;
+the displayed view rotation is folded into the map's native frame by the binder. Off-limb points lie
+outside the unit sphere and have no map data; the CAR/CEA projection discards them.
 The display mode and the source projection are independent choices. When differential rotation carries
-an observer-image surface point behind its source horizon (`z < 1/D`), HPC, Latitudinal and the warps reject it.
+an observer-image surface point behind its source horizon, HPC, Latitudinal and the warps reject it.
 
 From the plane point every mode computes original normalized coordinates:
 
@@ -228,9 +253,9 @@ source = original pixel coordinate / original image size
 ```
 
 `GLSLImageShader` builds this affine mapping from the original `planeToPixel` and `referencePixel`
-divided by the original size. [`imageCommon.frag`](../resources/glsl/imageCommon.frag) stores its two rows
-in `sourceX` and `sourceY`. Clipping and wrapping act on `source`. Right before the texture reads,
-`getColor` converts it to decoded coordinates with one `sampling` vector per image:
+divided by the original size. [`imageCommon.frag`](../resources/glsl/imageCommon.frag) stores its two columns
+in `imageFromPlaneX` and `imageFromPlaneY`, with the translation in `imageOffset`. Clipping and wrapping act on `source`. Right before the texture reads,
+`getColor` converts it to decoded coordinates with `texScale` and `texOffset` per image:
 
 ```text
 scale   = originalSize / (step · decodedSize)
@@ -238,18 +263,51 @@ offset  = (0.5 - F / step) / decodedSize
 texture = source · scale + offset
 ```
 
-The binder derives scale and offset from the grid; the shader keeps them in `sampling.xy` and
-`sampling.zw`. At level 0 they are the identity. Each 160-byte image record also contains the native
-frame, pole conventions, selected observer distance and observer transforms. `ImageLayer.render()` selects displayed
-distance/orientation for surface maps, including trackball rotation only in Orthographic. Observer images retain
-their source distance/orientation and existing camera-difference transform. The two-image uniform block is 320 bytes.
+The binder derives scale and offset from the grid; the shader keeps them in `texScale` and
+`texOffset`. At level 0 they are the identity.
 
-[`imageGeometry.frag`](../resources/glsl/imageGeometry.frag) projects homogeneous 3D directions through the
-prepared native frame. Observer points and warp-plane inputs go directly to that frame without converting to angles and back. TAN uses the
-formal WCS except in Orthographic, which keeps the simple-TAN display policy described above. The
-binder receives the display mode and folds the appropriate offset and user plane rotation into
-`sourceX/sourceY` before converting to float. For Orthographic TAN the offset is scaled CRVAL;
-otherwise it is the native projection origin. No additional image uniforms are needed. HPC and Latitudinal
+### Image uniform record
+
+Each image occupies 192 bytes; the current and comparison images share a 384-byte `ImageBlock`.
+Java packs the record in three groups: WCS projection data, image/texture mapping, then tracing
+viewpoint and frame rotations. WebGL uploads those Java-packed bytes and checks the named std140 offsets.
+The projection matrix uses std140 column-major storage, with each three-component column aligned to
+16 bytes. Projection parameters and the six scalar PV coefficients follow it; no parameter occupies
+a matrix padding slot.
+
+- `imageFromPlaneX/Y` and `imageOffset` map the raw projection plane to original normalized image
+  coordinates: `plane.x * imageFromPlaneX + plane.y * imageFromPlaneY + imageOffset`. The binder folds
+  `unitsPerRad` into the columns for formal projections; Orthographic TAN keeps its source-XY units.
+- `projectionFromRay` maps a forward-Z direction in the prepared image frame into WCSLIB's projection-local Cartesian frame. WCSLIB
+  calls this the **native frame**; it is a mathematical coordinate frame, not a reference to native
+  machine code. The binder composes the displayed orientation into this matrix for surface maps.
+- `azpTanTilt` and `azpSecTilt` hold the tangent and secant of AZP's projection-plane tilt.
+  `zpnMaxAngle` is the maximum invertible ZPN angular distance, in radians. The remaining effective
+  projection coefficients are the per-image scalars `pv0` through `pv5`, matching WCS PV2 indices.
+- `northPole` and `southPole` retain WCSLIB's choice of radial direction where
+  longitude is undefined at a projection pole.
+- `imageToView` rotates the prepared image frame into the displayed frame for Orthographic geometry.
+  `solarToImage` rotates the solar frame into the prepared image frame for latitude sampling and differential
+  rotation. `deltaT` is the time difference in megaseconds used by that rotation model.
+
+`ImageLayer.render()` supplies the display rotation and viewpoint and the source viewpoints.
+`ImageGeometry.tracingViewpoint()` selects the tracing viewpoint for both image bounds and
+shader binding. `GLSLImageShader` prepares the image-specific transforms when packing the record. `MapView.viewRotation()` includes the trackball rotation only for Orthographic.
+The prepared image frame is observer-aligned for observer images and display-aligned for surface maps.
+The binder owns CRVAL adjustment and prepares each record from that image's geometry and viewpoint.
+Projection coefficients travel in the same record as their transforms.
+The native WCSLIB interface exposes the projection axes, coefficients and pole directions as named fields.
+Java retains those names when preparing the shader values.
+
+[`imageGeometry.frag`](../resources/glsl/imageGeometry.frag) transforms source directions into the
+projection-local frame and applies the selected projection. Observer points and warp-plane inputs enter
+that frame without converting to angles and back. TAN uses formal WCS except in Orthographic, where the
+binder packs the renderer-specific `ORTHOGRAPHIC_TAN` code. This path maps source XY directly,
+without applying the projection matrix. Formal projections return radians; their unit conversion
+is already in the affine coefficients, including the longitude-turn displacement used by maps.
+The binder folds the appropriate offset and user plane rotation into
+the affine coefficients and `imageOffset` before converting to float. For Orthographic TAN the offset is scaled CRVAL;
+otherwise it is the native projection origin. HPC and Latitudinal
 angular inputs and RectWarp's angular direction use `sinCos()`. It uses built-in sine/cosine on hardware
 renderers and the accurate polynomial only on SwiftShader. `GLSLShader` selects this at fragment-shader
 compilation from `GL.renderer`, adding `JHV_SWIFTSHADER` after the version directive; each new context
@@ -279,7 +337,7 @@ footprints several turns away without wrapping an image-width interval. The deco
 is applied only after that source position is selected.
 
 Sharpening blurs nine taps around the decoded coordinate, with offsets in current-image texels. In
-difference mode the comparison offsets are scaled by `comparison.sampling.xy / current.sampling.xy`. Brightness,
+difference mode the comparison offsets are scaled by `comparison.texScale / current.texScale`. Brightness,
 enhancement, difference contrast, sharpening, gamma, dithering and the LUT then give the fragment color.
 
 ## Cutouts

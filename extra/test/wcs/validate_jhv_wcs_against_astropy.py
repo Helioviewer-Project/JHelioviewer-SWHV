@@ -29,7 +29,7 @@ SURFACE_MAP_PROJECTIONS = {"CAR", "CEA"}
 PV2_PROJECTIONS = {"AZP", "ZPN", "CEA"}
 PIXEL_SAMPLED_FORWARD_PROJECTIONS = {"ZPN", "CAR", "CEA"}
 DISPLAY_SECTORS = ((0.0, 0.0), (0.0, 0.0))
-DISPLAY_CUTOFF = (0.0, 0.0, -1.0)
+DISPLAY_CUTOFF = (0.0, 0.0, math.inf)
 DISPLAY_RADII = (0.0, math.inf)
 DISPLAY_SLIT = (0.0, 1.0)
 PLANE_Z_EPS = 1e-8
@@ -924,7 +924,7 @@ def mirrored_world_array_to_pixel_center(world_deg: np.ndarray, meta: JHVMeta) -
     return plane_internal_array_to_pixel_center(plane_internal, meta, wrap_x=surface_map_wraps_x(meta))
 
 
-def simple_tan_world_array_to_pixel_center(world_xyz: np.ndarray, meta: JHVMeta) -> np.ndarray:
+def orthographic_tan_world_array_to_pixel_center(world_xyz: np.ndarray, meta: JHVMeta) -> np.ndarray:
     dx = world_xyz[:, 0] - meta.crval_internal_x
     dy = world_xyz[:, 1] - meta.crval_internal_y
     return plane_internal_array_to_pixel_center(np.column_stack((dx, dy)), meta)
@@ -1367,8 +1367,6 @@ def passes_radii(radial2: float, radii: tuple[float, float] = DISPLAY_RADII) -> 
 
 
 def passes_cutoff(xy: tuple[float, float], cutoff: tuple[float, float, float] = DISPLAY_CUTOFF) -> bool:
-    if cutoff[2] < 0.0:
-        return True
     geometry_flat_dist = abs(xy[0] * cutoff[0] + xy[1] * cutoff[1])
     cutoff_alt = (-cutoff[1], cutoff[0])
     geometry_flat_dist_alt = abs(xy[0] * cutoff_alt[0] + xy[1] * cutoff_alt[1])
@@ -1855,7 +1853,7 @@ def sampleOrthoTexcoord(
     world_xyz: tuple[float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    simple_tan: bool = False,
+    orthographic_tan: bool = False,
 ) -> tuple[float, float]:
     if meta.projection == "CAR":
         plane = projectCarToWcsPlane(world_xyz, meta)
@@ -1863,7 +1861,7 @@ def sampleOrthoTexcoord(
     if meta.projection == "CEA":
         plane = projectCeaToWcsPlane(world_xyz, meta)
         return wcsPlaneToSurfaceTexcoord(plane, meta, image2d)
-    if simple_tan and meta.projection == "TAN":
+    if orthographic_tan and meta.projection == "TAN":
         return wcsPlaneToTexcoord((world_xyz[0] - meta.crval_internal_x, world_xyz[1] - meta.crval_internal_y), meta, image2d)
     helioprojective = worldToHelioprojective(world_xyz, meta.observer_distance)
     plane = projectHelioprojectiveToWcsPlane(helioprojective, meta)
@@ -1926,7 +1924,7 @@ def renderOrthographicTexcoords(
     image2d: np.ndarray,
     diff_meta: JHVMeta | None = None,
     diff_image2d: np.ndarray | None = None,
-    simple_tan: bool = False,
+    orthographic_tan: bool = False,
     camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     diff_camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
@@ -1965,7 +1963,7 @@ def renderOrthographicTexcoords(
     if not clipOrthoGeometry(world_xyz):
         return (math.nan, math.nan), (math.nan, math.nan), world_xyz, world_xyz
 
-    texcoord = sampleOrthoTexcoord(world_xyz, meta, image2d, simple_tan=simple_tan)
+    texcoord = sampleOrthoTexcoord(world_xyz, meta, image2d, orthographic_tan=orthographic_tan)
     if diff_meta is None:
         return texcoord, texcoord, world_xyz, world_xyz
 
@@ -1999,7 +1997,7 @@ def renderOrthographicTexcoords(
         diff_world_xyz,
         diff_meta,
         diff_image2d if diff_image2d is not None else image2d,
-        simple_tan=simple_tan,
+        orthographic_tan=orthographic_tan,
     )
     return texcoord, diff_texcoord, world_xyz, diff_world_xyz
 
@@ -2008,7 +2006,7 @@ def renderOrthographicPixel(
     screen_xy: tuple[float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    simple_tan: bool = False,
+    orthographic_tan: bool = False,
     camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
 ) -> tuple[tuple[float, float], tuple[float, float, float]]:
@@ -2016,7 +2014,7 @@ def renderOrthographicPixel(
         screen_xy,
         meta,
         image2d,
-        simple_tan=simple_tan,
+        orthographic_tan=orthographic_tan,
         camera_diff_quat=camera_diff_quat,
         source_view_quat=source_view_quat,
     )
@@ -2636,7 +2634,7 @@ def run_compare_initial_tan_image_frame(
         screen_xy = np.column_stack((world_xyz[:, 0], world_xyz[:, 1]))
         new_px = np.array([
             texcoord_to_pixel_center(
-                renderOrthographicTexcoords((float(sx), float(sy)), meta, image_data, simple_tan=False)[0],
+                renderOrthographicTexcoords((float(sx), float(sy)), meta, image_data, orthographic_tan=False)[0],
                 meta.pixel_width,
                 meta.pixel_height,
             )
@@ -2644,7 +2642,7 @@ def run_compare_initial_tan_image_frame(
         ], dtype=np.float64)
         old_px = np.array([
             texcoord_to_pixel_center(
-                renderOrthographicTexcoords((float(sx), float(sy)), meta, image_data, simple_tan=True)[0],
+                renderOrthographicTexcoords((float(sx), float(sy)), meta, image_data, orthographic_tan=True)[0],
                 meta.pixel_width,
                 meta.pixel_height,
             )
@@ -2734,7 +2732,7 @@ def run_compare_initial_tan_vs_hpc(
         valid_indices = np.arange(size)
         z_valid = np.sqrt(np.maximum(0.0, 1.0 - radius2))
         world_xyz = np.column_stack((xs, np.full(xs.shape, y, dtype=np.float64), z_valid))
-        old_px = simple_tan_world_array_to_pixel_center(world_xyz, meta)
+        old_px = orthographic_tan_world_array_to_pixel_center(world_xyz, meta)
         hpc_world_deg = np.rad2deg(np.column_stack((
             xs * solar_limb_angle,
             np.full(xs.shape, y * solar_limb_angle, dtype=np.float64),
@@ -3082,8 +3080,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--latitudinal-diff-selfcheck", action="store_true", help="Exercise the mirrored Latitudinal diff branch with identical source/meta on both sides")
     parser.add_argument("--orthographic-diff-selfcheck", action="store_true", help="Exercise the mirrored Orthographic diff branch with identical source/meta on both sides")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC over the full rendered comparison frame")
-    parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare simple-TAN against formal-TAN over the full image frame")
-    parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare simple-TAN against the JHV HPC display sampling over the full rendered comparison frame")
+    parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare Orthographic TAN against formal-TAN over the full image frame")
+    parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare Orthographic TAN against the JHV HPC display sampling over the full rendered comparison frame")
     parser.add_argument("--render-size", type=int, default=512, help="Square output size for HPC diagnostic renderings")
     parser.add_argument("--surface-map-grid-factor", type=int, default=4, help="Render CAR/CEA validation images at this multiple of the source width/height")
     parser.add_argument("--output-dir", type=Path, default=Path("extra/test/out"), help="Directory for diagnostic PNGs")

@@ -23,11 +23,16 @@ typedef struct {
     double reference_pixel[2];   // FITS centers, one based, Y up.
     double pixel_to_plane[4];    // Row major.
     double reference[2];        // Celestial longitude and latitude.
-    double native_basis[12];    // Three vec4 rows: JHV direction -> (east, north, zenith).
-                               // Row W values: AZP tan(gamma), sec(gamma), ZPN upper eta.
+    double to_projection_x[3]; // Projection-local Cartesian axes, applied to a JHV direction.
+    double azp_tan_tilt;
+    double to_projection_y[3];
+    double azp_sec_tilt;
+    double to_projection_z[3];
+    double zpn_max_angle;
     double offset[2];           // Subtract from the raw native projection plane.
     double pv[6];               // Effective float coefficients, also used by WCSLIB.
-    double native_poles[4];     // Projection directions at native north and south poles.
+    double north_pole[2];       // Radial directions at the projection poles.
+    double south_pole[2];
 } jhv_wcs_info;
 
 JHV_WCS_API jhv_wcs *jhv_wcs_create(const char *cards, int count, jhv_wcs_info *info,

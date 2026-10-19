@@ -45,20 +45,21 @@ public final class ImageLayers {
         return size;
     }
 
-    public static double getLargestRadialSize(double viewDistance) {
+    public static double getLargestRadialSize(Position viewpoint) {
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (!layer.isEnabled())
                 continue;
             MetaData metaData = layer.getMetaData();
-            double distance = metaData.getRenderDistance(viewDistance);
-            size = Math.max(size, ImageBounds.radial(metaData.getGeometry(), distance));
+            ImageGeometry geometry = metaData.getGeometry();
+            double distance = geometry.tracingViewpoint(viewpoint, metaData.getViewpoint()).distance;
+            size = Math.max(size, ImageBounds.radial(geometry, distance));
         }
         return size;
     }
 
-    public static Region computeHpcScaleBounds(double viewDistance) {
-        Region bounds = getHpcImageBounds(viewDistance);
+    public static Region computeHpcScaleBounds(Position viewpoint) {
+        Region bounds = getHpcImageBounds(viewpoint);
         double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
         double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
         if (halfWidth <= 0)
@@ -68,7 +69,7 @@ public final class ImageLayers {
         return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
     }
 
-    private static Region getHpcImageBounds(double viewDistance) {
+    private static Region getHpcImageBounds(Position viewpoint) {
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY;
@@ -78,8 +79,9 @@ public final class ImageLayers {
                 continue;
 
             MetaData metaData = layer.getMetaData();
-            double distance = metaData.getRenderDistance(viewDistance);
-            Region bounds = ImageBounds.hpc(metaData.getGeometry(), distance);
+            ImageGeometry geometry = metaData.getGeometry();
+            double distance = geometry.tracingViewpoint(viewpoint, metaData.getViewpoint()).distance;
+            Region bounds = ImageBounds.hpc(geometry, distance);
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);

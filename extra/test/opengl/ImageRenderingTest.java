@@ -59,6 +59,7 @@ import nom.tam.fits.ImageHDU;
 
 public final class ImageRenderingTest {
     private static final int TEXTURE_SIZE = 64;
+    private static final JHVTime TIME = new JHVTime("2026-01-15T12:00:00");
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1)
@@ -70,7 +71,7 @@ public final class ImageRenderingTest {
         Log.init();
         Directories.createCacheDirs();
         AppInit.loadSpice();
-        Position viewpoint = Sun.getEarth(new JHVTime("2026-01-15T12:00:00"));
+        Position viewpoint = Sun.getEarth(TIME);
         rayIntersections(viewpoint.time);
         DisplayController.setRenderRequestHandler(_ -> {});
         DisplayController.setViewpointUpdate(_ -> viewpoint, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
@@ -139,10 +140,10 @@ public final class ImageRenderingTest {
                         GLSLImageShader.bindDisplay(new float[]{opacity, opacity, opacity, opacity},
                                 1f / TEXTURE_SIZE, 1f / TEXTURE_SIZE, effect.equals("sharpen") ? -1 : 0, diff,
                                 effect.equals("levels") ? -0.2f : 0, effect.equals("levels") ? 1.5f : 1,
-                                effect.equals("gamma") ? 0.5f : 1, 1, 0, 0, 0, 0, 0, 0, -1, 0,
+                                effect.equals("gamma") ? 0.5f : 1, 1, 0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0,
                                 effect.equals("mask") ? 0.5f : 0, 100, 0, 1, 0);
-                        GLSLImageShader.render(mode, geometry, wcs, 215, 0, Quat.ZERO, Quat.ZERO,
-                                geometry, wcs, 215, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                        GLSLImageShader.render(mode, Quat.ZERO, centered(215), geometry, centered(215),
+                                geometry, centered(215), Mat2.IDENTITY, 0, 0, false);
                         ByteBuffer pixels = BufferUtils.newByteBuffer(size * size * 4);
                         GL.glReadPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
                         GLException.checkErrors("ImageRenderingTest " + mode + " " + effect);
@@ -770,7 +771,7 @@ public final class ImageRenderingTest {
         transforms(texture, difference, mask, wcs, centeredView, size);
         sharpening(texture, difference, mask, wcs, centeredView, size);
         wrapping(texture, difference, mask, centeredView, size);
-        simpleTan(texture, difference, mask, centeredView, size);
+        orthographicTan(texture, difference, mask, centeredView, size);
         orthoComparison(texture, difference, mask, centeredView, size);
         clipping(texture, difference, lut, mask, wcs, centeredView, size);
         System.out.println("PASS: reduced-grid alignment, fixed detector masks and slits, CAR/CEA wrapping, and nonlinear sharpening against a CPU reference");
@@ -826,12 +827,12 @@ public final class ImageRenderingTest {
                             0, 1, 1, 1, mode == MapMode.HPC ? (float) Math.PI : 0,
                             effect == 3 ? (float) Math.PI / 4 : effect == 6 ? (float) Math.PI : 0,
                             effect == 7 ? (mode == MapMode.HPC ? 0 : (float) Math.PI) : 0, effect == 7 ? (float) Math.PI / 4 : 0,
-                            1, 0, effect == 4 ? .1f : -1, 0,
+                            1, 0, effect == 4 ? .1f : Float.POSITIVE_INFINITY, 0,
                             effect == 2 ? 2 : 0, effect == 1 ? .1f : 100, .375f, .625f, effect == 5 ? 1 : 0);
                     GL.glClearColor(0, 0, 0, 1);
                     GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                    GLSLImageShader.render(mode, decoded.geometry(), wcs, 215, 0, Quat.ZERO, Quat.ZERO,
-                            decoded.geometry(), wcs, 215, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                    GLSLImageShader.render(mode, Quat.ZERO, centered(215), decoded.geometry(), centered(215),
+                            decoded.geometry(), centered(215), Mat2.IDENTITY, 0, 0, false);
                     ByteBuffer pixel = BufferUtils.newByteBuffer(4);
                     GL.glReadPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
                     if (GLException.checkErrors("ImageRenderingTest clipping"))
@@ -858,10 +859,10 @@ public final class ImageRenderingTest {
                         GLSLScreenShader.setView(view, Display.getViewport(0));
                         for (int effect = 0; effect < 3; effect++) {
                             GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, 0, 0, 1, 1, 1,
-                                    0, 0, 0, 0, 0, 0, -1, 0, effect == 1 ? .5f : 0, effect == 2 ? .5f : 100, 0, 1, 0);
+                                    0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, effect == 1 ? .5f : 0, effect == 2 ? .5f : 100, 0, 1, 0);
                             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                            GLSLImageShader.render(mode, surface, surfaceWcs, 215, 0, Quat.ZERO, displayed.toQuat(),
-                                    surface, surfaceWcs, 215, 0, Quat.ZERO, displayed.toQuat(), Mat2.IDENTITY);
+                            GLSLImageShader.render(mode, displayed.toQuat(), displayed, surface, displayed,
+                                    surface, displayed, Mat2.IDENTITY, 0, 0, false);
                             assertPixel(size / 2, size / 2, effect == 1 ? 0 : 128, "Rotated surface mask: " + projection + " " + mode);
                         }
                     }
@@ -884,10 +885,10 @@ public final class ImageRenderingTest {
                                 float sector = effect == 1 ? 0 : effect == 2 ? (float) Math.PI : 0;
                                 GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, diffMode, 0, 1, 1, 1,
                                         sector, effect == 1 || effect == 2 ? .1f : 0, 0, 0,
-                                        1, 0, effect == 3 ? 32 : -1, 0, 0, outer, 0, 1, enhanced);
+                                        1, 0, effect == 3 ? 32 : Float.POSITIVE_INFINITY, 0, 0, outer, 0, 1, enhanced);
                                 GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                                GLSLImageShader.render(MapMode.HPC, wide, arc, 10, 0, Quat.ZERO, Quat.ZERO,
-                                        wide, arc, 10, 0, Quat.ZERO, Quat.ZERO, Mat2.IDENTITY);
+                                GLSLImageShader.render(MapMode.HPC, Quat.ZERO, centered(10), wide, centered(10),
+                                        wide, centered(10), Mat2.IDENTITY, 0, 0, false);
                                 boolean masked = !Float.isInfinite(outer) || effect == 3
                                         || effect == 1 && longitude > 0 || effect == 2 && longitude < 0;
                                 int expected = masked ? 0 : Math.abs(longitude) >= 90 || enhanced == 0 || diffMode != 0 ? 128 : 255;
@@ -952,7 +953,8 @@ public final class ImageRenderingTest {
                 new Mat2(4. / 129, 0, 0, -4. / 97), new Vec2(64.5, 48.5));
         ImageGeometry surfaceGeometry = new ImageGeometry(129, 97, surface,
                 new Mat2(2 * Math.PI / 129, 0, 0, -4. / 97), new Vec2(64.5, 48.5));
-        Quat observerRotation = Quat.createAxisY(-Math.PI / 3), surfaceRotation = Quat.createAxisY(Math.PI / 6);
+        // The observer image is seen through display * conj(source) = rotation by -pi/3; the map through the display.
+        Position observerSource = new Position(viewpoint.time, 10, Math.PI / 2, 0), display = new Position(viewpoint.time, 10, Math.PI / 6, 0);
         for (int level : new int[]{0, 3}) {
             DecodedImage observerImage = ramp(observerGeometry, 3, 5, level);
             DecodedImage surfaceImage = ramp(surfaceGeometry, 3, 5, level + 1);
@@ -965,13 +967,11 @@ public final class ImageRenderingTest {
                     difference.bind();
                     texture.bind();
                     GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, 1,
-                            0, 1, 1, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 100, 0, 1, 0);
+                            0, 1, 1, 1, 0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, 0, 100, 0, 1, 0);
                     GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                    GLSLImageShader.render(MapMode.Orthographic,
-                            current.geometry(), current.geometry().wcs, 10, 0,
-                            reversed ? Quat.ZERO : observerRotation, reversed ? surfaceRotation : Quat.ZERO,
-                            prior.geometry(), prior.geometry().wcs, 10, 0,
-                            reversed ? observerRotation : Quat.ZERO, reversed ? Quat.ZERO : surfaceRotation, Mat2.IDENTITY);
+                    GLSLImageShader.render(MapMode.Orthographic, display.toQuat(), display,
+                            current.geometry(), observerSource,
+                            prior.geometry(), observerSource, Mat2.IDENTITY, 0, 0, false);
                     ByteBuffer pixels = BufferUtils.newByteBuffer(size * size * 4);
                     GL.glReadPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
                     for (int offset : new int[]{0, 48}) {
@@ -1004,7 +1004,7 @@ public final class ImageRenderingTest {
         System.out.println("PASS: independent Orthographic sphere/plane comparison with distinct rotations, projections, PV coefficients and decoded grids in both image orders");
     }
 
-    private static void simpleTan(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
+    private static void orthographicTan(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
                                   Position viewpoint, int size) {
         MapView view = MapView.create(Display.getCamera(), viewpoint, MapMode.Orthographic, GridType.Viewpoint, new MapScale[]{MapScale.ortho});
         Transform.ortho(1, 4, 0, 0, Quat.ZERO);
@@ -1027,14 +1027,14 @@ public final class ImageRenderingTest {
                 mask.bind();
                 difference.bind();
                 texture.bind();
-                WcsSolution currentWcs = wcs.adjusted(7200, -3600);
-                WcsSolution priorWcs = wcs.adjusted(-3600, 5400);
+                ImageGeometry currentGeometry = new ImageGeometry(129, 97, wcs.adjusted(7200, -3600), full.pixelToPlane, full.referencePixel);
+                ImageGeometry priorGeometry = new ImageGeometry(129, 97, wcs.adjusted(-3600, 5400), full.pixelToPlane, full.referencePixel);
                 for (int effect : new int[]{0, 2}) {
                     GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, effect,
-                            0, 1, 1, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 100, 0, 1, 0);
+                            0, 1, 1, 1, 0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, 0, 100, 0, 1, 0);
                     GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                    GLSLImageShader.render(MapMode.Orthographic, image.geometry(), currentWcs, 2, 0, Quat.ZERO, Quat.ZERO,
-                            prior.geometry(), priorWcs, 2, 0, Quat.ZERO, Quat.ZERO, adjustment);
+                    GLSLImageShader.render(MapMode.Orthographic, Quat.ZERO, centered(2), currentGeometry.forGrid(image.geometry().grid), centered(2),
+                            priorGeometry.forGrid(prior.geometry().grid), centered(2), adjustment, 0, 0, false);
                     ByteBuffer pixels = BufferUtils.newByteBuffer(size * size * 4);
                     GL.glReadPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
                     for (int[] sample : new int[][]{{0, 0}, {48, -24}, {-32, 40}, {80, 0}}) {
@@ -1057,7 +1057,7 @@ public final class ImageRenderingTest {
                         int actual = pixels.get(4 * (y * size + x)) & 255;
                         // Half-float filtering, LUT quantization and one-byte dither.
                         if (Math.abs(actual - expected) > 2)
-                            throw new AssertionError("Simple TAN: grid " + level + " effect " + effect + " point " + x + "," + y
+                            throw new AssertionError("Orthographic TAN: grid " + level + " effect " + effect + " point " + x + "," + y
                                     + ": " + actual + " vs " + expected);
                     }
                 }
@@ -1066,7 +1066,7 @@ public final class ImageRenderingTest {
                 image.release();
             }
         }
-        System.out.println("PASS: independent simple-TAN affine reference, user offsets/rotation, comparison image and reduced grids");
+        System.out.println("PASS: independent Orthographic TAN affine reference, user offsets/rotation, comparison image and reduced grids");
     }
 
     private static void transforms(GLStreamingTexture2D texture, GLStreamingTexture2D difference, GLTexture mask,
@@ -1325,15 +1325,19 @@ public final class ImageRenderingTest {
         texture.bind();
         GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 1f / image.imageBuffer().width, 1f / image.imageBuffer().height,
                 (effect & 1) != 0 ? -1 : 0, effect >= 2 ? 1 : 0,
-                0, 1, 1, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 100, .375f, .625f, 0);
+                0, 1, 1, 1, 0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, 0, 100, .375f, .625f, 0);
         GL.glClearColor(0, 0, 0, 1);
         GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        GLSLImageShader.render(mode, image.geometry(), image.geometry().wcs, 215, 0, Quat.ZERO, Quat.ZERO,
-                prior.geometry(), prior.geometry().wcs, 215, 0, Quat.ZERO, Quat.ZERO, adjustment);
+        GLSLImageShader.render(mode, Quat.ZERO, centered(215), image.geometry(), centered(215),
+                prior.geometry(), centered(215), adjustment, 0, 0, false);
         ByteBuffer pixels = BufferUtils.newByteBuffer(size * size * 4);
         GL.glReadPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
         if (GLException.checkErrors("ImageRenderingTest sampling"))
             throw new AssertionError("Sampling render failed");
         return pixels;
+    }
+
+    private static Position centered(double distance) {
+        return new Position(TIME, distance, 0, 0);
     }
 }

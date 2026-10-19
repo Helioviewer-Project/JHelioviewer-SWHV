@@ -27,7 +27,8 @@ public abstract class MapView {
         gridType = _gridType;
         scales = _scales;
         dragRotation = camera.getDragRotation();
-        viewRotation = Quat.rotate(dragRotation, viewpoint.toQuat());
+        // Projected views do not use the Orthographic trackball rotation.
+        viewRotation = mode == MapMode.Orthographic ? Quat.rotate(dragRotation, viewpoint.toQuat()) : viewpoint.toQuat();
         latiLongitudeOrigin = mode == MapMode.Latitudinal ? gridType.toLongitude(viewpoint) : 0;
         latiLatitudeOrigin = mode == MapMode.Latitudinal ? gridType.toLatitude(viewpoint) : 0;
     }

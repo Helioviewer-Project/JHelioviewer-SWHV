@@ -239,7 +239,7 @@ def local_geometry_cases(root, backend):
     # Expected motion advances heliographic longitude, independently of shader quaternions.
     jobs, checks = [], []
 
-    def add(name, mode, bounds, points, orientations, times=(0, 0), inverse=None, projection="TAN", distance=10, reference_longitude=0):
+    def add(name, mode, bounds, points, orientations, times=(0, 0), inverse=None, projection="TAN", distance=10, reference_longitude=0, enhanced=False):
         header = image_header(projection, distance)
         header["CRVAL1"], header["CRVAL2"] = reference_longitude, 0
         for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2"):
@@ -252,7 +252,7 @@ def local_geometry_cases(root, backend):
         expected = []
         for index, (point, quat, dt) in enumerate(zip(points, orientations, times, strict=True)):
             fields.append({**gpu.wcs_job_fields(meta if index == 0 else cpu.build_jhv_meta(secondary_header)),
-                           "sourceViewQuat": quat, "cameraDiff": [-quat[0], -quat[1], -quat[2], quat[3]],
+                           "solarToSource": quat, "sourceToView": [-quat[0], -quat[1], -quat[2], quat[3]],
                            "deltaT": dt})
             if point is not None:
                 uv, valid = reference_pixels(header if index == 0 else secondary_header,
@@ -262,7 +262,7 @@ def local_geometry_cases(root, backend):
         if any(point is None for point in points):
             expected = [0, 0, 0, 0]
         job.update(fields[0])
-        job.update({"secondary": fields[1], "difference": True, "productionCoordinates": True})
+        job.update({"secondary": fields[1], "difference": True, "productionCoordinates": True, "enhanced": enhanced})
         if inverse is not None:
             job["inverseMVP"] = inverse.T.ravel().tolist()
         jobs.append(job)
@@ -280,9 +280,10 @@ def local_geometry_cases(root, backend):
         for mode in gpu.ALL_MODES:
             # HPC and warp inputs start in source-observer coordinates; Ortho/Lati start in solar-world.
             start = world if mode in ("ortho", "lati_zenithal") else rotations[0] @ world
-            for moving in (False, True):
-                # Elapsed milliseconds * 1e-9 is elapsed seconds * 1e-6.
-                times = (86400e-6, -2 * 86400e-6) if moving else (0, 0)
+            # Mixed times exercise direct-ray and sphere sampling independently in the two images.
+            # Elapsed milliseconds * 1e-9 is elapsed seconds * 1e-6.
+            for motion, times in (("static", (0, 0)), ("both", (86400e-6, -2 * 86400e-6)),
+                                  ("current", (86400e-6, 0)), ("comparison", (0, -2 * 86400e-6))):
                 points = []
                 for rotation, dt in zip(rotations, times, strict=True):
                     solar = world if mode in ("ortho", "lati_zenithal") else rotation.T @ start
@@ -316,7 +317,7 @@ def local_geometry_cases(root, backend):
                             inverse[:2, :2] = 0
                             inverse[:2, 3] = [angle / 360 - .5, radius / 2 - .5]
                             bounds = (0, 360, 0, 2)  # lambda=1 gives a linear radial map.
-                add(f"local_rotation_{mode}_{latitude}_{moving}", mode, bounds, points, quats, times, inverse)
+                add(f"local_rotation_{mode}_{latitude}_{motion}", mode, bounds, points, quats, times, inverse)
 
     for distance, z in ((2, .75), (2, .5), (2, .25), (10, .2), (10, .05), (215, .01), (215, .002)):
         # At D=2,z=.5 the encoded Y quaternion has q.y=.5, so source.z is exactly .5.
@@ -378,17 +379,23 @@ def local_geometry_cases(root, backend):
         add(f"local_full_surface_{projection}", "lati_zenithal", (0, 0, 0, 0),
             [[0, 0, 1]] * 2, [[0, 1, 0, 0]] * 2, projection=projection)
 
-    for angle in (0, 178, 180):
-        add(f"local_directed_ray_{angle}", "hpc", (angle, angle, 0, 0),
-            [[0, 0, 1]] * 2 if angle == 0 else [None, None], [[0, 0, 0, 1]] * 2, projection="CAR")
+    # Surface maps require a sphere hit and ignore observer-image time correction
+    # and enhancement, including when both are enabled.
+    for projection in ("CAR", "CEA"):
+        for angle in (0, 178, 180):
+            for moving, enhanced in ((False, False), (True, False), (False, True), (True, True)):
+                add(f"local_directed_ray_{projection}_{angle}_{moving}_{enhanced}", "hpc", (angle, angle, 0, 0),
+                    [[0, 0, 1]] * 2 if angle == 0 else [None, None], [[0, 0, 0, 1]] * 2,
+                    times=(86400e-6, -2 * 86400e-6) if moving else (0, 0), projection=projection, enhanced=enhanced)
     # Wide-field observer images retain rear-facing rays. A point on each ray
     # supplies independent WCSLIB coordinates, without requiring a Sun-plane hit.
     for degrees in (45, 89, 90, 110, 178):
         angle = math.radians(degrees)
         point = [math.sin(angle), 0, 10 - math.cos(angle)]
-        add(f"local_image_{degrees}", "hpc", (degrees, degrees, 0, 0),
-            [point, point], [[0, 0, 0, 1]] * 2, times=(86400e-6, -2 * 86400e-6),
-            reference_longitude=degrees)
+        for moving, enhanced in ((False, False), (True, False), (False, True), (True, True)):
+            add(f"local_image_{degrees}_{moving}_{enhanced}", "hpc", (degrees, degrees, 0, 0),
+                [point, point], [[0, 0, 0, 1]] * 2,
+                times=(86400e-6, -2 * 86400e-6) if moving else (0, 0), reference_longitude=degrees, enhanced=enhanced)
     return jobs, checks
 
 
@@ -457,7 +464,7 @@ def surface_coverage_cases(root, backend, size):
             job = gpu.common_job("ortho" if seam else "lati_zenithal", Path(name), 1, root, cpu.build_jhv_meta(header), (0, 0, 0, 0), True, backend, name)
             job.update(productionCoordinates=True, difference=True, slit=slit)
             if seam:
-                job["sourceViewQuat"] = [0, 1, 0, 0]
+                job["solarToSource"] = [0, 1, 0, 0]
             jobs.append(job)
             checks.append(("local", np.tile(uv, 2) if valid else np.zeros(4), None, None))
     # Retain the real AIA header, including its half-pixel longitude origin.
@@ -485,7 +492,9 @@ def native_frame_cases(root, backend, size):
         else:
             # A point on each directed observer ray, independently constructed.
             world = np.stack((np.cos(lat)*np.sin(lon), np.sin(lat), 10-np.cos(lat)*np.cos(lon)), axis=-1)
-        for variant in ("tilted", "pole", "fiducial", "offset"):
+        for variant, normalization in (("tilted", .9), ("pole", 1.1), ("fiducial", 1.), ("offset", .93)):
+            # WcsInterpreter fixes map units to radians; only observer normalization varies.
+            normalization = 1. if surface else normalization
             header = image_header(projection)
             header["CRVAL1"], header["CRVAL2"] = 35., 20.
             if variant == "pole":
@@ -508,11 +517,15 @@ def native_frame_cases(root, backend, size):
             job.update(productionCoordinates=True)
             if adjustment is not None:
                 job["planeAdjustment"] = adjustment
+            secondary_fields = gpu.wcs_job_fields(cpu.build_jhv_meta(secondary))
+            # Change internal plane units without changing the FITS WCS or its source pixels.
+            for image in (job, secondary_fields):
+                image["wcsHeader"]["unitsPerRad"] *= normalization
             assert valid.any(), name
             jobs.append(job)
             checks.append(("coordinates", uv, valid, None))
             jobs.append({**job, "name": name + "_comparison", "difference": True,
-                         "secondary": {**gpu.wcs_job_fields(cpu.build_jhv_meta(secondary)),
+                         "secondary": {**secondary_fields,
                                        **({"planeAdjustment": adjustment} if adjustment is not None else {})},
                          "outputPath": str(root / f"{name}_comparison.rgba32f")})
             assert (valid & other_valid).any(), name
@@ -520,7 +533,7 @@ def native_frame_cases(root, backend, size):
     return jobs, checks
 
 
-def simple_tan_cases(root, backend):
+def orthographic_tan_cases(root, backend):
     # Real validation-note headers retain their original image scale and CRVAL.
     # Compare source pixels directly with an affine solve, independently of WCSLIB.
     jobs, checks = [], []
@@ -530,9 +543,12 @@ def simple_tan_cases(root, backend):
             header = cpu.find_image_hdu(hdul, None).header.copy()
         meta = cpu.build_jhv_meta(header)
         for adjusted in (False, True):
+            # Orthographic TAN follows source XY, independently of the formal native pole.
+            if adjusted:
+                header["LONPOLE"] = 90.
             delta = np.array([60., -45.]) if adjusted else np.zeros(2)
             adjustment = [[.96, -.28], [.28, .96]] if adjusted else None
-            name = f"simple_TAN_{filename}_{adjusted}"
+            name = f"orthographic_TAN_{filename}_{adjusted}"
             job = gpu.common_job("ortho", Path(name), 1, root, meta, (0, 1, 0, 1), True, backend, name)
             inverse = np.eye(4)
             inverse[:2, :2] = 0
@@ -585,12 +601,12 @@ def run_ortho_hpc_comparison(root, backend, electron):
         alpha = math.atan2(1., meta.observer_distance)
         bounds = np.degrees([-alpha, alpha, -alpha, alpha]).tolist()
         # A point on each HPC observer ray. Astropy supplies the FITS conversion;
-        # reference_pixels() independently solves the simple-TAN affine mapping.
+        # reference_pixels() independently solves the Orthographic TAN affine mapping.
         hpc_world = np.stack((meta.observer_distance * np.tan(x*alpha),
                               meta.observer_distance * np.tan(y*alpha) / np.cos(x*alpha),
                               np.zeros_like(x)), axis=-1)
         references = []
-        for variant in ("simple", "hpc", "formal"):
+        for variant in ("orthographic", "hpc", "formal"):
             mode = "hpc" if variant == "hpc" else "ortho"
             name = f"ortho_hpc_{label}_{variant}"
             job = gpu.common_job(mode, Path(filename), size, root, meta,
@@ -598,7 +614,7 @@ def run_ortho_hpc_comparison(root, backend, electron):
             job.update(productionCoordinates=True, formalTanControl=variant == "formal")
             jobs.append(job)
             uv, valid = reference_pixels(header, hpc_world if mode == "hpc" else world,
-                                         mode="ortho" if variant == "simple" else None)
+                                         mode="ortho" if variant == "orthographic" else None)
             if not valid.all():
                 raise AssertionError(f"{label}: fixture no longer covers the complete comparison frame")
             references.append(uv)
@@ -614,32 +630,38 @@ def run_ortho_hpc_comparison(root, backend, electron):
         source_size = np.array([meta.pixel_width, meta.pixel_height])
         entry = {"image": label, "source_size": source_size.tolist(),
                  "renderer": results[3*index]["renderer"], "reference_max_source_px": {}, "regions": {}}
-        for variant, actual, expected in zip(("simple", "hpc", "formal"), pixels, references, strict=True):
-            # Keep the existing 0.05-source-pixel coordinate tolerance. Coverage
-            # must match everywhere, so jointly discarded pixels cannot hide errors.
-            verify_coordinates(actual, expected, np.ones((size, size), bool), source_size=source_size)
+        for variant, actual, expected in zip(("orthographic", "hpc", "formal"), pixels, references, strict=True):
+            # Direct-ray HPC must avoid cancellation at observer-sized coordinates.
+            # Coverage must match everywhere, including beyond the nominal solar radius.
+            verify_coordinates(actual, expected, np.ones((size, size), bool), source_size=source_size,
+                               tolerance=.002 if variant == "hpc" else .05)
             entry["reference_max_source_px"][variant] = float(np.max(np.abs(actual[..., :2] - expected) * source_size))
-        for region, mask in (("disk", disk), ("off_limb", ~disk), ("full_frame", np.ones_like(disk))):
-            metrics = {"samples": int(mask.sum())}
-            for variant, actual in (("simple", pixels[0]), ("formal", pixels[2])):
+        # EUV emission can extend past the nominal limb; this band must remain fully sampled.
+        annulus = (x*x + y*y >= .95**2) & (x*x + y*y <= 1.05**2)
+        reference_error = np.max(np.abs(pixels[1][..., :2] - references[1]) * source_size, axis=-1)
+        for region, mask in (("disk", disk), ("off_limb", ~disk), ("limb_annulus", annulus), ("full_frame", np.ones_like(disk))):
+            metrics = {"samples": int(mask.sum()),
+                       "hpc_vs_reference": {"max_source_px": float(reference_error[mask].max()),
+                                            "rms_source_px": float(np.sqrt(np.mean(reference_error[mask]**2)))}}
+            for variant, actual in (("orthographic", pixels[0]), ("formal", pixels[2])):
                 error = np.max(np.abs(actual[..., :2].astype(float) - pixels[1][..., :2]) * source_size, axis=-1)
                 metrics[variant + "_vs_hpc"] = {"max_source_px": float(error[mask].max()),
                                                 "rms_source_px": float(np.sqrt(np.mean(error[mask]**2)))}
             entry["regions"][region] = metrics
-            print(f"Ortho/HPC {label} {region}: simple max/RMS "
-                  f"{metrics['simple_vs_hpc']['max_source_px']:.9g}/{metrics['simple_vs_hpc']['rms_source_px']:.9g} px; "
+            print(f"Ortho/HPC {label} {region}: Orthographic TAN max/RMS "
+                  f"{metrics['orthographic_vs_hpc']['max_source_px']:.9g}/{metrics['orthographic_vs_hpc']['rms_source_px']:.9g} px; "
                   f"formal max/RMS {metrics['formal_vs_hpc']['max_source_px']:.9g}/{metrics['formal_vs_hpc']['rms_source_px']:.9g} px")
         summary["images"].append(entry)
     (root / "ortho-hpc-comparison.json").write_text(json.dumps(summary, indent=2) + "\n")
     for entry in summary["images"]:
         for region in ("disk", "full_frame"):
             metrics = entry["regions"][region]
-            # This is the display-policy regression: the aligned simple-TAN
+            # This is the display-policy regression: the aligned Orthographic TAN
             # mapping stays subpixel and much closer to HPC than formal TAN.
-            simple = metrics["simple_vs_hpc"]["max_source_px"]
+            orthographic = metrics["orthographic_vs_hpc"]["max_source_px"]
             formal = metrics["formal_vs_hpc"]["max_source_px"]
-            if simple >= 1 or simple >= formal / 10:
-                raise AssertionError(f"{entry['image']} {region}: simple TAN {simple} px, formal TAN {formal} px")
+            if orthographic >= 1 or orthographic >= formal / 10:
+                raise AssertionError(f"{entry['image']} {region}: Orthographic TAN {orthographic} px, formal TAN {formal} px")
     print(f"PASS: {len(jobs)} Ortho/HPC production-fragment cases with independent references and formal-TAN controls")
 
 
@@ -785,8 +807,8 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
                 {
                     "inverseMVP": inverse.T.ravel().tolist(),
                     "sourceTexture": source,
-                    "cameraDiff": [0, math.sin(angle / 2), 0, math.cos(angle / 2)],
-                    "sourceViewQuat": [0, math.sin(angle / 2), 0, math.cos(angle / 2)],
+                    "sourceToView": [0, math.sin(angle / 2), 0, math.cos(angle / 2)],
+                    "solarToSource": [0, math.sin(angle / 2), 0, math.cos(angle / 2)],
                     "lutData": lut.ravel().tolist(),
                     "color": color.tolist(),
                     "brightness": [-0.04, 0.9],
@@ -826,8 +848,8 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
             ) * 0.9 * 2.5 + 0.5
             secondary = {
                 **gpu.wcs_job_fields(cpu.build_jhv_meta(secondary_header)),
-                "cameraDiff": job["cameraDiff"],
-                "sourceViewQuat": job["sourceViewQuat"],
+                "sourceToView": job["sourceToView"],
+                "solarToSource": job["solarToSource"],
             }
             add(
                 "_difference",
@@ -876,7 +898,7 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
                             add(f"_tilted_depth_{calculate_depth}_{difference_mode}_{probe}", {
                                 "colorSmoke": True, "calculateDepth": calculate_depth,
                                 "difference": difference_mode, "depthProbe": probe,
-                                "secondary": {**secondary, "cameraDiff": [0, 0, 0, 1]},
+                                "secondary": {**secondary, "sourceToView": [0, 0, 0, 1]},
                                 "diffSourceTexture": diff_source,
                             }, ("depth", probe <= depth, None, None))
 
@@ -889,7 +911,7 @@ def run_cases(root, backend, size, electron, local_only=False, coverage_only=Fal
         jobs.extend(new_jobs)
         checks.extend(new_checks)
     if not local_only and not coverage_only:
-        for new_jobs, new_checks in (native_frame_cases(root, backend, size), simple_tan_cases(root, backend), trig_cases(root, backend)):
+        for new_jobs, new_checks in (native_frame_cases(root, backend, size), orthographic_tan_cases(root, backend), trig_cases(root, backend)):
             jobs.extend(new_jobs)
             checks.extend(new_checks)
     results = gpu.run_electron_jobs(electron, jobs, backend)

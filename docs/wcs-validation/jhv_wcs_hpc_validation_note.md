@@ -12,7 +12,7 @@ lot: false
 `id: \exec{git hash-object \file}`
 
 This dated note records the pre-WCSLIB implementation and its historical experiments. Its decision to
-keep simple-TAN for TAN images in Orthographic remains current with WCSLIB: the binder folds scaled
+keep Orthographic TAN for TAN images in Orthographic remains current with WCSLIB: the binder folds scaled
 CRVAL into the affine mapping, and the shader samples the source point's XY coordinates directly.
 Earlier implementation details and results remain historical.
 Current ownership and coordinate contracts are in [image coordinates](../image-coordinates.md) and
@@ -38,7 +38,7 @@ Calabretta & Greisen
 Hereafter, `formal-TAN` denotes this FITS-compliant `TAN` formulation in JHV.
 
 The JHV `TAN` implementation of previous versions is hereafter denoted as
-`simple-TAN`. It treats the orthographic surface point's planar `(x,y)`
+`Orthographic TAN`. It treats the orthographic surface point's planar `(x,y)`
 coordinates as a small-angle approximation to helioprojective coordinates. It
 then feeds those coordinates directly into the linear image transform, instead of
 first converting the 3D point to helioprojective angles and then applying the
@@ -105,7 +105,7 @@ Main conclusions:
   geometry, even with the same observer viewpoint and `dragRotation = 0`.
   The measured discrepancy is consistent with the geometric difference
   derived in Appendix A.
-- on the sample TAN files, `simple-TAN` remains very close to the `HPC`
+- on the sample TAN files, `Orthographic TAN` remains very close to the `HPC`
   display geometry. It is kept in JHV `Orthographic` mode for data designated
   as `TAN` in the metadata.
 
@@ -135,7 +135,7 @@ Astropy does not implement JHV's `Orthographic` display mode. A display pixel
 first selects a point on the solar sphere or the off-limb plane, expressed in
 the image observer's frame. The validator constructs that geometry and uses
 Astropy only to convert the resulting viewing angles through the input FITS
-WCS. The `simple-TAN` shortcut is checked separately as an affine mapping of
+WCS. The `Orthographic TAN` shortcut is checked separately as an affine mapping of
 the point's x/y coordinates. Agreement with Astropy therefore validates the
 downstream WCS operation, not JHV's choice of sphere or plane.
 
@@ -161,7 +161,7 @@ determines how image coordinates relate to observer geometry, while the JHV
 rendering mode determines which display geometry is sampled before that WCS
 mapping is evaluated.
 
-The sampling pipeline described above, and the point at which `simple-TAN`
+The sampling pipeline described above, and the point at which `Orthographic TAN`
 departs from the formal WCS path, can be summarized as follows:
 
 ```text
@@ -174,7 +174,7 @@ screen pixel
   -> source-image coordinates
   -> interpolated image sample
 
-simple-TAN:
+Orthographic TAN:
 screen pixel
   -> display geometry point
   -> (x,y) coordinates in the image-view plane
@@ -183,7 +183,7 @@ screen pixel
   -> interpolated image sample
 ```
 
-In `simple-TAN`, the `(x,y)` pair refers to the display point's coordinates in
+In `Orthographic TAN`, the `(x,y)` pair refers to the display point's coordinates in
 the image-view plane, i.e., the plane perpendicular to the viewing direction in
 the image observer frame. Those coordinates are used directly as a
 small-angle approximation to the helioprojective viewing angles, instead of
@@ -554,7 +554,7 @@ cache ownership, or the application's complete layer-compositing sequence.
 The CCOR2 fixture `CCOR2_1A_20260902T211514_V00_NC.fits` preserves the original
 compressed FITS file, with its `ZPN` image in HDU 1. The core suite checks its
 Java/Python metadata, inverse WCS, and HPC and orthographic sampling on both
-backends. Its orthographic case guards against applying the simple-TAN
+backends. Its orthographic case guards against applying the Orthographic TAN
 reference shortcut to a non-TAN image. The inverse check uses an explicit
 `1e-6`-degree tolerance to allow for JHV's float32 polynomial coefficients,
 which introduce a `2.36e-7`-degree difference from the original FITS precision.
@@ -810,7 +810,7 @@ Interpretation:
 - it measures whether the `formal-TAN` path in `Orthographic` mode and `HPC`
   define the same on-screen geometry over that full rendered frame
 
-2. `simple-TAN` vs JHV `HPC`
+2. `Orthographic TAN` vs JHV `HPC`
 
 ```text
 python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
@@ -821,7 +821,7 @@ python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
 
 This mode compares, for TAN data:
 
-- `simple-TAN`
+- `Orthographic TAN`
 - the `HPC` display sampling path
 
 over the full rendered comparison frame, using a comparison grid at the native
@@ -841,10 +841,10 @@ It also reports:
 Interpretation:
 
 - this is an internal JHV comparison for `TAN`
-- it measures how closely `simple-TAN` in `Orthographic` mode matches the
+- it measures how closely `Orthographic TAN` in `Orthographic` mode matches the
   `HPC` display geometry over that full rendered frame
 
-3. `simple-TAN` vs `formal-TAN` over the full image frame
+3. `Orthographic TAN` vs `formal-TAN` over the full image frame
 
 ```text
 python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
@@ -855,7 +855,7 @@ python3 extra/test/wcs/validate_jhv_wcs_against_astropy.py \
 
 This mode compares:
 
-- `simple-TAN`
+- `Orthographic TAN`
 - `formal-TAN`
 - Astropy as the WCS reference
 
@@ -870,7 +870,7 @@ It writes:
 Interpretation:
 
 - this is an implementation-comparison mode for `TAN` only
-- it compares `simple-TAN` and `formal-TAN` against Astropy over the actual
+- it compares `Orthographic TAN` and `formal-TAN` against Astropy over the actual
   FITS image frame and shows where the two JHV paths diverge
 
 # Results
@@ -910,37 +910,37 @@ Astropy as the external WCS reference.
     - `2.05e-7 mas` max
     - `roundtrip_plane_max_error_internal=8.881784e-16`
 
-2. `formal-TAN` is substantially more accurate than `simple-TAN`.
+2. `formal-TAN` is substantially more accurate than `Orthographic TAN`.
 
 - native-resolution full-image-frame comparison against Astropy on the same TAN
   samples gives:
   - `sample.171.fits` (`1.009 AU`):
-    - `simple-TAN`: `3.674571 px` max, `1.864828 px` RMS
+    - `Orthographic TAN`: `3.674571 px` max, `1.864828 px` RMS
       (nominal-scale equivalents: `2.20 arcsec` max, `1.12 arcsec` RMS)
     - `formal-TAN`: `4.357389e-09 px` max, `1.084205e-10 px` RMS
       (nominal-scale equivalents: `2.61e-6 mas` max, `6.49e-8 mas` RMS)
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `simple-TAN`: recorded nominal-scale equivalents of `11.42 arcsec`
+    - `Orthographic TAN`: recorded nominal-scale equivalents of `11.42 arcsec`
       max and `2.46 arcsec` RMS
     - `formal-TAN`: `3.109335e-10 px` max, `1.292454e-11 px` RMS
       (nominal-scale equivalents: `1.38e-6 mas` max, `5.74e-8 mas` RMS)
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `simple-TAN`: recorded nominal-scale equivalents of `2.40 arcsec`
+    - `Orthographic TAN`: recorded nominal-scale equivalents of `2.40 arcsec`
       max and `0.252 arcsec` RMS
     - `formal-TAN`: `7.116796e-11 px` max, `4.363033e-12 px` RMS
       (nominal-scale equivalents: `1.05e-6 mas` max, `6.42e-8 mas` RMS)
-- for `simple-TAN`, the maximum is set by the on-disk region in all three
+- for `Orthographic TAN`, the maximum is set by the on-disk region in all three
   cases. The RMS values are calculated over the full image frame, which
   includes both the on-disk sphere region and the off-limb flat-plane region
   used by the `Orthographic` renderer outside the solar disk. `formal-TAN`
   remains at numerical precision across the full frame.
-- this does not contradict Appendix B. The `simple-TAN`
+- this does not contradict Appendix B. The `Orthographic TAN`
   small-angle-approximation error $\tan(a) - a$ grows with angular distance
   from the boresight, but this comparison does not measure that error directly
   everywhere. On the solar disk, `Orthographic` samples from the solar sphere.
   Outside the solar disk, `Orthographic` uses a flat image-view plane to
   sample the WCS projection instead. The off-limb part of the comparison is
-  not a direct measurement of the `simple-TAN` small-angle-approximation error
+  not a direct measurement of the `Orthographic TAN` small-angle-approximation error
   alone.
 
 3. `ARC` agrees with Astropy for the PUNCH test file.
@@ -1076,15 +1076,15 @@ These results show:
 - the visible “bulging” when switching between them is expected from that
   geometry difference, not from an Astropy/WCS mismatch
 
-## `Simple-TAN` versus JHV `HPC`
+## `Orthographic TAN` versus JHV `HPC`
 
 This is again a comparison within the Python model. Its purpose is to show
-whether `simple-TAN` behaves more like `HPC` or like `formal-TAN` in JHV
+whether `Orthographic TAN` behaves more like `HPC` or like `formal-TAN` in JHV
 `Orthographic` mode.
 
-- it compares the source pixels sampled by `simple-TAN` in `Orthographic`
+- it compares the source pixels sampled by `Orthographic TAN` in `Orthographic`
   mode and by `HPC` over the same full rendered comparison frame
-- native-resolution full-frame comparison between `simple-TAN` and `HPC`
+- native-resolution full-frame comparison between `Orthographic TAN` and `HPC`
   gives:
   - `sample.171.fits` (`1.009 AU`):
     - `2.807831e-02 px` max, `8.273222e-03 px` RMS
@@ -1100,7 +1100,7 @@ whether `simple-TAN` behaves more like `HPC` or like `formal-TAN` in JHV
     - `1.434673e-03 px` max, `3.928160e-04 px` RMS
     - nominal-scale equivalents: `21.1 mas` max, `5.77 mas` RMS
     - theoretical on-disk max from Appendix B: `7.65 mas`
-- this confirms that `simple-TAN` is much closer to the `HPC` display
+- this confirms that `Orthographic TAN` is much closer to the `HPC` display
   geometry than `formal-TAN`, which supports its use in `Orthographic` mode
   when visual consistency with `HPC` is preferred.
 - Appendix B gives an idealized on-disk estimate of the small-angle
@@ -1491,7 +1491,7 @@ At `0.2 AU`, the same idealized discrepancy is about `865 mas`.
 The following figure shows this centered-disk example of the idealized maximum
 discrepancy as a function of observer distance between `0.2 AU` and `1.1 AU`.
 
-![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](simple_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
+![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](orthographic_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
 
 In the centered-disk example treated here, disk center coincides with the
 boresight, so the discrepancy increases continuously from solar disk center to

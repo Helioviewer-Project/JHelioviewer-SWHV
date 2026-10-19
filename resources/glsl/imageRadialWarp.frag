@@ -5,5 +5,5 @@ void main(void) {
     if (t > 1.)
         discard;
     vec2 hpcXY = t == 0. ? vec2(0.) : (unwarpRadius(t) / viewRadius) * w;
-    renderWarpedHpc(hpcXY);
+    renderHpc(vec3(hpcXY, -images[0].observerDistance), vec3(hpcXY, -images[1].observerDistance));
 }

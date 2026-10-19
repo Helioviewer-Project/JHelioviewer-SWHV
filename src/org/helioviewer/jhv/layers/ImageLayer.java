@@ -20,13 +20,11 @@ import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.math.Mat2;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLSLImage;
 import org.helioviewer.jhv.opengl.GLSLImageShader;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.wcs.ImageGeometry;
-import org.helioviewer.jhv.wcs.WcsSolution;
 
 import org.json.JSONObject;
 
@@ -232,42 +230,16 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Position metaViewpoint1 = meta1.getViewpoint();
         ImageGeometry geometry0 = current.image().geometry();
         ImageGeometry geometry1 = imageDataDiff.image().geometry();
-        WcsSolution wcs0 = geometry0.wcs;
-        WcsSolution wcs1 = geometry1.wcs;
-
-        Quat q = mv.viewRotation();
-        Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
-        Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
-
         double deltaCROTA = displaySettings.getDeltaCROTA();
         Mat2 adjustment = deltaCROTA == 0 ? Mat2.IDENTITY : Mat2.rotation(Math.toRadians(-deltaCROTA));
 
         double deltaCRVAL1 = displaySettings.getDeltaCRVAL1();
         double deltaCRVAL2 = displaySettings.getDeltaCRVAL2();
-        wcs0 = wcs0.adjusted(deltaCRVAL1, deltaCRVAL2);
-        wcs1 = wcs1.adjusted(deltaCRVAL1, deltaCRVAL2);
 
-        float deltaT0 = 0, deltaT1 = 0;
-        Position renderViewpoint = mv.viewpoint();
-        if (ImageLayers.getDiffRotationMode()) {
-            deltaT0 = (float) ((renderViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9);
-            deltaT1 = (float) ((renderViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
-        }
-
-        boolean surface0 = wcs0.projection.isSurfaceMap();
-        boolean surface1 = wcs1.projection.isSurfaceMap();
-        // Projected views do not use the Orthographic trackball rotation.
-        Quat surfaceView = mv.isOrthographic() ? q : renderViewpoint.toQuat();
-        Quat sourceView0 = surface0 ? surfaceView : metaViewpoint0.toQuat();
-        Quat sourceView1 = surface1 ? surfaceView : metaViewpoint1.toQuat();
-        float distance0 = (float) meta0.getRenderDistance(renderViewpoint.distance);
-        float distance1 = (float) meta1.getRenderDistance(renderViewpoint.distance);
-
-        GLSLImageShader.render(mv.mode(),
-                geometry0, wcs0,
-                distance0, deltaT0, cameraDiff0, sourceView0,
-                geometry1, wcs1,
-                distance1, deltaT1, cameraDiff1, sourceView1, adjustment);
+        GLSLImageShader.render(mv.mode(), mv.viewRotation(), mv.viewpoint(),
+                geometry0, metaViewpoint0,
+                geometry1, metaViewpoint1,
+                adjustment, deltaCRVAL1, deltaCRVAL2, ImageLayers.getDiffRotationMode());
     }
 
     @Nonnull

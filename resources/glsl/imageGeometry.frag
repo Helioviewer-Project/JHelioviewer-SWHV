@@ -64,9 +64,11 @@ vec3 differential(const float dt, const vec3 v) {
         v.z * cosDelta + v.x * sinDelta);
 }
 
-vec3 differentialInSourceFrame(const Image img, const vec3 point) {
-    vec3 world = rotate_vector_inverse(img.sourceViewQuat, point);
-    return rotate_vector(img.sourceViewQuat, differential(img.deltaT, world));
+vec3 differentialInImageFrame(const Image img, const vec3 point) {
+    if (img.deltaT == 0.)
+        return point;
+    vec3 world = rotate_vector_inverse(img.solarToImage, point);
+    return rotate_vector(img.solarToImage, differential(img.deltaT, world));
 }
 
 // SwiftShader needs accurate quadrant reduction; hardware backends use their intrinsics.
@@ -101,61 +103,12 @@ vec3 helioprojectiveToObserverRay(const vec2 angles) {
     return vec3(lon.x * lat.y, lat.x, -lon.y * lat.y);
 }
 
-// Homogeneous direction -> native east/north/zenith. WCSLIB prepares this frame.
-vec3 nativeCoordinates(const vec3 direction, const Image img) {
-    return vec3(dot(img.nativeX.xyz, direction), dot(img.nativeY.xyz, direction), dot(img.nativeZ.xyz, direction));
-}
-
-float zpnRadial(const float eta, const float[6] PV) {
-    return (((((PV[5] * eta + PV[4]) * eta + PV[3]) * eta + PV[2]) * eta + PV[1]) * eta + PV[0]);
-}
-
-bool nativeToWcsPlane(const vec3 q, const Image img, const float[6] PV, out vec2 plane) {
-    float scale = img.planeUnitsPerRadian;
-    if (img.projectionCode == WCS_PROJECTION_TAN) {
-        if (q.z <= 0.)
-            return false;
-        plane = scale * q.xy / q.z;
-        return true;
-    }
-    if (img.projectionCode == WCS_PROJECTION_AZP) {
-        float lengthQ = length(q);
-        float mu = PV[1];
-        float denominator = mu * lengthQ + q.z - q.y * img.nativeX.w;
-        if (denominator * (mu + 1.) <= 0.)
-            return false;
-        if (abs(mu) > 1. && q.z < -lengthQ / mu)
-            return false;
-        plane = scale * (mu + 1.) * vec2(q.x, q.y * img.nativeY.w) / denominator;
-        return true;
-    }
-    float radius = length(q.xy);
-    vec2 direction = radius == 0. ? (q.z >= 0. ? img.nativePoles.xy : img.nativePoles.zw) : q.xy / radius;
-    if (img.projectionCode == WCS_PROJECTION_CAR || img.projectionCode == WCS_PROJECTION_CEA) {
-        // Resolve zero longitude explicitly, including signed zero on SwiftShader.
-        float longitude = direction.x == 0. && direction.y <= 0. ? 0. : atan(direction.x, -direction.y);
-        if (longitude == PI)
-            longitude = -PI;
-        float latitude = img.projectionCode == WCS_PROJECTION_CAR
-                ? atan(q.z, radius) : q.z / (length(q) * PV[1]);
-        plane = scale * vec2(longitude, latitude);
-        return true;
-    }
-    float eta = atan(radius, q.z);
-    float radial = eta;
-    if (img.projectionCode == WCS_PROJECTION_ZPN) {
-        if (eta > img.nativeZ.w)
-            return false;
-        radial = zpnRadial(eta, PV);
-    }
-    // Nonzero ZPN P0 is a radius, including at the north pole.
-    plane = scale * radial * direction;
-    return true;
+float zpnRadial(const float eta, const Image img) {
+    return (((((img.pv5 * eta + img.pv4) * eta + img.pv3) * eta + img.pv2) * eta + img.pv1) * eta + img.pv0);
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const Image img) {
-    vec3 p = vec3(plane, 1.);
-    return vec2(dot(img.sourceX.xyz, p), dot(img.sourceY.xyz, p));
+    return plane.x * img.imageFromPlaneX + plane.y * img.imageFromPlaneY + img.imageOffset;
 }
 
 vec2 longitudeTurnRange(const float coordinate, const float displacement, const vec2 bounds) {
@@ -165,7 +118,7 @@ vec2 longitudeTurnRange(const float coordinate, const float displacement, const 
 
 bool wrapSurfaceTexcoord(const Image img, inout vec2 texcoord) {
     // A longitude turn follows the image affine transform, including user rotation.
-    vec2 displacement = TWOPI * img.planeUnitsPerRadian * vec2(img.sourceX.x, img.sourceY.x);
+    vec2 displacement = TWOPI * img.imageFromPlaneX;
     vec2 turns;
     if (displacement.x == 0.) {
         if (texcoord.x < display.slit.x || texcoord.x > display.slit.y)
@@ -186,18 +139,60 @@ bool wrapSurfaceTexcoord(const Image img, inout vec2 texcoord) {
     return true;
 }
 
+const float SURFACE_RADIUS2 = 1. + 1e-5;
+
 bool isSurfaceMap(const Image img) {
-    return img.projectionCode == WCS_PROJECTION_CAR
-        || img.projectionCode == WCS_PROJECTION_CEA;
+    return img.projectionCode == WCS_PROJECTION_CAR || img.projectionCode == WCS_PROJECTION_CEA;
 }
 
-bool imageTexcoord(const vec3 direction, const Image img, const float[6] PV, out vec2 texcoord) {
+bool imageTexcoord(const vec3 direction, const Image img, out vec2 texcoord) {
     vec2 plane;
-    if (!nativeToWcsPlane(nativeCoordinates(direction, img), img, PV, plane))
-        return false;
+    if (img.projectionCode == ORTHOGRAPHIC_TAN) {
+        plane = direction.xy;
+    } else {
+        vec3 q = img.projectionFromRay * direction;
+        if (img.projectionCode == WCS_PROJECTION_TAN) {
+            if (q.z <= 0.)
+                return false;
+            plane = q.xy / q.z;
+        } else if (img.projectionCode == WCS_PROJECTION_AZP) {
+            float lengthQ = length(q);
+            float mu = img.pv1;
+            float denominator = mu * lengthQ + q.z - q.y * img.azpTanTilt;
+            if (denominator * (mu + 1.) <= 0.)
+                return false;
+            if (abs(mu) > 1. && q.z < -lengthQ / mu)
+                return false;
+            plane = (mu + 1.) * vec2(q.x, q.y * img.azpSecTilt) / denominator;
+        } else {
+            float radius = length(q.xy);
+            vec2 radialDirection = radius == 0. ? (q.z >= 0. ? img.northPole : img.southPole) : q.xy / radius;
+            if (img.projectionCode == WCS_PROJECTION_CAR || img.projectionCode == WCS_PROJECTION_CEA) {
+                // Maps cover the sphere only; off-limb points lie outside it.
+                if (dot(q, q) > SURFACE_RADIUS2)
+                    return false;
+                // Resolve zero longitude explicitly, including signed zero on SwiftShader.
+                float longitude = radialDirection.x == 0. && radialDirection.y <= 0. ? 0. : atan(radialDirection.x, -radialDirection.y);
+                if (longitude == PI)
+                    longitude = -PI;
+                float latitude = img.projectionCode == WCS_PROJECTION_CAR
+                        ? atan(q.z, radius) : q.z / (length(q) * img.pv1);
+                plane = vec2(longitude, latitude);
+                texcoord = wcsPlaneToTexcoord(plane, img);
+                return wrapSurfaceTexcoord(img, texcoord) && insideImage(texcoord);
+            }
+            float eta = atan(radius, q.z);
+            float radial = eta;
+            if (img.projectionCode == WCS_PROJECTION_ZPN) {
+                if (eta > img.zpnMaxAngle)
+                    return false;
+                radial = zpnRadial(eta, img);
+            }
+            // Nonzero ZPN P0 is a radius, including at the north pole.
+            plane = radial * radialDirection;
+        }
+    }
     texcoord = wcsPlaneToTexcoord(plane, img);
-    if (isSurfaceMap(img) && !wrapSurfaceTexcoord(img, texcoord))
-        return false;
     return insideImage(texcoord);
 }
 
@@ -245,58 +240,58 @@ bool insidePlanarMasks(const vec2 point) {
         return false;
     if (!insideSectorMasks(point))
         return false;
-    if (display.cutOff.z >= 0.) {
-        vec2 perpendicular = vec2(-display.cutOff.y, display.cutOff.x);
-        if (abs(dot(point, display.cutOff.xy)) > display.cutOff.z || abs(dot(point, perpendicular)) > display.cutOff.z)
-            return false;
-    }
-    return true;
+    vec2 perpendicular = vec2(-display.cutOff.y, display.cutOff.x);
+    return abs(dot(point, display.cutOff.xy)) <= display.cutOff.z && abs(dot(point, perpendicular)) <= display.cutOff.z;
 }
 
-bool hpcTexcoord(const Image img, const vec3 ray, const float offDiskFactor, const float[6] PV,
-                 out vec2 texcoord, out float enhancementFactor) {
+// Every image projects a prepared-image-frame point through (p.xy, projectionOriginZ - p.z).
+vec3 imageDirection(const Image img, const vec3 point) {
+    return vec3(point.xy, img.projectionOriginZ - point.z);
+}
+
+// Sphere points below the source horizon have no image data.
+bool sampleImagePoint(const Image img, const vec3 point, out vec2 texcoord) {
+    return point.z >= img.minSurfaceZ && imageTexcoord(imageDirection(img, point), img, texcoord);
+}
+
+bool hpcMask(const vec3 ray, const float observerDistance) {
+    // No forward plane: infinite mask radius, sectors by ray direction.
+    if (ray.z >= 0.)
+        return isinf(display.radii.y) && isinf(display.cutOff.z) && insideSectorMasks(ray.xy);
+    return insidePlanarMasks(-observerDistance * ray.xy / ray.z);
+}
+
+bool hpcTexcoord(const Image img, const vec3 ray, out vec2 texcoord, out float enhancementFactor) {
     enhancementFactor = 1.;
-    // Observer rays face -Z; WCS directions face +Z.
-    vec3 direction = vec3(ray.xy, -ray.z);
-    bool surface = isSurfaceMap(img);
-    if (surface || img.deltaT != 0. || display.enhanced != 0.) {
-        vec3 world;
-        bool onDisk = observerRayToWorld(ray, img.observerDistance, world);
-        if (surface) {
-            if (!onDisk)
-                return false;
-            direction = rotate_vector_inverse(img.sourceViewQuat, world);
-        } else if (onDisk && img.deltaT != 0.) {
-            vec3 rotated = differentialInSourceFrame(img, world);
-            if (rotated.z < 1. / img.observerDistance)
-                return false;
-            direction = vec3(rotated.xy, img.observerDistance - rotated.z);
-        } else if (!onDisk) {
-            enhancementFactor = offDiskFactor;
-        }
-    }
-    return imageTexcoord(direction, img, PV, texcoord);
+    if (!hpcMask(ray, img.observerDistance))
+        return false;
+    // Observer images need a sphere point only for time correction or off-limb enhancement.
+    vec3 point;
+    if ((isSurfaceMap(img) || img.deltaT != 0. || display.enhanced != 0.)
+            && observerRayToWorld(ray, img.observerDistance, point))
+        return sampleImagePoint(img, differentialInImageFrame(img, point), texcoord);
+    if (isSurfaceMap(img))
+        return false; // A surface map has no image beyond the sphere.
+    // Without a surface correction, every point along an observer ray projects alike.
+    // Radial enhancement follows the Sun-plane radius, which rear rays do not have.
+    if (ray.z < 0.)
+        enhancementFactor = length(img.observerDistance * ray.xy / ray.z);
+    // Direct observer rays need no point construction or subtraction of observer distances.
+    return imageTexcoord(vec3(ray.xy, -ray.z), img, texcoord);
 }
 
 // Rendering owns fragment rejection; coordinate helpers only report validity.
-void renderHpc(const vec3 ray, const float offDiskFactor, const vec3 diffRay, const float diffOffDiskFactor) {
+void renderHpc(const vec3 ray, const vec3 diffRay) {
     vec2 texCoord;
     float enhancementFactor;
-    if (!hpcTexcoord(images[0], ray, offDiskFactor, pv0, texCoord, enhancementFactor))
+    if (!hpcTexcoord(images[0], ray, texCoord, enhancementFactor))
         discard;
     vec2 diffTexCoord = texCoord;
     if (display.isDiff != NODIFFERENCE) {
         float diffEnhancementFactor;
-        if (!hpcTexcoord(images[1], diffRay, diffOffDiskFactor, pv1, diffTexCoord, diffEnhancementFactor))
+        if (!hpcTexcoord(images[1], diffRay, diffTexCoord, diffEnhancementFactor))
             discard;
         enhancementFactor = max(enhancementFactor, diffEnhancementFactor);
     }
     renderImage(texCoord, diffTexCoord, enhancementFactor);
-}
-
-void renderWarpedHpc(const vec2 hpcXY) {
-    if (!insidePlanarMasks(hpcXY))
-        discard;
-    float offDiskFactor = display.enhanced == 0. ? 1. : max(1., length(hpcXY));
-    renderHpc(vec3(hpcXY, -images[0].observerDistance), offDiskFactor, vec3(hpcXY, -images[1].observerDistance), offDiskFactor);
 }

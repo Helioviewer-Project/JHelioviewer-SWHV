@@ -88,13 +88,14 @@ function setUniformInt(gl, program, name, value) {
 
 const uniformBlockLayouts = {
   ImageBlock: {
-    byteLength: 320,
+    byteLength: 384,
     offsets: Object.fromEntries([0, 1].flatMap(i => Object.entries({
-      sourceX: 0, sourceY: 16, sampling: 32,
-      planeUnitsPerRadian: 48, projectionCode: 52, observerDistance: 56, deltaT: 60,
-      nativeX: 64, nativeY: 80, nativeZ: 96, nativePoles: 112,
-      cameraDiff: 128, sourceViewQuat: 144,
-    }).map(([field, offset]) => [`images[${i}].${field}`, i * 160 + offset]))),
+      projectionFromRay: 0, projectionCode: 48, azpTanTilt: 52, azpSecTilt: 56, zpnMaxAngle: 60,
+      pv0: 64, pv1: 68, pv2: 72, pv3: 76, pv4: 80, pv5: 84, northPole: 88, southPole: 96,
+      imageFromPlaneX: 104, imageFromPlaneY: 112, imageOffset: 120, texScale: 128, texOffset: 136,
+      observerDistance: 144, projectionOriginZ: 148, minSurfaceZ: 152, deltaT: 156,
+      imageToView: 160, solarToImage: 176,
+    }).map(([field, offset]) => [`images[${i}].${field}`, i * 192 + offset]))),
   },
   ScreenBlock: {
     byteLength: 96,
@@ -139,6 +140,11 @@ function bindUniformBlock(gl, program, name, binding, data) {
       if (actualOffsets[i] !== expectedOffset)
         throw new Error(`${uniform} has offset ${actualOffsets[i]}, expected ${expectedOffset}`);
     });
+    for (const [[uniform], uniformIndex] of active) {
+      if (uniform.endsWith(".projectionFromRay") &&
+          gl.getActiveUniforms(program, [uniformIndex], gl.UNIFORM_MATRIX_STRIDE)[0] !== 16)
+        throw new Error(`${uniform} must use a 16-byte matrix column stride`);
+    }
   }
 
   const buffer = gl.createBuffer();
@@ -153,42 +159,11 @@ function putVec4(block, offset, values) {
 }
 
 function imageBlock(job) {
-  const secondary = job.secondary || job;
-  const block = new Float32Array(80);
-  putImage(block, 0, job, job.mode, job.formalTanControl);
-  putImage(block, 40, secondary, job.mode, job.formalTanControl);
-  return block;
-}
-
-function putImage(block, offset, image, mode, formalTanControl) {
-  // Independent reference metadata still provides the old physical rectangle and
-  // normalized inverse. Compose those into the production pixel mapping here.
-  const [x, y, sx, sy] = image.rect;
-  const [a, b, c, d] = image.planeToImage;
-  const rowX = [a * sx, b * sx, -x * sx, 0];
-  const rowY = [-c * sy, -d * sy, -y * sy, 0];
-  if (image.planeAdjustment) {
-    const [[a, b], [c, d]] = image.planeAdjustment;
-    for (const row of [rowX, rowY]) {
-      const [x, y] = row;
-      row[0] = x * a + y * c;
-      row[1] = x * b + y * d;
-    }
-  }
-  const [ox, oy] = mode === "ortho" && image.projectionCode === 0 && !formalTanControl ? image.reference : image.nativeOffset;
-  rowX[2] -= rowX[0] * ox + rowX[1] * oy;
-  rowY[2] -= rowY[0] * ox + rowY[1] * oy;
-  putVec4(block, offset, rowX);
-  putVec4(block, offset + 4, rowY);
-  putVec4(block, offset + 8, [1, 1, 0, 0]); // These reference jobs use full-resolution textures.
-  block[offset + 12] = image.planeUnitsPerRadian;
-  block[offset + 13] = image.projectionCode;
-  block[offset + 14] = image.observerDistance;
-  block[offset + 15] = image.deltaT || 0;
-  block.set(image.nativeBasis, offset + 16);
-  putVec4(block, offset + 28, image.nativePoles);
-  putVec4(block, offset + 32, image.cameraDiff || [0, 0, 0, 1]);
-  putVec4(block, offset + 36, image.sourceViewQuat || [0, 0, 0, 1]);
+  const bytes = Buffer.concat([job, job.secondary || job].map(image => Buffer.from(image.imageRecord, "base64")));
+  if (bytes.length !== 384)
+    throw new Error(`Java image records contain ${bytes.length} bytes, expected 384`);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  return Float32Array.from({length: 96}, (_, i) => view.getFloat32(i * 4, true));
 }
 
 function screenBlock(job) {
@@ -220,11 +195,12 @@ function displayBlock(job) {
   block[10] = 1;     // upsilon.x
   block[11] = 1;     // upsilon.y
   putVec4(block, 12, [...(job.userSector || [0, 0]), ...(job.metadataSector || [0, 0])]);
-  putVec4(block, 16, [...(job.cutOff || [0, 0, -1]), 0]);
+  putVec4(block, 16, [...(job.cutOff || [0, 0, Infinity]), 0]); // +inf: no cutoff, as in CommonMetaData
   block[19] = job.calculateDepth ? 1 : 0;
   block[20] = radii[0];
   block[21] = radii[1];
   block.set(job.slit || [0, 1], 22);
+  block[24] = job.enhanced ? 1 : 0;
   return block;
 }
 
@@ -236,7 +212,6 @@ function bindUniformBlocks(gl, program, job) {
 
 function commonDiagnosticUniforms() {
   return `
-uniform float uPv[6];
 uniform vec3 uLatiGrid;
 uniform float uSampleTexture;
 
@@ -257,17 +232,13 @@ void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     if (!insideMap(mapPos)) discard;
     vec3 ray = helioprojectiveToObserverRay(radians(mix(screen.mapBounds.xz, screen.mapBounds.yw, mapPos)));
-    float offDiskFactor;
-    if (!hpcMaskAndEnhancement(ray, images[0].observerDistance, offDiskFactor)) discard;
     float enhancementFactor;
     vec2 texCoord;
-    if (!hpcTexcoord(images[0], ray, offDiskFactor, ${difference ? "pv0" : "uPv"}, texCoord, enhancementFactor)) discard;
+    if (!hpcTexcoord(images[0], ray, texCoord, enhancementFactor)) discard;
     ${difference ? `
-    float diffOffDiskFactor;
-    if (!hpcMaskAndEnhancement(ray, images[1].observerDistance, diffOffDiskFactor)) discard;
     float diffEnhancementFactor;
     vec2 diffTexCoord;
-    if (!hpcTexcoord(images[1], ray, diffOffDiskFactor, pv1, diffTexCoord, diffEnhancementFactor)) discard;
+    if (!hpcTexcoord(images[1], ray, diffTexCoord, diffEnhancementFactor)) discard;
     outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, enhancementFactor);"}
 }
 `;
@@ -285,10 +256,10 @@ void main(void) {
     vec3 spherePoint = onDisk ? vec3(viewPosition, sqrt(1. - radius2)) : vec3(0.);
     float depth;
     vec2 texCoord;
-    if (!orthoSample(images[0], viewPosition, spherePoint, onDisk, ${difference ? "pv0" : "uPv"}, texCoord, depth)) discard;
+    if (!orthoSample(images[0], viewPosition, spherePoint, onDisk, texCoord, depth)) discard;
     ${difference ? `
     vec2 diffTexCoord;
-    if (!orthoSample(images[1], viewPosition, spherePoint, onDisk, pv1, diffTexCoord, depth)) discard;
+    if (!orthoSample(images[1], viewPosition, spherePoint, onDisk, diffTexCoord, depth)) discard;
     outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, depth);"}
 }
 `;
@@ -296,7 +267,7 @@ void main(void) {
 
 function latiDiagnostic(commonSource, latiSource, mode = "normal", difference = false) {
   const comparison = mode === "assign" ? "" : `
-    if (!latiSample(world, images[${mode === "same-slot" ? 0 : 1}], ${mode === "same-slot" ? "pv0" : "pv1"}, diffTexCoord)) discard;`;
+    if (!latiSample(world, images[${mode === "same-slot" ? 0 : 1}], diffTexCoord)) discard;`;
   return `${commonSource}
 ${stripMain(latiSource)}
 ${commonDiagnosticUniforms()}
@@ -306,28 +277,26 @@ void main(void) {
     vec3 world;
     if (!latitudinalWorld(mapPos, world)) discard;
     vec2 texCoord;
-    if (!latiSample(world, images[0], pv0, texCoord)) discard;
+    if (!latiSample(world, images[0], texCoord)) discard;
     ${difference ? `vec2 diffTexCoord = texCoord; ${comparison} outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, 1.);"}
 }
 `;
 }
 
 function warpDiagnostic(commonSource, warpSource, difference = false) {
-  const render = "renderWarpedHpc(hpcXY);";
+  const render = "renderHpc(vec3(hpcXY, -images[0].observerDistance), vec3(hpcXY, -images[1].observerDistance));";
   if (warpSource.split(render).length !== 2)
     throw new Error("Warp diagnostic requires exactly one render call");
   const diagnostic = `
-    if (!insidePlanarMasks(hpcXY)) discard;
-    float offDiskFactor = display.enhanced == 0. ? 1. : max(1., length(hpcXY));
     vec3 ray = vec3(hpcXY, -images[0].observerDistance);
     float enhancementFactor;
     vec2 texCoord;
-    if (!hpcTexcoord(images[0], ray, offDiskFactor, ${difference ? "pv0" : "uPv"}, texCoord, enhancementFactor)) discard;
+    if (!hpcTexcoord(images[0], ray, texCoord, enhancementFactor)) discard;
     ${difference ? `
     vec3 diffRay = vec3(hpcXY, -images[1].observerDistance);
     float diffEnhancementFactor;
     vec2 diffTexCoord;
-    if (!hpcTexcoord(images[1], diffRay, offDiskFactor, pv1, diffTexCoord, diffEnhancementFactor)) discard;
+    if (!hpcTexcoord(images[1], diffRay, diffTexCoord, diffEnhancementFactor)) discard;
     outColor = vec4(texCoord, diffTexCoord);` : "diagnosticOutput(texCoord, length(hpcXY));"}`;
   return `${commonSource}
 ${commonDiagnosticUniforms()}
@@ -337,18 +306,9 @@ ${warpSource.replace(render, diagnostic)}`;
 function productionFragment(job, commonSource) {
   if (job.mode === "hpc")
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageHpc.frag"), "utf8")}`;
-  if (job.mode === "ortho") {
-    let source = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8");
-    if (job.formalTanControl) {
-      // Test-only formal-TAN control: remove exactly the shortcut from an
-      // in-memory copy. The production file and its main() remain intact.
-      const shortcut = "    if (simpleTan) {\n        texcoord = wcsPlaneToTexcoord(point.xy, img);\n        return insideImage(texcoord);\n    }\n";
-      if (source.split(shortcut).length !== 2)
-        throw new Error("Formal TAN control requires exactly one Orthographic TAN shortcut");
-      source = source.replace(shortcut, "");
-    }
-    return `${commonSource}\n${source}`;
-  }
+  // The formal-TAN diagnostic control uses Java-prepared formal projection data.
+  if (job.mode === "ortho")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageOrtho.frag"), "utf8")}`;
   if (job.mode === "lati_zenithal")
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/imageLati.frag"), "utf8")}`;
   if (job.mode === "radial_warp")
@@ -494,7 +454,7 @@ function diagnosticFragment(job, commonSource) {
       throw new Error("Production getColor signature not found");
     const source = commonSource.replace(signature,
         "vec4 getColor(vec2 uv, vec2 diffUV, float factor);\nvec4 unusedGetColor(");
-    const output = job.difference ? "vec4(uv, diffUV)" : "vec4(uv, texture(image, uv * images[0].sampling.xy + images[0].sampling.zw).r, 1.)";
+    const output = job.difference ? "vec4(uv, diffUV)" : "vec4(uv, texture(image, uv * images[0].texScale + images[0].texOffset).r, 1.)";
     return productionFragment(job, `${source}\nvec4 getColor(vec2 uv, vec2 diffUV, float factor) {
       if (texture(mask, uv).r == 0.) discard;
       return ${output};
@@ -550,9 +510,6 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   gl.bindVertexArray(quadVao);
   bindUniformBlocks(gl, program, job);
 
-  setUniform(gl, program, "uPv", job.pv2);
-  setUniform(gl, program, "pv0", job.pv2);
-  setUniform(gl, program, "pv1", secondary.pv2);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   setUniformInt(gl, program, "diffImage", 1);

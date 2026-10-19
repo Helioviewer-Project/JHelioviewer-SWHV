@@ -29,7 +29,7 @@ class CommonMetaData implements MetaData {
     protected float sector1 = 0;
 
     // Serves only for LASCO cutOff edges
-    protected float cutOffValue = -1;
+    protected float cutOffValue = Float.POSITIVE_INFINITY;
     protected float cutOffX = 0;
     protected float cutOffY = 0;
 

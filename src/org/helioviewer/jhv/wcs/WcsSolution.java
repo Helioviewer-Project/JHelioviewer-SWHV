@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 
 import org.lwjgl.system.LibraryResource;
 
@@ -21,7 +22,7 @@ import nom.tam.fits.HeaderCardException;
 import nom.tam.util.Cursor;
 
 // Prepared WCSLIB solution. Original and decoded geometries share its native owner.
-// Exported arrays are read-only by convention; the last nonzero CRVAL adjustment is cached.
+// PV coefficients are read-only by convention.
 @SuppressWarnings("restricted")
 public final class WcsSolution {
     public enum Projection {
@@ -40,10 +41,16 @@ public final class WcsSolution {
     private static final int OFFSET_REFERENCE_PIXEL = 8;
     private static final int OFFSET_PIXEL_TO_PLANE = 24;
     private static final int OFFSET_REFERENCE = 56;
-    private static final int OFFSET_NATIVE_BASIS = 72;
+    private static final int OFFSET_TO_PROJECTION_X = 72;
+    private static final int OFFSET_AZP_TAN_TILT = 96;
+    private static final int OFFSET_TO_PROJECTION_Y = 104;
+    private static final int OFFSET_AZP_SEC_TILT = 128;
+    private static final int OFFSET_TO_PROJECTION_Z = 136;
+    private static final int OFFSET_ZPN_MAX_ANGLE = 160;
     private static final int OFFSET_PLANE_OFFSET = 168;
     private static final int OFFSET_PV = 184;
-    private static final int OFFSET_NATIVE_POLES = 232;
+    private static final int OFFSET_NORTH_POLE = 232;
+    private static final int OFFSET_SOUTH_POLE = 248;
     private static final double ARCSEC_TO_RAD = Math.PI / (180 * 3600);
     private static final MethodHandle create;
     private static final MethodHandle adjust;
@@ -77,14 +84,16 @@ public final class WcsSolution {
     final Vec2 referencePixel; // FITS centers, Y up; ImageGeometry converts to buffer coordinates.
     final Mat2 pixelToPlane;
     public final Vec2 offset;
-    public final float[] nativeBasis = new float[12];
-    public final float[] nativePoles = new float[4];
+    public final Vec3 toProjectionX;
+    public final Vec3 toProjectionY;
+    public final Vec3 toProjectionZ;
+    public final float azpTanTilt;
+    public final float azpSecTilt;
+    public final float zpnMaxAngle;
+    public final Vec2 northPole;
+    public final Vec2 southPole;
     public final float[] pv2 = new float[6];
     private final MemorySegment handle;
-    private volatile Adjustment adjustment;
-
-    private record Adjustment(double longitude, double latitude, WcsSolution wcs) {}
-
     public WcsSolution(Header header, double _unitsPerRad) {
         this(header, null, 0, 0, _unitsPerRad);
     }
@@ -121,18 +130,28 @@ public final class WcsSolution {
                     value(info, OFFSET_PIXEL_TO_PLANE + 2 * Double.BYTES) * unitsPerRad,
                     value(info, OFFSET_PIXEL_TO_PLANE + 3 * Double.BYTES) * unitsPerRad);
             reference = pair(info, OFFSET_REFERENCE, 1);
-            for (int i = 0; i < nativeBasis.length; i++)
-                nativeBasis[i] = (float) value(info, OFFSET_NATIVE_BASIS + i * Double.BYTES);
+            toProjectionX = axis(info, OFFSET_TO_PROJECTION_X);
+            azpTanTilt = (float) value(info, OFFSET_AZP_TAN_TILT);
+            toProjectionY = axis(info, OFFSET_TO_PROJECTION_Y);
+            azpSecTilt = (float) value(info, OFFSET_AZP_SEC_TILT);
+            toProjectionZ = axis(info, OFFSET_TO_PROJECTION_Z);
+            zpnMaxAngle = (float) value(info, OFFSET_ZPN_MAX_ANGLE);
             offset = pair(info, OFFSET_PLANE_OFFSET, unitsPerRad);
             for (int i = 0; i < pv2.length; i++)
                 pv2[i] = (float) value(info, OFFSET_PV + i * Double.BYTES);
-            for (int i = 0; i < nativePoles.length; i++)
-                nativePoles[i] = (float) value(info, OFFSET_NATIVE_POLES + i * Double.BYTES);
+            northPole = new Vec2((float) value(info, OFFSET_NORTH_POLE), (float) value(info, OFFSET_NORTH_POLE + Double.BYTES));
+            southPole = new Vec2((float) value(info, OFFSET_SOUTH_POLE), (float) value(info, OFFSET_SOUTH_POLE + Double.BYTES));
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new IllegalStateException("WCSLIB binding failed", e);
         }
+    }
+
+    // Projection coefficients retain the float precision used by the shader interface.
+    private static Vec3 axis(MemorySegment info, int byteOffset) {
+        return new Vec3((float) value(info, byteOffset), (float) value(info, byteOffset + Double.BYTES),
+                (float) value(info, byteOffset + 2 * Double.BYTES));
     }
 
     private static double value(MemorySegment info, int byteOffset) {
@@ -157,17 +176,11 @@ public final class WcsSolution {
         return unitsPerRad * ARCSEC_TO_RAD;
     }
 
-    // User offsets change CRVAL, not the projection-plane origin. Recompute only when
-    // the requested adjustment changes, and let WCSLIB resolve pole defaults again.
-    public WcsSolution adjusted(double longitudeArcsec, double latitudeArcsec) {
+    // User offsets change CRVAL; WCSLIB resolves the projection's pole defaults again.
+    WcsSolution adjusted(double longitudeArcsec, double latitudeArcsec) {
         if (longitudeArcsec == 0 && latitudeArcsec == 0)
             return this;
-        Adjustment cached = adjustment;
-        if (cached != null && cached.longitude == longitudeArcsec && cached.latitude == latitudeArcsec)
-            return cached.wcs;
-        WcsSolution result = new WcsSolution(null, this, longitudeArcsec * ARCSEC_TO_RAD, latitudeArcsec * ARCSEC_TO_RAD, unitsPerRad);
-        adjustment = new Adjustment(longitudeArcsec, latitudeArcsec, result);
-        return result;
+        return new WcsSolution(null, this, longitudeArcsec * ARCSEC_TO_RAD, latitudeArcsec * ARCSEC_TO_RAD, unitsPerRad);
     }
 
     // Internal plane units -> celestial radians. Invalid points remain NaN pairs.

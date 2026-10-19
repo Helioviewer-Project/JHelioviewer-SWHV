@@ -174,7 +174,7 @@ public final class DisplayController {
         ImageLayer layer = Layers.getActiveImageLayer();
         Camera camera = Display.getCamera();
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
-        double cameraWidth = oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode, viewpoint.distance);
+        double cameraWidth = oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode, viewpoint);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
@@ -183,7 +183,7 @@ public final class DisplayController {
         render();
     }
 
-    private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, MapMode mode, double viewDistance) {
+    private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, MapMode mode, Position viewpoint) {
         ImageData imageData = layer.getImageData();
         if (imageData == null)
             return 0;
@@ -192,9 +192,9 @@ public final class DisplayController {
         if (mode != MapMode.HPC) // one viewport pixel per image pixel
             return vp.height * geometry.pixelSizeY;
 
-        Region scale = ImageLayers.computeHpcScaleBounds(viewDistance);
+        Region scale = ImageLayers.computeHpcScaleBounds(viewpoint);
         double viewportHeight = Math.max(scale.height, scale.width / vp.aspect);
-        double distance = imageData.metaData().getRenderDistance(viewDistance);
+        double distance = geometry.tracingViewpoint(viewpoint, imageData.metaData().getViewpoint()).distance;
         return viewportHeight > 0 ? vp.height * ImageBounds.hpc(geometry, distance).height
                 / (geometry.grid.height() * viewportHeight) : 0;
     }

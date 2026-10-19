@@ -10,15 +10,17 @@ import math
 import os
 import subprocess
 import sys
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory, gettempdir
 
 import numpy as np
+from astropy.io import fits
 
 from validate_jhv_wcs_against_astropy import (
     LATI_ZENITHAL_BOUNDS_DEG,
     LATI_SURFACE_BOUNDS_DEG,
+    build_jhv_meta,
     clipHpcGeometry,
     differential,
     latitudinalWorld,
@@ -39,7 +41,6 @@ from validate_jhv_wcs_against_astropy import (
     screenToHelioprojective,
     texcoord_to_pixel_center,
     worldToHelioprojective,
-    wcsRect,
 )
 
 
@@ -180,10 +181,7 @@ def wcs_job_fields(meta) -> dict:
     return {
         "wcsHeader": {"header": meta.header_cards, "width": meta.pixel_width,
                       "height": meta.pixel_height, "unitsPerRad": meta.plane_units_per_rad},
-        "rect": list(wcsRect(meta)),
-        "planeToImage": list(meta.plane_to_image),
         "projectionCode": PROJECTION_CODES[meta.projection],
-        "planeUnitsPerRadian": meta.plane_units_per_rad,
         "observerDistance": meta.observer_distance,
         "pv2": list(meta.pv2),
     }
@@ -201,14 +199,19 @@ def native_helper():
 
 def prepare_native_wcs(job_path):
     payload = json.loads(job_path.read_text())
-    images = []
+    images, requests = [], []
     for job in payload.get("jobs", [payload]):
-        images.extend(image for image in (job, job.get("secondary"))
-                      if image is not None and "wcsHeader" in image)
+        for image in (job, job.get("secondary")):
+            if image is None or "wcsHeader" not in image:
+                continue
+            images.append(image)
+            requests.append({**image["wcsHeader"], "mode": job["mode"],
+                             "formalTanControl": job.get("formalTanControl", False),
+                             **{key: image[key] for key in ("observerDistance", "deltaT", "solarToSource", "sourceToView", "planeAdjustment")
+                                if key in image}})
     if not images:
         return
     temporary, classpath = native_helper()
-    requests = [image["wcsHeader"] for image in images]
     input_path = Path(temporary.name) / "input.json"
     output_path = Path(temporary.name) / "output.json"
     input_path.write_text(json.dumps(requests))
@@ -246,7 +249,7 @@ def common_job(
         "outputPath": str(output_path),
         "boundsDeg": list(bounds),
         "warpLambda": 1.0,
-        "sourceViewQuat": [0.0, 0.0, 0.0, 1.0],
+        "solarToSource": [0.0, 0.0, 0.0, 1.0],
         "latiOrigin": [0.0, 0.0],
         **wcs_job_fields(meta),
         "sampleTexture": sample_texture,
@@ -597,7 +600,7 @@ def cpu_texcoord_for_mode(
         if screen_xy[0] * screen_xy[0] + screen_xy[1] * screen_xy[1] > 1.0:
             return (math.nan, math.nan)
         texcoord, _, _, _ = renderOrthographicTexcoords(
-            screen_xy, meta, image_data, simple_tan=True, delta_t=delta_t)
+            screen_xy, meta, image_data, orthographic_tan=True, delta_t=delta_t)
         return texcoord
     if mode == "lati_zenithal":
         texcoord, _ = renderLatitudinalTexcoords(
@@ -686,7 +689,7 @@ def expected_world_deg_for_mode(
             return (math.nan, math.nan)
         if job.get("deltaT", 0.0) != 0.0:
             world = differential(job["deltaT"], world)
-        source_world = rotate_vector(tuple(job.get("sourceViewQuat", (0.0, 0.0, 0.0, 1.0))), world)
+        source_world = rotate_vector(tuple(job.get("solarToSource", (0.0, 0.0, 0.0, 1.0))), world)
         if source_world[2] < 1.0 / meta.observer_distance:
             return (math.nan, math.nan)
         helioprojective = worldToHelioprojective(source_world, meta.observer_distance)
@@ -840,7 +843,7 @@ def compare_differential_rotation(
             name=f"{mode}_differential")
         job["deltaT"] = delta_t
         if mode == "lati_zenithal":
-            job["sourceViewQuat"] = list(source_view_quat)
+            job["solarToSource"] = list(source_view_quat)
             job["latiOrigin"] = [display_longitude, display_latitude]
         jobs.append(job)
 
@@ -878,8 +881,14 @@ def compare_distinct_wcs_slots(
     secondary_image, secondary_meta, _, _ = load_validation_context(secondary_file, None)
     # Shear and unequal axis scales expose matrix transposition and packing
     # mistakes that rotation-only FITS examples cannot distinguish.
-    primary_meta = replace(primary_meta, plane_to_image=(1.0, 0.25, -0.1, 0.9))
-    secondary_meta = replace(secondary_meta, plane_to_image=(0.8, -0.2, 0.35, 1.05))
+    metadata = []
+    for meta, matrix in ((primary_meta, (1.0, 0.25, -0.1, 0.9)),
+                         (secondary_meta, (0.8, -0.2, 0.35, 1.05))):
+        header = fits.Header.fromstring(meta.header_cards, sep="")
+        for key, value in zip(("PC1_1", "PC1_2", "PC2_1", "PC2_2"), matrix, strict=True):
+            header[key] = value
+        metadata.append(build_jhv_meta(header))
+    primary_meta, secondary_meta = metadata
     bounds = hpc_bounds_degrees(primary_meta, 1.0)
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1003,7 +1012,7 @@ def compare_planar_masks(
                     point,
                     (tuple(job.get("userSector", (0.0, 0.0))), tuple(job.get("metadataSector", (0.0, 0.0)))),
                     tuple(job.get("radii", (0.0, 1e30))),
-                    tuple(job.get("cutOff", (0.0, 0.0, -1.0))),
+                    tuple(job.get("cutOff", (0.0, 0.0, math.inf))),
                 )
                 expected = unmasked and passes_mask
                 actual = bool(pixels[iy, ix, 3] > 0.5)
@@ -1078,7 +1087,7 @@ def evaluate_shader_to_cpu(
                 job.get("warpLambda", DEFAULT_WARP_LAMBDA),
                 job.get("deltaT", 0.0),
                 tuple(job.get("latiOrigin", (0.0, 0.0))),
-                tuple(job.get("sourceViewQuat", (0.0, 0.0, 0.0, 1.0))),
+                tuple(job.get("solarToSource", (0.0, 0.0, 0.0, 1.0))),
             )
             cpu_valid = is_finite_texcoord(cpu_texcoord)
             if sample_texture and texture_data is not None:
@@ -2035,7 +2044,7 @@ def evaluate_hpc_diff_selfcheck(
             if job["mode"] == "hpc":
                 reference = renderHpcTexcoords((sx, sy), tuple(job["boundsDeg"]), meta, image_shape)[0]
             elif job["mode"] == "ortho":
-                reference = renderOrthographicTexcoords((2 * sx - 1, 2 * sy - 1), meta, image_shape, simple_tan=True)[0]
+                reference = renderOrthographicTexcoords((2 * sx - 1, 2 * sy - 1), meta, image_shape, orthographic_tan=True)[0]
             elif job["mode"] == "lati_zenithal":
                 reference = renderLatitudinalTexcoords((sx, sy), tuple(job["boundsDeg"]), meta, image_shape)[0]
             else:

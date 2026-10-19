@@ -15,24 +15,47 @@ const float WCS_PROJECTION_AZP = 2.;
 const float WCS_PROJECTION_ZPN = 3.;
 const float WCS_PROJECTION_CAR = 4.;
 const float WCS_PROJECTION_CEA = 5.;
+const float ORTHOGRAPHIC_TAN = 6.; // JHV display policy; the FITS projection remains TAN.
+
+// A prepared-image-frame point p yields the projection direction (p.xy, projectionOriginZ - p.z).
+// Observer images project from their observer, surface maps from Sun center with the display rotation
+// folded into the projection frame. Sphere points below minSurfaceZ have no source data.
 
 out vec4 outColor;
 in vec2 normalizedScreenpos;
 
+// Prepared image frame: observer-aligned for observer images, display-aligned for surface maps.
 struct Image {
-    vec4 sourceX; // affine WCS-plane -> original normalized pixels; w is padding
-    vec4 sourceY;
-    vec4 sampling; // original -> decoded normalized pixels: xy scale, zw offset
-    float planeUnitsPerRadian;
-    float projectionCode;
-    float observerDistance;
-    float deltaT;
-    vec4 nativeX; // xyz: native-frame row; w: AZP tan(gamma)
-    vec4 nativeY; // xyz: native-frame row; w: AZP sec(gamma)
-    vec4 nativeZ; // xyz: native-frame row; w: ZPN upper eta
-    vec4 nativePoles; // Projection directions at native north and south poles.
-    vec4 cameraDiff;
-    vec4 sourceViewQuat;
+    // Projection-local coordinates from a forward-Z ray in the prepared image frame.
+    mat3 projectionFromRay;
+    float projectionCode; // WCS projection enum, or ORTHOGRAPHIC_TAN display policy.
+    float azpTanTilt;
+    float azpSecTilt;
+    float zpnMaxAngle;
+    // Effective WCS PV2 coefficients: ZPN polynomial coefficients; AZP/CEA use pv1.
+    float pv0;
+    float pv1;
+    float pv2;
+    float pv3;
+    float pv4;
+    float pv5;
+    vec2 northPole;
+    vec2 southPole;
+
+    // Projection plane -> original normalized image -> decoded texture.
+    vec2 imageFromPlaneX;
+    vec2 imageFromPlaneY;
+    vec2 imageOffset;
+    vec2 texScale;
+    vec2 texOffset;
+
+    // Geometry in the prepared image frame, followed by its rotations.
+    float observerDistance; // In solar radii.
+    float projectionOriginZ; // Observer distance for images, zero for maps.
+    float minSurfaceZ; // 1/D for observer images, zero for Orthographic TAN, -inf for maps.
+    float deltaT; // Megaseconds from the tracing time.
+    vec4 imageToView; // Prepared image frame -> displayed frame.
+    vec4 solarToImage; // Solar frame -> prepared image frame.
 };
 
 layout(std140) uniform ImageBlock {
@@ -70,9 +93,6 @@ uniform sampler2D diffImage;
 uniform sampler2D lut;
 uniform sampler2D mask;
 
-uniform float pv0[6]; // kept as plain uniforms for simple indexed access
-uniform float pv1[6];
-
 #define BLUR_TAP_COUNT (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
 // https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
@@ -104,8 +124,8 @@ float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    vec2 imageCoord = texcoord * images[0].sampling.xy + images[0].sampling.zw;
-    vec2 diffImageCoord = difftexcoord * images[1].sampling.xy + images[1].sampling.zw;
+    vec2 imageCoord = texcoord * images[0].texScale + images[0].texOffset;
+    vec2 diffImageCoord = difftexcoord * images[1].texScale + images[1].texOffset;
     vec2 brightness = display.brightness;
     if (display.enhanced != 0. && factor != 1.)
         brightness.y *= pow(factor, display.enhanced);
@@ -126,7 +146,7 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
                 blurredValue += (i == BLUR_TAP_COUNT / 2 ? centerValue : fetch(image, imageCoord + offset, brightness)) * blurKernel[i];
             }
         } else {
-            vec2 diffScale = images[1].sampling.xy / images[0].sampling.xy;
+            vec2 diffScale = images[1].texScale / images[0].texScale;
             for (int i = 0; i < BLUR_TAP_COUNT; i++) {
                 vec2 offset = blurOffset[i] * sharpenStep;
                 blurredValue += (i == BLUR_TAP_COUNT / 2 ? centerValue : fetch(image, imageCoord + offset, brightness) - fetch(diffImage, diffImageCoord + offset * diffScale, brightness)) * blurKernel[i];

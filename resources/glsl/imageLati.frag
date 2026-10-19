@@ -8,18 +8,9 @@ bool latitudinalWorld(const vec2 mapPos, out vec3 world) {
     return true;
 }
 
-bool latiSample(vec3 world, const Image img, const float[6] PV, out vec2 texcoord) {
-    bool surface = isSurfaceMap(img);
-    if (!surface && img.deltaT != 0.)
-        world = differential(img.deltaT, world);
-    vec3 sourcePoint = rotate_vector(img.sourceViewQuat, world);
-    vec3 direction = world;
-    if (!surface) {
-        if (sourcePoint.z < 1. / img.observerDistance)
-            return false;
-        direction = vec3(sourcePoint.xy, img.observerDistance - sourcePoint.z);
-    }
-    return imageTexcoord(direction, img, PV, texcoord) && insidePlanarMasks(sourcePoint.xy);
+bool latiSample(const vec3 world, const Image img, out vec2 texcoord) {
+    vec3 point = rotate_vector(img.solarToImage, differential(img.deltaT, world));
+    return sampleImagePoint(img, point, texcoord) && insidePlanarMasks(point.xy);
 }
 
 void main(void) {
@@ -30,11 +21,11 @@ void main(void) {
     if (!latitudinalWorld(mapPos, world))
         discard;
     vec2 texCoord;
-    if (!latiSample(world, images[0], pv0, texCoord))
+    if (!latiSample(world, images[0], texCoord))
         discard;
     vec2 diffTexCoord = texCoord;
     if (display.isDiff != NODIFFERENCE) {
-        if (!latiSample(world, images[1], pv1, diffTexCoord))
+        if (!latiSample(world, images[1], diffTexCoord))
             discard;
     }
     renderImage(texCoord, diffTexCoord, 1.);

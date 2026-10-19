@@ -7,9 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.time.JHVTime;
 
 import nom.tam.fits.Header;
 
@@ -125,8 +127,8 @@ public final class WcsLibraryTest {
         WcsSolution zpn = new WcsSolution(zpnHeader, 1);
         Vec2 pole = zpn.worldToPlane(0, 0);
         near(Math.hypot(pole.x, pole.y), .125, "ZPN pole radius");
-        near(pole.x, .125 * zpn.nativePoles[0], "prepared ZPN pole X");
-        near(pole.y, .125 * zpn.nativePoles[1], "prepared ZPN pole Y");
+        near(pole.x, .125 * zpn.northPole.x, "prepared ZPN pole X");
+        near(pole.y, .125 * zpn.northPole.y, "prepared ZPN pole Y");
         if (!Double.isNaN(zpn.planeToWorld(new double[]{0, 0})[0]))
             throw new AssertionError("ZPN inverse hole accepted");
         for (double lambda : new double[]{0, -1, 1.1, 1e-60}) {
@@ -210,8 +212,10 @@ public final class WcsLibraryTest {
 
     private static void adjustments() throws Exception {
         WcsSolution original = new WcsSolution(header(WcsSolution.Projection.CAR, 35, 20), 1);
-        WcsSolution adjusted = original.adjusted(0, -40 * 3600);
-        if (original.adjusted(0, 0) != original || original.adjusted(0, -40 * 3600) != adjusted)
+        ImageGeometry geometry = new ImageGeometry(8, 6, original, false);
+        WcsSolution adjusted = geometry.adjustedWcs(0, -40 * 3600);
+        if (geometry.adjustedWcs(0, 0) != original || geometry.adjustedWcs(0, -40 * 3600) != adjusted
+                || geometry.forGrid(new ImageGrid(1, 4, 3)).adjustedWcs(0, -40 * 3600) != adjusted)
             throw new AssertionError("Adjustment cache changed ownership");
         WcsSolution reference = new WcsSolution(header(WcsSolution.Projection.CAR, 35, -20), 1);
         Vec2 expected = reference.worldToPlane(.8, .4), actual = adjusted.worldToPlane(.8, .4);
@@ -240,6 +244,25 @@ public final class WcsLibraryTest {
     }
 
     public static void main(String[] args) throws Exception {
+        ImageGeometry plain = new ImageGeometry(8, 6, 1);
+        ImageGeometry otherPlain = new ImageGeometry(12, 10, 2);
+        if (plain.wcs != otherPlain.wcs)
+            throw new AssertionError("Plain images must share the centered TAN solution");
+        near(plain.pixelSizeX, 1, "plain image scale");
+        near(otherPlain.pixelSizeX, 2, "shared WCS preserves each image's scale");
+        WcsSolution plainAdjusted = plain.adjustedWcs(10, 20);
+        WcsSolution otherAdjusted = otherPlain.adjustedWcs(30, 40);
+        if (plain.adjustedWcs(10, 20) != plainAdjusted || otherPlain.adjustedWcs(30, 40) != otherAdjusted)
+            throw new AssertionError("Plain images must retain independent WCS adjustments");
+        Position source = new Position(new JHVTime(0), 215, 0, 0);
+        Position display = new Position(source.time, source.distance * 2, source.lon + .1, source.lat);
+        for (WcsSolution.Projection projection : WcsSolution.Projection.values()) {
+            Position expected = projection.isSurfaceMap() ? display : source;
+            WcsSolution wcs = new WcsSolution(projection, new float[]{0, 1, 0, 0, 0, 0}, 215);
+            ImageGeometry geometry = new ImageGeometry(1, 1, wcs, false);
+            if (geometry.tracingViewpoint(display, source) != expected)
+                throw new AssertionError("Wrong tracing viewpoint for " + projection);
+        }
         projections();
         domains();
         coefficients();

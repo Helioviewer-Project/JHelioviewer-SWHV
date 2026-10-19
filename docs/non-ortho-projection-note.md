@@ -85,21 +85,24 @@ The projection-related uniform blocks separate per-image mapping, screen, and di
 `ImageBlock` contains two per-image records, one for the primary image and one for the difference image. Each record
 contains the fixed-layout state used to map rendered solar coordinates into that image:
 
-- two affine rows from the raw native projection plane to original normalized image pixels
+- two affine columns and an offset from the raw native projection plane to original normalized image pixels, including projection-unit scaling
 - original-to-decoded sampling scale and offset
-- projection code and plane units per radian
-- three native-frame rows, with AZP constants and the WCSLIB ZPN branch limit in their unused W components
-- WCSLIB's exact native-pole direction conventions
+- projection code
+- the projection-local matrix (`projectionFromRay`), named AZP tilt coefficients, the ZPN angular limit and six effective PV2 coefficients
+- WCSLIB's pole-direction conventions (`northPole`, `southPole`)
 - source-observer distance
-- relative display/source-observer rotation (`cameraDiff`)
+- prepared image-frame to display-frame rotation (`imageToView`)
 - differential-rotation interval (`deltaT`)
-- source-view quaternion
+- solar-frame to prepared image-frame rotation (`solarToImage`)
+- source visibility threshold (`minSurfaceZ`) and projection center (`projectionOriginZ`)
 
-Each std140 image record occupies 160 bytes, so the two-record block occupies 320 bytes.
-The six `PV2` coefficients remain ordinary uniforms for direct indexed access rather than becoming padded std140
-scalar arrays.
+Each std140 image record occupies 192 bytes, so the two-record block occupies 384 bytes. The projection matrix has ordinary std140 column padding. Projection data comes first, followed by image/texture
+mapping and viewpoint data. Their meanings and packing are described in
+[Image uniform record](image-coordinates.md#image-uniform-record).
+The six `PV2` coefficients are consecutive scalar members of each image record, so sampling helpers need
+only the image record rather than a separately matched coefficient array.
 
-The binder folds native plane-origin subtraction and user plane rotation into the affine rows, in double precision
+The binder folds native plane-origin subtraction and user plane rotation into the affine coefficients and offset, in double precision
 before upload. User CRVAL adjustments instead create a cached WCSLIB solution with resolved pole defaults.
 The shader projects homogeneous directions through that solution's basis; it does not reconstruct celestial
 rotations from CRVAL per fragment. Observer points and warp rays avoid angle roundtrips. HPC and Latitudinal
@@ -124,13 +127,12 @@ parameters.
 `DisplayBlock` has 25 meaningful floats and three trailing padding floats. Its std140 backing buffer therefore occupies
 112 bytes; Java and the WebGL runner must allocate all 28 floats.
 
-The meaning of `sourceViewQuat` depends on the sampling path. For observer images in `Latitudinal`, it rotates a
-solar-world point into that image's observer frame. For surface maps, `ImageLayer` uploads the displayed viewpoint
-rotation, including trackball rotation only in `Orthographic`, and the displayed observer distance;
-`Orthographic`, `HPC`, and the warp modes inverse-rotate their sphere intersection through it to keep the map attached
-to the visible sphere. Direct Latitudinal surface-map sampling does not need it. Observer images in `HPC` and the
-warp modes use `sourceViewQuat` for differential rotation through the solar frame, but not for reprojection
-between displayed and source viewpoints; that limitation is described below.
+For observer images, `solarToImage` rotates solar-world points into the source observer's frame.
+Latitudinal sampling uses it directly; HPC and the warps use it for differential rotation through the solar frame,
+not for reprojection between displayed and source viewpoints. For surface maps the binder selects the displayed
+orientation, including trackball rotation only in Orthographic. It composes that orientation into the projection
+rows, keeping the map attached to the solar sphere. Latitudinal sampling uses the same source-point rule; the
+prepared projection rows cancel the displayed orientation to recover the map's solar coordinates.
 
 ## Display modes
 
@@ -139,13 +141,13 @@ between displayed and source viewpoints; that limitation is described below.
 `Orthographic` is the only 3D display path. It intersects the view with the unit sphere on-disk and uses an image-view
 plane for off-limb observer images.
 
-TAN retains the intentional simple-TAN display policy: the source point's XY coordinates minus celestial
+TAN retains the intentional Orthographic TAN display policy: the source point's XY coordinates minus celestial
 CRVAL scaled by `unitsPerRad` form the plane input. The existing affine mapping then applies user rotation
 and the inverse pixel transform. `GLSLImageShader.putImage()` folds this subtraction into the affine
 offset for Orthographic TAN. WCSLIB still supplies its metadata, angular scale and pixel matrix.
 
 ARC, AZP and ZPN use the formal WCS from the scene point's observer direction. TAN also uses formal WCS
-in every other display mode. Orthographic and HPC select different display geometry; the simple-TAN
+in every other display mode. Orthographic and HPC select different display geometry; the Orthographic TAN
 policy preserves their close visual agreement on the validated solar images, as explained in the
 [WCS validation note](wcs-validation/jhv_wcs_hpc_validation_note.md#summary).
 
@@ -169,9 +171,10 @@ sheared and partial footprints. Longitude equivalence is not an image-width wrap
 - enabled image-layer footprints determine the displayed bounds;
 - those bounds are centered on `(0, 0)` and padded to the viewport aspect ratio.
 
-The GLSL path converts every displayed `(Tx, Ty)` to an observer ray. For observer images, on-disk rays intersect the
-unit sphere so that differential rotation can be applied to a physical solar point. Off-disk rays proceed directly to
-the source-image WCS.
+The GLSL path converts every displayed `(Tx, Ty)` to an observer ray. Observer images sample the source-image WCS
+directly from that ray when differential rotation and enhancement are off. Otherwise the ray is intersected with the
+unit sphere to correct a physical solar point or distinguish the disk from the enhanced off-limb region. Off-disk rays
+proceed directly to the source-image WCS.
 
 For CAR/CEA maps, the sphere intersection is inverse-rotated by the displayed view rotation and sampled through the
 same longitude/latitude mapping used by Orthographic. Longitude wraps; off-disk rays are discarded. The intersection
@@ -203,7 +206,7 @@ display latitude  = solar latitude  - latitude origin
 ```
 
 For observer images, GLSL reconstructs the solar-world point from the displayed map and rotates it with that image
-slot's `sourceViewQuat` before applying observer-image geometry and WCS. Differential rotation is also applied per
+slot's `solarToImage` before applying observer-image geometry and WCS. Differential rotation is also applied per
 image slot. Source visibility requires `sourceWorld.z >= 1 / observerDistance`. The source quaternion maps into
 an image observer's frame; it does not define the displayed map origin.
 
@@ -282,7 +285,7 @@ There are two different observer roles:
 - the displayed viewpoint used by Java map geometry and overlays;
 - each source image's observer used to interpret that image's WCS.
 
-For observer images, `Latitudinal` explicitly bridges those frames with each image slot's `sourceViewQuat`. The `HPC`,
+For observer images, `Latitudinal` explicitly bridges those frames with each image slot's `solarToImage`. The `HPC`,
 `RadialWarp`, and `RectWarp` image shaders instead interpret their displayed HPC coordinates directly in the source
 observer's frame.
 Consequently, those image paths are coherent when the displayed viewpoint matches the source observer in orientation

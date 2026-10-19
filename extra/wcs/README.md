@@ -52,14 +52,14 @@ and missing pixel scales. See the
 [fixture provenance and reference equations](../test/data/wcs-instruments/README.md).
 The adapter's exact input conventions are documented in
 [image coordinates](../../docs/image-coordinates.md).
-The fragment tests obtain prepared uniforms from the actual Java/native adapter
-and compare rendered coordinates with independent geometry and Astropy.
+The fragment tests obtain image records packed by the production Java binder using the native adapter,
+upload their bytes in WebGL and compare rendered coordinates with independent geometry and Astropy.
 They also check tilted references, pole parameters, native fiducials, origin
 offsets and the accuracy of angular-input sine/cosine on both graphics backends.
 
 Each frame's metadata prepares and retains a native solution. Decoded grids share
 that owner. Its automatic FFM arena frees it after all Java references become
-unreachable. Each source solution caches its last nonzero CRVAL adjustment;
+unreachable. Each original image geometry caches its last nonzero CRVAL adjustment;
 changing that offset prepares a new native copy, while zero reuses the original.
 Replaced copies become eligible for cleanup when no longer referenced.
 
