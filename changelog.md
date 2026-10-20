@@ -8,6 +8,7 @@
 - Improve rendering quality, performance, and memory handling
 - Use consistent percentile clipping across FITS sequences to reduce brightness flicker, and remove ZScale
 - Fix MGN numerical artifacts and refresh queued and difference images when changing filters
+- Show planets and stars at their apparent positions in the Location viewpoint, with names on hover
 
 ### Interaction and UI
 - Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
@@ -22,8 +23,7 @@
 
 ### Technical
 - Document the heliocentric 3D data interface and add a COCONUT conversion example
-- Improve JPIP movie download throughput, cache memory handling, cancellation, and JPEG 2000 resource cleanup
-- Read JPEG 2000 files and JPIP streams with the esajpip client library; Kakadu only decodes
+- Read JPEG 2000 files and JPIP streams with the esajpip client library, with faster JPIP movie downloads and lower cache memory use
 - Accelerate Rice-compressed 16-bit FITS decoding
 - Expand rendering, WCS, JPIP retrieval and cache restoration, and Callisto decoding regression coverage
 - Update bundled libraries
