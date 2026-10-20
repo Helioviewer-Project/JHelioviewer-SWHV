@@ -12,30 +12,9 @@ public interface UpdateViewpoint {
         return Vec3.YAxis;
     }
 
-    UpdateViewpoint observer = new Observer();
-    UpdateViewpoint observerAt1au = new ObserverAt1au();
-    UpdateViewpoint earthAt1au = new EarthAt1au();
-
-    class Observer implements UpdateViewpoint {
-        @Override
-        public Position update(JHVTime time) {
-            return Layers.getActiveImageLayer().frames().metaData(time).getViewpoint();
-        }
-    }
-
-    class ObserverAt1au implements UpdateViewpoint {
-        @Override
-        public Position update(JHVTime time) {
-            return Position.toFixedDistance(observer.update(time), Sun.MeanEarthDistance);
-        }
-    }
-
-    class EarthAt1au implements UpdateViewpoint {
-        @Override
-        public Position update(JHVTime time) {
-            return new Position(time, Sun.MeanEarthDistance, Sun.getEarth(time).lon, 0);
-        }
-    }
+    UpdateViewpoint observer = time -> Layers.getActiveImageLayer().frames().metaData(time).getViewpoint();
+    UpdateViewpoint observerAt1au = time -> Position.toFixedDistance(observer.update(time), Sun.MeanEarthDistance);
+    UpdateViewpoint earthAt1au = time -> new Position(time, Sun.MeanEarthDistance, Sun.getEarth(time).lon, 0);
 
     final class Location implements UpdateViewpoint {
         private final PositionLoad positionLoad;
@@ -86,32 +65,20 @@ public interface UpdateViewpoint {
 
         @Override
         public Position update(JHVTime playbackTime) {
-            double hciLon = 0;
+            double hciLon = 0, relLon = 0;
             JHVTime ephemerisTime = playbackTime;
 
-            if (controlLoad != null) {
-                PositionResponse response = controlLoad.getResponse();
-                if (response != null) {
-                    ephemerisTime = new JHVTime(response.interpolateTime(playbackTime.milli, start, end));
-                    if (frame == Frame.SOLO_HCI)
-                        hciLon = Sun.getEarthHCI(ephemerisTime).lon;
+            PositionResponse response = controlLoad == null ? null : controlLoad.getResponse();
+            if (response != null) {
+                ephemerisTime = new JHVTime(response.interpolateTime(playbackTime.milli, start, end));
+                if (frame == Frame.SOLO_HCI)
+                    hciLon = Sun.getEarthHCI(ephemerisTime).lon;
+                if (relative) {
+                    response.interpolateLatitudinal(playbackTime.milli, start, end, lati, interpolated);
+                    relLon = lati[1];
                 }
             }
-
-            double relLon = relativeLongitude(playbackTime.milli);
             return new Position(ephemerisTime, distance, Sun.getEarth(ephemerisTime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
-        }
-
-        private double relativeLongitude(long playbackTime) {
-            if (!relative || controlLoad == null)
-                return 0;
-
-            PositionResponse response = controlLoad.getResponse();
-            if (response != null) {
-                response.interpolateLatitudinal(playbackTime, start, end, lati, interpolated);
-                return lati[1];
-            }
-            return 0;
         }
     }
 
