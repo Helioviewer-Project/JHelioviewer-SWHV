@@ -9,7 +9,7 @@ python3 extra/test/run_tests.py
 Requires Python 3, JDK 25, and Ant on `PATH`. Native resources are read from
 `lib/jhv/<platform>/`. FFmpeg binaries use Git LFS; run `git lfs pull` if they
 were not downloaded during checkout. The runner compiles JHV first,
-then runs maintenance, command/state, model, JPIP, timeline, and event tests. Java tests use
+then runs maintenance, command/state, model, astronomy, JPIP, timeline, and event tests. Java tests use
 temporary class and home directories, leaving normal JHV settings and caches
 alone. JPIP and HAPI tests need permission to open loopback sockets. Model,
 image-loading and event tests use bundled native libraries, but need no graphics
@@ -34,6 +34,7 @@ silently skipping it. Some failure-path tests deliberately log exceptions.
 | `maintenance` (`extra/licenses/`, `extra/ffmpeg/`) | License synchronization and FFmpeg update scripts, using mocked downloads and temporary files | Yes |
 | `commands` | State/SAMP parameter parsing, partial updates, warnings, playback validation and recording start/refusal behavior | Yes |
 | `model` | Model URI recognition, Assimp metadata, generated glTF loading, geometry, materials, and layer metadata | Yes |
+| `astronomy` | Bundled star catalogue, apparent star directions against SOFA, barycentric state samples, and Location planet/star placement and solar-disk occultation against independent geometry, using the bundled SPICE kernels | Yes |
 | `j2k` | Image ownership/cache, worker requests, frame selection/loading, layer load completion, image request settings, disk cache failures, HTTP boundaries and JPIP socket cleanup | Yes |
 | `timelines` | HAPI server configuration and catalog loading, partial failures and cancellation, timeline data, request coverage, cache, export, and Java2D drawing | Yes |
 | `event` | HEK fixture parsing, event database persistence, filtering, cache/download coordination, and SWEK configuration | Yes |
@@ -68,6 +69,7 @@ claim that a suite validates every behavior in those files.
 | `opengl/model/`, `layers/ModelLayer`, model detection in `io/DataUri` | `model`: [ModelDataUriTest](model/ModelDataUriTest.java), [AssimpMetaDataTest](model/AssimpMetaDataTest.java), [AssimpModelLoaderTest](model/AssimpModelLoaderTest.java); `opengl`: [ModelRenderingTest](opengl/ModelRenderingTest.java) | Loader/metadata assertions do not replace rendered-output checks. |
 | `timelines/band/`, `timelines/TimelineLayers`, `time/RequestCache`, `timelines/draw/`, `timelines/chart/` | `timelines`: [HapiCatalogTest](timelines/HapiCatalogTest.java) and [TimelineDataTest](timelines/TimelineDataTest.java), including request reuse, coverage, band restoration, data export/import and chart painting | Verify mouse interaction, chart show/hide/re-attach behavior, display scales and recorded chart output for relevant UI changes. Use the explicit benchmarks below for performance claims. |
 | `event/`, `plugins/swek/`, repository-root `resources/settings/SWEK.json` | `event`: [runner](event/run_event_tests.py) executes HEK parsing, database, cache, filter-request, integration and SWEK layer tests | Live HEK availability is a separate probe. Interactive event selection and overlay appearance need GUI verification when affected. |
+| `astronomy/Stars`, `astronomy/Spice`, `astronomy/PositionResponse`, `astronomy/PositionLoad`, `layers/ViewpointLayer` Location mode, repository-root `resources/data/stars.bin` | `astronomy`: [StarsTest](astronomy/StarsTest.java) checks the catalogue, `Stars.apparent` against `jauApcs` + `jauAtciq` and local state ranges against `spkezr`; [LocationProjectionTest](astronomy/LocationProjectionTest.java) checks `projectLocation` against eqs. (3), (6) of Skokić on Carrington LT+S directions, occultation, and the solar pole constant against the `SOLO_IAU_SUN_2009` frame | Local SPICE only; the position server path is not exercised. Drawing, hover and the Planets/Stars checkboxes need GUI verification. Regenerate the catalogue with `extra/stars/update_stars.py`. |
 | `movie/`, `app/Commands`, `app/state/`, `io/samp/`, Swing controls | `commands`: [CommandStateTest](commands/CommandStateTest.java) checks state/SAMP parsing, warnings, partial updates and recording start/refusal; `opengl` checks capture/readback and export view-state restoration; `timelines` checks band serialization/restoration and chart painting | These are partial checks. The listed suites do not provide an end-to-end SAMP, whole-session restoration or encoded-movie regression. Exercise the changed command/state/recording flow, including completion/failure and output. |
 | Repository-root `extra/licenses/`, `extra/ffmpeg/` | `maintenance`: license and FFmpeg updater unit tests | Downloads are mocked. These checks do not run an installed FFmpeg encoder. ANGLE updates have their own [validation workflow](../angle/README.md). |
 

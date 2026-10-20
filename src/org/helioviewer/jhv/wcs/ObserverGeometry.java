@@ -36,7 +36,7 @@ public final class ObserverGeometry {
     }
 
     @Nullable
-    static Vec2 helioprojectiveToHpcPlane(double observerDistance, double longitude, double latitude) {
+    public static Vec2 helioprojectiveToHpcPlane(double observerDistance, double longitude, double latitude) {
         Vec3 ray = helioprojectiveRay(longitude, latitude);
         if (ray.z >= 0)
             return null;

@@ -12,7 +12,7 @@ import time
 
 TESTS = Path(__file__).resolve().parent
 ROOT = TESTS.parents[1]
-DEFAULT_SUITES = ["maintenance", "commands", "model", "j2k", "timelines", "event"]
+DEFAULT_SUITES = ["maintenance", "commands", "model", "astronomy", "j2k", "timelines", "event"]
 SCRIPTS = {
     "j2k": TESTS / "j2k/run_j2k_tests.py",
     "timelines": TESTS / "timelines/run_timelines_tests.py",
@@ -22,6 +22,7 @@ SCRIPTS = {
 }
 JAVA_TESTS = {
     "commands": ["io.samp.CommandStateTest"],
+    "astronomy": ["astronomy.StarsTest", "layers.LocationProjectionTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
     "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
 }
