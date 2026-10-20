@@ -21,6 +21,14 @@ public class PositionResponse {
         public double distance() {
             return Math.sqrt(x * x + y * y + z * z);
         }
+
+        private double longitude(double dist) {
+            return dist == 0 ? 0 : Math.atan2(y, x);
+        }
+
+        private double latitude(double dist) {
+            return dist == 0 ? 0 : Math.asin(Math.clamp(z / dist, -1., 1.));
+        }
     }
 
     private final Position.Cartesian[] position;
@@ -84,13 +92,34 @@ public class PositionResponse {
         }
     }
 
-    private void interpolate(long t, long start, long end, Interpolated out) {
+    private void interpolate(long t, long start, long end, Interpolated out, @Nullable double[] vel) {
         long time = interpolateTime(t, start, end);
         out.time = time;
-        interpolate(position, time, out);
+
+        int i = 0, inext = 0;
+        double alpha = 1.;
+        if (positionStart != positionEnd) {
+            int maxIndex = position.length - 1;
+            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
+            i = Math.clamp((int) interpolatedIndex, 0, maxIndex);
+            inext = Math.min(i + 1, maxIndex);
+
+            long tstart = position[i].milli();
+            long tend = position[inext].milli();
+            alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
+        }
+
+        // Position and velocity samples share timestamps.
+        if (vel != null) {
+            interpolate(velocity, i, inext, alpha, out);
+            vel[0] = out.x;
+            vel[1] = out.y;
+            vel[2] = out.z;
+        }
+        interpolate(position, i, inext, alpha, out);
     }
 
-    private void interpolate(Position.Cartesian[] samples, long time, Interpolated out) {
+    private void interpolate(Position.Cartesian[] samples, int i, int inext, double alpha, Interpolated out) {
         if (positionStart == positionEnd) {
             Position.Cartesian p = samples[0];
             out.x = p.x();
@@ -98,16 +127,6 @@ public class PositionResponse {
             out.z = p.z();
             return;
         }
-
-        int maxIndex = samples.length - 1;
-        double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
-        int i = Math.clamp((int) interpolatedIndex, 0, maxIndex);
-        int inext = Math.min(i + 1, maxIndex);
-
-        long tstart = samples[i].milli();
-        long tend = samples[inext].milli();
-
-        double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
 
         out.x = (1. - alpha) * samples[i].x() + alpha * samples[inext].x();
         out.y = (1. - alpha) * samples[i].y() + alpha * samples[inext].y();
@@ -118,20 +137,14 @@ public class PositionResponse {
     public void interpolateState(long t, long start, long end, double[] pos, double[] vel, Interpolated out) {
         if (velocity == null)
             throw new IllegalStateException("Not a state response");
-        long time = interpolateTime(t, start, end);
-        out.time = time;
-        interpolate(velocity, time, out);
-        vel[0] = out.x;
-        vel[1] = out.y;
-        vel[2] = out.z;
-        interpolate(position, time, out);
+        interpolate(t, start, end, out, vel);
         pos[0] = out.x;
         pos[1] = out.y;
         pos[2] = out.z;
     }
 
     public double interpolateRectangular(long t, long start, long end, float[] xyz, Interpolated out) {
-        interpolate(t, start, end, out);
+        interpolate(t, start, end, out, null);
 
         xyz[0] = (float) out.x;
         xyz[1] = (float) out.y;
@@ -140,7 +153,7 @@ public class PositionResponse {
     }
 
     public double interpolateRectangular(long t, long start, long end, double[] xyz, Interpolated out) {
-        interpolate(t, start, end, out);
+        interpolate(t, start, end, out, null);
 
         xyz[0] = out.x;
         xyz[1] = out.y;
@@ -149,37 +162,20 @@ public class PositionResponse {
     }
 
     public void interpolateLatitudinal(long t, long start, long end, double[] lati, Interpolated out) {
-        interpolate(t, start, end, out);
-        double dist, hgln, hglt;
-        dist = out.distance();
-        if (dist == 0) {
-            hgln = 0;
-            hglt = 0;
-        } else {
-            hgln = Math.atan2(out.y, out.x);
-            double sinLat = Math.clamp(out.z / dist, -1., 1.);
-            hglt = Math.asin(sinLat);
-        }
+        interpolate(t, start, end, out, null);
+        double dist = out.distance();
         lati[0] = dist;
-        lati[1] = hgln;
-        lati[2] = hglt;
+        lati[1] = out.longitude(dist);
+        lati[2] = out.latitude(dist);
     }
 
     Position interpolateCarrington(long t, long start, long end, Interpolated out) {
-        interpolate(t, start, end, out);
-        double dist, hgln, hglt;
-        dist = out.distance();
-        if (dist == 0) {
-            hgln = 0;
-            hglt = 0;
-        } else {
-            hgln = Math.atan2(out.y, out.x);
-            if (hgln < 0)
-                hgln += 2 * Math.PI;
-            double sinLat = Math.clamp(out.z / dist, -1., 1.);
-            hglt = Math.asin(sinLat);
-        }
-        return new Position(new JHVTime(out.time), dist, -hgln, hglt);
+        interpolate(t, start, end, out, null);
+        double dist = out.distance();
+        double hgln = out.longitude(dist);
+        if (hgln < 0)
+            hgln += 2 * Math.PI;
+        return new Position(new JHVTime(out.time), dist, -hgln, out.latitude(dist));
     }
 
 }

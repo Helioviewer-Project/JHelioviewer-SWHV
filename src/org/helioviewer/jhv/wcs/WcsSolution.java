@@ -94,6 +94,7 @@ public final class WcsSolution {
     public final Vec2 southPole;
     public final float[] pv2 = new float[6];
     private final MemorySegment handle;
+
     public WcsSolution(Header header, double _unitsPerRad) {
         this(header, null, 0, 0, _unitsPerRad);
     }
