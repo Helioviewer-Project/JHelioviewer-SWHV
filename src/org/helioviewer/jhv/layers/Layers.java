@@ -103,7 +103,6 @@ public final class Layers {
         DEFAULT_LAYERS.put(ConnectionLayer.class, () -> new ConnectionLayer(null));
         DEFAULT_LAYERS.put(GridLayer.class, () -> new GridLayer(null));
         DEFAULT_LAYERS.put(FOVLayer.class, () -> new FOVLayer(null));
-        // DEFAULT_LAYERS.put(StarLayer.class, () -> new StarLayer(null));
         DEFAULT_LAYERS.put(TimestampLayer.class, () -> new TimestampLayer(null));
         DEFAULT_LAYERS.put(MiniviewLayer.class, () -> new MiniviewLayer(null));
 

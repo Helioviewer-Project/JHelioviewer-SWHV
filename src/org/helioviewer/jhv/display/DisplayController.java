@@ -75,14 +75,6 @@ public final class DisplayController {
         return viewpointModel.getTrackingMode();
     }
 
-    public static void addViewpointListener(ViewpointListener listener) {
-        viewpointModel.addListener(listener);
-    }
-
-    public static void removeViewpointListener(ViewpointListener listener) {
-        viewpointModel.removeListener(listener);
-    }
-
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
         viewpointModel.setUpdateViewpoint(updateViewpoint);
         switch (mode) {

@@ -36,28 +36,6 @@ public class SpiceMath {
         return ret;
     }
 
-    public static double[] radrec(double radius, double lon, double lat) { // same as latrec
-        double clat = Math.cos(lat);
-        return new double[]{
-                radius * Math.cos(lon) * clat,
-                radius * Math.sin(lon) * clat,
-                radius * Math.sin(lat)};
-    }
-
-    public static double[] mxv(double[][] m, double[] v) {
-        return new double[]{
-                m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
-                m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
-                m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2]};
-    }
-
-    public static double[] mtxv(double[][] m, double[] v) {
-        return new double[]{
-                m[0][0] * v[0] + m[1][0] * v[1] + m[2][0] * v[2],
-                m[0][1] * v[0] + m[1][1] * v[1] + m[2][1] * v[2],
-                m[0][2] * v[0] + m[1][2] * v[1] + m[2][2] * v[2]};
-    }
-
     // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
     static Quat m2q(double[][] m) {
         double w, x, y, z;
