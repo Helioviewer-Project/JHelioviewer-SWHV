@@ -21,6 +21,7 @@ public class SpaceObject {
     public static final SpaceObject SUN = new SpaceObject(true, "SUN", "Sun", 1, Colors.Yellow.bytes());
     public static final SpaceObject SOLO = new SpaceObject(true, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79));
     public static final SpaceObject STA = new SpaceObject(true, "STEREO AHEAD", "STEREO Ahead", 2 / Sun.RadiusMeter, Colors.bytes(32, 32, 128));
+    static final SpaceObject SSB = new SpaceObject(true, "SSB", "Solar System Barycenter", 0, Colors.White.bytes());
 
     private static final ImmutableMap<String, SpaceObject> objectMap = new ImmutableMap.Builder<String, SpaceObject>()
             .put("Sun", SUN)

@@ -64,7 +64,7 @@ public class Sun {
         Position position = Spice.getCarrington("EARTH", time);
         if (position == null)
             position = new Position(time, getEarthDistance(time.milli), 0, 0);
-        return position.setLocation("EARTH");
+        return position;
     }
 
     // in case SPICE returns null
@@ -72,7 +72,7 @@ public class Sun {
         Position position = Spice.getPositionLat("SUN", "EARTH", Frame.SOLO_HCI.toString(), time);
         if (position == null)
             position = new Position(time, getEarthDistance(time.milli), 0, 0);
-        return position.setLocation("EARTH");
+        return position;
     }
 
     public static double getEarthDistance(long milli) {

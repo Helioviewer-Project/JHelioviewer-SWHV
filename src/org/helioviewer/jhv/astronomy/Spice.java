@@ -8,8 +8,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 //import com.google.common.base.Stopwatch;
 
 import spice.basic.CSPICE;
@@ -34,42 +32,40 @@ public class Spice {
     }
 
     @Nullable
-    static Position.Cartesian[] getPositionRange(String observer, String target, String frame, long start, long end, long deltat) {
+    static PositionResponse getRange(String observer, String target, String frame, String abcorr, boolean state, long start, long end, long deltat) {
         // Stopwatch sw = Stopwatch.createStarted();
         try {
             long dt = deltat * 1000;
-            Position.Cartesian[] ret = new Position.Cartesian[(int) ((end - start) / dt) + 1];
+            int len = (int) ((end - start) / dt) + 1;
+            Position.Cartesian[] position = new Position.Cartesian[len];
+            Position.Cartesian[] velocity = state ? new Position.Cartesian[len] : null;
             int i = 0;
             double[] v = new double[3];
+            double[] sv = new double[6];
             for (long milli = start; milli <= end; milli += dt) {
-                position(observer, target, frame, milli, v);
-                ret[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
+                if (state) {
+                    CSPICE.spkezr(target, milli2et(milli), frame, abcorr, observer, sv, lightTimeUnused);
+                    v[0] = sv[0] * Sun.RadiusKMeterInv;
+                    v[1] = sv[1] * Sun.RadiusKMeterInv;
+                    v[2] = sv[2] * Sun.RadiusKMeterInv;
+                    velocity[i] = new Position.Cartesian(milli, sv[3] * VelocityFactor, sv[4] * VelocityFactor, sv[5] * VelocityFactor);
+                } else
+                    position(observer, target, frame, abcorr, milli, v);
+                position[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
-            return ret;
-        } catch (SpiceErrorException e) {
+            return new PositionResponse(position, velocity);
+        } catch (Exception e) {
             Log.error(e);
         }
         return null;
-    }
-
-    public static double[] getPosition(String observer, String target, String frame, JHVTime time) throws SpiceErrorException {
-        double[] v = new double[3];
-        position(observer, target, frame, time.milli, v);
-        return v;
-    }
-
-    public static double[] getState(String observer, String target, String frame, JHVTime time) throws SpiceErrorException {
-        double[] v = new double[6];
-        state(observer, target, frame, time.milli, v);
-        return v;
     }
 
     @Nullable
     static Position getPositionLat(String observer, String target, String frame, JHVTime time) {
         try {
             double[] v = new double[3];
-            position(observer, target, frame, time.milli, v);
+            position(observer, target, frame, "NONE", time.milli, v);
             v = SpiceMath.reclat(v);
             return new Position(time, v[0], v[1], v[2]);
         } catch (SpiceErrorException e) {
@@ -82,7 +78,7 @@ public class Spice {
     public static Position getCarrington(String target, JHVTime time) {
         try {
             double[] v = new double[3];
-            position("SUN", target, "SOLO_IAU_SUN_2009", time.milli, v);
+            position("SUN", target, "SOLO_IAU_SUN_2009", "NONE", time.milli, v);
             v = SpiceMath.recrad(v);
             return new Position(time, v[0], -v[1], v[2]);
         } catch (Exception e) {
@@ -92,7 +88,6 @@ public class Spice {
     }
 
     private static final int[] axes = {3, 2, 1};
-    private static final double[][] IDENTITY_MATRIX = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
 
     @Nullable
     public static double[] getRotationEuler(String fromFrame, String toFrame, JHVTime time) {
@@ -103,19 +98,6 @@ public class Spice {
             Log.error(e);
         }
         return null;
-    }
-
-    public static final LoadingCache<JHVTime, double[][]> j2000ToSun = Caffeine.newBuilder().maximumSize(10000)
-            .build(t -> getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", t));
-
-    private static double[][] getRotationMatrix(String fromFrame, String toFrame, JHVTime time) {
-        try {
-            double et = milli2et(time.milli);
-            return CSPICE.pxform(fromFrame, toFrame, et);
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return IDENTITY_MATRIX;
     }
 
     /// /
@@ -133,21 +115,11 @@ public class Spice {
 // --Commented out by Inspection STOP (19/06/2024, 16:04)
 
     private static final double[] lightTimeUnused = new double[1];
+    static final double VelocityFactor = 1000 / Sun.CLIGHT; // km/s to c
 
-    private static void state(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
+    private static void position(String observer, String target, String frame, String abcorr, long milli, double[] result) throws SpiceErrorException {
         double et = milli2et(milli);
-        CSPICE.spkezr(target, et, frame, "NONE", observer, result, lightTimeUnused);
-        result[0] *= Sun.RadiusKMeterInv;
-        result[1] *= Sun.RadiusKMeterInv;
-        result[2] *= Sun.RadiusKMeterInv;
-        result[3] *= 1000 / Sun.CLIGHT;
-        result[4] *= 1000 / Sun.CLIGHT;
-        result[5] *= 1000 / Sun.CLIGHT;
-    }
-
-    private static void position(String observer, String target, String frame, long milli, double[] result) throws SpiceErrorException {
-        double et = milli2et(milli);
-        CSPICE.spkpos(target, et, frame, "NONE", observer, result, lightTimeUnused);
+        CSPICE.spkpos(target, et, frame, abcorr, observer, result, lightTimeUnused);
         result[0] *= Sun.RadiusKMeterInv;
         result[1] *= Sun.RadiusKMeterInv;
         result[2] *= Sun.RadiusKMeterInv;

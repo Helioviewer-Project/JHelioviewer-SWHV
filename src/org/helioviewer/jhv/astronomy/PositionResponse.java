@@ -2,6 +2,8 @@ package org.helioviewer.jhv.astronomy;
 
 import java.util.Iterator;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -22,27 +24,29 @@ public class PositionResponse {
     }
 
     private final Position.Cartesian[] position;
+    @Nullable
+    private final Position.Cartesian[] velocity; // units of c
     private final long positionStart;
     private final long positionEnd;
-    private final String location;
 
-    PositionResponse(Position.Cartesian[] _position, String _location) throws Exception {
+    PositionResponse(Position.Cartesian[] _position, @Nullable Position.Cartesian[] _velocity) throws Exception {
         int len = _position.length;
         if (len == 0)
             throw new Exception("Empty response");
         position = _position;
+        velocity = _velocity;
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
-        location = _location;
     }
 
-    PositionResponse(JSONObject jo) throws Exception {
+    PositionResponse(JSONObject jo, boolean state) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
         if (len == 0)
             throw new Exception("Empty response");
 
         position = new Position.Cartesian[len];
+        velocity = state ? new Position.Cartesian[len] : null;
         for (int i = 0; i < len; i++) {
             JSONObject posObject = res.getJSONObject(i);
             Iterator<String> iterKeys = posObject.keys();
@@ -50,16 +54,24 @@ public class PositionResponse {
                 throw new Exception("Unexpected format");
 
             String date = iterKeys.next();
+            long milli = TimeUtils.parse(date);
             JSONArray posArray = posObject.getJSONArray(date);
+            if (state) {
+                JSONArray velArray = posArray.getJSONArray(1);
+                posArray = posArray.getJSONArray(0);
+                double vx = velArray.getDouble(0) * Spice.VelocityFactor;
+                double vy = velArray.getDouble(1) * Spice.VelocityFactor;
+                double vz = velArray.getDouble(2) * Spice.VelocityFactor;
+                velocity[i] = new Position.Cartesian(milli, vx, vy, vz);
+            }
 
             double x = posArray.getDouble(0) * Sun.RadiusKMeterInv;
             double y = posArray.getDouble(1) * Sun.RadiusKMeterInv;
             double z = posArray.getDouble(2) * Sun.RadiusKMeterInv;
-            position[i] = new Position.Cartesian(TimeUtils.parse(date), x, y, z);
+            position[i] = new Position.Cartesian(milli, x, y, z);
         }
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
-        location = null;
     }
 
     long interpolateTime(long t, long start, long end) {
@@ -75,28 +87,47 @@ public class PositionResponse {
     private void interpolate(long t, long start, long end, Interpolated out) {
         long time = interpolateTime(t, start, end);
         out.time = time;
+        interpolate(position, time, out);
+    }
 
+    private void interpolate(Position.Cartesian[] samples, long time, Interpolated out) {
         if (positionStart == positionEnd) {
-            Position.Cartesian p = position[0];
+            Position.Cartesian p = samples[0];
             out.x = p.x();
             out.y = p.y();
             out.z = p.z();
             return;
         }
 
-        int maxIndex = position.length - 1;
+        int maxIndex = samples.length - 1;
         double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
         int i = Math.clamp((int) interpolatedIndex, 0, maxIndex);
         int inext = Math.min(i + 1, maxIndex);
 
-        long tstart = position[i].milli();
-        long tend = position[inext].milli();
+        long tstart = samples[i].milli();
+        long tend = samples[inext].milli();
 
         double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
 
-        out.x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
-        out.y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
-        out.z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
+        out.x = (1. - alpha) * samples[i].x() + alpha * samples[inext].x();
+        out.y = (1. - alpha) * samples[i].y() + alpha * samples[inext].y();
+        out.z = (1. - alpha) * samples[i].z() + alpha * samples[inext].z();
+    }
+
+    // position and velocity (units of c) of a state response
+    public void interpolateState(long t, long start, long end, double[] pos, double[] vel, Interpolated out) {
+        if (velocity == null)
+            throw new IllegalStateException("Not a state response");
+        long time = interpolateTime(t, start, end);
+        out.time = time;
+        interpolate(velocity, time, out);
+        vel[0] = out.x;
+        vel[1] = out.y;
+        vel[2] = out.z;
+        interpolate(position, time, out);
+        pos[0] = out.x;
+        pos[1] = out.y;
+        pos[2] = out.z;
     }
 
     public double interpolateRectangular(long t, long start, long end, float[] xyz, Interpolated out) {
@@ -148,7 +179,7 @@ public class PositionResponse {
             double sinLat = Math.clamp(out.z / dist, -1., 1.);
             hglt = Math.asin(sinLat);
         }
-        return new Position(new JHVTime(out.time), dist, -hgln, hglt).setLocation(location);
+        return new Position(new JHVTime(out.time), dist, -hgln, hglt);
     }
 
 }

@@ -12,7 +12,6 @@ public class Position {
     public final double lat;
     public final JHVTime time;
     private Quat q;
-    private String location; // useful for extra ephemeris computations, assume frame is SOLO_IAU_SUN_2009
 
     public Position(JHVTime _time, double _distance, double _lon, double _lat) {
         distance = _distance;
@@ -25,15 +24,6 @@ public class Position {
         if (q == null)
             q = Quat.createXY(lat, lon);
         return q;
-    }
-
-    Position setLocation(String _location) {
-        location = _location;
-        return this;
-    }
-
-    public String getLocation() {
-        return location;
     }
 
     public static Position toFixedDistance(Position p, double _distance) {

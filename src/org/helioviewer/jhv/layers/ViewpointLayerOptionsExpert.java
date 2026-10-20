@@ -256,7 +256,7 @@ public final class ViewpointLayerOptionsExpert {
         loads.put(element, PositionLoad.submit(status -> {
             container.setStatus(element, status);
             DisplayController.refreshCamera();
-        }, observer, target, frame, startTime, endTime));
+        }, observer, target, frame, "NONE", startTime, endTime));
     }
 
     private void unload(SpaceObjectElement element) {
