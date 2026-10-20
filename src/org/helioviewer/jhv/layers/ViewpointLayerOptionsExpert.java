@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
+import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.SpaceObject;
+import org.helioviewer.jhv.astronomy.Stars;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.thread.AppThread;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -24,11 +30,18 @@ public final class ViewpointLayerOptionsExpert {
 
     public static final int MIN_SPEED_SPIRAL = 200;
     public static final int MAX_SPEED_SPIRAL = 2000;
+    private static final String[] APPARENT_PLANETS = {"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
 
     private final boolean exclusive;
     private final SpaceObject observer;
     private final SpaceObjectContainer container;
     private final Map<SpaceObjectElement, PositionLoad> loads = new HashMap<>();
+    private final List<PositionLoad> apparentPlanets = new ArrayList<>();
+    private PositionLoad apparentSun;
+    private PositionLoad locationState;
+    private PositionLoad locationHeliocentric;
+    private final List<PositionLoad> locationLoads = new ArrayList<>(); // all of the above
+    private Future<Stars.Catalog> starCatalog;
     private Runnable changeListener = () -> {};
 
     private boolean syncInterval = true;
@@ -37,6 +50,9 @@ public final class ViewpointLayerOptionsExpert {
     private int spiralSpeed = 500;
     private boolean spiral = false;
     private boolean relative = false;
+    private boolean planets = true;
+    private boolean stars = true;
+    private boolean skyActive;
 
     private Frame frame;
 
@@ -51,6 +67,8 @@ public final class ViewpointLayerOptionsExpert {
                 frame = Frame.valueOf(jo.optString("frame"));
             } catch (Exception ignore) {}
             relative = jo.optBoolean("relativeLongitude", relative);
+            planets = jo.optBoolean("planets", planets);
+            stars = jo.optBoolean("stars", stars);
             ja = jo.optJSONArray("objects");
             syncInterval = jo.optBoolean("syncInterval", syncInterval);
             if (!syncInterval) {
@@ -184,6 +202,10 @@ public final class ViewpointLayerOptionsExpert {
             if (load.isDownloading())
                 return true;
         }
+        for (PositionLoad load : locationLoads) {
+            if (load.isDownloading())
+                return true;
+        }
         return false;
     }
 
@@ -191,6 +213,10 @@ public final class ViewpointLayerOptionsExpert {
         JSONObject jo = new JSONObject();
         jo.put("frame", frame);
         jo.put("relativeLongitude", relative);
+        if (exclusive) {
+            jo.put("planets", planets);
+            jo.put("stars", stars);
+        }
         jo.put("syncInterval", syncInterval);
         if (!syncInterval) {
             jo.put("startTime", new JHVTime(startTime));
@@ -218,6 +244,59 @@ public final class ViewpointLayerOptionsExpert {
         }
         loads.removeIf(PositionLoad::hasFailed);
         return loads;
+    }
+
+    // only once the location itself, the viewpoint, is loaded
+    @Nullable
+    PositionResponse getApparentSun() {
+        PositionLoad location = getHighlightedLoad();
+        return location == null || location.getResponse() == null || apparentSun == null ? null : apparentSun.getResponse();
+    }
+
+    List<PositionLoad> getApparentPlanets() {
+        return apparentPlanets;
+    }
+
+    @Nullable
+    PositionResponse getLocationState() {
+        return locationState == null ? null : locationState.getResponse();
+    }
+
+    @Nullable
+    PositionResponse getLocationHeliocentric() {
+        return locationHeliocentric == null ? null : locationHeliocentric.getResponse();
+    }
+
+    @Nullable
+    Stars.Catalog getStarCatalog() {
+        return starCatalog != null && starCatalog.state() == Future.State.SUCCESS ? starCatalog.resultNow() : null;
+    }
+
+    public boolean isPlanets() {
+        return planets;
+    }
+
+    public void setPlanets(boolean _planets) {
+        planets = _planets;
+        reloadSky();
+        DisplayController.display();
+    }
+
+    public boolean isStars() {
+        return stars;
+    }
+
+    public void setStars(boolean _stars) {
+        stars = _stars;
+        reloadSky();
+        DisplayController.display();
+    }
+
+    void setSkyActive(boolean _skyActive) {
+        if (skyActive == _skyActive)
+            return;
+        skyActive = _skyActive;
+        reloadSky();
     }
 
     int getSpiralSpeed() {
@@ -257,9 +336,65 @@ public final class ViewpointLayerOptionsExpert {
             container.setStatus(element, status);
             DisplayController.refreshCamera();
         }, observer, target, frame, "NONE", startTime, endTime));
+        reloadSky();
+    }
+
+    // apparent directions seen from the location in J2000, and its barycentric state and heliocentric position for the stars
+    private void reloadSky() {
+        cancelSky();
+        updateStarCatalog();
+        List<SpaceObjectElement> selected = container.getSelectedElements();
+        if (!exclusive || !skyActive || !(planets || stars) || selected.isEmpty())
+            return;
+        SpaceObject location = SpaceObject.get(selected.getFirst().toString());
+        if (location == null)
+            return;
+
+        PositionLoad.StatusReceiver receiver = status -> DisplayController.display();
+        apparentSun = PositionLoad.submit(receiver, location, SpaceObject.SUN, Frame.J2000, "LT+S", startTime, endTime);
+        locationLoads.add(apparentSun);
+        if (planets) {
+            for (String name : APPARENT_PLANETS) {
+                SpaceObject planet = SpaceObject.get(name);
+                if (planet != null && planet != location)
+                    apparentPlanets.add(PositionLoad.submit(receiver, location, planet, Frame.J2000, "LT+S", startTime, endTime));
+            }
+            locationLoads.addAll(apparentPlanets);
+        }
+        if (stars) {
+            locationState = PositionLoad.submitBarycentricState(receiver, location, startTime, endTime);
+            locationHeliocentric = PositionLoad.submit(receiver, SpaceObject.SUN, location, Frame.J2000, "NONE", startTime, endTime);
+            locationLoads.add(locationState);
+            locationLoads.add(locationHeliocentric);
+        }
+    }
+
+    private void cancelSky() {
+        locationLoads.forEach(PositionLoad::cancel);
+        locationLoads.clear();
+        locationState = null;
+        locationHeliocentric = null;
+        apparentSun = null;
+        apparentPlanets.clear();
+    }
+
+    // independent of time and location, kept while the stars are shown
+    private void updateStarCatalog() {
+        if (exclusive && skyActive && stars) {
+            if (starCatalog == null)
+                starCatalog = Task.submitBackground("stars", Stars::load, catalog -> DisplayController.display(), (logContext, t) -> {
+                    if (!AppThread.isInterrupted(t))
+                        Log.error(t);
+                });
+        } else if (starCatalog != null) {
+            starCatalog.cancel(true);
+            starCatalog = null;
+        }
     }
 
     private void unload(SpaceObjectElement element) {
+        cancelSky();
+
         PositionLoad load = loads.remove(element);
         if (load == null)
             return;

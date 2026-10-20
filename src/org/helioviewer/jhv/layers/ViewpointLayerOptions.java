@@ -37,6 +37,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     private final ViewpointLayerOptionsExpert equatorialOptions;
 
     private CameraMode cameraMode;
+    private boolean active;
 
     public ViewpointLayerOptions(JSONObject jo) {
         JSONObject joLocation = null;
@@ -78,6 +79,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
 
     public void setCameraMode(CameraMode _cameraMode, DisplayController.ViewpointApplyMode mode) {
         cameraMode = _cameraMode;
+        updateSky();
         applyCurrentViewpoint(mode);
     }
 
@@ -114,10 +116,19 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
 
     void activate() {
         Player.addTimeRangeListener(this);
+        active = true;
+        updateSky();
     }
 
     void deactivate() {
         Player.removeTimeRangeListener(this);
+        active = false;
+        updateSky();
+    }
+
+    // the sky loads run only while it is drawn
+    private void updateSky() {
+        locationOptions.setSkyActive(active && cameraMode == CameraMode.Location);
     }
 
     @Override
@@ -125,6 +136,10 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         locationOptions.setTimespan(start, end);
         equatorialOptions.setTimespan(start, end);
         optionStateChanged(cameraMode);
+    }
+
+    boolean isLocation() {
+        return cameraMode == CameraMode.Location;
     }
 
     boolean isHeliospheric() {

@@ -54,7 +54,22 @@ final class ViewpointLayerOptionsExpertPanel extends JPanel {
             add(createFramePanel(), c);
             c.gridy = 4;
             add(createSpiralPanel(), c);
+        } else {
+            c.gridy = 3;
+            add(createSkyPanel(), c);
         }
+    }
+
+    private JPanel createSkyPanel() {
+        JCheckBox planetsCheckBox = new JCheckBox("Planets", options.isPlanets());
+        planetsCheckBox.addActionListener(e -> options.setPlanets(planetsCheckBox.isSelected()));
+        JCheckBox starsCheckBox = new JCheckBox("Stars", options.isStars());
+        starsCheckBox.addActionListener(e -> options.setStars(starsCheckBox.isSelected()));
+
+        JPanel skyPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        skyPanel.add(planetsCheckBox);
+        skyPanel.add(starsCheckBox);
+        return skyPanel;
     }
 
     private void syncTimeSelector() {
