@@ -42,8 +42,7 @@ public class ViewpointLayer extends AbstractLayer {
     private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
     private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
-    private static final float SIZE_LOCATION_PLANET = 5;
-    private static final float SIZE_LOCATION_STAR = 6;
+    private static final float SIZE_LOCATION_PLANET = 6;
     private static final double STAR_OFFSET = 3e-3; // [rad] apparent minus catalogue star direction: proper motion 1990-2050, aberration at 192 km/s, deflection, parallax
     static final double[] SOLAR_POLE = solarPole(Math.toRadians(286.13), Math.toRadians(63.87)); // J2000, BODY10_POLE_RA/DEC in pck00011.tpc
 
@@ -456,7 +455,7 @@ public class ViewpointLayer extends AbstractLayer {
                 if (star.x() * locationSun[0] + star.y() * locationSun[1] + star.z() * locationSun[2] < cosCone)
                     continue;
                 double[] apparent = Stars.apparent(star, years, locationSsb, locationHelio, helioDistance, locationVelocity);
-                float size = (float) Math.clamp(SIZE_LOCATION_STAR - 0.4 * star.mag(), 2.5, SIZE_LOCATION_STAR);
+                float size = (float) Math.clamp(5 - 0.28 * star.mag(), 2.5, 5.5);
                 putLocation(star, projectLocation(apparent, true, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance), drag, size, color);
             }
         }

@@ -8,7 +8,7 @@
 - Improve rendering quality, performance, and memory handling
 - Use consistent percentile clipping across FITS sequences to reduce brightness flicker, and remove ZScale
 - Fix MGN numerical artifacts and refresh queued and difference images when changing filters
-- Show planets and stars at their apparent positions in the Location viewpoint, with names on hover
+- Show planets and stars (Gaia DR3, Hipparcos for the brightest) at their apparent positions in the Location viewpoint, with names on hover
 
 ### Interaction and UI
 - Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
