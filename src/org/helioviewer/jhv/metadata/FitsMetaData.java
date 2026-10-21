@@ -175,6 +175,9 @@ public final class FitsMetaData extends CommonMetaData {
         } else if (instrument.equals("SJI")) {
             measurement = m.getDouble("TWAVE1").map(w -> String.valueOf(w.longValue())).orElse("");
             displayName = observatory + ' ' + instrument + ' ' + measurement;
+        } else if (instrument.equals("ASPIICS")) {
+            measurement = m.getString("PROD_ID").orElseGet(() -> m.getRequiredString("WAVELNTH"));
+            displayName = instrument + ' ' + measurement;
         } else if (instrument.equals("EUI")) {
             displayName = instrument + ' ' + detector.replace('_', '-') + ' ' + measurement;
             String imageType = m.getString("IMGTYPE").orElse("");

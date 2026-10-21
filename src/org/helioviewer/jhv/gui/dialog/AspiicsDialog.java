@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,58 +12,45 @@ import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.io.Load;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
-import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
 public class AspiicsDialog extends StandardDialog {
 
     private static final String ORBITS_URL = "https://p3sc.oma.be/api/l3_orbit_time_ranges";
-    private static final String FITS_URL = "https://p3sc.oma.be/api/L3?select=datalocation&orbit_id=eq.%d&active=is.true";
-    private static final String JP2_URL = "https://p3sc.oma.be/api/L3_jpeg2000?select=datalocation&orbit_id=eq.%d&active=is.true";
-    private static final String DATA_URL = "https://p3sc.oma.be/datarepfiles/";
-    private static final Dimension RESULT_SIZE = new Dimension(500, 350);
+    // ROB Proba-3 ASPIICS datasets
+    private static final int[] SOURCE_IDS = {506, 508, 509, 510};
 
     private final JComboBox<Orbit> orbitCombo = new JComboBox<>();
-    private final JRadioButton fitsButton = new JRadioButton("FITS", true);
-    private final JRadioButton jp2Button = new JRadioButton("JP2");
-    private final JRadioButton[] productButtons = {
-            new JRadioButton("bt", true),
-            new JRadioButton("fe"),
-            new JRadioButton("he"),
-            new JRadioButton("pb"),
-            new JRadioButton("pa")
+    private final JCheckBox[] productBoxes = {
+            new JCheckBox("Total brightness", true),
+            new JCheckBox("Polarized brightness"),
+            new JCheckBox("He I D3"),
+            new JCheckBox("Fe XIV")
     };
-    private final JButton searchButton = new JButton("Search");
-    private final JButton addButton = new JButton("Add");
-    private final JList<String> listPane = new JList<>();
-    private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
-    private List<String> products = List.of();
-    private boolean loadingOrbits;
-    private boolean searching;
 
     private static AspiicsDialog instance;
 
@@ -82,9 +66,14 @@ public class AspiicsDialog extends StandardDialog {
 
     @Override
     public ButtonPanel createButtonPanel() {
+        JButton addButton = new JButton("Add");
         addButton.addActionListener(e -> {
-            List<String> selected = listPane.getSelectedValuesList();
-            Load.image(selected.stream().map(AspiicsDialog::uri).toList());
+            if (!(orbitCombo.getSelectedItem() instanceof Orbit orbit))
+                return;
+            for (int i = 0; i < SOURCE_IDS.length; i++) {
+                if (productBoxes[i].isSelected())
+                    ImageLayer.create().load(new APIRequest("ROB", SOURCE_IDS[i], orbit.start(), orbit.end(), APIRequest.CADENCE_ALL));
+            }
             setVisible(false);
         });
 
@@ -102,80 +91,26 @@ public class AspiicsDialog extends StandardDialog {
 
     @Override
     public JComponent createContentPanel() {
-        addToGroup(fitsButton, jp2Button);
-        addToGroup(productButtons);
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        content.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        orbitCombo.setPrototypeDisplayValue(new Orbit(9999, 0, 0));
         orbitCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Orbit(int ignored, String start, String end))
-                    label.setToolTipText(start + " - " + end);
+                if (value instanceof Orbit(int ignored, long start, long end))
+                    label.setToolTipText(TimeUtils.format(start) + " - " + TimeUtils.format(end));
                 return label;
             }
         });
-
-        JPanel queryPanel = new JPanel(new GridBagLayout());
-        queryPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridy = 0;
-        gc.fill = GridBagConstraints.NONE;
-        gc.anchor = GridBagConstraints.WEST;
-
-        gc.gridx = 0;
-        queryPanel.add(new JLabel("Orbit"), gc);
-        gc.gridx = 1;
-        queryPanel.add(orbitCombo, gc);
-        gc.gridx = 2;
-        queryPanel.add(fitsButton, gc);
-        gc.gridx = 3;
-        queryPanel.add(jp2Button, gc);
-        gc.gridx = 4;
-        queryPanel.add(searchButton, gc);
-
-        gc.gridx = 0;
-        gc.gridy = 1;
-        queryPanel.add(new JLabel("Product"), gc);
-        JPanel productPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        for (JRadioButton button : productButtons)
-            productPanel.add(button);
-        gc.gridx = 1;
-        gc.gridwidth = 4;
-        queryPanel.add(productPanel, gc);
-        gc.gridwidth = 1;
-
-        listPane.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Object text = value instanceof String datalocation ? fileName(datalocation) : value;
-                return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
-            }
-        });
-        SearchableUtils.installSearchable(listPane);
-        listPane.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting())
-                updateButtonState();
-        });
-
-        JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        foundPanel.add(foundLabel);
-
-        JScrollPane scrollPane = new JScrollPane(listPane);
-        scrollPane.setPreferredSize(RESULT_SIZE);
-
-        searchButton.addActionListener(e -> search());
-        fitsButton.addActionListener(e -> clearProducts());
-        jp2Button.addActionListener(e -> clearProducts());
-        for (JRadioButton button : productButtons)
-            button.addActionListener(e -> updateProductList());
-        orbitCombo.addActionListener(e -> clearProducts());
-
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(queryPanel);
-        content.add(foundPanel);
-        content.add(scrollPane);
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        updateButtonState();
+        JPanel orbitPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+        orbitPanel.setAlignmentX(LEFT_ALIGNMENT);
+        orbitPanel.add(new JLabel("Orbits"));
+        orbitPanel.add(orbitCombo);
+        content.add(orbitPanel);
+        for (JCheckBox box : productBoxes)
+            content.add(box);
         return content;
     }
 
@@ -186,122 +121,19 @@ public class AspiicsDialog extends StandardDialog {
     }
 
     public void showDialog() {
-        if (orbitCombo.getItemCount() == 0 && !loadingOrbits)
-            loadOrbits();
+        if (orbitCombo.getItemCount() == 0)
+            Task.submitBackground("ASPIICS orbits", new LoadOrbits(), this::setOrbits, "Failed to load ASPIICS orbits");
         pack();
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 
-    private void loadOrbits() {
-        loadingOrbits = true;
-        foundLabel.setText("Loading orbits...");
-        updateButtonState();
-        Task.submitBackground("ASPIICS orbits", new LoadOrbits(), this::onLoadOrbitsSuccess, (logContext, t) -> onLoadOrbitsFailure());
-    }
-
-    private void onLoadOrbitsSuccess(List<Orbit> orbits) {
-        loadingOrbits = false;
+    private void setOrbits(List<Orbit> orbits) {
         orbitCombo.setModel(new DefaultComboBoxModel<>(orbits.toArray(Orbit[]::new)));
-        foundLabel.setText("0 found");
-        updateButtonState();
+        pack();
     }
 
-    private void onLoadOrbitsFailure() {
-        loadingOrbits = false;
-        foundLabel.setText("Failed to load orbits");
-        updateButtonState();
-    }
-
-    private void search() {
-        Orbit orbit = (Orbit) orbitCombo.getSelectedItem();
-        if (orbit == null)
-            return;
-
-        searching = true;
-        clearProducts("Searching...");
-        boolean jp2 = jp2Button.isSelected();
-        Task.submitBackground("ASPIICS search", new SearchProducts(orbit.orbitId(), jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
-    }
-
-    private void onSearchSuccess(List<String> result) {
-        searching = false;
-        products = result;
-        updateProductList();
-    }
-
-    private void onSearchFailure() {
-        searching = false;
-        clearProducts();
-    }
-
-    private void updateButtonState() {
-        boolean enabled = !loadingOrbits && !searching;
-        orbitCombo.setEnabled(enabled);
-        fitsButton.setEnabled(enabled);
-        jp2Button.setEnabled(enabled);
-        setEnabled(productButtons, enabled);
-        searchButton.setEnabled(enabled && orbitCombo.getSelectedItem() != null);
-        addButton.setEnabled(enabled && listPane.getSelectedIndex() >= 0);
-    }
-
-    private void updateProductList() {
-        String type = selectedProductType();
-        String[] filtered = products.stream()
-                .filter(datalocation -> type.equals(productType(datalocation)))
-                .toArray(String[]::new);
-        listPane.setListData(filtered);
-        foundLabel.setText(filtered.length + " found");
-        updateButtonState();
-    }
-
-    private void clearProducts() {
-        clearProducts("0 found");
-    }
-
-    private void clearProducts(String status) {
-        products = List.of();
-        listPane.setListData(new String[0]);
-        foundLabel.setText(status);
-        updateButtonState();
-    }
-
-    private String selectedProductType() {
-        for (JRadioButton button : productButtons) {
-            if (button.isSelected())
-                return button.getText();
-        }
-        return productButtons[0].getText();
-    }
-
-    private static void addToGroup(JRadioButton... buttons) {
-        ButtonGroup group = new ButtonGroup();
-        for (JRadioButton button : buttons)
-            group.add(button);
-    }
-
-    private static void setEnabled(JRadioButton[] buttons, boolean enabled) {
-        for (JRadioButton button : buttons)
-            button.setEnabled(enabled);
-    }
-
-    private static String productType(String datalocation) {
-        String name = fileName(datalocation);
-        int start = "aspiics_".length();
-        int end = name.indexOf("_l3_", start);
-        return end > start ? name.substring(start, end) : null;
-    }
-
-    private static URI uri(String datalocation) {
-        return URI.create(DATA_URL + datalocation);
-    }
-
-    private static String fileName(String datalocation) {
-        int slash = datalocation.lastIndexOf('/');
-        return slash >= 0 ? datalocation.substring(slash + 1) : datalocation;
-    }
-
-    private record Orbit(int orbitId, String start, String end) {
+    private record Orbit(int orbitId, long start, long end) {
         @Override
         public String toString() {
             return Integer.toString(orbitId);
@@ -314,32 +146,12 @@ public class AspiicsDialog extends StandardDialog {
             JSONArray array = JSONUtils.getArray(new URI(ORBITS_URL));
             List<Orbit> orbits = new ArrayList<>(array.length());
             for (int i = 0; i < array.length(); i++) {
-                JSONObject item = array.optJSONObject(i);
-                if (item != null && item.has("orbit_id"))
-                    orbits.add(new Orbit(item.getInt("orbit_id"), item.optString("aa_start_time"), item.optString("aa_end_time")));
+                JSONObject item = array.getJSONObject(i);
+                orbits.add(new Orbit(item.getInt("orbit_id"), TimeUtils.parse(item.getString("aa_start_time")), TimeUtils.parse(item.getString("aa_end_time"))));
             }
-            orbits.sort(Comparator.comparingInt(Orbit::orbitId));
+            orbits.sort(Comparator.comparingLong(Orbit::start).reversed());
             return orbits;
         }
-    }
-
-    private record SearchProducts(int orbitId, boolean jp2) implements Callable<List<String>> {
-        @Override
-        public List<String> call() throws Exception {
-            String url = String.format(jp2 ? JP2_URL : FITS_URL, orbitId);
-            JSONArray array = JSONUtils.getArray(new URI(url));
-            List<String> products = new ArrayList<>(array.length());
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject item = array.optJSONObject(i);
-                if (item != null) {
-                    String datalocation = item.optString("datalocation");
-                    if (productType(datalocation) != null)
-                        products.add(datalocation);
-                }
-            }
-            return products;
-        }
-
     }
 
 }
