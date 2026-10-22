@@ -85,6 +85,7 @@ public final class AppInit {
                 "pck00011.tpc",
                 "de432s_reduced.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
+                "sta.bsp",
                 /* SOLO */
                 "solo_ANC_soc-sc-fk_V10.tf",
                 "solo_ANC_soc-sci-fk_V09.tf",
