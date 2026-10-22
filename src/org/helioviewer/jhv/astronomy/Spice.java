@@ -12,13 +12,28 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
+import spice.basic.SpiceException;
 
 public class Spice {
 
-    public static void loadKernels(List<String> files) throws SpiceErrorException {
+    // DELTET constants of the leapseconds kernel, leaps [s past J2000 UTC]
+    private record LeapSeconds(double deltaTA, double k, double eb, double m0, double m1, double[] deltaAT, double[] leaps) {}
+
+    private static LeapSeconds leapSeconds; // kernels load at startup on the main thread
+
+    public static void loadKernels(List<String> files) throws SpiceException {
         for (String f : files) {
             CSPICE.furnsh(f);
         }
+        double[] m = CSPICE.gdpool("DELTET/M", 0, 2);
+        double[] table = CSPICE.gdpool("DELTET/DELTA_AT", 0, 1000);
+        double[] deltaAT = new double[table.length / 2], leaps = new double[table.length / 2];
+        for (int i = 0; i < deltaAT.length; i++) {
+            deltaAT[i] = table[2 * i];
+            leaps[i] = table[2 * i + 1];
+        }
+        leapSeconds = new LeapSeconds(CSPICE.gdpool("DELTET/DELTA_T_A", 0, 1)[0], CSPICE.gdpool("DELTET/K", 0, 1)[0],
+                CSPICE.gdpool("DELTET/EB", 0, 1)[0], m[0], m[1], deltaAT, leaps);
     }
 
     @Nullable
@@ -102,9 +117,17 @@ public class Spice {
 
     /// /
 
-    private static double milli2et(long milli) throws SpiceErrorException {
+    // sec + CSPICE.deltet(sec, "UTC") as in deltet.c, without the native lock
+    static double milli2et(long milli) {
+        LeapSeconds ls = leapSeconds;
         double sec = (milli - TimeUtils.J2000.milli) / 1000.;
-        return sec + CSPICE.deltet(sec, "UTC");
+        int i = ls.leaps.length - 1;
+        while (i > 0 && sec < ls.leaps[i])
+            i--;
+        double deltaAT = sec < ls.leaps[0] ? ls.deltaAT[0] - 1 : ls.deltaAT[i]; // as deltet before the first leap second
+        double x = sec + ls.deltaTA + deltaAT;
+        double m = ls.m0 + ls.m1 * Math.copySign(Math.floor(Math.abs(x) + .5), x); // d_nint, nearest ET second
+        return sec + (deltaAT + ls.deltaTA + ls.k * Math.sin(m + ls.eb * Math.sin(m)));
     }
 
 // --Commented out by Inspection START (19/06/2024, 16:04):
