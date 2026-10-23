@@ -178,7 +178,7 @@ public final class WcsSolution {
     }
 
     // User offsets change CRVAL; WCSLIB resolves the projection's pole defaults again.
-    WcsSolution adjusted(double longitudeArcsec, double latitudeArcsec) {
+    public WcsSolution adjusted(double longitudeArcsec, double latitudeArcsec) {
         if (longitudeArcsec == 0 && latitudeArcsec == 0)
             return this;
         return new WcsSolution(null, this, longitudeArcsec * ARCSEC_TO_RAD, latitudeArcsec * ARCSEC_TO_RAD, unitsPerRad);
