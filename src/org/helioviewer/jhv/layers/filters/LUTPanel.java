@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.layers.filters;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.Buttons;
@@ -21,7 +19,6 @@ public final class LUTPanel implements FilterDetails {
     private final ImageDisplaySettings settings;
     private final LUTComboBox lutCombo;
     private final JideToggleButton invertButton;
-    private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JLabel title = new JLabel("Color ", JLabel.RIGHT);
 
     public LUTPanel(ImageLayer layer) {
@@ -40,7 +37,6 @@ public final class LUTPanel implements FilterDetails {
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
-        buttonPanel.add(invertButton, BorderLayout.LINE_END);
     }
 
     public void refresh() {
@@ -60,7 +56,7 @@ public final class LUTPanel implements FilterDetails {
 
     @Override
     public Component getThird() {
-        return buttonPanel;
+        return invertButton;
     }
 
 }

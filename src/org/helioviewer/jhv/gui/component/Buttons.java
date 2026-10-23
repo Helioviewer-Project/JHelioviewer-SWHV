@@ -13,9 +13,10 @@ public class Buttons {
     public static final String close = MaterialDesign.CLOSE.toString();
     public static final String play = MaterialDesign.PLAY.toString();
     public static final String pause = MaterialDesign.PAUSE.toString();
-    public static final String backward = MaterialDesign.STEP_BACKWARD.toString();
-    public static final String forward = MaterialDesign.STEP_FORWARD.toString();
+    public static final String backward = MaterialDesign.SKIP_PREVIOUS.toString();
+    public static final String forward = MaterialDesign.SKIP_NEXT.toString();
     public static final String record = MaterialDesign.RECORD.toString();
+    public static final String settings = MaterialDesign.TUNE.toString();
     public static final String check = MaterialDesign.CHECK.toString();
     public static final String collapseLeft = "<html><font face='Material Design Icons' size=3>" +
             MaterialDesign.CHEVRON_LEFT + "</font>";
@@ -26,11 +27,6 @@ public class Buttons {
             MaterialDesign.CHEVRON_RIGHT + "</font>&nbsp;";
     public static final String chevronDown = "<html><font face='Material Design Icons' size=3>" +
             MaterialDesign.CHEVRON_DOWN + "</font>&nbsp;";
-
-    public static final String optionsRight = "<html>Options<font face='Material Design Icons' size=4>" +
-            MaterialDesign.CHEVRON_RIGHT;
-    public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
-            MaterialDesign.CHEVRON_DOWN;
 
     public static final String fitsRight = "<html>FITS Settings<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_RIGHT;

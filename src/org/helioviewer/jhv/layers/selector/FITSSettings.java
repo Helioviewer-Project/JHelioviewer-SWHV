@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 import java.util.function.DoubleConsumer;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -19,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 
@@ -31,23 +31,14 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     private final JRadioButton betaButton = new JRadioButton("β");
     private final JRadioButton alphaButton = new JRadioButton("α");
     private final JHVSlider gammaSlider;
-    private final JLabel gammaLabel = new JLabel("", JLabel.RIGHT);
+    private final JLabel gammaLabel;
     private final JHVSlider betaSlider;
-    private final JLabel betaLabel = new JLabel("", JLabel.RIGHT);
+    private final JLabel betaLabel;
     private final JHVSlider alphaSlider;
-    private final JLabel alphaLabel = new JLabel("", JLabel.RIGHT);
+    private final JLabel alphaLabel;
     private final JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -ImageProcessingSettings.CLIP_LIMIT, ImageProcessingSettings.CLIP_LIMIT));
     private final JFormattedTextField maxClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -ImageProcessingSettings.CLIP_LIMIT, ImageProcessingSettings.CLIP_LIMIT));
     private final EnumMap<ImageProcessingSettings.ClippingMode, JRadioButton> clippingButtons = new EnumMap<>(ImageProcessingSettings.ClippingMode.class);
-
-    private static JPanel createScalingPanel(JRadioButton button, JHVSlider slider, JLabel label) {
-        JPanel panel = new JPanel(new BorderLayout(5, 0));
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        panel.add(button, BorderLayout.LINE_START);
-        panel.add(slider, BorderLayout.CENTER);
-        panel.add(label, BorderLayout.LINE_END);
-        return panel;
-    }
 
     private static void bindSelectionControls(JRadioButton button, Component... components) {
         for (Component component : components) {
@@ -71,6 +62,7 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     }
 
     public FITSSettings(ImageProcessingSettings _state) {
+        super(new GridBagLayout());
         state = _state;
         ImageProcessingSettings.FITSParameters initialState = state.fitsParameters();
         gammaSlider = createSlider(gammaIndex(ImageProcessingSettings.GAMMA_MAX),
@@ -79,6 +71,9 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
                 betaIndex(ImageProcessingSettings.BETA_MIN), betaIndex(initialState.beta()));
         alphaSlider = createSlider(alphaIndex(ImageProcessingSettings.ALPHA_MIN),
                 alphaIndex(ImageProcessingSettings.ALPHA_MAX), alphaIndex(initialState.alpha()));
+        gammaLabel = new SliderValueLabel(String.valueOf(gammaSlider.getValue() / 10.), gammaSlider, step -> String.valueOf(step / 10.));
+        betaLabel = new SliderValueLabel(String.valueOf(betaSlider.getValue()), betaSlider, String::valueOf);
+        alphaLabel = new SliderValueLabel(String.valueOf(alphaSlider.getValue()), alphaSlider, String::valueOf);
         state.addFITSListener(this);
 
         gammaButton.setToolTipText("<html><body>pixel<sup>1/γ</sup>");
@@ -110,10 +105,6 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         bindScalingMode(betaButton, betaSlider, ImageProcessingSettings.ScalingMode.Beta);
         bindScalingMode(alphaButton, alphaSlider, ImageProcessingSettings.ScalingMode.Alpha);
 
-        JPanel gammaPanel = createScalingPanel(gammaButton, gammaSlider, gammaLabel);
-        JPanel betaPanel = createScalingPanel(betaButton, betaSlider, betaLabel);
-        JPanel alphaPanel = createScalingPanel(alphaButton, alphaSlider, alphaLabel);
-
         minClip.setColumns(5);
         minClip.addPropertyChangeListener("value", e -> applyClipValue(minClip, state::setClippingMin));
         maxClip.setColumns(5);
@@ -123,19 +114,16 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         rangePanel.add(minClip, BorderLayout.LINE_START);
         rangePanel.add(maxClip, BorderLayout.LINE_END);
 
-        //
-        JPanel content = new JPanel(new GridBagLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
-        content.add(new JLabel("Clipping:", JLabel.RIGHT), c);
+        add(new JLabel("Clipping:", JLabel.RIGHT), c);
 
         ButtonGroup clippingGroup = new ButtonGroup();
         c.gridx = 1;
         c.weightx = 1;
+        c.gridwidth = 2;
         for (ImageProcessingSettings.ClippingMode clipping : ImageProcessingSettings.ClippingMode.values()) {
             JRadioButton radio = new JRadioButton(clipping.toString(), clipping == initialState.clippingMode());
             clippingButtons.put(clipping, radio);
@@ -150,30 +138,35 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
             clippingGroup.add(radio);
 
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            panel.add(radio, c);
+            panel.add(radio);
             if (rangeMode) {
                 panel.add(rangePanel);
             }
-            content.add(panel, c);
+            add(panel, c);
             c.gridy++;
         }
 
+        c.gridwidth = 1;
+        addScalingRow(c, gammaButton, gammaSlider, gammaLabel);
+        addScalingRow(c, betaButton, betaSlider, betaLabel);
+        addScalingRow(c, alphaButton, alphaSlider, alphaLabel);
+
+        fitsParametersChanged();
+    }
+
+    private void addScalingRow(GridBagConstraints c, JRadioButton button, JHVSlider slider, JLabel label) {
         c.gridx = 0;
         c.weightx = 0;
-        content.add(new JLabel("Scaling:", JLabel.RIGHT), c);
-
+        c.fill = GridBagConstraints.HORIZONTAL;
+        button.setHorizontalAlignment(JRadioButton.RIGHT);
+        add(button, c);
         c.gridx = 1;
         c.weightx = 1;
-        content.add(gammaPanel, c);
+        add(slider, c);
+        c.gridx = 2;
+        c.weightx = 0;
+        add(label, c);
         c.gridy++;
-        content.add(betaPanel, c);
-        c.gridy++;
-        content.add(alphaPanel, c);
-        c.gridy++;
-
-        setLayout(new BorderLayout());
-        add(content);
-        fitsParametersChanged();
     }
 
     @Override

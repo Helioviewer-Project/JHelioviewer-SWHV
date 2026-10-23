@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 
 import javax.swing.JComboBox;
@@ -11,17 +10,16 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideSplitButton;
 
-public final class ImageFilterPanel implements FilterDetails {
+public final class ImageFilterPanel {
 
-    private final JPanel filterPanel = new JPanel(new BorderLayout());
-    private final JPanel buttonPanel = new JPanel(new BorderLayout());
-    private final JLabel title = new JLabel("Filter ", JLabel.RIGHT);
+    private ImageFilterPanel() {}
 
     private static String formatLabel(double value) {
         return String.format("%.1f", value);
@@ -42,7 +40,7 @@ public final class ImageFilterPanel implements FilterDetails {
     private static JPanel createEnhancePanel(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
         JHVSlider slider = new JHVSlider(0, 3, settings.getEnhanced(), 10);
-        JLabel label = new JLabel(formatLabel(slider.getDoubleValue()), JLabel.RIGHT);
+        JLabel label = new SliderValueLabel(formatLabel(slider.getDoubleValue()), slider, step -> formatLabel(step / 10.));
         label.setToolTipText("<html><body>pixel⋅R<sup>v");
         slider.addChangeListener(e -> {
             double value = slider.getDoubleValue();
@@ -56,7 +54,9 @@ public final class ImageFilterPanel implements FilterDetails {
         return enhancePanel;
     }
 
-    public ImageFilterPanel(ImageLayer layer) {
+    public static FilterDetails create(ImageLayer layer) {
+        JPanel filterPanel = new JPanel(new BorderLayout());
+        JLabel title = new JLabel("Filter ", JLabel.RIGHT);
         ImageDisplaySettings settings = layer.getDisplaySettings();
         JComboBox<ImageFilter.Type> filterCombo = new JComboBox<>(ImageFilter.Type.values());
         filterCombo.setSelectedItem(layer.getFilter());
@@ -69,7 +69,7 @@ public final class ImageFilterPanel implements FilterDetails {
         enhanceButton.add(enhancePanel);
 
         JHVSlider upsilonLowSlider = new JHVSlider(0.05, 1, settings.getUpsilonLow(), 100);
-        JLabel upsilonLowLabel = new JLabel(formatUpsilon(upsilonLowSlider.getDoubleValue()), JLabel.RIGHT);
+        JLabel upsilonLowLabel = new SliderValueLabel(formatUpsilon(upsilonLowSlider.getDoubleValue()), upsilonLowSlider, step -> formatUpsilon(step / 100.));
         upsilonLowSlider.addChangeListener(e -> {
             double value = upsilonLowSlider.getDoubleValue();
             settings.setUpsilon(value, settings.getUpsilonHigh());
@@ -77,7 +77,7 @@ public final class ImageFilterPanel implements FilterDetails {
             DisplayController.display();
         });
         JHVSlider upsilonHighSlider = new JHVSlider(0.05, 1, settings.getUpsilonHigh(), 100);
-        JLabel upsilonHighLabel = new JLabel(formatUpsilon(upsilonHighSlider.getDoubleValue()), JLabel.RIGHT);
+        JLabel upsilonHighLabel = new SliderValueLabel(formatUpsilon(upsilonHighSlider.getDoubleValue()), upsilonHighSlider, step -> formatUpsilon(step / 100.));
         upsilonHighSlider.addChangeListener(e -> {
             double value = upsilonHighSlider.getDoubleValue();
             settings.setUpsilon(settings.getUpsilonLow(), value);
@@ -104,22 +104,7 @@ public final class ImageFilterPanel implements FilterDetails {
 
         filterPanel.add(filterCombo, BorderLayout.CENTER);
         filterPanel.add(upsilonButton, BorderLayout.LINE_END);
-        buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
-    }
-
-    @Override
-    public Component getFirst() {
-        return title;
-    }
-
-    @Override
-    public Component getSecond() {
-        return filterPanel;
-    }
-
-    @Override
-    public Component getThird() {
-        return buttonPanel;
+        return new FilterRow(title, filterPanel, enhanceButton);
     }
 
 }

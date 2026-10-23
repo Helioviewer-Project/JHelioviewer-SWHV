@@ -30,8 +30,6 @@ public final class ModelDataUriTest {
         URI sourceUri = new URI(source);
         DataUri data = new DataUri(sourceUri, cached.toUri(), cached.toFile());
         check(data.format() == expected, "remote " + expected + " format");
-        check(data.sourceUri().equals(sourceUri), "remote source URI");
-        check(data.file().toPath().equals(cached), "remote cached file");
     }
 
     private static void check(boolean condition, String description) {

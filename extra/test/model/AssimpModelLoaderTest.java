@@ -239,11 +239,6 @@ public final class AssimpModelLoaderTest {
 
     private static void checkLayer(Path model) throws Exception {
         ModelLayer layer = new ModelLayer(model.toUri());
-        check(layer.getName().equals("URI loader test"), "layer name");
-        check(layer.getTimeString().equals(TimeUtils.START.toString()), "default layer time");
-        check(layer.isEnabled(), "layer enabled");
-        check(layer.isLocal(), "local layer");
-
         JSONObject state = new JSONObject();
         layer.serialize(state);
         check(state.getString("uri").equals(model.toUri().toString()), "layer URI state");

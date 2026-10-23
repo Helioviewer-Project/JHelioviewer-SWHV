@@ -34,7 +34,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
 
     private final JTable grid;
 
-    SpaceObjectContainerPanel(ViewpointLayerOptionsExpert options) {
+    SpaceObjectContainerPanel(ViewpointLayerOptionsExpert options, Runnable selectionChanged) {
         SpaceObjectContainer container = options.getContainer();
         AbstractTableModel tableModel = new AbstractTableModel() {
             @Override
@@ -53,7 +53,10 @@ final class SpaceObjectContainerPanel extends JScrollPane {
             }
         };
         grid = new JTable(tableModel);
-        container.setChangeListener(() -> tableModel.fireTableRowsUpdated(0, tableModel.getRowCount() - 1));
+        container.setChangeListener(() -> {
+            tableModel.fireTableRowsUpdated(0, tableModel.getRowCount() - 1);
+            selectionChanged.run();
+        });
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
@@ -80,7 +83,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
                 if (v == null || !(v.value instanceof SpaceObjectElement element))
                     return;
 
-                if (v.col == SELECTED_COL)
+                if (container.isExclusive() || v.col == SELECTED_COL)
                     options.selectElement(element);
                 else
                     options.setHighlightedElement(element);

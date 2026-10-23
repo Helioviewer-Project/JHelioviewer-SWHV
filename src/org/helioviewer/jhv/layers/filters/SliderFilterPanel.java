@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -48,27 +49,43 @@ public final class SliderFilterPanel {
         return create("Sharpen ", -1, 1, settings.getSharpen(), 100, SliderFilterPanel::formatPercent, settings::setSharpen);
     }
 
+    public static FilterDetails sector(ImageLayer layer) {
+        ImageDisplaySettings settings = layer.getDisplaySettings();
+        return create("Sector", -180, 180, settings.getSectorCenter(), 1, SliderFilterPanel::formatWholeDegree,
+                value -> settings.setSector(value, settings.getSectorWidth()));
+    }
+
+    public static FilterDetails sectorWidth(ImageLayer layer) {
+        ImageDisplaySettings settings = layer.getDisplaySettings();
+        return create("Opening", 0, 360, settings.getSectorWidth(), 1, SliderFilterPanel::formatWholeDegree,
+                value -> settings.setSector(settings.getSectorCenter(), value));
+    }
+
+    private static String formatWholeDegree(double value) {
+        return String.format("%.0f°", value);
+    }
+
     private static String formatDegree(double value) {
-        return "<html><p align='right'>" + String.format("%.1f", value) + "°</p>";
+        return String.format("%.1f°", value);
     }
 
     private static String formatArcsec(double value) {
-        return "<html><p align='right'>" + String.format("%.0f", value) + "″</p>";
+        return String.format("%.0f″", value);
     }
 
     private static String formatPercent(double value) {
-        return "<html><p align='right'>" + String.format("%.0f", value * 100) + "%</p>";
+        return String.format("%.0f%%", value * 100);
     }
 
     // value changes in steps of 1/scale
-    static FilterDetails create(
+    private static FilterDetails create(
             String titleText,
             double min, double max, double initial, int scale,
             DoubleFunction<String> formatter,
             DoubleConsumer onValueChange) {
         JLabel title = new JLabel(titleText, JLabel.RIGHT);
         JHVSlider slider = new JHVSlider(min, max, initial, scale);
-        JLabel label = new JLabel(formatter.apply(slider.getDoubleValue()), JLabel.RIGHT);
+        JLabel label = new SliderValueLabel(formatter.apply(slider.getDoubleValue()), slider, step -> formatter.apply(step / (double) scale));
         slider.addChangeListener(e -> {
             double value = slider.getDoubleValue();
             onValueChange.accept(value);

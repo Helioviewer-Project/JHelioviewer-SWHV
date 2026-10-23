@@ -24,7 +24,7 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     private SWEKSwingUI ui;
 
     public SWEKPlugin() {
-        super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
+        super("Events", "Visualize space weather relevant events");
         instance = this;
     }
 

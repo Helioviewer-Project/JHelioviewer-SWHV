@@ -20,8 +20,7 @@ public final class TimelinesGUI implements Interfaces.MainContentPanelPlugin, Ti
     private final JMenuItem openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
 
     public void install() {
-        MainFrame.getLeftContentPane().add("Timeline Layers", panel, true);
-        MainFrame.getLeftContentPane().revalidate();
+        MainFrame.getLayersPanel().setTimelinesPanel(panel);
         MainFrame.getMainContentPanel().addPlugin(this);
         MainFrame.getMenuBar().getMenu(0).add(newItem, 5);
         MainFrame.getMenuBar().getMenu(0).add(openItem, 6);
@@ -33,8 +32,7 @@ public final class TimelinesGUI implements Interfaces.MainContentPanelPlugin, Ti
         MainFrame.getMenuBar().getMenu(0).remove(openItem);
         MainFrame.getMenuBar().getMenu(0).remove(newItem);
         MainFrame.getMainContentPanel().removePlugin(this);
-        MainFrame.getLeftContentPane().remove(panel);
-        MainFrame.getLeftContentPane().revalidate();
+        MainFrame.getLayersPanel().setTimelinesPanel(null);
     }
 
     @Override

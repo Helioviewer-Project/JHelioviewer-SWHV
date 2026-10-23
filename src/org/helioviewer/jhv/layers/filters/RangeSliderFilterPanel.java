@@ -4,6 +4,7 @@ import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
+import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -45,7 +46,10 @@ public final class RangeSliderFilterPanel {
             RangeConsumer onValueChange) {
         JLabel title = new JLabel(titleText, JLabel.RIGHT);
         JHVRangeSlider slider = new JHVRangeSlider(min, max, initialLow, initialHigh, scale);
-        JLabel label = new JLabel(formatter.format(slider.getLowDouble(), slider.getHighDouble()), JLabel.RIGHT);
+        // Both readout lines depend on one endpoint independently, so equal endpoints
+        // cover every displayed value without enumerating pairs.
+        JLabel label = new SliderValueLabel(formatter.format(slider.getLowDouble(), slider.getHighDouble()), slider,
+                step -> formatter.format(step / (double) scale, step / (double) scale));
         slider.addChangeListener(e -> {
             double low = slider.getLowDouble();
             double high = slider.getHighDouble();
@@ -57,12 +61,12 @@ public final class RangeSliderFilterPanel {
     }
 
     private static String formatPercent(double low, double high) {
-        return "<html><p align='right'>" + String.format("%.0f", low * 100) + "%</p><p align='right'>" + String.format("%.0f", high * 100) + "%</p>";
+        return String.format("%.0f%%\n%.0f%%", low * 100, high * 100);
     }
 
     private static String formatMask(double low, double high, double maximum) {
         String outer = high == maximum ? "∞" : String.format("%.2f", high);
-        return "<html><p align='right'>" + String.format("%.2f", low) + "R☉</p><p align='right'>" + outer + "R☉</p>";
+        return String.format("%.2fR☉\n%sR☉", low, outer);
     }
 
     @FunctionalInterface

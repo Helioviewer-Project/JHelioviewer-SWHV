@@ -67,9 +67,7 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(new Actions.ResetCamera());
         viewMenu.addSeparator();
 
-        JCheckBoxMenuItem separateMultiviewZoom = new JCheckBoxMenuItem(new Actions.SeparateMultiviewZoom());
-        separateMultiviewZoom.setState(Display.separateViewportZoom);
-        viewMenu.add(separateMultiviewZoom);
+        viewMenu.add(new Actions.SeparateMultiviewZoom());
 
         JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
         white.addItemListener(e -> {
@@ -109,8 +107,6 @@ public final class MenuBar extends JMenuBar {
             showStatusBar.setText(statusPanel.isVisible() ? "Hide Status Bar" : "Show Status Bar");
         });
         viewMenu.add(showStatusBar);
-
-        viewMenu.addSeparator();
 
         add(viewMenu);
 

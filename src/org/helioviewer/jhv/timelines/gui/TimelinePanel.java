@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
@@ -21,7 +20,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
@@ -43,7 +41,7 @@ import com.jidesoft.swing.JideButton;
 public final class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
-    private static final String PREDEFINED_PLACEHOLDER = "Predefined";
+    private static final String PREDEFINED_PLACEHOLDER = "Predefined plot";
 
     private static final int NUMBEROFVISIBLEROWS = 6;
 
@@ -126,17 +124,21 @@ public final class TimelinePanel extends JPanel {
 
         grid = new TimelineTable(model);
 
-        JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
-        jsp.getViewport().setBackground(grid.getBackground());
+        JPanel tablePanel = new JPanel(new BorderLayout()) {
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(-1, grid.getRowHeight() * Math.max(NUMBEROFVISIBLEROWS, grid.getRowCount()) + 1);
+            }
+        };
+        tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
+        tablePanel.add(grid, BorderLayout.CENTER);
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> dialog.showDialog());
 
         predefinedCombo = new JComboBox<>();
         predefinedCombo.setToolTipText("Predefined plot");
-        predefinedCombo.setMaximumSize(new Dimension(100, predefinedCombo.getPreferredSize().height));
-        predefinedCombo.setPreferredSize(new Dimension(80, predefinedCombo.getPreferredSize().height));
+        predefinedCombo.setPrototypeDisplayValue(PREDEFINED_PLACEHOLDER);
         predefinedCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -162,25 +164,16 @@ public final class TimelinePanel extends JPanel {
             boolean compositionChanged = e.getType() == TableModelEvent.INSERT
                     || e.getType() == TableModelEvent.DELETE
                     || e.getLastRow() == Integer.MAX_VALUE;
-            if (compositionChanged && !updatingPredefinedGroup)
-                predefinedCombo.setSelectedItem(null);
+            if (compositionChanged) {
+                if (!updatingPredefinedGroup)
+                    predefinedCombo.setSelectedItem(null);
+                revalidate();
+            }
         });
 
-        JPanel leftButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
-        leftButtonPanel.add(addLayerButton);
-
-        JPanel rightButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
-        rightButtonPanel.add(predefinedCombo);
-        rightButtonPanel.add(new DrawControllerOptions());
-
-        JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(leftButtonPanel, BorderLayout.LINE_START);
-        addLayerButtonWrapper.add(rightButtonPanel, BorderLayout.LINE_END);
-
-        JPanel jspContainer = new JPanel(new BorderLayout());
-        jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
-        jspContainer.add(jsp, BorderLayout.PAGE_END);
-        add(jspContainer, gc);
+        add(new DrawControllerOptions(predefinedCombo, addLayerButton), gc);
+        gc.gridy = 1;
+        add(tablePanel, gc);
 
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
@@ -241,9 +234,7 @@ public final class TimelinePanel extends JPanel {
             }
         });
 
-        jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
-
-        gc.gridy = 1;
+        gc.gridy = 2;
         optionsPanelWrapper = new JPanel(new BorderLayout());
         add(optionsPanelWrapper, gc);
     }
@@ -272,11 +263,14 @@ public final class TimelinePanel extends JPanel {
     }
 
     private void setOptionsPanel(@Nullable TimelineLayer timeline) {
-        optionsPanelWrapper.removeAll();
         JPanel optionsPanel = timeline == null ? null : options.getOptionsPanel(timeline);
-        if (optionsPanel != null) {
+        if (optionsPanel != null)
             ComponentUtils.setEnabled(optionsPanel, timeline.isEnabled());
-            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
+        if (current != optionsPanel) {
+            optionsPanelWrapper.removeAll();
+            if (optionsPanel != null)
+                optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }
         revalidate();
         repaint();

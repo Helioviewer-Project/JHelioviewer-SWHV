@@ -2,8 +2,7 @@ package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -36,7 +36,6 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
     private static final int yOffset = 12;
 
     final SWEKSession session;
-    private final SWEKTreePane treePane;
     private final HashMap<SWEKSupplier, FilterDialog> filters = new HashMap<>();
     private final Set<SWEKEventInformationDialog> information = new HashSet<>();
     private Cursor lastCursor;
@@ -44,9 +43,8 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
 
     public SWEKSwingUI(SWEKSession _session) {
         session = _session;
-        treePane = new SWEKTreePane(session, this);
-        MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", treePane, true);
-        MainFrame.getLeftContentPane().revalidate();
+        SWEKTreePane treePane = new SWEKTreePane(session, this);
+        MainFrame.getLayersPanel().setEventsPanel(treePane);
         LayerOptions.register(SWEKLayer.class, selectedLayer -> createLayerOptions((SWEKLayer) selectedLayer));
     }
 
@@ -55,14 +53,9 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> layer.setIcons(check.isSelected()));
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.weightx = 1.;
-        c.weighty = 1.;
-        c.gridy = 0;
-        c.gridx = 0;
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.add(check, c);
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        panel.add(check);
         return panel;
     }
 
@@ -75,8 +68,7 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
             dialog.dispose();
         information.clear();
 
-        MainFrame.getLeftContentPane().remove(treePane);
-        MainFrame.getLeftContentPane().revalidate();
+        MainFrame.getLayersPanel().setEventsPanel(null);
     }
 
     void showFilter(SWEKSupplier supplier, Point location) {

@@ -16,7 +16,6 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.TimestampLayer;
-import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
 // Options panels per layer, created on demand and dropped with the layer. Plugins register providers.
@@ -32,7 +31,6 @@ public final class LayerOptions implements Layers.Listener {
         register(ImageLayer.class, layer -> new ImageLayerOptions((ImageLayer) layer));
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
-        register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel((ViewpointLayer) layer));
     }
 
     LayerOptions() {
@@ -76,8 +74,8 @@ public final class LayerOptions implements Layers.Listener {
 
     @Override
     public void layerUpdated(Layer layer) {
-        if (panels.get(layer) instanceof ImageLayerOptions panel)
-            panel.refresh(layer);
+        if (layer instanceof ImageLayer imageLayer && panels.get(layer) instanceof ImageLayerOptions panel)
+            panel.refresh(imageLayer);
     }
 
 }

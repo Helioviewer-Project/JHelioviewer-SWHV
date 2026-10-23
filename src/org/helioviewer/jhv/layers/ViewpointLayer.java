@@ -301,13 +301,17 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void setEnabled(boolean _enabled) {
+        setEnabled(_enabled, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+    }
+
+    private void setEnabled(boolean _enabled, DisplayController.ViewpointApplyMode mode) {
         boolean wasEnabled = enabled;
-        super.setEnabled(_enabled);
+        super.setEnabled(_enabled && options.getCameraMode() != ViewpointLayerOptions.CameraMode.Observer);
 
         if (enabled) {
             InputController.addListener(hoverListener);
             options.activate();
-            options.applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+            options.applyCurrentViewpoint(mode);
         } else {
             hoverText.clear();
             clearOrbitWorker();
@@ -316,6 +320,32 @@ public class ViewpointLayer extends AbstractLayer {
             if (wasEnabled && Layers.getViewpointLayer() == this)
                 DisplayController.setViewpointUpdate(UpdateViewpoint.observer, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         }
+    }
+
+    public ViewpointLayerOptions.CameraMode getCameraMode() {
+        return enabled ? options.getCameraMode() : ViewpointLayerOptions.CameraMode.Observer;
+    }
+
+    public void setCameraMode(ViewpointLayerOptions.CameraMode mode) {
+        if (getCameraMode() == mode)
+            return;
+        if (mode == ViewpointLayerOptions.CameraMode.Observer) {
+            setEnabled(false);
+            options.setCameraMode(mode, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+        } else {
+            options.setCameraMode(mode, DisplayController.ViewpointApplyMode.RESET);
+            if (!enabled)
+                setEnabled(true, DisplayController.ViewpointApplyMode.RESET);
+        }
+        Layers.fireLayerUpdated(this);
+        DisplayController.render();
+    }
+
+    void applyCurrentViewpoint() {
+        if (enabled)
+            options.applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+        else
+            DisplayController.setViewpointUpdate(UpdateViewpoint.observer, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class TableValue {
         int col = table.columnAtPoint(point);
         if (row == -1 || col == -1)
             return null;
-        return new TableValue(row, col, table.getModel().getValueAt(row, col));
+        return new TableValue(row, col, table.getValueAt(row, col));
     }
 
 }

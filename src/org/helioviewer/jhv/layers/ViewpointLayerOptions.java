@@ -17,6 +17,7 @@ import org.json.JSONObject;
 public final class ViewpointLayerOptions implements TimeListener.Range {
 
     public enum CameraMode {
+        Observer("Observer"),
         ObserverAt1au("Observer at 1au"),
         Location("Location"),
         Heliosphere("Heliosphere");
@@ -51,7 +52,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         locationOptions.setChangeListener(() -> optionStateChanged(CameraMode.Location));
         equatorialOptions.setChangeListener(() -> optionStateChanged(CameraMode.Heliosphere));
 
-        cameraMode = CameraMode.Location;
+        cameraMode = jo == null ? CameraMode.Observer : CameraMode.Location;
         if (jo != null) {
             try {
                 cameraMode = CameraMode.valueOf(jo.optString("mode"));
@@ -80,7 +81,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     public void setCameraMode(CameraMode _cameraMode, DisplayController.ViewpointApplyMode mode) {
         cameraMode = _cameraMode;
         updateSky();
-        applyCurrentViewpoint(mode);
+        if (active)
+            applyCurrentViewpoint(mode);
     }
 
     public ViewpointLayerOptionsExpert getLocationOptions() {
@@ -99,6 +101,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         long start = Player.getStartTime();
         long end = Player.getEndTime();
         return switch (cameraMode) {
+            case Observer -> UpdateViewpoint.observer;
             case ObserverAt1au -> UpdateViewpoint.observerAt1au;
             case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), start, end);
             case Heliosphere ->
@@ -108,7 +111,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     private void optionStateChanged(CameraMode mode) {
-        if (cameraMode == mode) {
+        if (active && cameraMode == mode) {
             applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
             DisplayController.render();
         }

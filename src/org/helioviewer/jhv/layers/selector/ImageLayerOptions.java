@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,14 +17,12 @@ import org.helioviewer.jhv.gui.component.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.filters.ChannelMixerPanel;
 import org.helioviewer.jhv.layers.filters.DifferencePanel;
 import org.helioviewer.jhv.layers.filters.FilterDetails;
 import org.helioviewer.jhv.layers.filters.ImageFilterPanel;
 import org.helioviewer.jhv.layers.filters.LUTPanel;
 import org.helioviewer.jhv.layers.filters.RangeSliderFilterPanel;
-import org.helioviewer.jhv.layers.filters.SectorPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
 
 import com.jidesoft.swing.JideButton;
@@ -35,68 +34,66 @@ final class ImageLayerOptions extends JPanel {
     private final FITSSettings fitsSettings;
     private final JideToggleButton fitsButton = new JideToggleButton(Buttons.fitsRight);
     private final LUTPanel lutPanel;
-    private final FilterDetails slitPanel;
-    private final SectorPanel sectorPanel;
-    private final FilterDetails maskPanel;
-    private final FilterDetails deltaCROTAPanel;
-    private final FilterDetails deltaCRVAL1Panel;
-    private final FilterDetails deltaCRVAL2Panel;
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
     private DownloadProgress downloadProgress;
 
     ImageLayerOptions(ImageLayer layer) {
+        super(new GridBagLayout());
         fitsSettings = new FITSSettings(layer.getProcessingSettings());
-        DifferencePanel differencePanel = new DifferencePanel(layer);
+        FilterDetails differencePanel = DifferencePanel.create(layer);
         FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
         FilterDetails blendPanel = SliderFilterPanel.blend(layer);
-        FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
+        FilterDetails channelMixerPanel = ChannelMixerPanel.create(layer);
         lutPanel = new LUTPanel(layer);
         FilterDetails levelsPanel = RangeSliderFilterPanel.levels(layer);
         FilterDetails sharpenPanel = SliderFilterPanel.sharpen(layer);
-        FilterDetails imageFilterPanel = new ImageFilterPanel(layer);
+        FilterDetails imageFilterPanel = ImageFilterPanel.create(layer);
 
-        slitPanel = RangeSliderFilterPanel.slit(layer);
-        maskPanel = RangeSliderFilterPanel.mask(layer);
-        sectorPanel = new SectorPanel(layer);
-        deltaCROTAPanel = SliderFilterPanel.deltaCROTA(layer);
-        deltaCRVAL1Panel = SliderFilterPanel.deltaCRVAL1(layer);
-        deltaCRVAL2Panel = SliderFilterPanel.deltaCRVAL2(layer);
-
-        setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.HORIZONTAL;
-
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridx = 0;
-
         c.gridy = 0;
-        addToGridBag(c, differencePanel);
+        addFilterRow(this, c, differencePanel);
         c.gridy++;
-        addToGridBag(c, opacityPanel);
+        addFilterRow(this, c, opacityPanel);
         c.gridy++;
-        addToGridBag(c, blendPanel);
+        addFilterRow(this, c, blendPanel);
         c.gridy++;
-        addToGridBag(c, sharpenPanel);
+        addFilterRow(this, c, sharpenPanel);
         c.gridy++;
-        addToGridBag(c, levelsPanel);
+        addFilterRow(this, c, levelsPanel);
         c.gridy++;
-        addToGridBag(c, lutPanel);
+        addFilterRow(this, c, lutPanel);
         c.gridy++;
-        addToGridBag(c, channelMixerPanel);
+        addFilterRow(this, c, channelMixerPanel);
         c.gridy++;
-        addToGridBag(c, imageFilterPanel);
+        addFilterRow(this, c, imageFilterPanel);
         c.gridy++;
+
+        JPanel adjustmentsPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints adjustmentConstraints = new GridBagConstraints();
+        adjustmentConstraints.gridy = 0;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, RangeSliderFilterPanel.slit(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, RangeSliderFilterPanel.mask(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.sector(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.sectorWidth(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.deltaCROTA(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.deltaCRVAL1(layer));
+        adjustmentConstraints.gridy++;
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.deltaCRVAL2(layer));
+        adjustmentsPanel.setVisible(false);
 
         JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
         adjButton.addActionListener(e -> {
             boolean selected = adjButton.isSelected();
-            setAdjustmentsVisibility(selected);
+            adjustmentsPanel.setVisible(selected);
             adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
         });
         c.gridx = 1;
@@ -146,21 +143,12 @@ final class ImageLayerOptions extends JPanel {
         c.anchor = GridBagConstraints.LINE_END;
         add(buttonPanel, c);
 
-        setAdjustmentsVisibility(false);
         c.gridy++;
-        addToGridBag(c, slitPanel);
-        c.gridy++;
-        addToGridBag(c, maskPanel);
-        c.gridy++;
-        addToGridBag(c, sectorPanel.getDirectionDetails());
-        c.gridy++;
-        addToGridBag(c, sectorPanel.getWidthDetails());
-        c.gridy++;
-        addToGridBag(c, deltaCROTAPanel);
-        c.gridy++;
-        addToGridBag(c, deltaCRVAL1Panel);
-        c.gridy++;
-        addToGridBag(c, deltaCRVAL2Panel);
+        c.gridx = 0;
+        c.gridwidth = 3;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(adjustmentsPanel, c);
         fitsButton.addActionListener(e -> {
             boolean expanded = fitsButton.isSelected();
             fitsButton.setText(expanded ? Buttons.fitsDown : Buttons.fitsRight);
@@ -179,11 +167,27 @@ final class ImageLayerOptions extends JPanel {
         c.gridwidth = 3;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(fitsSettings, c);
+        alignColumns(this, adjustmentsPanel, fitsSettings);
         // Usually refreshed through ImageLayer activation; initialize here too in case that activation already happened before panel creation.
         refresh(layer);
     }
 
-    private void addToGridBag(GridBagConstraints c, FilterDetails details) {
+    private static void alignColumns(JPanel... panels) {
+        int[] widths = new int[3];
+        for (JPanel panel : panels) {
+            GridBagLayout layout = (GridBagLayout) panel.getLayout();
+            for (Component component : panel.getComponents()) {
+                GridBagConstraints c = layout.getConstraints(component);
+                if (c.gridwidth == 1 && (c.gridx == 0 || c.gridx == 2))
+                    widths[c.gridx] = Math.max(widths[c.gridx], component.getPreferredSize().width);
+            }
+        }
+        // Include collapsed rows, so only the center column takes remaining space.
+        for (JPanel panel : panels)
+            ((GridBagLayout) panel.getLayout()).columnWidths = widths;
+    }
+
+    private static void addFilterRow(JPanel panel, GridBagConstraints c, FilterDetails details) {
         c.gridwidth = 1;
 
         c.gridx = 0;
@@ -191,32 +195,22 @@ final class ImageLayerOptions extends JPanel {
         c.weighty = 1;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
-        add(details.getFirst(), c);
+        panel.add(details.getFirst(), c);
 
         c.gridx = 1;
         c.weightx = 1;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
-        add(details.getSecond(), c);
+        panel.add(details.getSecond(), c);
 
         c.gridx = 2;
         c.weightx = 0;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
-        add(details.getThird(), c);
+        panel.add(details.getThird(), c);
     }
 
-    private void setAdjustmentsVisibility(boolean visibility) {
-        slitPanel.setVisible(visibility);
-        maskPanel.setVisible(visibility);
-        sectorPanel.setVisible(visibility);
-        deltaCROTAPanel.setVisible(visibility);
-        deltaCRVAL1Panel.setVisible(visibility);
-        deltaCRVAL2Panel.setVisible(visibility);
-    }
-
-    public void refresh(Layer layer) {
-        ImageLayer imageLayer = (ImageLayer) layer;
+    void refresh(ImageLayer imageLayer) {
         downloadButton.setVisible(!imageLayer.isLocal());
         boolean hasFITS = imageLayer.frames().hasFITS();
         fitsButton.setVisible(hasFITS);

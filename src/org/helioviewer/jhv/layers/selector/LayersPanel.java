@@ -2,298 +2,185 @@ package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.annotation.Nullable;
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.DropMode;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
-import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.TransferAccess;
-import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.component.MoviePanel;
-import org.helioviewer.jhv.gui.component.TableValue;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.SamplingPanel;
+import org.helioviewer.jhv.gui.dialog.ImageDialog;
+import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
+import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.ViewpointLayer;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-public final class LayersPanel extends JPanel {
+public final class LayersPanel extends JPanel implements Layers.Listener {
 
-    private static final int ICON_WIDTH = 12;
-
-    static final int ENABLED_COL = 0;
-    static final int NAME_COL = 1;
-    static final int TIME_COL = 2;
-    static final int REMOVE_COL = 3;
-    static final int NUMBER_COLUMNS = 4;
-
-    private static final int NUMBEROFVISIBLEROWS = 9;
-
-    private final LayersTable grid;
-    private final LayerOptions options = new LayerOptions();
-    private final JPanel optionsPanelWrapper;
-
-    private static class LayersTable extends JTable implements Interfaces.LazyComponent {
-
-        LayersTable(TableModel tm) {
-            super(tm);
-            UITimer.register(this);
-        }
-
-        @Override
-        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != ENABLED_COL && col != REMOVE_COL)
-                super.changeSelection(row, col, toggle, extend);
-            // otherwise prevent changing selection
-        }
-
-        @Override
-        public void tableChanged(TableModelEvent e) {
-            if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == TIME_COL) {
-                dirtyTimeColumn = true;
-                return;
-            }
-
-            super.tableChanged(e);
-            if (e.getType() == TableModelEvent.INSERT) {
-                int row = e.getLastRow();
-                if (row >= 0 && getValueAt(row, 0) instanceof ImageLayer)
-                    setRowSelectionInterval(row, row);
-            }
-        }
-
-        // Repaint the whole table because ImageLayers can have heterogenous frame names.
-
-        @Override
-        public void repaint() {
-            dirty = true;
-        }
-
-        @Override
-        public void repaint(int x, int y, int width, int height) {
-            if (dirtyRect == null)
-                dirtyRect = new Rectangle(x, y, width, height);
-            else
-                dirtyRect.add(new Rectangle(x, y, width, height));
-        }
-
-        private boolean dirty = false;
-        @Nullable
-        private Rectangle dirtyRect;
-        private boolean dirtyTimeColumn = false;
-
-        @Override
-        public void lazyRepaint() {
-            if (dirty) {
-                super.repaint();
-            } else {
-                if (dirtyRect != null)
-                    super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
-                if (dirtyTimeColumn)
-                    repaintTimeColumn();
-            }
-            dirty = false;
-            dirtyRect = null;
-            dirtyTimeColumn = false;
-        }
-
-        private void repaintTimeColumn() {
-            Rectangle visible = getVisibleRect();
-            Rectangle cell = getCellRect(0, TIME_COL, true);
-
-            int x0 = Math.max(cell.x, visible.x);
-            int x1 = Math.min(cell.x + cell.width, visible.x + visible.width);
-            if (x0 < x1)
-                super.repaint(x0, visible.y, x1 - x0, visible.height);
-        }
-
-    }
+    private final ImageDialog imageDialog = new ImageDialog();
+    private final LayerListPanel images = new LayerListPanel(true);
+    private final LayerListPanel overlays = new LayerListPanel(false);
+    private final JPanel header = new JPanel(new BorderLayout());
+    private final JPanel timelines = new JPanel(new BorderLayout());
+    private final JPanel events = new JPanel(new BorderLayout());
+    private final JTabbedPane tabs;
+    private ViewpointLayerOptionsPanel viewpointOptions;
 
     public LayersPanel() {
-        setLayout(new GridBagLayout());
-        LayersTableModel model = new LayersTableModel();
+        super(new BorderLayout());
 
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.gridx = 0;
-        gc.gridy = 0;
-        gc.weightx = 1;
-        gc.weighty = 1;
-        gc.fill = GridBagConstraints.BOTH;
+        JideButton addLayerButton = new JideButton(Buttons.newLayer);
+        addLayerButton.addActionListener(e -> imageDialog.showNewLayerSelector());
+        JideButton syncButton = new JideButton(Buttons.syncLayers);
+        syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
+        syncButton.addActionListener(e -> ImageLayers.syncLayersSpan());
+        JPanel imageActions = new JPanel(new BorderLayout());
+        imageActions.add(addLayerButton, BorderLayout.LINE_START);
+        imageActions.add(syncButton, BorderLayout.LINE_END);
+        JPanel imagePanel = new JPanel(new BorderLayout());
 
-        grid = new LayersTable(model);
-
-        JScrollPane jsp = new JScrollPane(grid, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
-        jsp.getViewport().setBackground(grid.getBackground());
-        add(jsp, gc);
-
-        grid.setTableHeader(null);
-        grid.setShowHorizontalLines(true);
-        grid.setRowSelectionAllowed(true);
-        grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        grid.setColumnSelectionAllowed(false);
-        grid.setIntercellSpacing(new Dimension(0, 0));
-
-        TableColumn enabledColumn = grid.getColumnModel().getColumn(ENABLED_COL);
-        enabledColumn.setCellRenderer(new CellRenderer.Enabled());
-        enabledColumn.setPreferredWidth(ICON_WIDTH + 8);
-        enabledColumn.setMaxWidth(ICON_WIDTH + 8);
-
-        grid.getColumnModel().getColumn(NAME_COL).setCellRenderer(new CellRenderer.Name());
-
-        TableColumn timeColumn = grid.getColumnModel().getColumn(TIME_COL);
-        CellRenderer.Time timeRenderer = new CellRenderer.Time();
-        timeRenderer.setFont(CellRenderer.Time.font);
-        timeRenderer.setText("2000-01-01T12:00:00.000");
-        int timeWidth = timeRenderer.getPreferredSize().width;
-        timeColumn.setCellRenderer(timeRenderer);
-        timeColumn.setMinWidth(timeWidth);
-        timeColumn.setPreferredWidth(timeWidth);
-        timeColumn.setMaxWidth(timeWidth);
-
-        TableColumn removeColumn = grid.getColumnModel().getColumn(REMOVE_COL);
-        removeColumn.setCellRenderer(new CellRenderer.Remove());
-        removeColumn.setPreferredWidth(ICON_WIDTH + 2);
-        removeColumn.setMaxWidth(ICON_WIDTH + 2);
-
-        grid.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting())
-                refreshSelectedOptionsPanel();
-        });
-
-        model.addTableModelListener(e -> {
-            if (e.getType() != TableModelEvent.UPDATE || e.getColumn() == NAME_COL || e.getColumn() == TIME_COL)
-                return;
-
-            int row = grid.getSelectedRow();
-            if (row >= 0 && e.getFirstRow() <= row && row <= e.getLastRow())
-                refreshSelectedOptionsPanel();
-        });
-
-        grid.addMouseListener(new MouseAdapter() {
+        // The selector edits the settings and shows what they accepted.
+        ImageRequestSettings settings = ImageRequestSettings.instance();
+        TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+        timeSelectorPanel.setTime(settings.start(), settings.end());
+        timeSelectorPanel.addListener(settings::setInterval);
+        settings.addListener(new ImageRequestSettings.Listener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
-                if (v == null || !(v.value instanceof Layer layer))
-                    return;
-
-                if ((v.col == NAME_COL || v.col == TIME_COL) && layer instanceof ImageLayer il && e.getClickCount() == 2) {
-                    MoviePanel.getInstance().changeDataset(il);
-                    return;
-                }
-
-                if (v.col == ENABLED_COL) {
-                    layer.setEnabled(!layer.isEnabled());
-                    model.updateCell(v.row, v.col);
-                    DisplayController.render();
-                } else if (v.col == NAME_COL && layer instanceof ImageLayer il) {
-                    Layers.setActiveImageLayer(il);
-                    grid.repaint(); // multiple rows involved
-                } else if (v.col == REMOVE_COL && layer.isDeletable()) {
-                    boolean selected = selectedLayer() == layer;
-                    Layers.remove(layer);
-                    if (selected)
-                        selectExistingRow(v.row);
-                }
+            public void intervalChanged(long start, long end) {
+                timeSelectorPanel.setTime(start, end);
             }
         });
-        grid.addMouseMotionListener(new MouseAdapter() {
+        GridBagConstraints samplingConstraints = new GridBagConstraints();
+        samplingConstraints.gridy = 2;
+        samplingConstraints.gridx = 0;
+        samplingConstraints.weightx = 1;
+        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
+        SamplingPanel samplingPanel = new SamplingPanel();
+        timeSelectorPanel.add(samplingPanel, samplingConstraints);
+
+        JPanel imageHeader = new JPanel(new BorderLayout());
+        imageHeader.add(timeSelectorPanel, BorderLayout.NORTH);
+        imageHeader.add(imageActions, BorderLayout.SOUTH);
+        imagePanel.add(imageHeader, BorderLayout.NORTH);
+        imagePanel.add(images, BorderLayout.CENTER);
+
+        refreshViewpoint();
+        tabs = new JTabbedPane() {
             @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = grid.rowAtPoint(e.getPoint());
-                if (row >= 0 && grid.getValueAt(row, 0) instanceof ImageLayer) {
-                    grid.setCursor(UIGlobals.openHandCursor);
-                } else {
-                    grid.setCursor(Cursor.getDefaultCursor());
-                }
+            public Dimension getPreferredSize() {
+                return selectedHeight(super.getPreferredSize(), false);
             }
-        });
 
-        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, DesktopIntegration.menuShortcutMask, false), "copy_time");
-        grid.getActionMap().put("copy_time", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                Layer layer = selectedLayer();
-                if (layer != null) {
-                    String timeString = layer.getTimeString();
-                    if (timeString != null)
-                        TransferAccess.writeClipboard(timeString);
-                }
+            public Dimension getMinimumSize() {
+                return selectedHeight(super.getMinimumSize(), true);
             }
-        });
 
-        grid.setDragEnabled(true);
-        grid.setDropMode(DropMode.INSERT_ROWS);
-        grid.setTransferHandler(new TableRowTransferHandler(grid));
+            private Dimension selectedHeight(Dimension size, boolean minimum) {
+                Component selected = getSelectedComponent();
+                if (selected != null) {
+                    int maximumHeight = 0;
+                    for (int index = 0; index < getTabCount(); index++) {
+                        Component content = getComponentAt(index);
+                        Dimension contentSize = minimum ? content.getMinimumSize() : content.getPreferredSize();
+                        maximumHeight = Math.max(maximumHeight, contentSize.height);
+                    }
+                    // Keep the tab strip, borders and widest content; only replace the content height.
+                    Dimension selectedSize = minimum ? selected.getMinimumSize() : selected.getPreferredSize();
+                    size.height += selectedSize.height - maximumHeight;
+                }
+                return size;
+            }
+        };
+        tabs.addTab("Images", imagePanel);
+        tabs.addTab("Overlays", overlays);
+        tabs.addTab("Timelines", timelines);
+        tabs.addTab("Events", events);
+        tabs.setEnabledAt(2, false);
+        tabs.setEnabledAt(3, false);
+        tabs.setBackground(UIManager.getColor("Table.background"));
+        tabs.setOpaque(true);
+        Border contentBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, UIManager.getColor("Separator.foreground"));
+        for (int index = 0; index < tabs.getTabCount(); index++)
+            ((JComponent) tabs.getComponentAt(index)).setBorder(contentBorder);
+        add(header, BorderLayout.NORTH);
+        add(tabs, BorderLayout.CENTER);
+        Layers.addListener(this);
+    }
 
-        jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
+    private void refreshViewpoint() {
+        if (viewpointOptions != null)
+            header.remove(viewpointOptions);
+        viewpointOptions = new ViewpointLayerOptionsPanel(Layers.getViewpointLayer());
+        header.add(viewpointOptions, BorderLayout.NORTH);
+        header.revalidate();
+        header.repaint();
+    }
 
-        gc.gridy = 1;
-        gc.weighty = 0;
-        optionsPanelWrapper = new JPanel(new BorderLayout());
-        add(optionsPanelWrapper, gc);
+    @Override
+    public void layersCleared() {
+        refreshViewpoint();
+    }
+
+    @Override
+    public void layerUpdated(Layer layer) {
+        if (layer == Layers.getViewpointLayer())
+            viewpointOptions.refreshMode();
     }
 
     public int getGridRowHeight() {
-        return grid.getRowHeight();
+        return images.getGridRowHeight();
     }
 
-    @Nullable
-    private Layer selectedLayer() {
-        int row = grid.getSelectedRow();
-        if (row < 0)
-            return null;
-        return grid.getValueAt(row, 0) instanceof Layer layer ? layer : null;
+    public ImageDialog getImageDialog() {
+        return imageDialog;
     }
 
-    private void selectExistingRow(int preferredRow) {
-        int rowCount = grid.getRowCount();
-        if (rowCount == 0) {
-            setOptionsPanel(null);
-            return;
-        }
-        int row = Math.min(preferredRow, rowCount - 1);
-        grid.getSelectionModel().setSelectionInterval(row, row);
+    public void setTransportPanel(JComponent panel) {
+        header.add(panel, BorderLayout.SOUTH);
     }
 
-    private void refreshSelectedOptionsPanel() {
-        setOptionsPanel(selectedLayer());
+    public void setTimelinesPanel(@Nullable JComponent panel) {
+        setTabContent(timelines, panel);
+    }
+
+    public void setEventsPanel(@Nullable JComponent panel) {
+        setTabContent(events, panel);
+    }
+
+    private void setTabContent(JPanel target, @Nullable JComponent panel) {
+        target.removeAll();
+        if (panel != null)
+            target.add(panel, BorderLayout.CENTER);
+        int index = tabs.indexOfComponent(target);
+        if (panel == null && tabs.getSelectedIndex() == index)
+            tabs.setSelectedIndex(0);
+        tabs.setEnabledAt(index, panel != null);
+        revalidate();
+        repaint();
     }
 
     public void setOptionsPanel(@Nullable Layer layer) {
-        Component optionsPanel = layer == null ? null : options.getOptionsPanel(layer);
-        if (optionsPanel != null)
-            ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
-        Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
-        if (current != optionsPanel) {
-            optionsPanelWrapper.removeAll();
-            if (optionsPanel != null)
-                optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+        if (layer == null) {
+            images.setOptionsPanel(null);
+            overlays.setOptionsPanel(null);
+        } else if (layer instanceof ImageLayer) {
+            images.setOptionsPanel(layer);
+        } else if (!(layer instanceof ViewpointLayer)) {
+            overlays.setOptionsPanel(layer);
         }
-        revalidate();
-        repaint();
     }
 
 }

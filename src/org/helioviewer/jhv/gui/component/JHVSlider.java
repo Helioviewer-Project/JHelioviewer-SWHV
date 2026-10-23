@@ -24,7 +24,7 @@ public final class JHVSlider extends JSlider {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                if (isEnabled() && e.getClickCount() == 2 && !e.isConsumed()) {
                     e.consume();
                     setValue(defaultStep);
                 }

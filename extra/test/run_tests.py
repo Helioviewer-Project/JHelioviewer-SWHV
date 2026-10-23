@@ -21,7 +21,8 @@ SCRIPTS = {
     "wcs": TESTS / "wcs/run_jhv_wcs_hpc_validation_suite.py",
 }
 JAVA_TESTS = {
-    "commands": ["io.samp.CommandStateTest"],
+    "commands": ["io.samp.CommandStateTest", "layers.ViewpointStateTest"],
+    "sidebar": ["layers.selector.SidebarTest"],
     "astronomy": ["astronomy.PositionResponseTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
     "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
@@ -50,7 +51,8 @@ def run_java_suite(suite, native_resources=None, render_output=None):
                 filename = name.rsplit(".", 1)[1]
                 output_args = [str(render_output / (filename if filename in ("GridRenderingTest", "ImageRenderingTest") else filename + ".png"))]
             subprocess.run([
-                "java", "--enable-native-access=ALL-UNNAMED", "-Djava.awt.headless=true",
+                "java", "--enable-native-access=ALL-UNNAMED", "-Djava.awt.headless=" + str(suite != "sidebar").lower(),
+                *(["--add-exports=java.desktop/sun.awt=ALL-UNNAMED", "--add-exports=java.desktop/sun.swing=ALL-UNNAMED"] if suite == "sidebar" else []),
                 "-Duser.timezone=UTC", "-Duser.language=en", "-Duser.country=US", "-Duser.home=" + str(home),
                 "-cp", os.pathsep.join([temporary, classpath]), "org.helioviewer.jhv." + name, *output_args,
             ], cwd=ROOT, check=True, timeout=120)
@@ -58,7 +60,7 @@ def run_java_suite(suite, native_resources=None, render_output=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("suites", nargs="*", choices=[*DEFAULT_SUITES, "shaders", "wcs", "opengl", "uri"],
+    parser.add_argument("suites", nargs="*", choices=[*DEFAULT_SUITES, "sidebar", "shaders", "wcs", "opengl", "uri"],
                         default=DEFAULT_SUITES, help="suites to run (default: %(default)s)")
     parser.add_argument("--no-build", action="store_true", help="skip the initial ant compile")
     parser.add_argument("--native-resources", type=Path, help="use a staged resource directory containing jhv/<platform>")

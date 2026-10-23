@@ -1,8 +1,10 @@
 package org.helioviewer.jhv.plugins.pfss;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -17,6 +19,7 @@ class PfssLayerOptions extends JPanel {
 
     PfssLayerOptions(PfssLayer layer) {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         JHVSpinner levelSpinner = new JHVSpinner(layer.getDetail(), 0, PfssSettings.MAX_DETAIL, 1);
         levelSpinner.addChangeListener(e -> layer.setDetail((Integer) levelSpinner.getValue()));
@@ -31,18 +34,18 @@ class PfssLayerOptions extends JPanel {
 
         c0.gridx = 0;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(createSpinnerPanel("Detail", levelSpinner), c0);
+        add(createSpinnerPanel("Detail ", levelSpinner), c0);
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(createSpinnerPanel("Radius", radiusSpinner), c0);
+        add(createSpinnerPanel("Radius ", radiusSpinner), c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", layer.getFixedColor());
         fixedColors.setHorizontalTextPosition(SwingConstants.LEFT);
         fixedColors.addActionListener(e -> layer.setFixedColor(fixedColors.isSelected()));
 
         c0.gridx = 2;
-        c0.anchor = GridBagConstraints.LINE_END;
+        c0.anchor = GridBagConstraints.LINE_START;
         add(fixedColors, c0);
 
         JButton availabilityButton = new JButton("Available data");
@@ -56,7 +59,7 @@ class PfssLayerOptions extends JPanel {
     }
 
     private static JPanel createSpinnerPanel(String label, JHVSpinner spinner) {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         panel.add(new JLabel(label, JLabel.RIGHT));
         panel.add(spinner);
         return panel;

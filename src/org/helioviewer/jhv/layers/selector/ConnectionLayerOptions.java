@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.layers.selector;
 
 import java.awt.FileDialog;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import java.io.File;
 import java.net.URI;
 import java.util.function.BiConsumer;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.layers.connect.LoadHCS;
 final class ConnectionLayerOptions extends JPanel {
 
     ConnectionLayerOptions(ConnectionLayer layer) {
+        super(new FlowLayout(FlowLayout.LEADING, 0, 0));
         JButton clearBtn = new JButton("Clear all");
         clearBtn.addActionListener(e -> layer.clear());
 
@@ -32,21 +32,10 @@ final class ConnectionLayerOptions extends JPanel {
         JButton footpointBtn = new JButton("Footpoint");
         footpointBtn.addActionListener(e -> load(layer, LoadFootpoint::submit));
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.LINE_END;
-        c0.weightx = 1.;
-        c0.weighty = 1.;
-        c0.gridy = 0;
-
-        c0.gridx = 0;
-        add(clearBtn, c0);
-        c0.gridx = 1;
-        add(connectivityBtn, c0);
-        c0.gridx = 2;
-        add(hcsBtn, c0);
-        c0.gridx = 3;
-        add(footpointBtn, c0);
+        add(clearBtn);
+        add(connectivityBtn);
+        add(hcsBtn);
+        add(footpointBtn);
     }
 
     private void load(ConnectionLayer layer, BiConsumer<URI, ConnectionLayer> consumer) {

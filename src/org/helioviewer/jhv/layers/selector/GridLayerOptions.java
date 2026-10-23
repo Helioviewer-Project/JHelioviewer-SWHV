@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
 import javax.swing.BorderFactory;
@@ -23,108 +22,81 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.gui.component.JHVSpinner;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.GridLayer;
-
-import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 final class GridLayerOptions extends JPanel {
 
     GridLayerOptions(GridLayer layer) {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.fill = GridBagConstraints.HORIZONTAL;
         c0.weightx = 1.;
         c0.weighty = 1.;
+        c0.anchor = GridBagConstraints.LINE_START;
 
         c0.gridy = 0;
 
-        c0.gridx = 1;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(createToggle("Solar axis", layer.isShowAxis(), layer::setShowAxis), c0);
+        c0.gridx = 0;
+        c0.gridwidth = 2;
+        JCheckBox radial = new JCheckBox("Radial grid", layer.isShowRadial());
+        radial.setHorizontalTextPosition(SwingConstants.LEFT);
+        radial.addActionListener(e -> layer.setShowRadial(radial.isSelected()));
+        add(radial, c0);
 
+        c0.gridx = 2;
+        c0.gridwidth = 1;
+        c0.weightx = 0;
+        add(new JLabel("Grid type ", JLabel.RIGHT), c0);
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(createToggle("Grid labels", layer.isShowLabels(), layer::setShowLabels), c0);
+        c0.weightx = 1;
+        add(createGridTypeBox(layer), c0);
 
         c0.gridy = 1;
 
-        c0.gridx = 1;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(createToggle("Radial grid", layer.isShowRadial(), layer::setShowRadial), c0);
-
-        c0.gridx = 2;
-        c0.anchor = GridBagConstraints.LINE_END;
-        add(new JLabel("Grid type ", JLabel.RIGHT), c0);
-        c0.gridx = 3;
-        c0.anchor = GridBagConstraints.LINE_START;
-        add(createGridTypeBox(layer), c0);
-
-        c0.gridy = 2;
-
         c0.gridx = 0;
-        c0.anchor = GridBagConstraints.LINE_END;
+        c0.weightx = 0;
         add(new JLabel("Longitude ", JLabel.RIGHT), c0);
 
         c0.gridx = 1;
-        c0.anchor = GridBagConstraints.LINE_START;
+        c0.weightx = 1;
         add(createGridResolutionSpinner(layer.getLonStep(), layer::setLonStep), c0);
 
         c0.gridx = 2;
-        c0.anchor = GridBagConstraints.LINE_END;
+        c0.weightx = 0;
         add(new JLabel("Latitude ", JLabel.RIGHT), c0);
 
         c0.gridx = 3;
-        c0.anchor = GridBagConstraints.LINE_START;
+        c0.weightx = 1;
         add(createGridResolutionSpinner(layer.getLatStep(), layer::setLatStep), c0);
 
-        JPanel adjustmentsPanel = new JPanel(new GridBagLayout());
-        adjustmentsPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
-        addAdjustmentRow(adjustmentsPanel, "Color ", createColorBox(layer), 0);
-        addAdjustmentRow(adjustmentsPanel, "Line width ", createLineWidthSlider(layer), 1);
-        addAdjustmentRow(adjustmentsPanel, "Line opacity ", createOpacitySlider(layer.getGridAlpha(), layer::setGridAlpha), 2);
-        addAdjustmentRow(adjustmentsPanel, "Label opacity ", createOpacitySlider(layer.getLabelAlpha(), layer::setLabelAlpha), 3);
-        addAdjustmentRow(adjustmentsPanel, "Label size ", createLabelSizeSlider(layer), 4);
-        addAdjustmentRow(adjustmentsPanel, "Ring label angle ", createLabelAngleSlider(layer), 5);
+        JPanel appearancePanel = new JPanel(new GridBagLayout());
+        addAppearanceRow(appearancePanel, "Color ", createColorBox(layer), 0);
+        addAppearanceRow(appearancePanel, "Line width ", createLineWidthSlider(layer), 1);
+        addAppearanceRow(appearancePanel, "Line opacity ", createOpacitySlider(layer.getGridAlpha(), layer::setGridAlpha), 2);
+        addAppearanceRow(appearancePanel, "Label opacity ", createOpacitySlider(layer.getLabelAlpha(), layer::setLabelAlpha), 3);
+        addAppearanceRow(appearancePanel, "Label size ", createLabelSizeSlider(layer), 4);
+        addAppearanceRow(appearancePanel, "Ring label angle ", createLabelAngleSlider(layer), 5);
 
-        JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
-        adjButton.addActionListener(e -> {
-            boolean selected = adjButton.isSelected();
-            adjustmentsPanel.setVisible(selected);
-            adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
-        });
-        adjustmentsPanel.setVisible(false);
-
-        c0.gridy = 3;
-        c0.gridx = 1;
-        c0.gridwidth = 3;
-        c0.anchor = GridBagConstraints.LINE_START;
-        c0.fill = GridBagConstraints.NONE;
-        add(adjButton, c0);
-
-        c0.gridy = 4;
+        c0.gridy = 2;
         c0.gridx = 0;
         c0.gridwidth = 4;
-        c0.anchor = GridBagConstraints.LINE_START;
-        c0.fill = GridBagConstraints.HORIZONTAL;
-        add(adjustmentsPanel, c0);
+        add(appearancePanel, c0);
     }
 
-    private static void addAdjustmentRow(JPanel panel, String text, Component component, int y) {
+    private static void addAppearanceRow(JPanel panel, String text, Component component, int y) {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = y;
         c.anchor = GridBagConstraints.LINE_END;
         panel.add(new JLabel(text, JLabel.RIGHT), c);
 
-        c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = y;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
@@ -164,13 +136,6 @@ final class GridLayerOptions extends JPanel {
         JHVSlider slider = new JHVSlider(GridLayer.GRID_LABEL_ANGLE_MIN, GridLayer.GRID_LABEL_ANGLE_MAX, layer.getGridLabelAngle(), 1);
         slider.addChangeListener(e -> layer.setGridLabelAngle(slider.getDoubleValue()));
         return slider;
-    }
-
-    private JCheckBox createToggle(String text, boolean initialValue, Consumer<Boolean> onChange) {
-        JCheckBox checkBox = new JCheckBox(text, initialValue);
-        checkBox.setHorizontalTextPosition(SwingConstants.LEFT);
-        checkBox.addActionListener(e -> onChange.accept(checkBox.isSelected()));
-        return checkBox;
     }
 
     private JComboBox<GridType> createGridTypeBox(GridLayer layer) {

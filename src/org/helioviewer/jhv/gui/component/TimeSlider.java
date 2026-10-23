@@ -303,7 +303,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         public Dimension getPreferredSize() {
             Insets insets = getInsets();
             FontMetrics fm = getFontMetrics(getFont());
-            String maximumText = (maximum + 1) + "/" + (maximum + 1);
+            int count = Math.max(10000, maximum + 1);
+            String maximumText = count + "/" + count;
             return new Dimension(
                     insets.left + fm.stringWidth(maximumText) + insets.right,
                     insets.top + fm.getHeight() + insets.bottom);

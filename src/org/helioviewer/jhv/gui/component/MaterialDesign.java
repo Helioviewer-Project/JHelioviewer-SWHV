@@ -41,10 +41,11 @@ enum MaterialDesign {
     SIDEBAR("jhv-sidebar", '\ue000'), // JHV outline added to the bundled icon font.
     SKIP_BACKWARD("mdi-skip-backward", '\uf4ab'),
     SKIP_FORWARD("mdi-skip-forward", '\uf4ac'),
+    SKIP_NEXT("mdi-skip-next", '\uf4ad'),
+    SKIP_PREVIOUS("mdi-skip-previous", '\uf4ae'),
     // SLACK("mdi-slack", '\uf4b1'),
-    STEP_BACKWARD("mdi-step-backward", '\uf4d5'),
-    STEP_FORWARD("mdi-step-forward", '\uf4d7'),
     SYNC("mdi-sync", '\uf4e6'),
+    TUNE("mdi-tune", '\uf62e'),
     // UPLOAD("mdi-upload", '\uf552'),
     VECTOR_CIRCLE_VARIANT("mdi-vector-circle-variant", '\uf557'),
     WEATHER_SUNNY("mdi-weather-sunny", '\uf599'),

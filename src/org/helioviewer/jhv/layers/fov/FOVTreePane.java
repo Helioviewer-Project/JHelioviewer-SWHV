@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers.fov;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Enumeration;
 
@@ -12,7 +11,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -23,12 +21,13 @@ import org.helioviewer.jhv.gui.component.JHVSpinner;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 
 @SuppressWarnings("serial")
-public final class FOVTreePane extends JScrollPane {
+public final class FOVTreePane extends JPanel {
 
     private final DefaultMutableTreeNode root;
     private final JTree tree;
 
     public FOVTreePane(FOVCatalog catalog) {
+        super(new BorderLayout());
         root = new DefaultMutableTreeNode("Root");
         catalog.platforms().forEach(platform -> {
             TreeNodeComponent platformNode = new TreeNodeComponent(platform, createPlatformComponent(platform));
@@ -46,11 +45,8 @@ public final class FOVTreePane extends JScrollPane {
         tree.setCellEditor(new Editor());
         //tree.setRowHeight(0); // force calculation of nodes heights
 
-        setViewportView(tree);
-        setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        add(tree, BorderLayout.CENTER);
         setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
-        setPreferredSize(new Dimension(-1, 120));
     }
 
     @Override

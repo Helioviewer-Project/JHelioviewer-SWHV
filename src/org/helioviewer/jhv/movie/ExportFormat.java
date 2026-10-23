@@ -2,6 +2,8 @@ package org.helioviewer.jhv.movie;
 
 import java.util.List;
 
+import org.helioviewer.jhv.app.Settings;
+
 public enum ExportFormat {
     H264("H.264", ".mp4", List.of("-c:v", "libx264", "-profile:v", "high", "-crf", "23", "-preset", "fast",
             "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:fullrange=on")),
@@ -21,6 +23,14 @@ public enum ExportFormat {
         name = _name;
         extension = _extension;
         settings = _settings;
+    }
+
+    public static ExportFormat fromSettings() {
+        try {
+            return valueOf(Settings.getProperty("video.format"));
+        } catch (Exception ignore) {
+            return H264;
+        }
     }
 
     @Override

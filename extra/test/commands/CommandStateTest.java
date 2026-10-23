@@ -10,10 +10,12 @@ import java.util.logging.Logger;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiThread;
@@ -50,6 +52,7 @@ public final class CommandStateTest {
                 checkMode(warnings);
                 checkPlayback(warnings);
                 checkRecording(warnings);
+                checkExportFormats();
             });
         } finally {
             UiThread.postAndWait(() -> {
@@ -60,6 +63,20 @@ public final class CommandStateTest {
             Logger.getLogger("").removeHandler(handler);
         }
         System.out.println("CommandStateTest passed");
+    }
+
+    private static void checkExportFormats() {
+        String original = Settings.getProperty("video.format");
+        try {
+            for (ExportFormat format : ExportFormat.values()) {
+                Settings.setProperty("video.format", format.name());
+                check(ExportFormat.fromSettings() == format, "Configured recording format changed");
+            }
+            Settings.setProperty("video.format", "invalid");
+            check(ExportFormat.fromSettings() == ExportFormat.H264, "Invalid recording format did not default to H.264");
+        } finally {
+            Settings.setProperty("video.format", original);
+        }
     }
 
     private static void checkMode(List<String> warnings) {

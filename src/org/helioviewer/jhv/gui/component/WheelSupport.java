@@ -17,7 +17,6 @@ import javax.swing.JSpinner;
 // Adds mouse wheel support to JSpinner and JSlider.
 final class WheelSupport {
 
-    private static final String CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER = "mouseWheelListener";
     private static final String SPINNER_ACTION_NAME_INCREMENT = "increment";
     private static final String SPINNER_ACTION_NAME_DECREMENT = "decrement";
     private static final String SLIDER_ACTION_NAME_INCREMENT = "positiveUnitIncrement";
@@ -48,14 +47,6 @@ final class WheelSupport {
             }
         };
         component.addMouseWheelListener(l);
-        component.putClientProperty(CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER, l);
-    }
-
-    static <T extends JComponent> void uninstallMouseWheelSupport(T component) {
-        MouseWheelListener l = (MouseWheelListener) component.getClientProperty(CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER);
-        if (l != null) {
-            component.removeMouseWheelListener(l);
-        }
     }
 
     private WheelSupport() {}

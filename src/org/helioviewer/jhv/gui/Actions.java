@@ -18,7 +18,6 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.dialog.AspiicsDialog;
 import org.helioviewer.jhv.gui.dialog.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialog.NewVersionDialog;
@@ -92,7 +91,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            MoviePanel.getInstance().showNewLayerSelector();
+            MainFrame.getLayersPanel().getImageDialog().showNewLayerSelector();
         }
     }
 
@@ -257,12 +256,13 @@ public final class Actions {
 
     public static class SeparateMultiviewZoom extends AbstractAction {
         public SeparateMultiviewZoom() {
-            super("Separate Multiview Zoom");
+            super(Display.separateViewportZoom ? "Link Multiview Zoom" : "Separate Multiview Zoom");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             Display.setSeparateViewportZoom(!Display.separateViewportZoom);
+            putValue(NAME, Display.separateViewportZoom ? "Link Multiview Zoom" : "Separate Multiview Zoom");
             DisplayController.render();
         }
     }

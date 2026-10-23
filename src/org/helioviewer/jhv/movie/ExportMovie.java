@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.image.nio.MappedImageFactory;
@@ -175,15 +174,7 @@ public final class ExportMovie {
             height = outputHeight;
 
             writer = new ExportWriter(mode == ViewState.RecordingMode.SHOT ?
-                    ExportFormat.PNG : videoFormat(), width, height, fps);
-        }
-
-        private static ExportFormat videoFormat() {
-            try {
-                return ExportFormat.valueOf(Settings.getProperty("video.format"));
-            } catch (Exception ignore) {
-                return ExportFormat.H264;
-            }
+                    ExportFormat.PNG : ExportFormat.fromSettings(), width, height, fps);
         }
 
         void start() {

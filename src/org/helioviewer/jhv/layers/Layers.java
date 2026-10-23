@@ -168,6 +168,8 @@ public final class Layers {
     private static void detach(Layer layer) {
         if (layer instanceof ImageLayer imageLayer)
             imageLayer.detach();
+        if (layer instanceof ViewpointLayer)
+            layer.setEnabled(false);
         if (!newLayers.remove(layer))
             removedLayers.add(layer);
     }
@@ -328,6 +330,7 @@ public final class Layers {
         }
 
         setActiveImageLayer(null);
+        viewpointLayer.applyCurrentViewpoint();
         listeners.forEach(Listener::layersCleared);
         ImageLayers.arrangeMultiView();
         DisplayController.zoomMiniToFit();

@@ -53,7 +53,7 @@ public final class GridRenderingTest {
                     for (MapMode mode : MapMode.values()) {
                         Display.mode = mode;
                         for (boolean labels : new boolean[]{false, true}) {
-                            grid.setShowLabels(labels);
+                            grid.setLabelAlpha(labels ? 1 : 0);
                             renderer.render(viewpoint, false);
                             ByteBuffer pixels = BufferUtils.newByteBuffer(width * height * 4);
                             GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);

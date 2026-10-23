@@ -27,7 +27,6 @@ import org.helioviewer.jhv.layers.Layers;
 class TableRowTransferHandler extends TransferHandler {
 
     private final JTable grid;
-    private BufferedImage image;
     private Cursor dragCursor;
 
     TableRowTransferHandler(JTable table) {
@@ -38,12 +37,12 @@ class TableRowTransferHandler extends TransferHandler {
         return info.getComponent() == grid && info.isDrop() && info.isDataFlavorSupported(DataFlavor.stringFlavor);
     }
 
-    private void createImageOfRow(int rowIndex) {
+    private BufferedImage createImageOfRow(int rowIndex) {
         int w = grid.getWidth();
         int h = grid.getRowHeight();
         int x = grid.getX();
         int y = h * rowIndex;
-        image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = image.createGraphics();
         float opacity = 0.5f;
@@ -51,6 +50,7 @@ class TableRowTransferHandler extends TransferHandler {
         g2.translate(-x, -y);
         grid.paint(g2);
         g2.dispose();
+        return image;
     }
 
     @Nullable
@@ -63,18 +63,18 @@ class TableRowTransferHandler extends TransferHandler {
         if (row == -1)
             return null;
 
-        Object el = grid.getModel().getValueAt(row, 0);
+        Object el = grid.getValueAt(row, 0);
         if (!(el instanceof ImageLayer))
             return null;
 
-        createImageOfRow(row);
+        BufferedImage image = createImageOfRow(row);
         dragCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD");
         return new StringSelection(Integer.toString(row));
     }
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        boolean ours = isOurs(info) && image != null;
+        boolean ours = isOurs(info) && dragCursor != null;
         grid.setCursor(ours ? dragCursor : DragSource.DefaultMoveNoDrop);
         return ours;
     }
@@ -89,7 +89,7 @@ class TableRowTransferHandler extends TransferHandler {
         TransferHandler.DropLocation idl;
         if (isOurs(info) && (idl = info.getDropLocation()) instanceof JTable.DropLocation) {
             int index = ((JTable.DropLocation) idl).getRow();
-            int max = grid.getModel().getRowCount();
+            int max = grid.getRowCount();
             if (index < 0 || index > max)
                 index = max;
 
@@ -97,9 +97,10 @@ class TableRowTransferHandler extends TransferHandler {
                 Object obj = info.getTransferable().getTransferData(DataFlavor.stringFlavor);
                 int rowFrom = Integer.parseInt((String) obj);
                 if (rowFrom != -1 && rowFrom != index) {
-                    Layer moved = (Layer) grid.getModel().getValueAt(rowFrom, 0);
-                    ((LayersTableModel) grid.getModel()).reorder(rowFrom, index);
-                    int row = Layers.getLayers().indexOf(moved);
+                    Layer moved = (Layer) grid.getValueAt(rowFrom, 0);
+                    int target = index == grid.getRowCount() ? Layers.getImageLayers().size() : grid.convertRowIndexToModel(index);
+                    ((LayersTableModel) grid.getModel()).reorder(grid.convertRowIndexToModel(rowFrom), target);
+                    int row = grid.convertRowIndexToView(Layers.getLayers().indexOf(moved));
                     grid.setRowSelectionInterval(row, row); // the model change cleared the selection
                     grid.repaint(); // multiple rows involved
                     return true;
@@ -113,7 +114,6 @@ class TableRowTransferHandler extends TransferHandler {
 
     @Override
     protected void exportDone(JComponent c, Transferable t, int act) {
-        image = null;
         dragCursor = null;
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getDefaultCursor());

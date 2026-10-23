@@ -20,8 +20,11 @@ import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.DataSourcesTree;
 import org.helioviewer.jhv.gui.component.HTMLPane;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
+import org.helioviewer.jhv.io.ImageRequestSettings;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -30,13 +33,8 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public final class ImageDialog extends StandardDialog implements DataSources.Listener {
 
-    public interface Handler {
-        void setDefaultTimeRange(long start, long end);
-
-        void loadDatasets(List<DataSourcesParser.SourceItem> items);
-    }
-
-    private final Handler handler;
+    private final ImageRequestSettings settings = ImageRequestSettings.instance();
+    private ImageLayer layerToReplace;
     private final DataSourcesTree sourcesTree;
     private final HTMLPane datasetExtent = new HTMLPane();
     private final JButton availabilityButton = new JButton("Available data");
@@ -48,9 +46,8 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     };
     private final JButton actionButton = new JButton(load);
 
-    public ImageDialog(Handler _handler) {
+    public ImageDialog() {
         super(MainFrame.get(), "New Image Layer", false);
-        handler = _handler;
         sourcesTree = new DataSourcesTree(this::loadSelectedDatasets);
         sourcesTree.addTreeSelectionListener(e -> selectionChanged());
         selectionChanged();
@@ -102,7 +99,20 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         return null;
     }
 
-    public void showDialog(boolean changeMode) {
+    public void showNewLayerSelector() {
+        layerToReplace = null;
+        showDialog(false);
+    }
+
+    public void changeDataset(ImageLayer layer) {
+        layerToReplace = layer;
+        APIRequest req = layer.getAPIRequest();
+        if (req != null)
+            sourcesTree.setSelectedItem(req.server(), req.sourceId());
+        showDialog(true);
+    }
+
+    private void showDialog(boolean changeMode) {
         setTitle(changeMode ? "Change Dataset" : "New Image Layer");
         actionButton.setText(changeMode ? "Change" : "Add");
         sourcesTree.getSelectionModel().setSelectionMode(
@@ -115,10 +125,6 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         } else {
             toFront();
         }
-    }
-
-    public void selectDataset(String server, int sourceId) {
-        sourcesTree.setSelectedItem(server, sourceId);
     }
 
     private void selectionChanged() {
@@ -144,7 +150,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     public void setupSources(DataSourcesParser parser) {
         DataSourcesParser.SourceItem item = sourcesTree.setParsedData(parser);
         if (item != null)
-            handler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
+            settings.setInterval(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
     }
 
     private void loadSelectedDatasets() {
@@ -152,6 +158,11 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         if (items.isEmpty())
             return;
         setVisible(false);
-        handler.loadDatasets(items);
+        ImageLayer target = layerToReplace;
+        layerToReplace = null;
+        for (DataSourcesParser.SourceItem item : items) {
+            ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
+            imageLayer.load(settings.request(item.server, item.sourceId));
+        }
     }
 }

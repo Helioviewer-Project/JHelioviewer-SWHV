@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers.filters;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.ButtonGroup;
@@ -17,13 +15,14 @@ import org.helioviewer.jhv.layers.ImageLayers;
 
 import com.jidesoft.swing.JideButton;
 
-public final class DifferencePanel implements FilterDetails {
+public final class DifferencePanel {
 
-    private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-    private final JPanel buttonPanel = new JPanel(new BorderLayout());
-    private final JLabel title = new JLabel(" Difference ", JLabel.RIGHT);
+    private DifferencePanel() {}
 
-    public DifferencePanel(ImageLayer layer) {
+    public static FilterDetails create(ImageLayer layer) {
+        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        JideButton syncButton = new JideButton(Buttons.sync);
+        JLabel title = new JLabel(" Difference ", JLabel.RIGHT);
         ImageDisplaySettings settings = layer.getDisplaySettings();
         ButtonGroup modeGroup = new ButtonGroup();
         for (ImageDisplaySettings.DifferenceMode mode : ImageDisplaySettings.DifferenceMode.values()) {
@@ -38,25 +37,9 @@ public final class DifferencePanel implements FilterDetails {
             modePanel.add(item);
         }
 
-        JideButton syncButton = new JideButton(Buttons.sync);
         syncButton.setToolTipText("Sync all layers to this layer's time range using selected sampling");
         syncButton.addActionListener(e -> ImageLayers.syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
-        buttonPanel.add(syncButton, BorderLayout.LINE_END);
-    }
-
-    @Override
-    public Component getFirst() {
-        return title;
-    }
-
-    @Override
-    public Component getSecond() {
-        return modePanel;
-    }
-
-    @Override
-    public Component getThird() {
-        return buttonPanel;
+        return new FilterRow(title, modePanel, syncButton);
     }
 
 }

@@ -69,6 +69,10 @@ public final class ViewpointLayerOptionsExpert {
             relative = jo.optBoolean("relativeLongitude", relative);
             planets = jo.optBoolean("planets", planets);
             stars = jo.optBoolean("stars", stars);
+            if (!exclusive) {
+                spiral = jo.optBoolean("spiral", spiral);
+                spiralSpeed = Math.clamp(jo.optInt("spiralSpeed", spiralSpeed), MIN_SPEED_SPIRAL, MAX_SPEED_SPIRAL);
+            }
             ja = jo.optJSONArray("objects");
             syncInterval = jo.optBoolean("syncInterval", syncInterval);
             if (!syncInterval) {
@@ -216,6 +220,9 @@ public final class ViewpointLayerOptionsExpert {
         if (exclusive) {
             jo.put("planets", planets);
             jo.put("stars", stars);
+        } else {
+            jo.put("spiral", spiral);
+            jo.put("spiralSpeed", spiralSpeed);
         }
         jo.put("syncInterval", syncInterval);
         if (!syncInterval) {

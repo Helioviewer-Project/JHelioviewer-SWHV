@@ -2,7 +2,6 @@ package org.helioviewer.jhv.plugins.swek.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -28,6 +27,7 @@ import javax.swing.tree.TreePath;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 
@@ -126,7 +126,7 @@ final class SWEKTreePane extends JPanel {
         }
 
         if (component != null)
-            setEnabledRecursively(component, tree.isEnabled());
+            ComponentUtils.setEnabled(component, tree.isEnabled());
         return component;
     }
 
@@ -179,8 +179,8 @@ final class SWEKTreePane extends JPanel {
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         tree.setEnabled(enabled);
-        groupComponents.values().forEach(component -> setEnabledRecursively(component, enabled));
-        supplierComponents.values().forEach(component -> setEnabledRecursively(component, enabled));
+        groupComponents.values().forEach(component -> ComponentUtils.setEnabled(component, enabled));
+        supplierComponents.values().forEach(component -> ComponentUtils.setEnabled(component, enabled));
     }
 
     @Override
@@ -194,14 +194,6 @@ final class SWEKTreePane extends JPanel {
         session.setGroupChangedCallback(_ -> {});
         loadingTimer.stop();
         super.removeNotify();
-    }
-
-    private static void setEnabledRecursively(Component component, boolean enabled) {
-        component.setEnabled(enabled);
-        if (component instanceof Container container) {
-            for (Component child : container.getComponents())
-                setEnabledRecursively(child, enabled);
-        }
     }
 
     private final class Renderer extends DefaultTreeCellRenderer {

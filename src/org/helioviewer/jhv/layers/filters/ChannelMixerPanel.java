@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers.filters;
 
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 
@@ -12,13 +11,13 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 
-public final class ChannelMixerPanel implements FilterDetails {
+public final class ChannelMixerPanel {
 
-    private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-    private final JPanel emptyPanel = new JPanel();
-    private final JLabel title = new JLabel("Channels ", JLabel.RIGHT);
+    private ChannelMixerPanel() {}
 
-    public ChannelMixerPanel(ImageLayer layer) {
+    public static FilterDetails create(ImageLayer layer) {
+        JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        JLabel title = new JLabel("Channels ", JLabel.RIGHT);
         ImageDisplaySettings settings = layer.getDisplaySettings();
         JCheckBox redCheckBox = new JCheckBox("Red", settings.getRed());
         redCheckBox.setToolTipText("Toggle red channel");
@@ -41,21 +40,7 @@ public final class ChannelMixerPanel implements FilterDetails {
         redCheckBox.addActionListener(listener);
         greenCheckBox.addActionListener(listener);
         blueCheckBox.addActionListener(listener);
-    }
-
-    @Override
-    public Component getFirst() {
-        return title;
-    }
-
-    @Override
-    public Component getSecond() {
-        return boxPanel;
-    }
-
-    @Override
-    public Component getThird() {
-        return emptyPanel;
+        return new FilterRow(title, boxPanel, new JPanel());
     }
 
 }

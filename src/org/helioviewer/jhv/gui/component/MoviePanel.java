@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.List;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -16,43 +14,46 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.MainFrame;
-import org.helioviewer.jhv.gui.dialog.ImageDialog;
-import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
-import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.io.DataSourcesParser;
-import org.helioviewer.jhv.io.ImageRequestSettings;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.opengl.GLRenderer;
+import org.helioviewer.jhv.time.JHVTime;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
+public class MoviePanel extends JPanel implements Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener, Interfaces.LazyComponent {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
-    private int fixedPreferredWidth = -1;
 
-    private boolean isAdvanced;
-
-    private final ImageRequestSettings settings = ImageRequestSettings.instance();
-    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final ImageDialog imageDialog;
-    private ImageLayer layerToReplace;
+    private final JTextField programTime = new JTextField() {
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension size = super.getPreferredSize();
+            // Keep one extra pixel beyond Swing's caret margin to prevent horizontal scrolling.
+            size.width++;
+            return size;
+        }
+    };
+    private long displayedTime = Long.MIN_VALUE;
 
     private final JideButton playButton;
 
-    private final RecordButton recordButton;
+    private final JideToggleButton recordButton;
 
-    private final JideButton advancedButton;
+    private final JideToggleButton advancedButton;
     private final JHVSpinner speedSpinner;
     private final JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
     private final JComboBox<Player.AdvanceMode> advanceModeComboBox;
@@ -60,9 +61,9 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
     private final JRadioButton shotButton;
     private final JRadioButton freeButton;
     private final JComboBox<ViewState.RecordingSize> recordSizeComboBox;
+    private final JComboBox<ExportFormat> formatComboBox;
 
-    private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-    private final JPanel recordPanel = new JPanel(new GridBagLayout());
+    private final JPanel optionsPanel = new JPanel();
 
     private static MoviePanel instance;
 
@@ -72,92 +73,91 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
 
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        programTime.setFont(UIGlobals.uiFontMonoSmall);
+        programTime.setEditable(false);
+        programTime.setOpaque(false);
+        programTime.setBorder(BorderFactory.createEmptyBorder());
+        programTime.setHorizontalAlignment(JTextField.RIGHT);
+        programTime.setToolTipText("Program time");
+        lazyRepaint();
+        UITimer.register(this);
 
         // Time slider
         TimeSlider timeSlider = new TimeSlider(0, 0, 0);
 
-        JPanel sliderPanel = new JPanel(new BorderLayout());
-        sliderPanel.add(timeSlider);
-
         JPanel secondLine = new JPanel(new BorderLayout());
         // Control buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 0));
-        int small = 18, big = 26;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        int buttonSize = 18;
 
         JideButton prevFrameButton = new JideButton(Buttons.backward);
-        prevFrameButton.setFont(Buttons.getMaterialFont(small));
+        prevFrameButton.setFont(Buttons.getMaterialFont(buttonSize));
         prevFrameButton.setToolTipText("Step to previous frame");
         prevFrameButton.addActionListener(Actions.PREVIOUS_FRAME);
         HoldRepeat.install(prevFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(prevFrameButton);
 
         playButton = new JideButton(Buttons.play);
-        playButton.setFont(Buttons.getMaterialFont(big));
+        playButton.setFont(Buttons.getMaterialFont(buttonSize));
         playButton.setToolTipText("Play movie");
         playButton.addActionListener(Actions.PLAY_PAUSE);
         buttonPanel.add(playButton);
 
         JideButton nextFrameButton = new JideButton(Buttons.forward);
-        nextFrameButton.setFont(Buttons.getMaterialFont(small));
+        nextFrameButton.setFont(Buttons.getMaterialFont(buttonSize));
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(Actions.NEXT_FRAME);
         HoldRepeat.install(nextFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(nextFrameButton);
 
-        recordButton = new RecordButton(small);
+        recordButton = new JideToggleButton(Buttons.record);
+        recordButton.setFont(Buttons.getMaterialFont(buttonSize));
+        recordButton.setToolTipText("Record movie");
+        recordButton.addActionListener(Actions.RECORD);
         buttonPanel.add(recordButton);
 
-        advancedButton = new JideButton(Buttons.optionsDown);
-        advancedButton.setToolTipText("Options to control playback and recording");
-        advancedButton.addActionListener(e -> setAdvanced(!isAdvanced));
+        advancedButton = new JideToggleButton(Buttons.settings);
+        advancedButton.setFont(Buttons.getMaterialFont(buttonSize));
+        advancedButton.setToolTipText("Playback and recording options");
+        advancedButton.getAccessibleContext().setAccessibleName("Playback and recording options");
+        advancedButton.addActionListener(e -> setAdvanced(advancedButton.isSelected()));
         buttonPanel.add(advancedButton);
 
         secondLine.add(buttonPanel, BorderLayout.LINE_START);
 
         // Current frame number
         JComponent frameNumberPanel = timeSlider.getFrameNumberPanel();
-        frameNumberPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-        secondLine.add(frameNumberPanel, BorderLayout.LINE_END);
+        JPanel positionPanel = new JPanel(new BorderLayout(4, 0));
+        positionPanel.add(frameNumberPanel, BorderLayout.CENTER);
+        positionPanel.add(programTime, BorderLayout.LINE_END);
+        secondLine.add(positionPanel, BorderLayout.CENTER);
 
         // Speed
-        modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
+        JPanel playbackSpeed = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        playbackSpeed.add(new JLabel("Play ", JLabel.RIGHT));
 
         speedSpinner = new JHVSpinner(ViewState.playbackData().speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1);
         speedSpinner.setToolTipText("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps");
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
-        modePanel.add(speedSpinner);
+        playbackSpeed.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(ViewState.PlaybackSpeedUnit.values());
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
-        modePanel.add(speedUnitComboBox);
-
-        // Animation mode
-        modePanel.add(new JLabel(" and ", JLabel.RIGHT));
-
         advanceModeComboBox = new JComboBox<>(new Player.AdvanceMode[]{Player.AdvanceMode.Loop, Player.AdvanceMode.Stop, Player.AdvanceMode.Swing});
         advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Player.AdvanceMode) advanceModeComboBox.getSelectedItem()));
-        modePanel.add(advanceModeComboBox);
+
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
 
         // Record
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.LINE_START;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-
         loopButton = new JRadioButton(ViewState.RecordingMode.LOOP.toString());
         shotButton = new JRadioButton(ViewState.RecordingMode.SHOT.toString());
         freeButton = new JRadioButton(ViewState.RecordingMode.FREE.toString());
 
-        c.gridy = 0;
-        c.gridx = 0;
-        recordPanel.add(new JLabel("Record ", JLabel.RIGHT), c);
-        c.gridx = 1;
-        recordPanel.add(loopButton, c);
-        c.gridx = 2;
-        recordPanel.add(shotButton, c);
-        c.gridx = 3;
-        recordPanel.add(freeButton, c);
+        JPanel recordingModes = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        recordingModes.add(new JLabel("Record ", JLabel.RIGHT));
+        recordingModes.add(loopButton);
+        recordingModes.add(shotButton);
+        recordingModes.add(freeButton);
 
         ButtonGroup group = new ButtonGroup();
         group.add(loopButton);
@@ -168,53 +168,31 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         shotButton.addActionListener(e -> ViewState.setRecordingMode(ViewState.RecordingMode.SHOT));
         freeButton.addActionListener(e -> ViewState.setRecordingMode(ViewState.RecordingMode.FREE));
 
-        c.gridy = 1;
-        c.gridx = 2;
-        recordPanel.add(new JLabel("Output size ", JLabel.RIGHT), c);
-
         recordSizeComboBox = new JComboBox<>(ViewState.RecordingSize.values());
         recordSizeComboBox.addActionListener(e -> ViewState.setRecordingSize((ViewState.RecordingSize) recordSizeComboBox.getSelectedItem()));
-        c.gridx = 3;
-        recordPanel.add(recordSizeComboBox, c);
 
-        // The selector edits the settings and shows what they accepted.
-        timeSelectorPanel.setTime(settings.start(), settings.end());
-        timeSelectorPanel.addListener(settings::setInterval);
-        settings.addListener(new ImageRequestSettings.Listener() {
-            @Override
-            public void intervalChanged(long start, long end) {
-                timeSelectorPanel.setTime(start, end);
-            }
-        });
-        GridBagConstraints samplingConstraints = new GridBagConstraints();
-        samplingConstraints.gridy = 2;
-        samplingConstraints.gridx = 0;
-        samplingConstraints.weightx = 1;
-        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
-        SamplingPanel samplingPanel = new SamplingPanel();
-        timeSelectorPanel.add(samplingPanel, samplingConstraints);
+        formatComboBox = new JComboBox<>(ExportFormat.values());
+        formatComboBox.setSelectedItem(ExportFormat.fromSettings());
+        formatComboBox.addActionListener(e -> Settings.setProperty("video.format", ((ExportFormat) Objects.requireNonNull(formatComboBox.getSelectedItem())).name()));
 
-        add(sliderPanel);
+        playbackSpeed.add(speedUnitComboBox);
+        playbackSpeed.add(new JLabel(" and "));
+        playbackSpeed.add(advanceModeComboBox);
+
+        JPanel output = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        output.add(new JLabel("Output size "));
+        output.add(recordSizeComboBox);
+        output.add(new JLabel("Format "));
+        output.add(formatComboBox);
+
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
+        optionsPanel.add(playbackSpeed);
+        optionsPanel.add(recordingModes);
+        optionsPanel.add(output);
+
+        add(timeSlider);
         add(secondLine);
-        add(modePanel);
-        add(recordPanel);
-        add(timeSelectorPanel);
-
-        imageDialog = new ImageDialog(this);
-
-        JideButton addLayerButton = new JideButton(Buttons.newLayer);
-        addLayerButton.addActionListener(e -> showNewLayerSelector());
-
-        JideButton syncButton = new JideButton(Buttons.syncLayers);
-        syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
-        syncButton.addActionListener(e -> ImageLayers.syncLayersSpan());
-
-        JPanel addLayerPanel = new JPanel(new BorderLayout());
-        addLayerPanel.add(addLayerButton, BorderLayout.LINE_START);
-        addLayerPanel.add(syncButton, BorderLayout.LINE_END);
-        add(addLayerPanel);
-
-        add(MainFrame.getLayersPanel());
+        add(optionsPanel);
 
         Player.addStatusListener(this);
         ExportMovie.addStatusListener(this);
@@ -222,60 +200,24 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         ViewState.addRecordingConfigListener(this);
     }
 
-    @Override
-    public void setDefaultTimeRange(long start, long end) {
-        settings.setInterval(start, end);
-    }
-
-    @Override
-    public void loadDatasets(List<DataSourcesParser.SourceItem> items) {
-        ImageLayer target = layerToReplace;
-        layerToReplace = null;
-        for (DataSourcesParser.SourceItem item : items) {
-            ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
-            imageLayer.load(settings.request(item.server, item.sourceId));
-        }
-    }
-
-    public void showNewLayerSelector() {
-        layerToReplace = null;
-        imageDialog.showDialog(false);
-    }
-
-    public void changeDataset(ImageLayer layer) {
-        layerToReplace = layer;
-        APIRequest req = layer.getAPIRequest();
-        if (req != null)
-            imageDialog.selectDataset(req.server(), req.sourceId());
-        imageDialog.showDialog(true);
-    }
-
-    private static class RecordButton extends JideToggleButton {
-        RecordButton(float fontSize) {
-            super(Buttons.record);
-            setFont(Buttons.getMaterialFont(fontSize));
-            setToolTipText("Record movie");
-            addActionListener(Actions.RECORD);
-        }
-    }
-
     public void setAdvanced(boolean advanced) {
-        isAdvanced = advanced;
-        advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
-        modePanel.setVisible(advanced);
-        recordPanel.setVisible(advanced);
-    }
-
-    public void setFixedPreferredWidth(int width) {
-        fixedPreferredWidth = width;
+        advancedButton.setSelected(advanced);
+        optionsPanel.setVisible(advanced);
+        revalidate();
+        repaint();
     }
 
     @Override
-    public Dimension getPreferredSize() {
-        Dimension size = super.getPreferredSize();
-        if (fixedPreferredWidth > 0)
-            size.width = fixedPreferredWidth;
-        return size;
+    public void lazyRepaint() {
+        JHVTime time = GLRenderer.getDisplayedViewpoint().time;
+        if (displayedTime != time.milli) {
+            displayedTime = time.milli;
+            int selectionStart = programTime.getSelectionStart();
+            int selectionEnd = programTime.getSelectionEnd();
+            programTime.setText(time.toString());
+            if (selectionStart != selectionEnd)
+                programTime.select(selectionStart, selectionEnd);
+        }
     }
 
     private void updatePlaybackConfig() {
@@ -305,8 +247,14 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         if (recordButton.isSelected() != recording)
             recordButton.setSelected(recording);
         recordButton.setForeground(recording ? Color.RED : new Color(0x800000));
-        ComponentUtils.setEnabled(modePanel, !recording);
-        ComponentUtils.setEnabled(recordPanel, !recording);
+        ComponentUtils.setEnabled(optionsPanel, !recording);
+        updateFormatEnabled();
+    }
+
+    private void updateFormatEnabled() {
+        boolean screenshot = ViewState.recordingData().mode() == ViewState.RecordingMode.SHOT;
+        formatComboBox.setEnabled(!screenshot && !ExportMovie.isRecording());
+        formatComboBox.setToolTipText(screenshot ? "Screenshots are saved as PNG" : null);
     }
 
     @Override
@@ -337,6 +285,7 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
         }
         if (recordSizeComboBox.getSelectedItem() != recordingData.size())
             recordSizeComboBox.setSelectedItem(recordingData.size());
+        updateFormatEnabled();
     }
 
 }

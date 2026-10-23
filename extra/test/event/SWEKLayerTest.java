@@ -163,7 +163,6 @@ public final class SWEKLayerTest {
         metadata.add("later", "Later", "Not in the built event", true);
         List<String> expected = List.of("Speed : 6.799E2", "Text : https:// is not a valid URL");
         check(SWEKData.visibleParameterLines(event).equals(expected), "hover labels preserve order, formatting and exclusions");
-        check(SWEKData.visibleParameterLines(event).equals(expected), "repeated labels preserve their values");
         check(event.getAllEventParameters().length == 6 && event.getVisibleEventParameters().length == 5, "detail lists retain URLs and hidden metadata");
         EventParameter link = event.getVisibleEventParameters()[2];
         check(link.isUrl(), "URL classification");

@@ -27,6 +27,8 @@ import org.helioviewer.jhv.movie.ExportMovie;
 public final class UIGlobals {
 
     public static void setLaf() {
+        if (Platform.isWindows())
+            com.formdev.flatlaf.FlatLaf.setPreferredMonospacedFontFamily("Consolas");
         try {
             switch (DisplaySettings.getUITheme()) {
                 case Dark -> com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
@@ -49,6 +51,8 @@ public final class UIGlobals {
         backColor = UIManager.getColor("Label.background");
         midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
+        if (Platform.isLinux())
+            UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("small.font"));
         if (Platform.isMacOS()) {
             UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("medium.font")); // smaller, FlatLaf 2
             ImageIcon cursor = IconBank.getIcon(JHVIcon.CLOSED_HAND_MAC);
