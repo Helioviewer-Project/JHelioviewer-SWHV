@@ -47,6 +47,7 @@ public final class AngleCanvas extends Canvas {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         setBackground(Color.BLACK);
+        addPropertyChangeListener("graphicsConfiguration", e -> scheduleHostUpdate(true));
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -331,6 +332,8 @@ public final class AngleCanvas extends Canvas {
         if (!changed)
             return false;
 
+        if (Platform.isWindows() && isDisplayable())
+            WinAngleBridge.syncPosition(this);
         Display.pixelScale[0] = scaleX;
         Display.pixelScale[1] = scaleY;
         invalidateGlSize();
