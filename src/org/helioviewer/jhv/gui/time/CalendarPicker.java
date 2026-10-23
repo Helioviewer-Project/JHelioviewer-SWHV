@@ -98,14 +98,13 @@ class CalendarPicker extends JPanel {
 
         private final JideButton quickForwardButton = new JideButton(">>");
         private final JideButton quickBackButton = new JideButton("<<");
-        private final JideButton forwardButton = new JideButton(">");
-        private final JideButton backButton = new JideButton("<");
         private final JideButton selectButton = new JideButton();
 
         NavigationPanel() {
             setLayout(new BorderLayout());
 
             JPanel forwardButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 2));
+            JideButton forwardButton = new JideButton(">");
             forwardButtonPanel.add(forwardButton);
             forwardButtonPanel.add(quickForwardButton);
 
@@ -114,6 +113,7 @@ class CalendarPicker extends JPanel {
 
             JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 2, 2));
             backButtonPanel.add(quickBackButton);
+            JideButton backButton = new JideButton("<");
             backButtonPanel.add(backButton);
 
             add(forwardButtonPanel, BorderLayout.LINE_END);
@@ -134,7 +134,7 @@ class CalendarPicker extends JPanel {
                 switch (displayMode) {
                     case DAYS -> changeDisplayMode(DisplayMode.MONTHS);
                     case MONTHS -> changeDisplayMode(DisplayMode.YEARS);
-                    case YEARS -> { return; }
+                    case YEARS -> {return;}
                 }
                 updateDateDisplay();
             });

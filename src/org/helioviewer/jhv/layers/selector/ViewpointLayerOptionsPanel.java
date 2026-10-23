@@ -30,7 +30,7 @@ final class ViewpointLayerOptionsPanel extends JPanel {
             <b>Observer at 1au</b>: view from the active observer, but at 1au fixed distance.
             <b>Location</b>: view from selected object.
             <b>Heliosphere</b>: view onto the solar equatorial plane.
-
+            
             If "Use movie time interval" is unselected, the viewpoint time is interpolated in the configured time interval.""";
 
     private final ViewpointLayer layer;
