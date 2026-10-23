@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -96,7 +94,7 @@ class CalendarPicker extends JPanel {
 
     // Panel which acts as a container for the navigation buttons on the top of
     // the calendar component
-    private class NavigationPanel extends JPanel implements ActionListener {
+    private class NavigationPanel extends JPanel {
 
         private final JideButton quickForwardButton = new JideButton(">>");
         private final JideButton quickBackButton = new JideButton("<<");
@@ -122,11 +120,24 @@ class CalendarPicker extends JPanel {
             add(selectionButtonPanel, BorderLayout.CENTER);
             add(backButtonPanel, BorderLayout.LINE_START);
 
-            quickForwardButton.addActionListener(this);
-            quickBackButton.addActionListener(this);
-            forwardButton.addActionListener(this);
-            backButton.addActionListener(this);
-            selectButton.addActionListener(this);
+            quickForwardButton.addActionListener(e -> quickMove(true));
+            quickBackButton.addActionListener(e -> quickMove(false));
+            forwardButton.addActionListener(e -> {
+                calendarViewController.moveForward();
+                updateDateDisplay();
+            });
+            backButton.addActionListener(e -> {
+                calendarViewController.moveBack();
+                updateDateDisplay();
+            });
+            selectButton.addActionListener(e -> {
+                switch (displayMode) {
+                    case DAYS -> changeDisplayMode(DisplayMode.MONTHS);
+                    case MONTHS -> changeDisplayMode(DisplayMode.YEARS);
+                    case YEARS -> { return; }
+                }
+                updateDateDisplay();
+            });
         }
 
         // Sets the text of the button which changes the view
@@ -134,56 +145,16 @@ class CalendarPicker extends JPanel {
             selectButton.setText(text);
         }
 
-        // Action event for all the buttons of this component
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == forwardButton) {
-                // depending on the current view controller the next date period will be shown
-                calendarViewController.moveForward();
+        private void quickMove(boolean forward) {
+            CalendarViewController controller = switch (displayMode) {
+                case DAYS -> new MonthViewController();
+                case MONTHS -> new YearViewController();
+                case YEARS -> null;
+            };
+            if (controller != null) {
+                controller.setTime(calendarViewController.getTime());
+                calendarViewController.setTime(forward ? controller.moveForward() : controller.moveBack());
                 updateDateDisplay();
-            } else if (e.getSource() == backButton) {
-                // depending on the current view controller the previous date period will be shown
-                calendarViewController.moveBack();
-                updateDateDisplay();
-            } else if (e.getSource() == selectButton) {
-                // change the view mode and the corresponding controller
-                switch (displayMode) {
-                    case DAYS -> {
-                        changeDisplayMode(DisplayMode.MONTHS);
-                        updateDateDisplay();
-                    }
-                    case MONTHS -> {
-                        changeDisplayMode(DisplayMode.YEARS);
-                        updateDateDisplay();
-                    }
-                    case YEARS -> {}
-                }
-            } else if (e.getSource() == quickForwardButton) {
-                // increase current date by using the view controller of the next higher period control
-                CalendarViewController cvc = switch (displayMode) {
-                    case DAYS -> new MonthViewController();
-                    case MONTHS -> new YearViewController();
-                    case YEARS -> null;
-                };
-
-                if (cvc != null) {
-                    cvc.setTime(calendarViewController.getTime());
-                    calendarViewController.setTime(cvc.moveForward());
-                    updateDateDisplay();
-                }
-            } else if (e.getSource() == quickBackButton) {
-                // reduce current date by using the view controller of the next higher period control
-                CalendarViewController cvc = switch (displayMode) {
-                    case DAYS -> new MonthViewController();
-                    case MONTHS -> new YearViewController();
-                    case YEARS -> null;
-                };
-
-                if (cvc != null) {
-                    cvc.setTime(calendarViewController.getTime());
-                    calendarViewController.setTime(cvc.moveBack());
-                    updateDateDisplay();
-                }
             }
         }
 

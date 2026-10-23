@@ -381,16 +381,16 @@ public final class Actions {
     }
 
     public static class ShowDialog extends AbstractAction {
-        private final Interfaces.ShowableDialog dialog;
+        private final Runnable showDialog;
 
-        public ShowDialog(String name, Interfaces.ShowableDialog _dialog) {
+        public ShowDialog(String name, Runnable _showDialog) {
             super(name);
-            dialog = _dialog;
+            showDialog = _showDialog;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            dialog.showDialog();
+            showDialog.run();
         }
     }
 

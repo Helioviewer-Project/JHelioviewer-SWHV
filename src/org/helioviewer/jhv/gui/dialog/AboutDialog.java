@@ -15,7 +15,6 @@ import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.HTMLPane;
@@ -27,7 +26,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class AboutDialog extends StandardDialog implements Interfaces.ShowableDialog, HyperlinkListener {
+public final class AboutDialog extends StandardDialog implements HyperlinkListener {
 
     public AboutDialog() {
         super(MainFrame.get(), "About JHelioviewer", true);
@@ -101,7 +100,6 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
         return banner;
     }
 
-    @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(MainFrame.get());

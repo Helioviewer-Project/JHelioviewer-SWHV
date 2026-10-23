@@ -6,7 +6,6 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 
@@ -14,7 +13,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings({"serial", "this-escape"})
-public class TextDialog extends StandardDialog implements Interfaces.ShowableDialog {
+public class TextDialog extends StandardDialog {
 
     private final String text;
 
@@ -45,7 +44,6 @@ public class TextDialog extends StandardDialog implements Interfaces.ShowableDia
         return null;
     }
 
-    @Override
     public void showDialog() {
         pack();
         setLocationRelativeTo(MainFrame.get());

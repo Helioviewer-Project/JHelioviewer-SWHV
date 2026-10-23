@@ -118,7 +118,7 @@ public final class MenuBar extends JMenuBar {
         movieMenu.add(Actions.RECORD);
         add(movieMenu);
 
-        Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog());
+        Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog()::showDialog);
         if (Platform.isMacOS()) {
             DesktopIntegration.setPreferencesHandler(e -> settingsAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
@@ -135,10 +135,10 @@ public final class MenuBar extends JMenuBar {
 
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
-        helpMenu.add(new Actions.ShowDialog("Interaction Guide...", new TextDialog("Interaction Guide", interactionHelp(), true)));
-        helpMenu.add(new Actions.ShowDialog("Timeline Interaction...", new TextDialog("Timeline Interaction", timelineHelp(), true)));
+        helpMenu.add(new Actions.ShowDialog("Interaction Guide...", new TextDialog("Interaction Guide", interactionHelp(), true)::showDialog));
+        helpMenu.add(new Actions.ShowDialog("Timeline Interaction...", new TextDialog("Timeline Interaction", timelineHelp(), true)::showDialog));
 
-        Actions.ShowDialog aboutAction = new Actions.ShowDialog("About JHelioviewer...", new AboutDialog());
+        Actions.ShowDialog aboutAction = new Actions.ShowDialog("About JHelioviewer...", new AboutDialog()::showDialog);
         if (Platform.isMacOS()) {
             DesktopIntegration.setAboutHandler(e -> aboutAction.actionPerformed(null));
         }
@@ -148,7 +148,7 @@ public final class MenuBar extends JMenuBar {
         helpMenu.add(new Actions.OpenURLinBrowser("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
         helpMenu.add(new Actions.CheckForUpdates());
         helpMenu.addSeparator();
-        helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()));
+        helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()::showDialog));
         helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", AppInfo.bugURL));
         if (!Platform.isMacOS()) {
             helpMenu.addSeparator();

@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,7 +12,6 @@ import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -23,19 +20,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+import javax.swing.JTextField;
 
 import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
@@ -48,7 +37,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class SettingsDialog extends StandardDialog implements Interfaces.ShowableDialog {
+public final class SettingsDialog extends StandardDialog {
 
     private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
     private final JButton clearCache = new JButton("Clear Cache");
@@ -72,7 +61,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         return "The image cache currently uses " + size + "GB on disk.";
     }
 
-    private DefaultsSelectionPanel defaultsPanel;
+    private ProxyPanel proxyPanel;
 
     public SettingsDialog() {
         super(MainFrame.get(), "Settings", true);
@@ -84,7 +73,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         AbstractAction close = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                defaultsPanel.saveSettings();
+                proxyPanel.saveSettings();
                 setVisible(false);
             }
         };
@@ -103,9 +92,9 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public JComponent createContentPanel() {
-        defaultsPanel = new DefaultsSelectionPanel();
-        defaultsPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
-        return defaultsPanel;
+        proxyPanel = new ProxyPanel();
+        proxyPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        return proxyPanel;
     }
 
     @Override
@@ -115,7 +104,6 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         return panel;
     }
 
-    @Override
     public void showDialog() {
         updateCacheSize();
         pack();
@@ -271,70 +259,36 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         return statePanel;
     }
 
-    private static class DefaultsSelectionPanel extends JPanel {
+    private static class ProxyPanel extends JPanel {
 
-        final JTable grid;
-        final TableModel model;
+        private final JTextField username = new JTextField(Settings.getProperty("proxy.username"), 20);
+        private final JPasswordField password = new JPasswordField(20);
 
-        DefaultsSelectionPanel() {
-            super(new BorderLayout());
-            setPreferredSize(new Dimension(-1, 150));
+        ProxyPanel() {
+            super(new GridBagLayout());
+            password.setText(ProxySettings.getPassword());
 
-            String[][] tableData = {
-                    {"Proxy username", Settings.getProperty("proxy.username")},
-                    {"Proxy password", ProxySettings.getPassword()},
-            };
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.LINE_END;
+            c.insets = new Insets(0, 2, 0, 2);
+            c.gridx = 0;
+            c.gridy = 0;
+            add(new JLabel("Proxy username:"), c);
+            c.gridy = 1;
+            add(new JLabel("Proxy password:"), c);
 
-            model = new DefaultTableModel(tableData, new String[]{"Description", "Value"}) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return column == 1;
-                }
-            };
-
-            JPasswordField passField = new JPasswordField();
-            TableCellEditor passEditor = new DefaultCellEditor(passField);
-
-            grid = new JTable(model) {
-                @Override
-                public TableCellEditor getCellEditor(int row, int column) {
-                    return row == 1 && column == 1 ? passEditor : super.getCellEditor(row, column);
-                }
-            };
-            grid.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                    if (row == 1 && column == 1) {
-                        if (value instanceof String str)
-                            passField.setText(str);
-                        return passField;
-                    }
-                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                }
-            });
-
-            grid.setRowHeight(20);
-            JScrollPane scrollPane = new JScrollPane(grid);
-            grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            // grid.setFillsViewportHeight(true);
-
-            TableColumn col = grid.getColumnModel().getColumn(0);
-            col.setMaxWidth(150);
-            col.setMinWidth(150);
-
-            add(scrollPane, BorderLayout.CENTER);
+            c.gridx = 1;
+            c.gridy = 0;
+            c.weightx = 1;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            add(username, c);
+            c.gridy = 1;
+            add(password, c);
         }
 
         void saveSettings() {
-            if (grid.isEditing())
-                grid.getCellEditor().stopCellEditing();
-
-            Object val0 = model.getValueAt(0, 1);
-            if (val0 instanceof String str)
-                Settings.setProperty("proxy.username", str);
-            Object val1 = model.getValueAt(1, 1);
-            if (val1 instanceof String str)
-                ProxySettings.setPassword(str);
+            Settings.setProperty("proxy.username", username.getText());
+            ProxySettings.setPassword(new String(password.getPassword()));
         }
 
     }

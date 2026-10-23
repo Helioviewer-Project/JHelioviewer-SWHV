@@ -99,6 +99,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
 
         playButton = new JideButton(Buttons.play);
         playButton.setFont(Buttons.getMaterialFont(buttonSize));
+        playButton.setPreferredSize(new Dimension(32, 32));
         playButton.setToolTipText("Play movie");
         playButton.addActionListener(Actions.PLAY_PAUSE);
         buttonPanel.add(playButton);

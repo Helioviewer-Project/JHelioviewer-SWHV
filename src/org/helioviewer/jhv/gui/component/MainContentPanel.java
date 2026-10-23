@@ -4,47 +4,41 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.util.ArrayList;
 
+import javax.annotation.Nullable;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 
-// This panel acts as a container for the GUI elements which are shown in the
-// main area of the application. Usually it contains the main image area. Below
-// the main image area plug-ins are able to display their GUI components.
+// The canvas and optional collapsible Timelines plot share a vertical split pane.
 @SuppressWarnings("serial")
 public final class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 5;
     private static final double NORMAL_RESIZE_WEIGHT = 0.75;
 
-    private final ArrayList<Interfaces.MainContentPanelPlugin> pluginList = new ArrayList<>();
-
     private final JSplitPane splitPane;
-    private final JPanel pluginContainer;
+    private final JPanel timelineContainer;
     private final CollapsiblePane collapsiblePane;
     private final CollapsiblePaneButton maximizeButton;
 
-    private boolean pluginMaximized;
+    private boolean timelineMaximized;
     private int normalDividerLocation;
 
     public MainContentPanel(Component mainComponent) {
-        pluginContainer = new JPanel(new BorderLayout());
-        collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, !"false".equals(Settings.getProperty("display.plugins")));
+        timelineContainer = new JPanel(new BorderLayout());
+        collapsiblePane = new CollapsiblePane("Timelines", timelineContainer, !"false".equals(Settings.getProperty("display.plugins")));
         collapsiblePane.toggleButton.addActionListener(e -> updateLayout());
 
         maximizeButton = new CollapsiblePaneButton();
         maximizeButton.setFont(Buttons.getMaterialFont(12));
         maximizeButton.setHorizontalAlignment(SwingConstants.CENTER);
         maximizeButton.setPreferredSize(new Dimension(28, maximizeButton.getPreferredSize().height));
-        maximizeButton.addActionListener(e -> togglePluginMaximized());
+        maximizeButton.addActionListener(e -> toggleTimelineMaximized());
         collapsiblePane.addHeaderComponent(maximizeButton);
         updateMaximizeButton();
 
@@ -60,60 +54,32 @@ public final class MainContentPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    // Adds a plug-in and the associated GUI to the container. The GUI will be displayed below the main component.
-    public void addPlugin(Interfaces.MainContentPanelPlugin plugin) {
-        if (plugin == null || pluginList.contains(plugin) || plugin.getVisualInterfaces().isEmpty()) {
-            return;
-        }
-        pluginList.add(plugin);
+    public void setTimelinesPanel(@Nullable JComponent panel) {
+        timelineContainer.removeAll();
+        if (panel != null)
+            timelineContainer.add(panel, BorderLayout.CENTER);
         updateLayout();
     }
 
-    // Removes a plug-in and the associated GUI from the container
-    public void removePlugin(Interfaces.MainContentPanelPlugin plugin) {
-        if (pluginList.remove(plugin))
-            updateLayout();
-    }
-
-    // Updates the layout of the container and its subcomponents. Plug-ins will
-    // be displayed, if available, in separated tabs below the main component
-    // area. A split pane will be provided, if necessary, to readjust the
-    // height of the components.
     private void updateLayout() {
-        if ((pluginList.isEmpty() || !collapsiblePane.toggleButton.isSelected()) && pluginMaximized)
-            restorePluginSize();
+        boolean hasContent = timelineContainer.getComponentCount() != 0;
+        if ((!hasContent || !collapsiblePane.toggleButton.isSelected()) && timelineMaximized)
+            restoreTimelineSize();
 
         splitPane.remove(collapsiblePane);
         remove(collapsiblePane);
         splitPane.setDividerSize(0);
 
-        if (pluginList.isEmpty()) {
-            pluginContainer.removeAll();
+        if (!hasContent) {
             revalidate();
             repaint();
             return;
         }
 
         boolean isSelected = collapsiblePane.toggleButton.isSelected();
-        boolean onePlugin = pluginList.size() == 1 && pluginList.getFirst().getVisualInterfaces().size() == 1;
-        collapsiblePane.setTitle(onePlugin ? pluginList.getFirst().getTabName() : "Plugins");
-
         if (isSelected) {
-            pluginContainer.removeAll();
-
-            if (onePlugin) {
-                pluginContainer.add(pluginList.getFirst().getVisualInterfaces().getFirst(), BorderLayout.CENTER);
-            } else {
-                JTabbedPane tabbedPane = new JTabbedPane();
-                for (Interfaces.MainContentPanelPlugin plugin : pluginList) {
-                    for (JComponent component : plugin.getVisualInterfaces()) {
-                        tabbedPane.addTab(plugin.getTabName(), component);
-                    }
-                }
-                pluginContainer.add(tabbedPane, BorderLayout.CENTER);
-            }
             splitPane.setBottomComponent(collapsiblePane);
-            if (pluginMaximized) {
+            if (timelineMaximized) {
                 splitPane.setDividerLocation(0);
             } else {
                 splitPane.setDividerSize(DIVIDER_SIZE);
@@ -128,40 +94,40 @@ public final class MainContentPanel extends JPanel {
         repaint();
     }
 
-    private void togglePluginMaximized() {
-        if (pluginMaximized) {
-            restorePluginSize();
+    private void toggleTimelineMaximized() {
+        if (timelineMaximized) {
+            restoreTimelineSize();
         } else {
             normalDividerLocation = splitPane.getDividerLocation();
             MainFrame.setRenderSurfaceVisible(false);
             splitPane.setResizeWeight(0);
             splitPane.setDividerSize(0);
             splitPane.setDividerLocation(0);
-            pluginMaximized = true;
+            timelineMaximized = true;
             updateMaximizeButton();
             revalidate();
             repaint();
         }
     }
 
-    private void restorePluginSize() {
+    private void restoreTimelineSize() {
         splitPane.setResizeWeight(NORMAL_RESIZE_WEIGHT);
         splitPane.setDividerSize(DIVIDER_SIZE);
         splitPane.setDividerLocation(normalDividerLocation);
-        pluginMaximized = false;
+        timelineMaximized = false;
         updateMaximizeButton();
         revalidate();
         repaint();
         EventQueue.invokeLater(() -> {
-            if (!pluginMaximized)
+            if (!timelineMaximized)
                 MainFrame.setRenderSurfaceVisible(true);
         });
     }
 
     private void updateMaximizeButton() {
         maximizeButton.setSelected(true);
-        maximizeButton.setText((pluginMaximized ? MaterialDesign.CHEVRON_DOWN : MaterialDesign.CHEVRON_UP).toString());
-        maximizeButton.setToolTipText(pluginMaximized ? "Restore panel size" : "Maximize panel");
+        maximizeButton.setText((timelineMaximized ? MaterialDesign.CHEVRON_DOWN : MaterialDesign.CHEVRON_UP).toString());
+        maximizeButton.setToolTipText(timelineMaximized ? "Restore panel size" : "Maximize panel");
     }
 
 }

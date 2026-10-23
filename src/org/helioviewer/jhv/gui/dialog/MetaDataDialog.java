@@ -22,7 +22,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
@@ -47,7 +46,7 @@ import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
 
 @SuppressWarnings("serial")
-public final class MetaDataDialog extends StandardDialog implements Interfaces.ShowableDialog {
+public final class MetaDataDialog extends StandardDialog {
 
     private final JideSplitPane content = new JideSplitPane(JideSplitPane.VERTICAL_SPLIT);
     private final JButton exportFitsButton = new JButton("Export FITS Header as XML");
@@ -118,7 +117,6 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         return null;
     }
 
-    @Override
     public void showDialog() {
         fitsTable.updateRowHeights();
         pack();

@@ -46,7 +46,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         header.add(component, BorderLayout.LINE_END);
     }
 
-    void setTitle(String _title) {
+    private void setTitle(String _title) {
         title = _title;
         toggleButton.setText((toggleButton.isSelected() ? Buttons.chevronDown : Buttons.chevronRight) + title);
     }

@@ -34,7 +34,7 @@ final class FilterDialog extends JDialog implements FocusListener, WindowFocusLi
             if (filter == null)
                 continue;
             for (SWEK.Operand operand : filter.operands())
-                filterPanels.add(new FilterPanel(parameter, operand, this));
+                filterPanels.add(new FilterPanel(parameter, operand, () -> applyButton.setEnabled(true)));
         }
 
         JPanel filterPanel = new JPanel(new GridLayout(filterPanels.size() + 1, 1));
@@ -69,10 +69,6 @@ final class FilterDialog extends JDialog implements FocusListener, WindowFocusLi
     @Override
     public void windowLostFocus(WindowEvent e) {
         setVisible(false);
-    }
-
-    void filterParameterChanged() {
-        applyButton.setEnabled(true);
     }
 
 }

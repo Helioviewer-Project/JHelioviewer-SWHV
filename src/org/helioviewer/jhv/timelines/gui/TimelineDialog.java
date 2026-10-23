@@ -29,7 +29,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.band.BandDataset;
@@ -40,7 +39,7 @@ import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
-public final class TimelineDialog extends StandardDialog implements Interfaces.ShowableDialog {
+public final class TimelineDialog extends StandardDialog {
 
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Timelines");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(root);
@@ -120,7 +119,6 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         return null;
     }
 
-    @Override
     public void showDialog() {
         if (!isVisible()) {
             pack();

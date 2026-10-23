@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -34,7 +35,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class SoarDialog extends StandardDialog implements SoarClient.ReceiverItems, SoarClient.ReceiverSoops {
+public class SoarDialog extends StandardDialog {
 
     private static final double MAX_SIZE = 2;
     private static final Dimension resultSize = new Dimension(500, 350);
@@ -58,6 +59,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
             build();
 
     private boolean soopsDownloaded;
+    private int searchRequest;
     private final JComboBox<String> soopCombo = new JComboBox<>();
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final JList<SoarClient.DataItem> listPane = new JList<>();
@@ -128,8 +130,9 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         soopQuery.addItemListener(e -> {
             boolean selected = soopQuery.isSelected();
             if (selected && !soopsDownloaded) {
-                SoarClient.submitGetSoops(this);
+                SoarClient.submitGetSoops(this::setSoops);
             }
+            clearResults();
             soopCombo.setEnabled(selected);
             ComponentUtils.setEnabled(timeSelectorPanel, !selected);
         });
@@ -161,6 +164,10 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         dataSelector.add(levelCombo);
         JButton searchButton = getSearchButton(datasetCombo, levelCombo, timeQuery);
         dataSelector.add(searchButton);
+        datasetCombo.addActionListener(e -> clearResults());
+        levelCombo.addActionListener(e -> clearResults());
+        soopCombo.addActionListener(e -> clearResults());
+        timeSelectorPanel.addListener((start, end) -> clearResults());
 
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         foundPanel.add(foundLabel);
@@ -196,11 +203,14 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
             if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
                 List<String> descriptors = Dataset.get(dataset);
                 if (descriptors != null) {
+                    clearResults();
+                    int request = searchRequest;
+                    Consumer<List<SoarClient.DataItem>> onResult = list -> setItems(request, list);
                     if (timeQuery.isSelected()) {
-                        SoarClient.submitSearchTime(this, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+                        SoarClient.submitSearchTime(onResult, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
                         foundLabel.setText("Searching...");
                     } else if (soopCombo.getSelectedItem() instanceof String soop) {
-                        SoarClient.submitSearchSoop(this, descriptors, level, soop);
+                        SoarClient.submitSearchSoop(onResult, descriptors, level, soop);
                         foundLabel.setText("Searching...");
                     }
                 }
@@ -221,14 +231,20 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         setVisible(true);
     }
 
-    @Override
-    public void setSoarResponseItems(List<SoarClient.DataItem> list) {
+    private void clearResults() {
+        searchRequest++;
+        listPane.setListData(new SoarClient.DataItem[0]);
+        foundLabel.setText("0 found");
+    }
+
+    private void setItems(int request, List<SoarClient.DataItem> list) {
+        if (request != searchRequest)
+            return;
         listPane.setListData(list.toArray(SoarClient.DataItem[]::new));
         foundLabel.setText(list.size() + " found");
     }
 
-    @Override
-    public void setSoarResponseSoops(List<String> list) {
+    private void setSoops(List<String> list) {
         soopCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
         soopsDownloaded = true; // mark loaded only after successful callback
         if (!list.isEmpty())

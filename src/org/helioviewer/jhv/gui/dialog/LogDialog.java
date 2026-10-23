@@ -14,15 +14,13 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.thread.Task;
 
-public class LogDialog implements Interfaces.ShowableDialog {
+public class LogDialog {
 
-    @Override
     public void showDialog() {
         Task.submitBackground("log", Log::get, LogDialog::showDialog, Log::error);
     }

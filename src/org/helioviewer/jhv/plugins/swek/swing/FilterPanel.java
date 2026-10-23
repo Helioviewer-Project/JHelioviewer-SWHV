@@ -16,28 +16,28 @@ import org.helioviewer.jhv.gui.component.JHVSpinner;
 @SuppressWarnings("serial")
 class FilterPanel extends JPanel {
 
-    private final JLabel label;
     private final JHVSpinner spinner;
 
-    private boolean enabled = false;
+    private final JCheckBox enableButton = new JCheckBox();
 
     private final SWEK.Parameter parameter;
 
-    private final FilterDialog filterDialog;
     private final SWEK.Operand operand;
 
-    FilterPanel(SWEK.Parameter _parameter, SWEK.Operand _operand, FilterDialog _filterDialog) {
+    FilterPanel(SWEK.Parameter _parameter, SWEK.Operand _operand, Runnable onChange) {
         operand = _operand;
-        filterDialog = _filterDialog;
         parameter = _parameter;
         spinner = createSpinner(parameter.filter());
-        spinner.addChangeListener(e -> filterDialog.filterParameterChanged());
+        spinner.addChangeListener(e -> onChange.run());
 
-        JCheckBox enableButton = new JCheckBox();
-        enableButton.addActionListener(e -> toggleEnabled());
-        label = new JLabel(parameter.displayName() + ' ' + operand.representation);
-        spinner.setEnabled(enabled);
-        label.setEnabled(enabled);
+        JLabel label = new JLabel(parameter.displayName() + ' ' + operand.representation);
+        spinner.setEnabled(false);
+        label.setEnabled(false);
+        enableButton.addActionListener(e -> {
+            label.setEnabled(enableButton.isSelected());
+            spinner.setEnabled(enableButton.isSelected());
+            onChange.run();
+        });
 
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -76,19 +76,12 @@ class FilterPanel extends JPanel {
     }
 
     SWEK.Param filter() {
-        if (enabled) {
+        if (enableButton.isSelected()) {
             Object oval = spinner.getValue();
             double value = oval instanceof String str ? GOESLevel.getFloatValue(str) : ((Number) oval).doubleValue();
             return new SWEK.Param(parameter.name(), value, operand);
         }
         return null;
-    }
-
-    private void toggleEnabled() {
-        enabled = !enabled;
-        label.setEnabled(enabled);
-        spinner.setEnabled(enabled);
-        filterDialog.filterParameterChanged();
     }
 
 }

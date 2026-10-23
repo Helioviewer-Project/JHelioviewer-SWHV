@@ -32,7 +32,7 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class PunchDialog extends StandardDialog implements PunchClient.ReceiverItems, PunchClient.ReceiverProducts, PunchClient.ReceiverCoverage {
+public class PunchDialog extends StandardDialog {
 
     // Generous cap with a confirmation prompt past CONFIRM_FILES; multi-URI image
     // loads can resolve files concurrently, so very large selections need a hard limit
@@ -80,6 +80,9 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     private final HTMLPane coverageLabel = new HTMLPane();
     private final JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
 
+    private int productsRequest;
+    private int coverageRequest;
+    private int searchRequest;
     private boolean productsDownloaded;
     private boolean rangeUserChanged; // true once the user has explicitly set a range
     private boolean updatingProducts;
@@ -146,29 +149,12 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         JButton searchButton = getSearchButton();
         dataSelector.add(searchButton);
 
-        levelCombo.addActionListener(e -> {
-            if (levelCombo.getSelectedItem() instanceof String level) {
-                clearResults();
-                coverageLabel.setText("Checking products...");
-                updatingProducts = true;
-                try {
-                    productCombo.setModel(new DefaultComboBoxModel<>());
-                } finally {
-                    updatingProducts = false;
-                }
-                productsDownloaded = false;
-                PunchClient.submitGetProducts(this, level);
-            }
-        });
+        levelCombo.addActionListener(e -> loadProducts());
         productCombo.addActionListener(e -> {
-            if (!updatingProducts && productCombo.getSelectedItem() instanceof String product) {
-                clearResults();
-                productCombo.setToolTipText(ProductInfo.getOrDefault(product, "PUNCH data product"));
-                coverageLabel.setText("Checking archive coverage...");
-                if (levelCombo.getSelectedItem() instanceof String level)
-                    PunchClient.submitGetCoverage(this, level, product);
-            }
+            if (!updatingProducts)
+                loadCoverage();
         });
+        cadenceCombo.addActionListener(e -> clearResults());
 
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         foundPanel.add(foundLabel);
@@ -211,7 +197,9 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
             if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product &&
                     cadenceCombo.getSelectedItem() instanceof Cadence cadence) {
                 clearResults();
-                PunchClient.submitSearchTime(this, level, product, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime(), cadence.milli);
+                int request = searchRequest;
+                PunchClient.submitSearchTime(list -> setItems(request, list), level, product,
+                        timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime(), cadence.milli);
                 foundLabel.setText("Searching...");
             }
         });
@@ -219,6 +207,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     }
 
     private void clearResults() {
+        searchRequest++;
         listPane.setListData(new PunchClient.DataItem[0]);
         foundLabel.setText("0 found");
         selectedLabel.setText("0 selected");
@@ -231,24 +220,42 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     }
 
     public void showDialog() {
-        if (!productsDownloaded && levelCombo.getSelectedItem() instanceof String level)
-            PunchClient.submitGetProducts(this, level);
+        if (!productsDownloaded)
+            loadProducts();
 
         pack();
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 
-    @Override
-    public void setPunchResponseItems(List<PunchClient.DataItem> list) {
+    private void setItems(int request, List<PunchClient.DataItem> list) {
+        if (request != searchRequest)
+            return;
         listPane.setListData(list.toArray(PunchClient.DataItem[]::new));
         foundLabel.setText(list.isEmpty()
                 ? "0 found — archive may not cover this period; see umbra.nascom.nasa.gov/punch"
                 : list.size() + " found");
     }
 
-    @Override
-    public void setPunchResponseProducts(List<String> list) {
+    private void loadProducts() {
+        clearResults();
+        coverageRequest++;
+        int request = ++productsRequest;
+        productsDownloaded = false;
+        coverageLabel.setText("Checking products...");
+        updatingProducts = true;
+        try {
+            productCombo.setModel(new DefaultComboBoxModel<>());
+        } finally {
+            updatingProducts = false;
+        }
+        if (levelCombo.getSelectedItem() instanceof String level)
+            PunchClient.submitGetProducts(list -> setProducts(request, list), level);
+    }
+
+    private void setProducts(int request, List<String> list) {
+        if (request != productsRequest)
+            return;
         updatingProducts = true;
         try {
             productCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
@@ -260,18 +267,24 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         } finally {
             updatingProducts = false;
         }
-        if (productCombo.getSelectedItem() instanceof String product) {
+        loadCoverage();
+    }
+
+    private void loadCoverage() {
+        clearResults();
+        int request = ++coverageRequest;
+        if (productCombo.getSelectedItem() instanceof String product && levelCombo.getSelectedItem() instanceof String level) {
             productCombo.setToolTipText(ProductInfo.getOrDefault(product, "PUNCH data product"));
             coverageLabel.setText("Checking archive coverage...");
-            if (levelCombo.getSelectedItem() instanceof String level)
-                PunchClient.submitGetCoverage(this, level, product);
+            PunchClient.submitGetCoverage(latest -> setCoverage(request, latest), level, product);
         } else {
             coverageLabel.setText("Archive: no products for this level");
         }
     }
 
-    @Override
-    public void setPunchResponseCoverage(long latestDayMilli) {
+    private void setCoverage(int request, long latestDayMilli) {
+        if (request != coverageRequest)
+            return;
         if (latestDayMilli == 0) {
             coverageLabel.setText("Archive: no data for this product");
             return;

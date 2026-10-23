@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 
 import javax.swing.BorderFactory;
 import javax.swing.JToggleButton;
@@ -18,17 +17,9 @@ public final class CollapsiblePaneButton extends JToggleButton {
 
     private static final Color bright = brighter(UIGlobals.backColor, 0.85);
     private static final Color dark = darker(UIGlobals.backColor, 0.9);
-    private static final int THICKNESS_HORZ = 14;
-    private static final int THICKNESS_VERT = 12;
-
-    private final boolean vertical;
+    private static final int THICKNESS = 14;
 
     public CollapsiblePaneButton() {
-        this(SwingConstants.HORIZONTAL);
-    }
-
-    public CollapsiblePaneButton(int orientation) {
-        vertical = orientation == SwingConstants.VERTICAL;
         setBorder(BorderFactory.createEmptyBorder());
         setContentAreaFilled(false);
         setFocusPainted(false);
@@ -39,11 +30,7 @@ public final class CollapsiblePaneButton extends JToggleButton {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        if (vertical) {
-            size.width = THICKNESS_VERT;
-        } else {
-            size.height = THICKNESS_HORZ;
-        }
+        size.height = THICKNESS;
         return size;
     }
 
@@ -76,21 +63,13 @@ public final class CollapsiblePaneButton extends JToggleButton {
         Graphics2D g = (Graphics2D) g1.create();
         int w = getWidth();
         int h = getHeight();
-        Point p0 = new Point(0, 0);
-        Point ph = vertical ? new Point(w, 0) : new Point(0, h);
-        int half = vertical ? w / 2 : h / 2;
-
-        if (isSelected()) {
-            g.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g.fillRect(0, 0, vertical ? half : w, vertical ? h : half);
-            g.setPaint(new GradientPaint(p0, dark, ph, bright));
-            g.fillRect(vertical ? half : 0, vertical ? 0 : half, vertical ? half : w, vertical ? h : half);
-        } else {
-            g.setPaint(new GradientPaint(p0, dark, ph, bright));
-            g.fillRect(0, 0, vertical ? half : w, vertical ? h : half);
-            g.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g.fillRect(vertical ? half : 0, vertical ? 0 : half, vertical ? half : w, vertical ? h : half);
-        }
+        int half = h / 2;
+        Color top = isSelected() ? bright : dark;
+        Color bottom = isSelected() ? dark : bright;
+        g.setPaint(new GradientPaint(0, 0, top, 0, h, bottom));
+        g.fillRect(0, 0, w, half);
+        g.setPaint(new GradientPaint(0, 0, bottom, 0, h, top));
+        g.fillRect(0, half, w, half);
         g.dispose();
 
         super.paintComponent(g1);

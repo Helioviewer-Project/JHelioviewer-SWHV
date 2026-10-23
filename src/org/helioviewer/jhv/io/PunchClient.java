@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,29 +37,17 @@ public final class PunchClient {
         }
     }
 
-    public interface ReceiverItems {
-        void setPunchResponseItems(List<DataItem> list);
+    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
+        Task.submitBackground("punch", new QueryItems(level, product, start, end, cadence), onResult, "Error listing the PUNCH archive");
     }
 
-    public interface ReceiverProducts {
-        void setPunchResponseProducts(List<String> list);
+    public static void submitGetProducts(@Nonnull Consumer<List<String>> onResult, @Nonnull String level) {
+        Task.submitBackground("punch", new QueryProducts(level), onResult, "Error listing the PUNCH archive");
     }
 
-    public interface ReceiverCoverage {
-        // Latest day with data, in UTC epoch ms; 0 if the archive has nothing for this product
-        void setPunchResponseCoverage(long latestDayMilli);
-    }
-
-    public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
-        Task.submitBackground("punch", new QueryItems(level, product, start, end, cadence), receiver::setPunchResponseItems, "Error listing the PUNCH archive");
-    }
-
-    public static void submitGetProducts(@Nonnull ReceiverProducts receiver, @Nonnull String level) {
-        Task.submitBackground("punch", new QueryProducts(level), receiver::setPunchResponseProducts, "Error listing the PUNCH archive");
-    }
-
-    public static void submitGetCoverage(@Nonnull ReceiverCoverage receiver, @Nonnull String level, @Nonnull String product) {
-        Task.submitBackground("punch", new QueryCoverage(level, product), receiver::setPunchResponseCoverage, "Error listing the PUNCH archive");
+    // Latest day with data, in UTC epoch ms; 0 if the archive has nothing for this product.
+    public static void submitGetCoverage(@Nonnull LongConsumer onResult, @Nonnull String level, @Nonnull String product) {
+        Task.submitBackground("punch", new QueryCoverage(level, product), onResult::accept, "Error listing the PUNCH archive");
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {

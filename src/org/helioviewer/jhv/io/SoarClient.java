@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
@@ -31,20 +32,20 @@ public final class SoarClient {
         }
     }
 
-    private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        Task.submitBackground("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
+    private static void doDataSearch(@Nonnull Consumer<List<DataItem>> onResult, String adql) {
+        Task.submitBackground("soar", new QueryItems(adql), onResult, "Error getting the data");
     }
 
-    public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
-        doDataSearch(receiver, adqlSearchTime(descriptors, level, start, end));
+    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        doDataSearch(onResult, adqlSearchTime(descriptors, level, start, end));
     }
 
-    public static void submitSearchSoop(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
-        doDataSearch(receiver, adqlSearchSoop(descriptors, level, soop));
+    public static void submitSearchSoop(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
+        doDataSearch(onResult, adqlSearchSoop(descriptors, level, soop));
     }
 
-    public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        Task.submitBackground("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
+    public static void submitGetSoops(@Nonnull Consumer<List<String>> onResult) {
+        Task.submitBackground("soar", new QuerySoops(querySoops), onResult,
                 "An error occurred querying the server");
     }
 
@@ -115,14 +116,6 @@ public final class SoarClient {
             result.add(item.getString(0));
         }
         return result;
-    }
-
-    public interface ReceiverItems {
-        void setSoarResponseItems(List<DataItem> list);
-    }
-
-    public interface ReceiverSoops {
-        void setSoarResponseSoops(List<String> list);
     }
 
     private static JSONObject query(String adql) throws Exception {
