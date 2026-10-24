@@ -32,7 +32,9 @@ public final class ImageGeometry {
                 new Mat2(pixelSize, 0, 0, -pixelSize), new Vec2(.5 * width, .5 * height));
     }
 
-    // Convert FITS centers and upward Y once, into buffer edge coordinates.
+    // Pixel centers: FITS = integers starting at 1, OpenGL = half-integers starting at 0.5.
+    // JHV buffers have their origin at the upper-left edge, with Y following buffer rows.
+    // Convert FITS centers and upward Y once: x = CRPIX1 - 0.5, y = height - (CRPIX2 - 0.5).
     public ImageGeometry(int width, int height, WcsSolution _wcs, boolean pixelsAlreadyRotated) {
         Mat2 transform = _wcs.pixelToPlane;
         if (pixelsAlreadyRotated)
