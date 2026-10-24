@@ -79,7 +79,7 @@ claim that a suite validates every behavior in those files.
 | `annotation/`, `display/ProjectedView`, `layers/ConnectionLayer` | `opengl`: [AnnotationRenderingTest](opengl/AnnotationRenderingTest.java) | Actual cross/loop and connectivity rendering checks finite-distance occlusion, tangent points, hidden strip breaks, seams and whole-surface Latitudinal behavior against independent geometry. |
 | `opengl/text/SdfTextRenderer`, `opengl/GLText` | `opengl`: [SdfTextRenderingTest](opengl/SdfTextRenderingTest.java), [GridRenderingTest](opengl/GridRenderingTest.java) | All atlas glyph pairs: widths and both draw paths against JSON advances/kerning; spaces, missing-glyph fallback and supplementary code points; framebuffer equality with independently positioned glyphs. Grid checks exercise production labels across all modes and display scales. |
 | `opengl/model/`, `layers/ModelLayer`, model detection in `io/DataUri` | `model`: [ModelDataUriTest](model/ModelDataUriTest.java), [AssimpMetaDataTest](model/AssimpMetaDataTest.java), [AssimpModelLoaderTest](model/AssimpModelLoaderTest.java); `opengl`: [ModelRenderingTest](opengl/ModelRenderingTest.java) | Loader/metadata assertions do not replace rendered-output checks. |
-| `timelines/band/`, `timelines/TimelineLayers`, `time/RequestCache`, `timelines/draw/`, `timelines/chart/` | `timelines`: [HapiCatalogTest](timelines/HapiCatalogTest.java) and [TimelineDataTest](timelines/TimelineDataTest.java), including request reuse, coverage, band restoration, data export/import and chart painting | Verify mouse interaction, chart show/hide/re-attach behavior, display scales and recorded chart output for relevant UI changes. Use the explicit benchmarks below for performance claims. |
+| `timelines/band/`, `timelines/TimelineLayers`, `time/RequestCache`, `timelines/draw/`, `timelines/chart/` | `timelines`: [HapiCatalogTest](timelines/HapiCatalogTest.java) and [TimelineDataTest](timelines/TimelineDataTest.java), including request reuse, coverage, band restoration, data export/import, chart painting, and independent line-equation and crop-invariance checks at integer/fractional scales and translations, including multicolor transitions and extreme-zoom coordinate limits | Verify mouse interaction, chart show/hide/re-attach behavior, display scales and recorded chart output for relevant UI changes. The opt-in [rendering benchmark](timelines/run_rendering_benchmark.py) checks the rendered cache, device resolution, stroke width and exact placement, multicolor runs and gaps, and resize, and measures pan/zoom and movie export. Use the explicit benchmarks below for performance claims. |
 | `event/`, `plugins/swek/`, repository-root `resources/settings/SWEK.json` | `event`: [runner](event/run_event_tests.py) executes HEK parsing, database, cache, filter-request, integration and SWEK layer tests | Live HEK availability is a separate probe. Interactive event selection and overlay appearance need GUI verification when affected. |
 | `astronomy/Stars`, `astronomy/Spice`, `astronomy/PositionResponse`, `astronomy/PositionLoad`, `layers/ViewpointLayer` Location mode, repository-root `resources/data/stars.bin` | `astronomy`: [PositionResponseTest](astronomy/PositionResponseTest.java) checks position/state interpolation, playback mapping, spherical conventions and JSON units; [SpiceTest](astronomy/SpiceTest.java) checks `Spice.milli2et` against `deltet` hourly 1960-2060 and around every leap second; [StarsTest](astronomy/StarsTest.java) checks the catalogue, `Stars.apparent` against `jauApcs` + `jauAtciq` and local state ranges against `spkezr`; [LocationProjectionTest](astronomy/LocationProjectionTest.java) checks `projectLocation` against eqs. (3), (6) of Skokić on Carrington LT+S directions, occultation, and the solar pole constant against the `SOLO_IAU_SUN_2009` frame | Local fixtures and SPICE only; live position-server requests are not exercised. Drawing, hover and the Planets/Stars checkboxes need GUI verification. Regenerate the catalogue with `extra/stars/update_stars.py`. |
 | `movie/`, `app/Commands`, `app/state/`, `io/samp/`, Swing controls | `commands`: [CommandStateTest](commands/CommandStateTest.java) checks state/SAMP parsing, warnings, partial updates, configured export formats and fallback, and recording start/refusal; `opengl` checks capture/readback and export view-state restoration; `timelines` checks band serialization/restoration and chart painting | These are partial checks. The listed suites do not provide an end-to-end SAMP, whole-session restoration or encoded-movie regression. Exercise the changed command/state/recording flow, including completion/failure and output. |
@@ -155,6 +155,7 @@ python3 extra/test/j2k/run_j2k_tests.py --live
 python3 extra/test/event/check_hek_server.py
 python3 extra/test/timelines/run_timelines_tests.py --benchmark
 python3 extra/test/timelines/run_timelines_tests.py --hapi-benchmark /path/to/capture
+python3 extra/test/timelines/run_rendering_benchmark.py --output /path/to/new-run --scale 2
 ```
 
 The [JPIP guide](j2k/README.md) describes the ROB retrieval, movie, disk-cache,
@@ -172,6 +173,30 @@ python3 extra/test/timelines/run_timelines_tests.py \
 Capture into a new directory outside the repository. Replay writes plot images
 there. Benchmarks report elapsed time and allocations, not CPU time or
 whole-application memory usage.
+
+The timeline raster regressions define aliased band traces on the nearest device-pixel
+grid. They evaluate the line equation with rational arithmetic, accept either
+nearest pixel at an exact halfway tie, and check endpoints, joins, colors and gaps.
+Clipped output must equal the full trace masked by the viewport at pixel centers.
+
+The headful timeline rendering benchmark requires a desktop and an accelerated
+Java2D graphics configuration. It exercises the production chart cache with
+five-layer synthetic reduced, full-resolution, and multicolor line workloads,
+overlay and stacked layouts, and pan/zoom interval sequences. Graph preparation
+runs synchronously for deterministic timing. An accelerated offscreen destination
+and a final readback include completed GPU work without window-manager timing.
+These measurements are not interactive frame rates or live HAPI workloads.
+
+Run each device scale in a separate JVM with `--scale 1` or `--scale 2`.
+`--workload` selects one fixture. Each output directory must be new and contains
+logs, frames, an isolated JHV home, source snapshots, and the exact Java command.
+
+Export capture measurements include the frame-source callback and native image
+copy, with both reused and redrawn chart caches. At 2x, the runner also writes
+60-frame timeline-only movies through the production export writer and bundled
+FFmpeg, reporting capture, scaling/raw-file writing, and final encoding separately.
+They exclude the application's playback scheduling, encoder queue, and main-canvas
+capture. `--ffmpeg` can override the bundled encoder path.
 
 ## Maintaining tests
 

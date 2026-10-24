@@ -1,10 +1,13 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
@@ -90,6 +93,8 @@ public final class TimelineDataTest {
         checkHapiTimes();
         checkHapiRequests();
         checkChartPainting();
+        checkBandEdgeClipping();
+        checkBandDeviceCoordinateLimits();
         System.out.println("Timeline data tests passed");
         int captureIndex = Arrays.asList(args).indexOf("--hapi-benchmark");
         if (captureIndex >= 0) {
@@ -132,6 +137,210 @@ public final class TimelineDataTest {
         Method draw = chart.getClass().getDeclaredMethod("drawChart", Graphics2D.class, GraphGeometry.class, TimeAxis.class);
         draw.setAccessible(true);
         return draw;
+    }
+
+    private static void checkBandEdgeClipping() throws Exception {
+        Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+        build.setAccessible(true);
+        Field graph = Band.class.getDeclaredField("graphData");
+        graph.setAccessible(true);
+        Rectangle clip = new Rectangle(2, 2, 12, 12);
+        Rectangle fullClip = new Rectangle(-8, -8, 40, 40);
+        int[][][] fixtures = {
+                {{13, 8, 14, 12}}, {{3, 8, 1, 12}}, {{8, 3, 12, 1}}, {{8, 13, 12, 14}},
+                {{11, 1, 13, 7}}, {{8, 7, 1, 3}},
+                {{13, 8, 14, 12, 13, 4}}, {{3, 8, 1, 12, 3, 4}},
+                {{8, 3, 12, 1, 8, 12}}, {{8, 13, 12, 14, 8, 4}},
+                {{-4, 8, 20, 8}}, {{8, -4, 8, 20}}, {{-4, -4, 20, 20}}, {{-4, 20, 20, -4}},
+                {{3, 4, 11, 8, 3, 4}}, {{8, 8, 8, 8}}, {{3, 4, 11, 8}}, {{11, 8, 3, 4}},
+                {{3, 6, 6, 6}, {10, 6, 13, 6}}
+        };
+        List<int[][]> cases = new ArrayList<>(Arrays.asList(fixtures));
+        Random random = new Random(713481);
+        for (int i = 0; i < 32; i++) {
+            int[][] paths = new int[i % 3 == 0 ? 2 : 1][];
+            for (int j = 0; j < paths.length; j++) {
+                paths[j] = new int[i % 2 == 0 ? 4 : 6];
+                for (int k = 0; k < paths[j].length; k++)
+                    paths[j][k] = random.nextInt(25) - 4;
+            }
+            cases.add(paths);
+        }
+        YAxis.Mapper yMapper = new YAxis(0, 16, YAxis.generateScale("linear", "")).mapper(0, 16);
+        for (boolean multicolor : new boolean[]{false, true}) {
+            JSONObject type = new JSONObject().put("name", "raster geometry").put("range", new JSONArray(List.of(0, 16)));
+            if (multicolor) {
+                type.put("levels", new JSONArray()
+                        .put(new JSONObject().put("range", new JSONArray(List.of(0, 8))).put("color", "#ff0000"))
+                        .put(new JSONObject().put("range", new JSONArray(List.of(8, 16))).put("color", "#00ff00")));
+            }
+            Band band = new Band(new BandType(type));
+            band.setDataColor(Color.YELLOW);
+            try {
+                for (int[][] paths : cases) {
+                    List<List<BandCache.DateValue>> samples = new ArrayList<>();
+                    for (int[] points : paths) {
+                        List<BandCache.DateValue> path = new ArrayList<>();
+                        for (int i = 0; i < points.length; i += 2)
+                            path.add(new BandCache.DateValue(points[i], 16 - points[i + 1]));
+                        samples.add(path);
+                    }
+                    graph.set(band, build.invoke(null, samples, new TimeAxis.Mapper(0, 16, 0, 16),
+                            yMapper, LongUnaryOperator.identity(), multicolor));
+                    for (double scale : new double[]{1, 1.25, 1.5, 1.75, 2, 2.5, 3}) {
+                        for (double translation : new double[]{0, .25, 1}) {
+                            String context = Arrays.deepToString(paths) + ", scale=" + scale
+                                    + ", translation=" + translation + ", multicolor=" + multicolor;
+                            BufferedImage full = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+                            BufferedImage cropped = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+                            for (boolean clipped : new boolean[]{false, true}) {
+                                Graphics2D graphics = (clipped ? cropped : full).createGraphics();
+                                try {
+                                    graphics.translate(32, 32);
+                                    graphics.scale(scale, scale);
+                                    graphics.translate(translation, translation);
+                                    graphics.setClip(clipped ? clip : fullClip);
+                                    graphics.setStroke(new BasicStroke(3));
+                                    Stroke stroke = graphics.getStroke();
+                                    AffineTransform transform = graphics.getTransform();
+                                    Rectangle clipBounds = graphics.getClipBounds();
+                                    band.draw(graphics, clip, false);
+                                    check(graphics.getTransform().equals(transform), "Band painting changes the transform");
+                                    check(graphics.getStroke().equals(stroke), "Band painting changes the stroke");
+                                    check(graphics.getClipBounds().equals(clipBounds), "Band painting changes the clip");
+                                } finally {
+                                    graphics.dispose();
+                                }
+                            }
+                            checkBandRasterGeometry(full, paths, multicolor, scale, translation, context);
+                            // A viewport masks an already rasterized line. It must not change the line's slope or phase.
+                            // Rectangle membership is sampled at pixel centers, with an exclusive upper boundary.
+                            double minX = 32 + scale * (clip.x + translation);
+                            double minY = 32 + scale * (clip.y + translation);
+                            double maxX = minX + scale * clip.width;
+                            double maxY = minY + scale * clip.height;
+                            for (int y = 0; y < 128; y++) {
+                                for (int x = 0; x < 128; x++) {
+                                    boolean inside = x + .5 >= minX && x + .5 < maxX && y + .5 >= minY && y + .5 < maxY;
+                                    int expected = inside ? full.getRGB(x, y) : Color.BLACK.getRGB();
+                                    if (cropped.getRGB(x, y) != expected)
+                                        check(false, "Clipping changes the raster at " + x + "," + y + ": " + context);
+                                }
+                            }
+                        }
+                    }
+                }
+            } finally {
+                band.remove();
+            }
+        }
+    }
+
+    private static void checkBandRasterGeometry(BufferedImage image, int[][] paths, boolean multicolor,
+                                                double scale, double translation, String context) {
+        int[] allowedColors = new int[128 * 128];
+        List<int[]> samples = new ArrayList<>();
+        for (int[] points : paths) {
+            for (int i = 2; i < points.length; i += 2) {
+                // Grid-normalized, aliased, one-device-pixel traces include both endpoints.
+                int x0 = (int) Math.floor(32 + scale * (points[i - 2] + translation) + .5);
+                int y0 = (int) Math.floor(32 + scale * (points[i - 1] + translation) + .5);
+                int x1 = (int) Math.floor(32 + scale * (points[i] + translation) + .5);
+                int y1 = (int) Math.floor(32 + scale * (points[i + 1] + translation) + .5);
+                int value = 16 - points[i - 1];
+                int color = !multicolor ? 1 : value >= 0 && value <= 8 ? 2 : value >= 8 && value <= 16 ? 4 : 1;
+                boolean xMajor = Math.abs(x1 - x0) >= Math.abs(y1 - y0);
+                int start = xMajor ? x0 : y0, end = xMajor ? x1 : y1;
+                int minorStart = xMajor ? y0 : x0, minorEnd = xMajor ? y1 : x1;
+                if (start > end) {
+                    int swap = start; start = end; end = swap;
+                    swap = minorStart; minorStart = minorEnd; minorEnd = swap;
+                }
+                // Evaluate the line equation directly at every major-axis lattice coordinate.
+                // Rational arithmetic distinguishes exact half-pixel ties without floating-point tolerances.
+                long denominator = Math.max(1, end - start);
+                for (int major = start; major <= end; major++) {
+                    long numerator = (long) minorStart * denominator + (long) (major - start) * (minorEnd - minorStart);
+                    int lower = (int) Math.floorDiv(numerator, denominator);
+                    long remainder = Math.floorMod(numerator, denominator);
+                    int first = 2 * remainder < denominator ? lower : lower + 1;
+                    int second = 2 * remainder == denominator ? lower : first;
+                    int a = xMajor ? first * 128 + major : major * 128 + first;
+                    int b = xMajor ? second * 128 + major : major * 128 + second;
+                    if (a == b) {
+                        allowedColors[a] = color;
+                    } else {
+                        // Either equidistant pixel is valid. A later segment may own a shared vertex or crossing.
+                        allowedColors[a] |= color;
+                        allowedColors[b] |= color;
+                    }
+                    samples.add(new int[]{a, b});
+                }
+            }
+        }
+        int[] pixels = image.getRGB(0, 0, 128, 128, null, 0, 128);
+        for (int i = 0; i < pixels.length; i++) {
+            int rgb = pixels[i];
+            int color = rgb == Color.YELLOW.getRGB() ? 1 : rgb == Color.RED.getRGB() ? 2 : rgb == Color.GREEN.getRGB() ? 4 : 0;
+            if (rgb != Color.BLACK.getRGB() && (color & allowedColors[i]) == 0)
+                check(false, "Pixel outside the analytic line or wrong color at " + i % 128 + "," + i / 128 + ": " + context);
+        }
+        for (int[] sample : samples) {
+            boolean first = pixels[sample[0]] != Color.BLACK.getRGB();
+            boolean second = pixels[sample[1]] != Color.BLACK.getRGB();
+            check(first || second, "Missing analytic line sample: " + context);
+            if (paths.length == 1 && paths[0].length == 4 && sample[0] != sample[1])
+                check(first != second, "Two pixels at a one-pixel line's exact halfway tie: " + context);
+        }
+    }
+
+    private static void checkBandDeviceCoordinateLimits() throws Exception {
+        Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+        build.setAccessible(true);
+        Field graph = Band.class.getDeclaredField("graphData");
+        graph.setAccessible(true);
+        YAxis.Mapper mapper = new YAxis(100 - 1e-9, 100 + 1e-9, YAxis.generateScale("linear", "")).mapper(2, 12);
+        Rectangle clip = new Rectangle(2, 2, 12, 12);
+        for (boolean multicolor : new boolean[]{false, true}) {
+            JSONObject type = new JSONObject().put("name", "coordinate limits").put("range", new JSONArray(List.of(0, 200)));
+            if (multicolor)
+                type.put("levels", new JSONArray().put(new JSONObject()
+                        .put("range", new JSONArray(List.of(0, 200))).put("color", "#ffff00")));
+            Band band = new Band(new BandType(type));
+            band.setDataColor(Color.YELLOW);
+            try {
+                for (float value : new float[]{0, 200}) {
+                    List<BandCache.DateValue> samples = List.of(new BandCache.DateValue(3, 100), new BandCache.DateValue(13, value));
+                    graph.set(band, build.invoke(null, List.of(samples), new TimeAxis.Mapper(0, 16, 0, 16),
+                            mapper, LongUnaryOperator.identity(), multicolor));
+                    for (int scale : new int[]{1, 2, 3}) {
+                        BufferedImage image = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+                        Graphics2D graphics = image.createGraphics();
+                        try {
+                            graphics.scale(scale, scale);
+                            graphics.setClip(clip);
+                            band.draw(graphics, clip, false);
+                        } finally {
+                            graphics.dispose();
+                        }
+                        // The far endpoint exceeds int range. Within this viewport, the nearest samples stay in one column.
+                        int first = value < 100 ? 8 * scale : 2 * scale;
+                        int last = value < 100 ? 14 * scale - 1 : 8 * scale;
+                        for (int y = 0; y < 64; y++) {
+                            for (int x = 0; x < 64; x++) {
+                                int expected = x == 3 * scale && y >= first && y <= last ? Color.YELLOW.getRGB() : Color.BLACK.getRGB();
+                                check(image.getRGB(x, y) == expected,
+                                        "Device coordinate wraps at scale " + scale + ", value=" + value + ", multicolor=" + multicolor);
+                            }
+                        }
+                    }
+                }
+            } finally {
+                band.remove();
+            }
+        }
     }
 
     private static void checkChartPainting() throws Exception {

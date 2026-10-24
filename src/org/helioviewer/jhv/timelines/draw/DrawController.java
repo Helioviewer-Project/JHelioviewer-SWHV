@@ -311,7 +311,7 @@ public final class DrawController {
     private static boolean toDraw;
     private static boolean drawMovieLine;
     // Coalesces draw requests while the graph pane is showing.
-    private static final UiTimer drawTimer = new UiTimer(1000 / 10, DrawController::flushDrawRequests);
+    private static final UiTimer drawTimer = new UiTimer(50, DrawController::flushDrawRequests);
 
     private static void flushDrawRequests() {
         if (toDraw) {

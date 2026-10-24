@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +47,7 @@ public final class Band extends TimelineLayer {
     private record BarGraph(List<Bar> bars) implements GraphData {}
 
     private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
+    private static final BasicStroke LINE_STROKE = new BasicStroke(1);
     private static final Colors.Data bandColors = new Colors.Data();
     private static final int GRAPH_THREADS = Math.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 8);
     private static final ExecutorService graphPool = AppThread.createIdleExecutor("Timeline-Graph", GRAPH_THREADS);
@@ -244,19 +244,7 @@ public final class Band extends TimelineLayer {
                     g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
                 }
             }
-            case LineGraph lines -> {
-                Stroke stroke = g.getStroke();
-                AffineTransform transform = g.getTransform();
-                double scale = Math.max(transform.getScaleX(), transform.getScaleY());
-                g.setStroke(new BasicStroke((float) (1 / scale)));
-                if (multicolor) {
-                    drawMulticolorPolylines(g, lines.polylines);
-                } else {
-                    g.setColor(graphColor);
-                    lines.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.xPoints.length));
-                }
-                g.setStroke(stroke);
-            }
+            case LineGraph lines -> drawPolylines(g, lines.polylines);
         }
 
         if (drawWarnings) {
@@ -270,33 +258,68 @@ public final class Band extends TimelineLayer {
         }
     }
 
-    private void drawMulticolorPolylines(Graphics2D g, List<Polyline> polylines) {
-        Path2D.Float path = new Path2D.Float();
-        for (Polyline line : polylines) {
-            int[] xp = line.xPoints;
-            int[] yp = line.yPoints;
-            float[] vals = line.values;
-            Color pathColor = null;
-            for (int i = 0; i < xp.length - 1; i++) {
-                Color segmentColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
-                if (segmentColor == null)
-                    segmentColor = graphColor;
-                if (!segmentColor.equals(pathColor)) {
+    private void drawPolylines(Graphics2D g, List<Polyline> polylines) {
+        AffineTransform transform = g.getTransform();
+        Stroke stroke = g.getStroke();
+        try {
+            g.setStroke(LINE_STROKE);
+            // Unit-scale translations already use the integer-polyline rasterizer.
+            if (!multicolor && transform.getType() <= AffineTransform.TYPE_TRANSLATION) {
+                g.setColor(graphColor);
+                for (Polyline line : polylines)
+                    g.drawPolyline(line.xPoints, line.yPoints, line.xPoints.length);
+                return;
+            }
+            // Chart drawing uses axis-aligned device scaling.
+            g.setTransform(new AffineTransform());
+            // The existing device clip survives the transform change.
+            for (Polyline line : polylines) {
+                int size = line.xPoints.length;
+                if (multicolor) {
+                    Color pathColor = null;
+                    int start = 0;
+                    for (int i = 0; i < size - 1; i++) {
+                        Color segmentColor = line.values != null ? bandType.getLevelColor(line.values[i]) : null;
+                        if (segmentColor == null)
+                            segmentColor = graphColor;
+                        if (!segmentColor.equals(pathColor)) {
+                            if (pathColor != null) {
+                                g.setColor(pathColor);
+                                drawDevicePolyline(g, line, start, i + 1, transform);
+                            }
+                            start = i;
+                            pathColor = segmentColor;
+                        }
+                    }
                     if (pathColor != null) {
                         g.setColor(pathColor);
-                        g.draw(path);
+                        drawDevicePolyline(g, line, start, size, transform);
                     }
-                    path.reset();
-                    path.moveTo(xp[i], yp[i]);
-                    pathColor = segmentColor;
+                } else {
+                    g.setColor(graphColor);
+                    drawDevicePolyline(g, line, 0, size, transform);
                 }
-                path.lineTo(xp[i + 1], yp[i + 1]);
             }
-            if (pathColor != null) {
-                g.setColor(pathColor);
-                g.draw(path);
-            }
+        } finally {
+            g.setTransform(transform);
+            g.setStroke(stroke);
         }
+    }
+
+    private static void drawDevicePolyline(Graphics2D g, Polyline line, int start, int end,
+                                          AffineTransform transform) {
+        int count = end - start;
+        int[] xp = new int[count];
+        int[] yp = new int[count];
+        double sx = transform.getScaleX(), sy = transform.getScaleY();
+        double tx = transform.getTranslateX(), ty = transform.getTranslateY();
+        for (int i = 0; i < count; i++) {
+            // Narrow from double so extreme offscreen coordinates saturate instead of wrapping.
+            xp[i] = (int) Math.floor(sx * line.xPoints[start + i] + tx + .5);
+            yp[i] = (int) Math.floor(sy * line.yPoints[start + i] + ty + .5);
+        }
+        // Keep one rasterizer across the clip boundary so clipping only masks pixels.
+        g.drawPolyline(xp, yp, count);
     }
 
     private void updateGraph() {
