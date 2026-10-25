@@ -114,8 +114,8 @@ public:
                 return;
             }
         }
-        // The decoding thread waits for its workers; the client allows at most four.
-        int threads = static_cast<int>(std::min(4u, std::thread::hardware_concurrency()));
+        // The decoding thread waits for its workers; the client allows at most eight.
+        int threads = static_cast<int>(std::min(8u, std::thread::hardware_concurrency()));
         held = hvc_decoder_create(threads);
         if (!held) held = hvc_decoder_create(0);
         if (!held) throw std::bad_alloc();
@@ -231,7 +231,10 @@ const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, co
     }
     char error[256];
     hvc_image image;
-    if (hvc_openjpeg_decode_region(decoder.get(), data, size, reduce, &render, area, &image, error, sizeof error))
+    // OpenJPEG decodes a whole level faster without a decode area.
+    bool whole = region.width == level.width && region.height == level.height;
+    if (whole ? hvc_openjpeg_decode_context(decoder.get(), data, size, reduce, &render, &image, error, sizeof error)
+              : hvc_openjpeg_decode_region(decoder.get(), data, size, reduce, &render, area, &image, error, sizeof error))
         throw std::runtime_error(error);
     if (image.width != static_cast<uint32_t>(region.width) || image.height != static_cast<uint32_t>(region.height) ||
         image.components != (bytes == 1 ? 1 : 3))
