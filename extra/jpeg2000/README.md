@@ -1,8 +1,16 @@
 # Preparing JPEG 2000 native libraries
 
 The `jhvj2k` bridge builds the static esajpip client and JPEG 2000 reader as
-part of the same CMake project. It requires a Kakadu SDK and compatible Kakadu
-libraries, supplied separately. OpenJPEG, GLib, llhttp and zlib are not required.
+part of the same CMake project. `JHV_J2K_DECODER` selects its decoder: `kdu`, the
+default, requires a Kakadu SDK and compatible Kakadu libraries, supplied separately;
+`openjpeg` uses the OpenJPEG copy in the esajpip client and needs no Kakadu files.
+GLib, llhttp and zlib are not required.
+
+Both decoders serve the same C interface. The OpenJPEG bridge keeps a decoder
+workspace for each concurrent decode, with up to four worker threads, and reuses
+it for later decodes. It does not drop coding passes below display precision, as
+Kakadu's quality limiter does, so reduced resolutions can differ from Kakadu's by
+a few gray levels. It reads coding parameters from the main header only.
 
 Use CMake 3.20 or later and a C11/C++11 compiler. From the JHV root, build
 against supplied libraries:
@@ -31,6 +39,12 @@ JHV's bundled Kakadu library:
 
 ```sh
 KDU_VENDOR=/path/to/kakadu-sdk bash native/jpeg2000/build.sh
+```
+
+or with OpenJPEG:
+
+```sh
+JHV_J2K_DECODER=openjpeg bash native/jpeg2000/build.sh
 ```
 
 It writes the extracted Kakadu library and built bridge to `tmp/j2k-native`.

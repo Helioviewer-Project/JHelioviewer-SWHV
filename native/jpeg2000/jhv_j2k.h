@@ -1,5 +1,5 @@
 /* JHV's JPEG 2000 engine: the esajpip C client reads local files and JPIP data,
- * Kakadu decodes. Lengths are bytes. Errors are text in a 256-byte buffer;
+ * Kakadu or OpenJPEG decodes. Lengths are bytes. Errors are text in a 256-byte buffer;
  * negative results or NULL mean failure. No exception crosses this boundary.
  * The host serializes calls on one source, including close and begin_decode.
  * A decode job retains its source and may run while the source is used or closed. */
@@ -47,7 +47,7 @@ JHV_J2K_API int64_t jhv_j2k_export(jhv_j2k *source, int frame, uint8_t *out, uin
 JHV_J2K_API int jhv_j2k_import(jhv_j2k *source, int frame, const uint8_t *entry, uint64_t size, char *error);
 /* Fails unless the level (0 finest) is ready. Decode writes Gray8 or RGBA rows
  * of a region of that level and returns the byte count; on success error holds
- * any Kakadu warning. Run and end a job on one thread. */
+ * any decoder warning. Run and end a job on one thread. */
 JHV_J2K_API jhv_j2k_job *jhv_j2k_begin_decode(jhv_j2k *source, int frame, int level, char *error);
 JHV_J2K_API int64_t jhv_j2k_decode(jhv_j2k_job *job, int x, int y, int width, int height,
                                 uint8_t *out, uint64_t capacity, char *error);

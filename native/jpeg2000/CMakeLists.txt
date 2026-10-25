@@ -2,39 +2,53 @@ cmake_minimum_required(VERSION 3.20)
 project(jhvj2k LANGUAGES C CXX)
 
 set(ESAJPIP "" CACHE PATH "esajpip source directory")
+set(JHV_J2K_DECODER kdu CACHE STRING "JPEG 2000 decoder: kdu or openjpeg")
+set_property(CACHE JHV_J2K_DECODER PROPERTY STRINGS kdu openjpeg)
 set(KDU_VENDOR "" CACHE PATH "Kakadu SDK directory")
 set(KDU_LIBRARY "" CACHE FILEPATH "JHV's Kakadu shared library or import library")
 set(KDU_CORE_LIBRARY "" CACHE FILEPATH "Kakadu core DLL or import library, for Windows")
 
-# Build the core client with the bridge's toolchain; OpenJPEG is not used.
+# Build the client with the bridge's toolchain. The OpenJPEG decoder is part
+# of the extended client, esajpip_client_wasm.
 option(ESAJPIP_CLIENT_ONLY "Build the client without the server or tests" ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory("${ESAJPIP}" client EXCLUDE_FROM_ALL)
 
-add_library(jhvj2k SHARED jhv_j2k.cc jhv_kdu_geometry.cc jhv_kdu_decode.cc)
+if(JHV_J2K_DECODER STREQUAL "kdu")
+    set(client esajpip_client)
+    add_library(jhvj2k SHARED jhv_j2k.cc jhv_kdu.cc jhv_kdu_geometry.cc jhv_kdu_decode.cc)
+    target_include_directories(jhvj2k SYSTEM PRIVATE
+        "${KDU_VENDOR}/coresys/common" "${KDU_VENDOR}/apps/support" "${KDU_VENDOR}/apps/compressed_io")
+    target_link_libraries(jhvj2k PRIVATE "${KDU_LIBRARY}")
+elseif(JHV_J2K_DECODER STREQUAL "openjpeg")
+    set(client esajpip_client_wasm)
+    add_library(jhvj2k SHARED jhv_j2k.cc jhv_opj.cc)
+else()
+    message(FATAL_ERROR "JHV_J2K_DECODER must be kdu or openjpeg")
+endif()
+target_link_libraries(jhvj2k PRIVATE ${client})
 set_target_properties(jhvj2k PROPERTIES
     CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 # Match the client's LTO settings at the final link (including older GCC).
 foreach(config RELEASE RELWITHDEBINFO MINSIZEREL)
-    get_target_property(client_ipo esajpip_client INTERPROCEDURAL_OPTIMIZATION_${config})
+    get_target_property(client_ipo ${client} INTERPROCEDURAL_OPTIMIZATION_${config})
     if(client_ipo)
         set_property(TARGET jhvj2k PROPERTY INTERPROCEDURAL_OPTIMIZATION_${config} ON)
     endif()
 endforeach()
-target_include_directories(jhvj2k SYSTEM PRIVATE
-    "${KDU_VENDOR}/coresys/common" "${KDU_VENDOR}/apps/support" "${KDU_VENDOR}/apps/compressed_io")
-target_link_libraries(jhvj2k PRIVATE esajpip_client "${KDU_LIBRARY}")
 if(WIN32)
     if(NOT MINGW)
-        message(FATAL_ERROR "JHV's Windows Kakadu libraries require the MinGW toolchain")
+        message(FATAL_ERROR "JHV's Windows JPEG 2000 bridge requires the MinGW toolchain")
     endif()
-    if(NOT EXISTS "${KDU_CORE_LIBRARY}")
-        message(FATAL_ERROR "KDU_CORE_LIBRARY must name the Windows Kakadu core library")
+    if(JHV_J2K_DECODER STREQUAL "kdu")
+        if(NOT EXISTS "${KDU_CORE_LIBRARY}")
+            message(FATAL_ERROR "KDU_CORE_LIBRARY must name the Windows Kakadu core library")
+        endif()
+        # v7's auxiliary headers mark inline definitions dllimport with KDU_AUX_IMPORTS.
+        # MinGW can link their external functions through import thunks without it.
+        target_compile_definitions(jhvj2k PRIVATE CORESYS_IMPORTS)
+        target_link_libraries(jhvj2k PRIVATE "${KDU_CORE_LIBRARY}")
     endif()
-    # v7's auxiliary headers mark inline definitions dllimport with KDU_AUX_IMPORTS.
-    # MinGW can link their external functions through import thunks without it.
-    target_compile_definitions(jhvj2k PRIVATE CORESYS_IMPORTS)
-    target_link_libraries(jhvj2k PRIVATE "${KDU_CORE_LIBRARY}")
     target_link_options(jhvj2k PRIVATE -static -static-libgcc -static-libstdc++
         -Wl,--no-insert-timestamp,--major-subsystem-version,5,--minor-subsystem-version,2)
 endif()
