@@ -13,6 +13,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -478,6 +479,36 @@ public final class J2KNativeTest {
         System.out.println("JPIP responses: readiness, continuation, pixels at every level, cache entry, refusal");
     }
 
+    private static void resolutionOverrides(Path folder) throws Exception {
+        boolean openjpeg = "jhvj2k_opj".equals(System.getProperty("j2k.bridge"));
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(folder, "resolutions-*.jp2")) {
+            for (Path path : paths) {
+                int expectedLevels = Integer.parseInt(path.getFileName().toString().split("-")[1]);
+                // OPJ checks a lower tile COD before later COC, and every component.
+                if (openjpeg
+                        && path.getFileName().toString().endsWith("coc-over-cod.jp2"))
+                    expectedLevels = 3;
+                if (expectedLevels == 0) {
+                    if (!openjpeg) continue;
+                    try (J2KNative source = new J2KNative(path)) {
+                        source.frame(0);
+                        throw new AssertionError("invalid tile header accepted: " + path);
+                    } catch (IOException expectedFailure) { /* Expected. */ }
+                    continue;
+                }
+                try (J2KNative source = new J2KNative(path)) {
+                    check(source.frame(0).levels().length == expectedLevels, "tile/component resolution count: " + path);
+                    for (int level = 0; level < expectedLevels; level++) {
+                        byte[] decoded = pixels(source, 0, level);
+                        for (byte value : decoded)
+                            check(value == 0, "tile/component pixels: " + path + " level " + level);
+                    }
+                }
+                local(path);
+            }
+        }
+    }
+
     // Arguments: Kakadu library, bridge library, folder made by run_native_test.sh, its image, then JP2/JPX files.
     public static void main(String[] args) throws Exception {
         // Check a prebuilt set without building the server or generating responses.
@@ -493,6 +524,7 @@ public final class J2KNativeTest {
             }
             responseProgress();
             palettes(Path.of(args[2]));
+            resolutionOverrides(Path.of(args[2]));
             headerFallback(Path.of(args[2]), Path.of(args[3]));
             for (int i = 3; i < args.length; i++)
                 local(Path.of(args[i]));

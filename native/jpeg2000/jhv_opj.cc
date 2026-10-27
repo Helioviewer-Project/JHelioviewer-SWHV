@@ -1,6 +1,8 @@
 #include "jhv_j2k_decoder.h"
 #include "hvc_openjpeg.h"
+#include "decoder_header.h"
 #include "openjpeg.h"
+#include "jpeg2000/hv_codes.h"
 #include <algorithm>
 #include <climits>
 #include <mutex>
@@ -50,15 +52,99 @@ static void keep_error(const char *text, void *user) {
     while (!error.empty() && error.back() == '\n') error.pop_back();
 }
 
+static void read_header_bytes(decoder_input &input, size_t at, size_t end, uint8_t *bytes, size_t size) {
+    if (at > end || size > end - at)
+        throw std::runtime_error("truncated JPEG 2000 tile header");
+    while (size) {
+        size_t count = input.read(at, bytes, size);
+        if (!count) throw std::runtime_error("truncated JPEG 2000 tile header");
+        at += count;
+        bytes += count;
+        size -= count;
+    }
+}
+
+static unsigned header_word(const uint8_t *bytes) {
+    return (static_cast<unsigned>(bytes[0]) << 8) | bytes[1];
+}
+
+static unsigned header_marker(decoder_input &input, size_t at, size_t end, size_t &next) {
+    uint8_t bytes[2];
+    read_header_bytes(input, at, end, bytes, 2);
+    unsigned code = header_word(bytes);
+    next = at + 2;
+    if (code == HV_SOD || code == HV_EOC ||
+        (code >= HV_NO_SEGMENT_FIRST && code <= HV_NO_SEGMENT_LAST)) return code;
+    read_header_bytes(input, next, end, bytes, 2);
+    unsigned length = header_word(bytes);
+    if (length < 2 || length > end - next)
+        throw std::runtime_error("invalid JPEG 2000 marker length");
+    next += length;
+    return code;
+}
+
+// OpenJPEG checks the reduction while reading every tile COD/COC, before a
+// later override can replace it. Bound it by all such markers, not only the
+// final effective coding. Read only tile-part headers; Psot skips packet data.
+static unsigned local_resolutions(decoder_input &input, unsigned count, unsigned components) {
+    size_t at = 2, next;
+    unsigned code;
+    while ((code = header_marker(input, at, input.size(), next)) != HV_SOT) {
+        if (code == HV_SOD || code == HV_EOC)
+            throw std::runtime_error("missing JPEG 2000 tile header");
+        at = next;
+    }
+    for (;;) {
+        uint8_t sot[8];
+        if (next - at != 12) throw std::runtime_error("invalid JPEG 2000 SOT length");
+        read_header_bytes(input, at + 4, next, sot, sizeof sot);
+        uint32_t length = (static_cast<uint32_t>(header_word(sot + 2)) << 16) | header_word(sot + 4);
+        if (length && ((length < 14 && length != 12) || length > input.size() - at))
+            throw std::runtime_error("invalid JPEG 2000 tile-part length");
+        size_t end = length ? at + length : input.size();
+        at = next;
+        if (length != 12) {
+            while ((code = header_marker(input, at, end, next)) != HV_SOD) {
+                if (code == HV_SOT || code == HV_EOC)
+                    throw std::runtime_error("JPEG 2000 tile header without SOD");
+                if (code == HV_COD) {
+                    uint8_t levels;
+                    if (next - at < 14) throw std::runtime_error("invalid JPEG 2000 COD length");
+                    read_header_bytes(input, at + 9, next, &levels, 1);
+                    if (levels >= OPJ_J2K_MAXRLVLS) throw std::runtime_error("invalid tile resolution count");
+                    count = std::min(count, static_cast<unsigned>(levels) + 1);
+                } else if (code == HV_COC) {
+                    unsigned index_bytes = components <= 256 ? 1 : 2;
+                    uint8_t bytes[4];
+                    if (next - at < 10 + index_bytes) throw std::runtime_error("invalid JPEG 2000 COC length");
+                    read_header_bytes(input, at + 4, next, bytes, index_bytes + 2);
+                    unsigned component = index_bytes == 1 ? bytes[0] : header_word(bytes);
+                    unsigned levels = bytes[index_bytes + 1];
+                    if (component >= components || levels >= OPJ_J2K_MAXRLVLS)
+                        throw std::runtime_error("invalid JPEG 2000 component coding");
+                    count = std::min(count, levels + 1);
+                }
+                at = next;
+            }
+        }
+        if (!length || end == input.size()) return count; // Final part, including OpenJPEG's tolerated EOF.
+        at = end;
+        code = header_marker(input, at, input.size(), next);
+        if (code == HV_EOC) return count;
+        if (code != HV_SOT) throw std::runtime_error("expected JPEG 2000 tile-part header");
+    }
+}
+
 // The main header of a codestream: its image and coding parameters.
 class header {
     opj_input source;
     opj_stream_t *stream = nullptr;
     opj_codec_t *codec = nullptr;
-    opj_codestream_info_v2_t *info = nullptr;
     std::string error;
 public:
     opj_image_t *image = nullptr;
+    unsigned resolution_limit = OPJ_J2K_MAXRLVLS;
+    unsigned layers = 0;
 
     explicit header(decoder_input &input) : source{input, 0} {
         stream = opj_stream_create(1 << 16, OPJ_TRUE);
@@ -75,23 +161,30 @@ public:
         opj_set_error_handler(codec, keep_error, &error);
         opj_dparameters_t parameters;
         opj_set_default_decoder_parameters(&parameters);
-        if (!opj_setup_decoder(codec, &parameters) || !opj_read_header(stream, codec, &image) ||
-            !(info = opj_get_cstr_info(codec))) {
+        if (!opj_setup_decoder(codec, &parameters) || !opj_read_header(stream, codec, &image)) {
             std::string reason = error.empty() ? "cannot read the JPEG 2000 codestream header" : error;
             release();
             throw std::runtime_error(reason);
+        }
+        try {
+            // OpenJPEG's reduction setter checks every main-header component.
+            for (OPJ_UINT32 c = 0; c < image->numcomps; c++) {
+                OPJ_UINT32 resolutions;
+                if (!opj_decoder_get_coding_parameters(codec, c, &resolutions, &layers))
+                    throw std::runtime_error("cannot read JPEG 2000 coding parameters");
+                resolution_limit = std::min(resolution_limit, resolutions);
+            }
+            if (!input.data()) resolution_limit = local_resolutions(input, resolution_limit, image->numcomps);
+        } catch (...) {
+            release();
+            throw;
         }
     }
     ~header() { release(); }
     header(const header &) = delete;
     header &operator=(const header &) = delete;
-    void coding_parameters(OPJ_UINT32 component, OPJ_UINT32 &resolutions, OPJ_UINT32 &layers) const {
-        resolutions = info->m_default_tile_info.tccp_info[component].numresolutions;
-        layers = info->m_default_tile_info.numlayers;
-    }
 private:
     void release() {
-        if (info) opj_destroy_cstr_info(&info);
         opj_image_destroy(image);
         if (codec) opj_destroy_codec(codec);
         if (stream) opj_stream_destroy(stream);
@@ -163,18 +256,15 @@ static const char *read_geometry(const header &h, const hv_render &render, jhv_j
         return "palette indices require one unsigned component of at most 8 bits";
     value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
-    // The main header's coding parameters; tile-part headers are not read.
-    value.resolutions = 33;
+    // Include local tile overrides and the decoder's component-wide limit.
+    value.resolutions = static_cast<int>(h.resolution_limit);
+    value.layers = static_cast<int>(h.layers);
     for (int plane = 0; plane < value.plane_count; plane++) {
         const opj_image_comp_t &component = h.image->comps[components[plane]];
         if (component.dx != 1 || component.dy != 1)
             return "selected output components require resampling";
         if (component.prec < 1 || component.prec > 31)
             return "unsupported decoder sample precision";
-        OPJ_UINT32 resolutions, layers;
-        h.coding_parameters(components[plane], resolutions, layers);
-        value.resolutions = std::min(value.resolutions, static_cast<int>(resolutions));
-        value.layers = static_cast<int>(layers);
     }
     if (value.resolutions > 31)
         return "unsupported decoder sampling range";

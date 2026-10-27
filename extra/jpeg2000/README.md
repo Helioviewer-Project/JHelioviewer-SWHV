@@ -41,7 +41,10 @@ Both decoders serve the same C interface. The OpenJPEG bridge keeps a decoder
 workspace for each concurrent decode, with up to eight worker threads, and reuses
 it for later decodes. It does not drop coding passes below display precision, as
 Kakadu's quality limiter does, so reduced resolutions can differ from Kakadu's by
-a few gray levels. It reads coding parameters from the main header only.
+a few gray levels. Local inspection also checks tile-part COD/COC headers to bound
+the advertised resolutions, skipping packet data. OpenJPEG can expose fewer levels
+than Kakadu when it rejects a reduction before reading a later coding override.
+JPIP reconstruction uses the served profile's main-header parameters.
 
 Use CMake 3.20 or later and a C11/C++11 compiler. From the JHV root, build
 against supplied libraries:
