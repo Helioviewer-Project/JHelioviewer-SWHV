@@ -42,7 +42,8 @@ JHV_J2K_API int jhv_j2k_frame(jhv_j2k *source, int frame, jhv_j2k_frame_info *in
  * indices beyond the palette's entries select its last entry. */
 JHV_J2K_API int64_t jhv_j2k_xml(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
 JHV_J2K_API int jhv_j2k_palette_rgba(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
-/* Disk cache entry of a JPIP frame. A refused import leaves the source unchanged. */
+/* Disk cache entry of a JPIP frame. Validation refusal leaves the source unchanged.
+ * Allocation failure may retain earlier validated bins; retrying is safe. */
 JHV_J2K_API int64_t jhv_j2k_export(jhv_j2k *source, int frame, uint8_t *out, uint64_t capacity, char *error);
 JHV_J2K_API int jhv_j2k_import(jhv_j2k *source, int frame, const uint8_t *entry, uint64_t size, char *error);
 /* Fails unless the level (0 finest) is ready. Decode writes Gray8 or RGBA rows

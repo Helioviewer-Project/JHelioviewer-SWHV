@@ -208,7 +208,7 @@ class J2KReader implements Runnable {
             return false;
         try {
             client.importFrame(frame, entry.block());
-        } catch (IOException e) { // refused: the source is unchanged
+        } catch (IOException e) { // Allocation failure may retain valid bins; server replay is safe.
             JPIPCacheManager.remove(key);
             return false;
         }
