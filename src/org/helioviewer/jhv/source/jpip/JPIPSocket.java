@@ -29,7 +29,7 @@ public final class JPIPSocket extends HTTPSocket {
     // Asks for a channel; the first response received opens it.
     public JPIPSocket(URI uri) throws IOException {
         super(uri);
-        jpipPath = uri.getPath();
+        jpipPath = URI.create(uri.toASCIIString()).getRawPath();
         try {
             writeRequest(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0")); // deliberately short
         } catch (IOException e) {

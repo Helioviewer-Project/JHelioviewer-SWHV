@@ -48,6 +48,7 @@ public final class JPIPSocketTest {
             return;
         }
         ProxySettings.init();
+        testEncodedPath();
         testResponse("content-length: 3\r\n\r\n", true);
         testResponse("Content-Length: -1\r\n\r\n", false);
         testResponse("Content-Length: 3\r\n", false);
@@ -62,7 +63,7 @@ public final class JPIPSocketTest {
         testClose(true);
         for (boolean refused : new boolean[]{false, true})
             testProxyFailover(refused);
-        System.out.println("PASS: channel opening, plain/gzip/deflate chunked bodies in request order, buffer growth, graceful close, abort and cancelled handshake");
+        System.out.println("PASS: encoded request paths, channel opening, plain/gzip/deflate chunked bodies in request order, buffer growth, graceful close, abort and cancelled handshake");
     }
 
     private static void testProxyFailover(boolean refused) throws Exception {
@@ -333,6 +334,20 @@ public final class JPIPSocketTest {
             });
             client.run(URI.create("jpip://127.0.0.1:" + listener.getLocalPort() + "/test"), workers, served);
             return served.get(5, TimeUnit.SECONDS);
+        }
+    }
+
+    private static void testEncodedPath() throws Exception {
+        for (String[] path : new String[][]{
+                {"/a%20b%23%3F%25%2F.jp2", "/a%20b%23%3F%25%2F.jp2"},
+                {"/café.jp2", "/caf%C3%A9.jp2"}}) {
+            String request = (String) exchange((connection, input) -> readRequest(input), (uri, workers, served) -> {
+                JPIPSocket client = new JPIPSocket(uri.resolve(path[0]));
+                client.abort();
+            });
+            String expected = "GET " + path[1] + "?cnew=http&type=jpp-stream&tid=0&len=512 HTTP/1.1";
+            if (!expected.equals(request))
+                throw new AssertionError("Encoded request path changed: " + request);
         }
     }
 
