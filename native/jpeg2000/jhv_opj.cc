@@ -2,7 +2,7 @@
 #include "hvc_openjpeg.h"
 #include "decoder_header.h"
 #include "openjpeg.h"
-#include "jpeg2000/hv_codes.h"
+#include "jpeg2000/hv_reader.h"
 #include <algorithm>
 #include <climits>
 #include <mutex>
@@ -69,18 +69,14 @@ static unsigned header_word(const uint8_t *bytes) {
 }
 
 static unsigned header_marker(decoder_input &input, size_t at, size_t end, size_t &next) {
-    uint8_t bytes[2];
-    read_header_bytes(input, at, end, bytes, 2);
-    unsigned code = header_word(bytes);
-    next = at + 2;
-    if (code == HV_SOD || code == HV_EOC ||
-        (code >= HV_NO_SEGMENT_FIRST && code <= HV_NO_SEGMENT_LAST)) return code;
-    read_header_bytes(input, next, end, bytes, 2);
-    unsigned length = header_word(bytes);
-    if (length < 2 || length > end - next)
-        throw std::runtime_error("invalid JPEG 2000 marker length");
-    next += length;
-    return code;
+    if (at > end) throw std::runtime_error("truncated JPEG 2000 tile header");
+    uint8_t bytes[4];
+    read_header_bytes(input, at, end, bytes, std::min<size_t>(sizeof bytes, end - at));
+    hv_marker marker;
+    if (const char *error = hv_marker_read(bytes, 0, end - at, &marker))
+        throw std::runtime_error(error);
+    next = at + marker.end;
+    return marker.code;
 }
 
 // OpenJPEG checks the reduction while reading every tile COD/COC, before a
