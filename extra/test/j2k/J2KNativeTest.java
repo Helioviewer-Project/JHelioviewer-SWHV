@@ -219,8 +219,11 @@ public final class J2KNativeTest {
                 try { job.run(0, 0, width, height, small); throw new AssertionError("small buffer accepted"); }
                 catch (IOException expected) { check(small.position() == 0, "failed output position"); }
                 ByteBuffer output = ByteBuffer.allocateDirect(width * height * info.channels());
-                try { job.run(-1, 0, width, height, output); throw new AssertionError("invalid region accepted"); }
-                catch (IOException expected) { /* Expected. */ }
+                for (int[] region : new int[][]{{-1, 0, width, height}, {0, -1, width, height},
+                        {0, 0, 0, height}, {0, 0, width, 0}, {width, 0, 1, 1}, {0, height, 1, 1}}) {
+                    try { job.run(region[0], region[1], region[2], region[3], output); throw new AssertionError("invalid region accepted"); }
+                    catch (IOException expected) { check(output.position() == 0, "invalid region changed output position"); }
+                }
                 job.run(0, 0, width, height, output);
                 check(output.equals(ByteBuffer.wrap(pixels(source, 0, level))), "job retry after failures");
             }

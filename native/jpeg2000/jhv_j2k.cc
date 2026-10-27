@@ -49,7 +49,7 @@ int jhv_j2k_source::inspect(hvc *, size_t frame, void *context,
                             hvc_info *info, char *error, size_t error_size) noexcept {
     return guarded(error, -1, [&] {
         const description &result = static_cast<jhv_j2k_source *>(context)->describe(frame);
-        info->components = result.geometry.plane_count;
+        info->components = result.geometry.coded_components;
         info->resolutions = result.geometry.resolutions;
         info->layers = result.geometry.layers;
         for (int r = 0; r < info->resolutions; r++) {
@@ -155,10 +155,21 @@ int64_t jhv_j2k_decode(jhv_j2k_job *job, int x, int y, int width, int height,
     int64_t size = guarded<int64_t>(error, -1, [&] {
         jhv_j2k_level region = {x, y, width, height};
         const jhv_j2k_source::description &description = job->description;
+        const jhv_j2k_geometry &geometry = description.geometry;
+        if (job->level < 0 || job->level >= geometry.resolutions)
+            throw std::runtime_error("JPEG 2000 reduction out of range");
+        const jhv_j2k_level &level = geometry.level[job->level];
+        if (x < 0 || y < 0 || width <= 0 || height <= 0 ||
+            static_cast<int64_t>(x) + width > level.width ||
+            static_cast<int64_t>(y) + height > level.height)
+            throw std::runtime_error("JPEG 2000 region out of range");
+        uint64_t required = static_cast<uint64_t>(width) * height * (geometry.channels == 1 ? 1 : 4);
+        if (!out || required > capacity || required > INT64_MAX)
+            throw std::runtime_error("JPEG 2000 output buffer too small");
         const char *reason = jhv_decoder_decode(job->input, description.render, description.geometry,
                                                 job->level, region, out, capacity);
         if (reason) throw std::runtime_error(reason);
-        return int64_t(width) * height * (description.geometry.channels == 1 ? 1 : 4);
+        return static_cast<int64_t>(required);
     });
     if (size >= 0) jhv_decoder_warnings(error);
     return size;

@@ -229,28 +229,13 @@ void jhv_decoder_init() {}
 
 static const char *read_geometry(const header &h, const hv_render &render, jhv_j2k_geometry &out) {
     jhv_j2k_geometry value = jhv_j2k_geometry();
-    // Original decoder output indices, in decode order.
-    OPJ_UINT32 components[3] = {};
-    for (size_t c = 0; c < render.channel_count; c++) {
-        OPJ_UINT32 component = static_cast<OPJ_UINT32>(render.channel[c].component);
-        if (component >= h.image->numcomps) return "selected component does not exist";
-        int plane = 0;
-        while (plane < value.plane_count && components[plane] != component)
-            plane++;
-        if (plane == value.plane_count)
-            components[value.plane_count++] = component;
-    }
-    // The host applies a palette: its channels share one decoded index plane.
+    int components[3] = {};
+    if (const char *reason = jhv_decoder_layout(render, h.image->numcomps, components, value))
+        return reason;
     bool indexed = render.channel[0].palette_column >= 0;
-    for (size_t c = 1; c < render.channel_count; c++)
-        if ((render.channel[c].palette_column >= 0) != indexed)
-            return "unsupported mix of palette and direct channels";
-    if (indexed && value.plane_count != 1)
-        return "unsupported palette on several components";
     const opj_image_comp_t &first = h.image->comps[components[0]];
     if (indexed && (first.sgnd || first.prec > 8))
         return "palette indices require one unsigned component of at most 8 bits";
-    value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
     // Include local tile overrides and the decoder's component-wide limit.
     value.resolutions = static_cast<int>(h.resolution_limit);
@@ -284,20 +269,13 @@ void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
         [&](const hv_render &selected, jhv_j2k_geometry &geometry) {
             return read_geometry(h, selected, geometry);
         }, render, out);
+    out.coded_components = static_cast<int>(h.image->numcomps);
 }
 
 const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, const jhv_j2k_geometry &geometry,
                                int reduce, const jhv_j2k_level &region, uint8_t *output, size_t capacity) {
-    if (reduce < 0 || reduce >= geometry.resolutions)
-        return "JPEG 2000 reduction out of range";
     const jhv_j2k_level &level = geometry.level[reduce], &full = geometry.level[0];
-    if (region.x < 0 || region.y < 0 || region.width <= 0 || region.height <= 0 ||
-        static_cast<int64_t>(region.x) + region.width > level.width ||
-        static_cast<int64_t>(region.y) + region.height > level.height)
-        return "JPEG 2000 region out of range";
     size_t bytes = geometry.channels == 1 ? 1 : 4;
-    uint64_t required = static_cast<uint64_t>(region.width) * region.height * bytes;
-    if (!output || required > capacity) return "JPEG 2000 output buffer too small";
 
     // The full-resolution area whose reduction is the region, relative to the image.
     uint64_t x0 = static_cast<uint64_t>(level.x) + region.x, x1 = x0 + region.width;

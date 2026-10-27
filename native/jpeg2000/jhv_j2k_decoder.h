@@ -9,6 +9,7 @@ struct jhv_j2k_level {
 };
 
 struct jhv_j2k_geometry {
+    int coded_components;      // SIZ count before transforms/channel selection
     int plane_count;
     int channels;               // decoded output: 1 gray or palette indices, 3 color
     int resolutions, layers;
@@ -48,6 +49,26 @@ void jhv_decoder_init();
 void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
                           hv_render &render, jhv_j2k_geometry &out);
 
+// Shared display layout; sampling, precision and geometry stay in each backend.
+inline const char *jhv_decoder_layout(const hv_render &render, size_t output_components,
+                                      int components[3], jhv_j2k_geometry &value) {
+    bool indexed = render.channel[0].palette_column >= 0;
+    for (size_t c = 0; c < render.channel_count; c++) {
+        if ((render.channel[c].palette_column >= 0) != indexed)
+            return "unsupported mix of palette and direct channels";
+        if (render.channel[c].component >= output_components)
+            return "selected component does not exist";
+        int component = static_cast<int>(render.channel[c].component);
+        int plane = 0;
+        while (plane < value.plane_count && components[plane] != component) plane++;
+        if (plane == value.plane_count) components[value.plane_count++] = component;
+    }
+    if (indexed && value.plane_count != 1)
+        return "unsupported palette on several components";
+    value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
+    return NULL;
+}
+
 // Shared selection policy for either backend's already-open header.
 // read_geometry returns NULL, or a rendering limitation with out unchanged.
 // It must support retrying with the first component on the same header.
@@ -69,7 +90,8 @@ template<class F> void jhv_decoder_select(hvc *client, size_t frame, size_t comp
 }
 // Gray8 rows for grayscale and palette indices, RGBA rows with opaque alpha
 // for sRGB, of a nonempty region of level reduce relative to its top-left
-// pixel. Returns NULL, or why the output is incomplete.
+// pixel. The common native boundary validates reduction, region and capacity
+// before calling. Returns NULL, or why the output is incomplete.
 const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, const jhv_j2k_geometry &geometry,
                                int reduce, const jhv_j2k_level &region, uint8_t *output, size_t capacity);
 // Append pending decoder warnings to a 256-byte text.

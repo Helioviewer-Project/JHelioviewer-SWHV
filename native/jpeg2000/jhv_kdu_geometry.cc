@@ -5,26 +5,12 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
                                   const hv_render &render, jhv_j2k_geometry &out) {
     using namespace kdu_core;
     jhv_j2k_geometry value = jhv_j2k_geometry();
-    // Original decoder output indices, in decode order.
     int components[3] = {};
-    for (size_t c = 0; c < render.channel_count; c++) {
-        int component = static_cast<int>(render.channel[c].component);
-        int plane = 0;
-        while (plane < value.plane_count && components[plane] != component)
-            plane++;
-        if (plane == value.plane_count)
-            components[value.plane_count++] = component;
-    }
-    // The host applies a palette: its channels share one decoded index plane.
+    if (const char *reason = jhv_decoder_layout(render, static_cast<size_t>(stream.get_num_components(true)), components, value))
+        return reason;
     bool indexed = render.channel[0].palette_column >= 0;
-    for (size_t c = 1; c < render.channel_count; c++)
-        if ((render.channel[c].palette_column >= 0) != indexed)
-            return "unsupported mix of palette and direct channels";
-    if (indexed && value.plane_count != 1)
-        return "unsupported palette on several components";
     if (indexed && (stream.get_signed(components[0], true) || stream.get_bit_depth(components[0], true) > 8))
         return "palette indices require one unsigned component of at most 8 bits";
-    value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
     stream.apply_input_restrictions(value.plane_count, components, 0, 0,
                                     NULL, KDU_WANT_OUTPUT_COMPONENTS);

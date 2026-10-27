@@ -74,18 +74,20 @@ void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
     with_stream(input, [&](kdu_codestream &stream) {
         // Geometry can retry with the first component after creating tiles.
         stream.set_persistent();
+        int coded_components = stream.get_num_components(false);
         jhv_decoder_select(client, frame, static_cast<size_t>(stream.get_num_components(true)),
             [&](const hv_render &selected, jhv_j2k_geometry &geometry) {
                 return jhv_kdu_read_geometry(stream, selected, geometry);
             }, render, out);
+        out.coded_components = coded_components;
         return 0;
     });
 }
 
 const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, const jhv_j2k_geometry &geometry,
-                               int reduce, const jhv_j2k_level &region, uint8_t *output, size_t capacity) {
+                               int reduce, const jhv_j2k_level &region, uint8_t *output, size_t) {
     return with_stream(input, [&](kdu_codestream &stream) {
-        return jhv_kdu_decode(stream, render, geometry, reduce, region, output, capacity);
+        return jhv_kdu_decode(stream, render, geometry, reduce, region, output);
     });
 }
 
