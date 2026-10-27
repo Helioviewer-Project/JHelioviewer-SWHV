@@ -13,6 +13,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,8 +41,18 @@ import kdu_jni.Kdu_region_compositor;
 // as the pixel reference: the compositor, driven as JHV's former decoder drove it.
 public final class J2KNativeTest {
 
+    // Largest per-byte difference from Kakadu's compositor: 0 for a Kakadu bridge.
+    private static final int TOLERANCE = Integer.getInteger("j2k.tolerance", 0);
+
     private static void check(boolean ok, String message) {
         if (!ok) throw new AssertionError(message);
+    }
+
+    private static boolean near(byte[] actual, byte[] expected) {
+        if (actual.length != expected.length) return false;
+        for (int i = 0; i < actual.length; i++)
+            if (Math.abs((actual[i] & 0xff) - (expected[i] & 0xff)) > TOLERANCE) return false;
+        return true;
     }
 
     private static ByteBuffer body(Path file) throws IOException {
@@ -153,7 +164,7 @@ public final class J2KNativeTest {
                 String where = path + " frame " + frame + " level " + level;
                 check(info.levels()[level].width() == expected.width() && info.levels()[level].height() == expected.height(),
                         "geometry differs from Kakadu's compositor: " + where);
-                check(Arrays.equals(pixels(source, frame, level), expected.pixels()),
+                check(near(pixels(source, frame, level), expected.pixels()),
                         "pixels differ from Kakadu's compositor: " + where);
             }
         }
@@ -364,6 +375,36 @@ public final class J2KNativeTest {
         }
     }
 
+    // Retry geometry on the same parsed header when color needs resampling.
+    // Only the header is inspected: packets still describe the original RGB grids.
+    private static void headerFallback(Path folder, Path rgb) throws Exception {
+        byte[] bytes = Files.readAllBytes(rgb);
+        int at = 0;
+        while (at + 49 < bytes.length && !(bytes[at] == (byte) 0xff && bytes[at + 1] == 0x4f
+                && bytes[at + 2] == (byte) 0xff && bytes[at + 3] == 0x51)) at++;
+        check(at + 49 < bytes.length && bytes[at + 40] == 0 && bytes[at + 41] == 3, "RGB SIZ marker");
+        bytes[at + 46] = 2; // Component 1 now needs horizontal resampling.
+        Path fallback = folder.resolve("header-fallback.jp2");
+        Files.write(fallback, bytes);
+        try (J2KNative original = new J2KNative(rgb); J2KNative source = new J2KNative(fallback)) {
+            J2KNative.Frame expected = original.frame(0), actual = source.frame(0);
+            check(actual.channels() == 1 && Arrays.equals(actual.levels(), expected.levels()),
+                    "color geometry did not fall back to the first component");
+            check(Arrays.equals(source.frame(0).levels(), actual.levels()), "cached fallback geometry changed");
+        }
+        bytes[at + 43] = 2; // The first component cannot be shown either.
+        Path refused = folder.resolve("header-resampling.jp2");
+        Files.write(refused, bytes);
+        try (J2KNative source = new J2KNative(refused)) {
+            for (int repeat = 0; repeat < 2; repeat++) {
+                try { source.frame(0); throw new AssertionError("subsampled first component described"); }
+                catch (IOException expected) {
+                    check(expected.getMessage().contains("require resampling"), "fallback lost its rendering error");
+                }
+            }
+        }
+    }
+
     // A color description the client does not support, and a codestream Kakadu refuses.
     private static void unsupported(Path folder) throws Exception {
         Path sycc = folder.resolve("sycc.jp2");
@@ -445,13 +486,14 @@ public final class J2KNativeTest {
             if (System.getProperty("os.name").startsWith("Windows"))
                 System.load(libraries.resolve("kdu_v7AR.dll").toString());
             System.load(libraries.resolve(System.mapLibraryName("kdu_jni")).toString());
-            System.load(libraries.resolve(System.mapLibraryName("jhvj2k")).toString());
+            System.load(libraries.resolve(System.mapLibraryName(System.getProperty("j2k.bridge", "jhvj2k_kdu"))).toString());
             if (args[0].equals("--responses")) {
                 responseParsing();
                 return;
             }
             responseProgress();
             palettes(Path.of(args[2]));
+            headerFallback(Path.of(args[2]), Path.of(args[3]));
             for (int i = 3; i < args.length; i++)
                 local(Path.of(args[i]));
             failures(Path.of(args[3]));
@@ -466,6 +508,7 @@ public final class J2KNativeTest {
             local(Path.of(args[i]));
         failures(image);
         unsupported(folder);
+        headerFallback(folder, Path.of(args[3]));
         remote(folder, Path.of(args[3]));
     }
 

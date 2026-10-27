@@ -69,15 +69,16 @@ void jhv_decoder_init() {
     kdu_customize_warnings(&warnings());
 }
 
-size_t jhv_decoder_components(decoder_input &input) {
-    return with_stream(input, [](kdu_codestream &stream) {
-        return static_cast<size_t>(stream.get_num_components(true));
-    });
-}
-
-const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, jhv_j2k_geometry &out) {
-    return with_stream(input, [&](kdu_codestream &stream) {
-        return jhv_kdu_read_geometry(stream, render, out);
+void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
+                          hv_render &render, jhv_j2k_geometry &out) {
+    with_stream(input, [&](kdu_codestream &stream) {
+        // Geometry can retry with the first component after creating tiles.
+        stream.set_persistent();
+        jhv_decoder_select(client, frame, static_cast<size_t>(stream.get_num_components(true)),
+            [&](const hv_render &selected, jhv_j2k_geometry &geometry) {
+                return jhv_kdu_read_geometry(stream, selected, geometry);
+            }, render, out);
+        return 0;
     });
 }
 

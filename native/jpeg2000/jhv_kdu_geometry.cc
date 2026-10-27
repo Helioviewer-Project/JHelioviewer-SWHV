@@ -26,7 +26,6 @@ const char *jhv_kdu_read_geometry(kdu_core::kdu_codestream &stream,
         return "palette indices require one unsigned component of at most 8 bits";
     value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
-    stream.set_persistent();
     stream.apply_input_restrictions(value.plane_count, components, 0, 0,
                                     NULL, KDU_WANT_OUTPUT_COMPONENTS);
     kdu_dims tiles;

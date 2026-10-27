@@ -1,0 +1,103 @@
+name: Build OpenJPEG native bridges
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Platform to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - macos-arm64
+          - macos-x64
+          - linux-x64
+          - windows-x64
+      jhv_commit:
+        description: Full JHelioviewer-SWHV commit SHA
+        required: true
+        type: string
+      esajpip_commit:
+        description: Full esajpip commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(inputs.target == 'all' && '["macos-arm64","macos-x64","linux-x64","windows-x64"]' || format('["{0}"]', inputs.target)) }}
+    runs-on: ${{ fromJSON('{"macos-arm64":"macos-15","macos-x64":"macos-15-intel","linux-x64":"ubuntu-24.04","windows-x64":"windows-2022"}')[matrix.target] }}
+    timeout-minutes: 45
+    env:
+      ESAJPIP_SOURCE: ${{ github.workspace }}/esajpip
+      OUTPUT_DIR: ${{ github.workspace }}/build/openjpeg-natives
+      TARGET: ${{ matrix.target }}
+    steps:
+      - name: Require immutable source revisions
+        shell: bash
+        env:
+          JHV_COMMIT: ${{ inputs.jhv_commit }}
+          ESAJPIP_COMMIT: ${{ inputs.esajpip_commit }}
+        run: |
+          [[ "$JHV_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]
+          [[ "$ESAJPIP_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.jhv_commit }}
+          path: jhv
+      - uses: actions/checkout@v6
+        with:
+          repository: Helioviewer-Project/esajpip
+          ref: ${{ inputs.esajpip_commit }}
+          path: esajpip
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Build macOS or Windows bridge
+        if: matrix.target != 'linux-x64'
+        shell: bash
+        run: python jhv/extra/jpeg2000/build_openjpeg.py "$TARGET" --esajpip "$ESAJPIP_SOURCE" --output "$OUTPUT_DIR"
+      - name: Build Linux bridge with glibc 2.17
+        if: matrix.target == 'linux-x64'
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE/jhv:/jhv:ro" \
+            -v "$ESAJPIP_SOURCE:/esajpip:ro" \
+            -v "$OUTPUT_DIR:/output" \
+            quay.io/pypa/manylinux2014_x86_64@sha256:296069bc05d85275248f168f6e3b34ba8aa06181b67e40cd7447c64d56d3a851 \
+            /opt/python/cp313-cp313/bin/python3 /jhv/extra/jpeg2000/build_openjpeg.py linux-x64 --esajpip /esajpip --output /output
+      - name: Check FFM loading and decoded pixels
+        shell: bash
+        run: |
+          case "$TARGET" in
+            macos-arm64) reference=macos-arm64; names=(libkdu_jni.dylib) ;;
+            macos-x64) reference=macos-amd64; names=(libkdu_jni.dylib) ;;
+            linux-x64) reference=linux-amd64; names=(libkdu_jni.so) ;;
+            windows-x64) reference=windows-amd64; names=(kdu_v7AR.dll kdu_jni.dll) ;;
+          esac
+          for name in "${names[@]}"; do
+            cp "jhv/lib/jhv/$reference/$name" "$OUTPUT_DIR/$TARGET/"
+          done
+          python jhv/extra/test/j2k/check_native_build.py "$OUTPUT_DIR/$TARGET" \
+            --esajpip "$ESAJPIP_SOURCE" --decoder openjpeg --tolerance 8
+          for name in "${names[@]}"; do
+            rm "$OUTPUT_DIR/$TARGET/$name"
+          done
+      - uses: actions/upload-artifact@v6
+        with:
+          name: jhv-openjpeg-${{ matrix.target }}
+          path: build/openjpeg-natives/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 7

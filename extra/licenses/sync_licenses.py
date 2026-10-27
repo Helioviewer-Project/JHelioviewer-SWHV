@@ -68,6 +68,8 @@ ADDITIONAL_NOTICES = {
 NATIVE_NOTICES = {
     "jhvwcs": ("WCSLIB.txt",),
     "jhvj2k": ("esajpip.txt",),
+    "jhvj2k_kdu": ("esajpip.txt",),
+    "jhvj2k_opj": ("esajpip.txt", "OpenJPEG-Notices.txt"),
     "EGL": ("ANGLE.txt",),
     "GLESv2": ("ANGLE.txt",),
     "JNISpice": ("SPICE.txt",),

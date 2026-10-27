@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage matched KDU/bridge libraries without replacing installed files."""
+"""Stage KDU and/or OpenJPEG bridges without replacing installed files."""
 
 import argparse
 import hashlib
@@ -8,20 +8,27 @@ import re
 
 
 PLATFORMS = {
-    "macos-arm64": ("macos-arm64", ("libkdu_jni.dylib", "libjhvj2k.dylib")),
-    "macos-x64": ("macos-amd64", ("libkdu_jni.dylib", "libjhvj2k.dylib")),
-    "linux-x64": ("linux-amd64", ("libkdu_jni.so", "libjhvj2k.so")),
-    "windows-x64": ("windows-amd64", ("kdu_v7AR.dll", "kdu_jni.dll", "jhvj2k.dll")),
+    "macos-arm64": ("macos-arm64", ("libkdu_jni.dylib", "libjhvj2k_kdu.dylib"), "libjhvj2k_opj.dylib"),
+    "macos-x64": ("macos-amd64", ("libkdu_jni.dylib", "libjhvj2k_kdu.dylib"), "libjhvj2k_opj.dylib"),
+    "linux-x64": ("linux-amd64", ("libkdu_jni.so", "libjhvj2k_kdu.so"), "libjhvj2k_opj.so"),
+    "windows-x64": ("windows-amd64", ("kdu_v7AR.dll", "kdu_jni.dll", "jhvj2k_kdu.dll"), "jhvj2k_opj.dll"),
 }
 
 
 def prepare(root, builds, output, platform):
-    resource, names = PLATFORMS[platform]
+    resource, kdu_names, opj_name = PLATFORMS[platform]
     build = builds / platform
     info = (build / "build-info.txt").read_text(encoding="utf-8-sig")
     hashes = dict((name, digest) for digest, name in
                   re.findall(r"^([0-9a-f]{64})  ([\w.]+)$", info, re.MULTILINE))
     replacements = {}
+    names = []
+    if any(name in hashes for name in kdu_names):
+        names.extend(kdu_names)
+    if opj_name in hashes:
+        names.append(opj_name)
+    if not names:
+        raise ValueError(f"no decoder bridge recorded in {build / 'build-info.txt'}")
     for name in names:
         data = (build / name).read_bytes()
         if hashlib.sha256(data).hexdigest() != hashes.get(name):
@@ -34,7 +41,10 @@ def prepare(root, builds, output, platform):
     candidate.mkdir(parents=True, exist_ok=True)
     for name, data in replacements.items():
         (candidate / name).write_bytes(data)
-    (output / f"{platform}-build-info.txt").write_text(info, encoding="utf-8")
+    backend = "kdu" if kdu_names[-1] in replacements else "openjpeg"
+    if backend == "kdu" and opj_name in replacements:
+        backend = "both"
+    (output / f"{platform}-{backend}-build-info.txt").write_text(info, encoding="utf-8")
     print(f"Prepared {candidate}")
 
 

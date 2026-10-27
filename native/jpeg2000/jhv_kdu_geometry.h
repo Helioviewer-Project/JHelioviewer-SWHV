@@ -4,7 +4,8 @@
 #include "kdu_compressed.h"
 #include "jhv_j2k_decoder.h"
 
-// Inspect a freshly created, seekable codestream, before opening decoder tiles.
+// Inspect a seekable codestream in persistent mode. May be called again with
+// a different selection; the caller sets persistence before creating any tiles.
 // render must describe this codestream's supported grayscale/RGB channels.
 // Palette-mapped channels select the palette's single index component, which
 // decodes like a grayscale plane; the host applies the color table.

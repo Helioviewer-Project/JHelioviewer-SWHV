@@ -17,14 +17,6 @@ private:
     hvc *client = nullptr;
     std::vector<description> descriptions;
 
-    // What JHV shows of a file whose color description is not supported.
-    static void first_component(hv_render &render) {
-        render = hv_render();
-        render.colour_space = 17;
-        render.channel_count = 1;
-        render.channel[0].palette_column = -1;
-    }
-
     static int inspect(hvc *source, size_t frame, void *context,
                        hvc_info *info, char *error, size_t error_size) noexcept;
     const description &describe(size_t frame);

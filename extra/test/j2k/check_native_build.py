@@ -59,6 +59,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("libraries", type=Path, help="directory containing the built native libraries")
     parser.add_argument("--esajpip", type=Path, required=True, help="esajpip source checkout")
+    parser.add_argument("--decoder", choices=("kdu", "openjpeg"), default="kdu",
+                        help="bridge to validate (default: kdu)")
+    parser.add_argument("--tolerance", type=int, default=0,
+                        help="largest per-byte difference from Kakadu's compositor, for an OpenJPEG bridge")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     fixtures = args.esajpip.resolve() / "tests"
@@ -82,7 +86,8 @@ def main():
             str(root / "src/org/helioviewer/jhv/source/J2KNative.java"),
             str(root / "extra/test/j2k/J2KNativeTest.java"),
         ], check=True, timeout=60)
-        java_args = ["--enable-native-access=ALL-UNNAMED", "-cp", classpath + os.pathsep + directory,
+        bridge = "jhvj2k_kdu" if args.decoder == "kdu" else "jhvj2k_opj"
+        java_args = ["--enable-native-access=ALL-UNNAMED", f"-Dj2k.bridge={bridge}", f"-Dj2k.tolerance={args.tolerance}", "-cp", classpath + os.pathsep + directory,
                      "org.helioviewer.jhv.source.J2KNativeTest"]
         subprocess.run(["java", "-Xmx64m", *java_args, "--responses", str(args.libraries.resolve())], check=True, timeout=30)
         subprocess.run([

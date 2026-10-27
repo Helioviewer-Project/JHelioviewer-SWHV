@@ -42,13 +42,31 @@ public:
 // The decoder of this build, Kakadu or OpenJPEG. Failures throw std::exception.
 // jhv_decoder_init runs once before any other call.
 void jhv_decoder_init();
-// The codestream's output component count, after its transforms.
-size_t jhv_decoder_components(decoder_input &input);
-// Geometry of the planes that render selects. render must describe the
-// codestream's supported grayscale/RGB channels; a palette's channels share
-// one unsigned index plane of at most 8 bits. Selected planes must not need
-// resampling. Returns NULL, or a rendering limitation with out unchanged.
-const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, jhv_j2k_geometry &out);
+// Select rendering and geometry using one parsed header. A palette's channels
+// share one unsigned index plane of at most 8 bits. Unsupported color layouts
+// fall back to the first component, as for an unsupported color description.
+void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
+                          hv_render &render, jhv_j2k_geometry &out);
+
+// Shared selection policy for either backend's already-open header.
+// read_geometry returns NULL, or a rendering limitation with out unchanged.
+// It must support retrying with the first component on the same header.
+template<class F> void jhv_decoder_select(hvc *client, size_t frame, size_t components,
+                                         F read_geometry, hv_render &render, jhv_j2k_geometry &out) {
+    auto first_component = [&] {
+        render = hv_render();
+        render.colour_space = 17;
+        render.channel_count = 1;
+        render.channel[0].palette_column = -1;
+    };
+    if (hvc_render_read(client, frame, components, &render)) first_component();
+    const char *reason = read_geometry(render, out);
+    if (reason && render.channel_count > 1 && render.channel[0].palette_column < 0) {
+        first_component();
+        reason = read_geometry(render, out);
+    }
+    if (reason) throw std::runtime_error(reason);
+}
 // Gray8 rows for grayscale and palette indices, RGBA rows with opaque alpha
 // for sRGB, of a nonempty region of level reduce relative to its top-left
 // pixel. Returns NULL, or why the output is incomplete.

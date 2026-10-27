@@ -61,11 +61,18 @@ public final class AppInit {
     }
 
     private static void loadLibs(String resourceDir) throws Exception {
-        if (Platform.isWindows()) {
-            loadLib("kdu_v7AR", resourceDir);
+        String bridge = switch (System.getProperty("jhv.j2k.decoder", "kdu")) {
+            case "kdu" -> "jhvj2k_kdu";
+            case "openjpeg" -> "jhvj2k_opj";
+            default -> throw new IllegalArgumentException("jhv.j2k.decoder must be kdu or openjpeg");
+        };
+        if (bridge.equals("jhvj2k_kdu")) {
+            if (Platform.isWindows()) {
+                loadLib("kdu_v7AR", resourceDir);
+            }
+            loadLib("kdu_jni", resourceDir);
         }
-        loadLib("kdu_jni", resourceDir);
-        loadLib("jhvj2k", resourceDir);
+        loadLib(bridge, resourceDir);
 
         Path ffmpegPath = Path.of(Directories.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {

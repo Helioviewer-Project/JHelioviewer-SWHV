@@ -40,14 +40,7 @@ const jhv_j2k_source::description &jhv_j2k_source::describe(size_t frame) {
     // The coarsest level suffices: every header is kept at any reduction.
     decoder_input input(client, frame, INT_MAX);
     description result = description();
-    if (hvc_render_read(client, frame, jhv_decoder_components(input), &result.render))
-        first_component(result.render);
-    const char *reason = jhv_decoder_geometry(input, result.render, result.geometry);
-    if (reason && result.render.channel_count > 1 && result.render.channel[0].palette_column < 0) {
-        first_component(result.render);
-        reason = jhv_decoder_geometry(input, result.render, result.geometry);
-    }
-    if (reason) throw std::runtime_error(reason);
+    jhv_decoder_describe(input, client, frame, result.render, result.geometry);
     stored = result;
     return stored;
 }

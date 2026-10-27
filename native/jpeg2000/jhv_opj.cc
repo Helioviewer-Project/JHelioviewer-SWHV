@@ -3,7 +3,6 @@
 #include "openjpeg.h"
 #include <algorithm>
 #include <climits>
-#include <cstring>
 #include <mutex>
 #include <new>
 #include <string>
@@ -56,10 +55,10 @@ class header {
     opj_input source;
     opj_stream_t *stream = nullptr;
     opj_codec_t *codec = nullptr;
+    opj_codestream_info_v2_t *info = nullptr;
     std::string error;
 public:
     opj_image_t *image = nullptr;
-    opj_codestream_info_v2_t *info = nullptr;
 
     explicit header(decoder_input &input) : source{input, 0} {
         stream = opj_stream_create(1 << 16, OPJ_TRUE);
@@ -86,6 +85,10 @@ public:
     ~header() { release(); }
     header(const header &) = delete;
     header &operator=(const header &) = delete;
+    void coding_parameters(OPJ_UINT32 component, OPJ_UINT32 &resolutions, OPJ_UINT32 &layers) const {
+        resolutions = info->m_default_tile_info.tccp_info[component].numresolutions;
+        layers = info->m_default_tile_info.numlayers;
+    }
 private:
     void release() {
         if (info) opj_destroy_cstr_info(&info);
@@ -114,7 +117,7 @@ public:
                 return;
             }
         }
-        // The decoding thread waits for its workers; the client allows at most eight.
+        // The decoding thread waits for its workers; limit each decode to eight.
         int threads = static_cast<int>(std::min(8u, std::thread::hardware_concurrency()));
         held = hvc_decoder_create(threads);
         if (!held) held = hvc_decoder_create(0);
@@ -135,13 +138,7 @@ public:
 
 void jhv_decoder_init() {}
 
-size_t jhv_decoder_components(decoder_input &input) {
-    header h(input);
-    return h.image->numcomps;
-}
-
-const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, jhv_j2k_geometry &out) {
-    header h(input);
+static const char *read_geometry(const header &h, const hv_render &render, jhv_j2k_geometry &out) {
     jhv_j2k_geometry value = jhv_j2k_geometry();
     // Original decoder output indices, in decode order.
     OPJ_UINT32 components[3] = {};
@@ -167,7 +164,6 @@ const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, 
     value.channels = indexed ? 1 : static_cast<int>(render.channel_count);
 
     // The main header's coding parameters; tile-part headers are not read.
-    const opj_tile_info_v2_t &tile = h.info->m_default_tile_info;
     value.resolutions = 33;
     for (int plane = 0; plane < value.plane_count; plane++) {
         const opj_image_comp_t &component = h.image->comps[components[plane]];
@@ -175,9 +171,11 @@ const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, 
             return "selected output components require resampling";
         if (component.prec < 1 || component.prec > 31)
             return "unsupported decoder sample precision";
-        value.resolutions = std::min(value.resolutions, static_cast<int>(tile.tccp_info[components[plane]].numresolutions));
+        OPJ_UINT32 resolutions, layers;
+        h.coding_parameters(components[plane], resolutions, layers);
+        value.resolutions = std::min(value.resolutions, static_cast<int>(resolutions));
+        value.layers = static_cast<int>(layers);
     }
-    value.layers = static_cast<int>(tile.numlayers);
     if (value.resolutions > 31)
         return "unsupported decoder sampling range";
     // Unit sampling: every plane covers the image area.
@@ -191,6 +189,15 @@ const char *jhv_decoder_geometry(decoder_input &input, const hv_render &render, 
     }
     out = value;
     return NULL;
+}
+
+void jhv_decoder_describe(decoder_input &input, hvc *client, size_t frame,
+                          hv_render &render, jhv_j2k_geometry &out) {
+    header h(input);
+    jhv_decoder_select(client, frame, h.image->numcomps,
+        [&](const hv_render &selected, jhv_j2k_geometry &geometry) {
+            return read_geometry(h, selected, geometry);
+        }, render, out);
 }
 
 const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, const jhv_j2k_geometry &geometry,
@@ -233,25 +240,13 @@ const char *jhv_decoder_decode(decoder_input &input, const hv_render &render, co
     hvc_image image;
     // OpenJPEG decodes a whole level faster without a decode area.
     bool whole = region.width == level.width && region.height == level.height;
+    hvc_decoder_output(decoder.get(), output, capacity, bytes == 4);
     if (whole ? hvc_openjpeg_decode_context(decoder.get(), data, size, reduce, &render, &image, error, sizeof error)
               : hvc_openjpeg_decode_region(decoder.get(), data, size, reduce, &render, area, &image, error, sizeof error))
         throw std::runtime_error(error);
     if (image.width != static_cast<uint32_t>(region.width) || image.height != static_cast<uint32_t>(region.height) ||
         image.components != (bytes == 1 ? 1 : 3))
         return "JPEG 2000 decode does not match the region";
-    // Pixels are borrowed from the decoder until its next decode.
-    size_t count = static_cast<size_t>(region.width) * region.height;
-    if (bytes == 1) {
-        std::memcpy(output, image.pixels, count);
-    } else {
-        const uint8_t *in = image.pixels;
-        for (size_t i = 0; i < count; i++, in += 3, output += 4) {
-            output[0] = in[0];
-            output[1] = in[1];
-            output[2] = in[2];
-            output[3] = 255;
-        }
-    }
     return NULL;
 }
 

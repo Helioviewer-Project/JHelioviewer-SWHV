@@ -16,19 +16,25 @@ add_subdirectory("${ESAJPIP}" client EXCLUDE_FROM_ALL)
 
 if(JHV_J2K_DECODER STREQUAL "kdu")
     set(client esajpip_client)
+    set(bridge_name jhvj2k_kdu)
     add_library(jhvj2k SHARED jhv_j2k.cc jhv_kdu.cc jhv_kdu_geometry.cc jhv_kdu_decode.cc)
     target_include_directories(jhvj2k SYSTEM PRIVATE
         "${KDU_VENDOR}/coresys/common" "${KDU_VENDOR}/apps/support" "${KDU_VENDOR}/apps/compressed_io")
     target_link_libraries(jhvj2k PRIVATE "${KDU_LIBRARY}")
 elseif(JHV_J2K_DECODER STREQUAL "openjpeg")
     set(client esajpip_client_wasm)
+    set(bridge_name jhvj2k_opj)
     add_library(jhvj2k SHARED jhv_j2k.cc jhv_opj.cc)
 else()
     message(FATAL_ERROR "JHV_J2K_DECODER must be kdu or openjpeg")
 endif()
 target_link_libraries(jhvj2k PRIVATE ${client})
 set_target_properties(jhvj2k PROPERTIES
+    OUTPUT_NAME ${bridge_name}
     CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+if(WIN32)
+    set_target_properties(jhvj2k PROPERTIES PREFIX "")
+endif()
 # Match the client's LTO settings at the final link (including older GCC).
 foreach(config RELEASE RELWITHDEBINFO MINSIZEREL)
     get_target_property(client_ipo ${client} INTERPROCEDURAL_OPTIMIZATION_${config})
