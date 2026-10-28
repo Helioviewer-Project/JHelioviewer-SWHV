@@ -88,14 +88,19 @@ public final class WcsInterpreterTest {
         String scales = "<CDELT1>-2</CDELT1><CDELT2>0.01</CDELT2>";
         String cd = "<CD1_1>-3</CD1_1><CD1_2>0.4</CD1_2><CD2_1>-0.02</CD2_1><CD2_2>0.03</CD2_2>";
         String pc = "<PC1_1>0.8</PC1_1><PC1_2>0.2</PC1_2><PC2_1>-0.3</PC2_1><PC2_2>0.7</PC2_2>";
-        String[] cases = {scales, cd, scales + pc + cd, scales + "<CUNIT2>deg</CUNIT2>"};
+        String sineLatitude = "<CUNIT2>Sine Latitude</CUNIT2>";
+        String[] cases = {scales, cd, scales + pc + cd, scales + "<CUNIT2>deg</CUNIT2>",
+                scales + sineLatitude, cd + sineLatitude, scales + pc + cd + sineLatitude};
         // FITS row scales times PC (or CD directly), with buffer Y reversed.
         // Missing CUNIT2 makes the legacy CEA row a dimensionless radian scale.
         double[][] expected = {
                 {Math.toRadians(-2), 0, 0, -.01},
                 {Math.toRadians(-3), Math.toRadians(-.4), -.02, -.03},
                 {Math.toRadians(-1.6), Math.toRadians(.4), -.003, -.007},
-                {Math.toRadians(-2), 0, 0, Math.toRadians(-.01)}
+                {Math.toRadians(-2), 0, 0, Math.toRadians(-.01)},
+                {Math.toRadians(-2), 0, 0, -.01},
+                {Math.toRadians(-3), Math.toRadians(-.4), -.02, -.03},
+                {Math.toRadians(-1.6), Math.toRadians(.4), -.003, -.007}
         };
         for (int i = 0; i < cases.length; i++) {
             WcsSolution wcs = WcsInterpreter.read(new XMLMetaDataContainer(prefix + cases[i] + "</meta></xml>"), 8, 8, 215);
@@ -104,6 +109,18 @@ public final class WcsInterpreterTest {
                     geometry.pixelToPlane.m10, geometry.pixelToPlane.m11};
             for (int j = 0; j < actual.length; j++)
                 near(actual[j], expected[i][j], 1e-15, "CEA row scale " + i + ":" + j);
+        }
+        // synopMr_small.fits: the 360 rows span sin(latitude) from -1 to 1.
+        String synoptic = "<xml><meta><CTYPE1>CRLN-CEA</CTYPE1><CTYPE2>CRLT-CEA</CTYPE2>" +
+                "<CUNIT1>degree</CUNIT1>" + sineLatitude +
+                "<CRPIX1>362</CRPIX1><CRPIX2>180.5</CRPIX2><CRVAL1>824220</CRVAL1><CRVAL2>0</CRVAL2>" +
+                "<CDELT1>-0.5</CDELT1><CDELT2>0.005555555555555556</CDELT2></meta></xml>";
+        WcsSolution synopticWcs = WcsInterpreter.read(new XMLMetaDataContainer(synoptic), 720, 360, 215);
+        ImageGeometry synopticGeometry = new ImageGeometry(720, 360, synopticWcs, false);
+        for (double row : new double[]{1, 180.5, 360}) {
+            Vec2 plane = synopticGeometry.toPlane(361.5, 360 - (row - .5));
+            double[] world = synopticWcs.planeToWorld(new double[]{plane.x, plane.y});
+            near(world[1], Math.asin((row - 180.5) / 180), 2e-12, "synoptic CEA latitude row " + row);
         }
         // PC takes precedence over CD, so it still requires both CDELT values.
         for (String invalid : new String[]{pc + cd, "<CDELT1>-2</CDELT1>"}) {
