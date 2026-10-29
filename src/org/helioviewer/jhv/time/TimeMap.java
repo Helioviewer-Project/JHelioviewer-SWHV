@@ -1,58 +1,104 @@
 package org.helioviewer.jhv.time;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 
-@SuppressWarnings("serial")
-public class TimeMap<V> extends TreeMap<JHVTime, V> {
+// Populate with put(), then buildIndex() before reading. Do not change entries while using the index.
+public class TimeMap<V> {
 
+    private TreeMap<JHVTime, V> entries;
     private JHVTime[] timeArray;
-    private int maxIdx;
+    private Object[] valueArray;
 
-    public void buildIndex() {
-        if (isEmpty())
-            throw new RuntimeException("Attempt to call buildIndex() on empty TimeMap");
-
-        Set<JHVTime> keySet = navigableKeySet();
-        timeArray = keySet.toArray(JHVTime[]::new);
-        maxIdx = timeArray.length - 1;
+    public TimeMap() {
+        entries = new TreeMap<>();
     }
 
-    @Override
+    // Already ordered input needs no construction tree. Copies the items and builds the index directly.
+    public TimeMap(List<? extends V> _items, Function<? super V, JHVTime> _timeOf) {
+        if (_items.isEmpty())
+            throw new IllegalArgumentException("Empty time map");
+        valueArray = _items.toArray();
+        timeArray = new JHVTime[valueArray.length];
+        for (int i = 0; i < timeArray.length; i++) {
+            @SuppressWarnings("unchecked")
+            V item = (V) valueArray[i];
+            JHVTime time = _timeOf.apply(item);
+            if (i > 0 && time.milli <= timeArray[i - 1].milli)
+                throw new IllegalArgumentException("Times out of order");
+            timeArray[i] = time;
+        }
+    }
+
+    public V put(JHVTime time, V value) {
+        return entries.put(time, value);
+    }
+
+    public int size() {
+        return entries == null ? valueArray.length : entries.size();
+    }
+
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    public void clear() {
+        entries = new TreeMap<>();
+        timeArray = null;
+        valueArray = null;
+    }
+
+    public void buildIndex() {
+        if (entries == null)
+            return; // Ordered input is already indexed.
+        if (entries.isEmpty())
+            throw new RuntimeException("Attempt to call buildIndex() on empty TimeMap");
+
+        timeArray = new JHVTime[entries.size()];
+        valueArray = new Object[entries.size()];
+        int i = 0;
+        for (Map.Entry<JHVTime, V> entry : entries.entrySet()) {
+            timeArray[i] = entry.getKey();
+            valueArray[i] = entry.getValue();
+            i++;
+        }
+    }
+
     public JHVTime firstKey() {
         return timeArray[0];
     }
 
-    @Override
     public JHVTime lastKey() {
-        return timeArray[maxIdx];
+        return timeArray[timeArray.length - 1];
     }
 
-    @Override
+    // The latest time before this one, or the first.
     public JHVTime lowerKey(JHVTime time) {
-        JHVTime k = super.lowerKey(time);
-        return k == null ? timeArray[0] : k;
+        int idx = Arrays.binarySearch(timeArray, time);
+        int i = (idx >= 0 ? idx : -idx - 1) - 1;
+        return key(i);
     }
 
-    @Override
+    // The earliest time after this one, or the last.
     public JHVTime higherKey(JHVTime time) {
-        JHVTime k = super.higherKey(time);
-        return k == null ? timeArray[maxIdx] : k;
+        int idx = Arrays.binarySearch(timeArray, time);
+        int i = idx >= 0 ? idx + 1 : -idx - 1;
+        return key(i);
     }
 
     public int maxIndex() {
-        return maxIdx;
+        return timeArray.length - 1;
+    }
+
+    private int clamp(int idx) {
+        return Math.clamp(idx, 0, timeArray.length - 1);
     }
 
     public JHVTime key(int idx) {
-        if (idx < 0) {
-            idx = 0;
-        } else if (idx > maxIdx) {
-            idx = maxIdx;
-        }
-        return timeArray[idx];
+        return timeArray[clamp(idx)];
     }
 
     public JHVTime nearestKey(JHVTime time) {
@@ -67,8 +113,8 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
         int ip = -idx - 1;
         if (ip == 0)
             return 0;
-        if (ip > maxIdx)
-            return maxIdx;
+        if (ip >= timeArray.length)
+            return timeArray.length - 1;
 
         JHVTime f = timeArray[ip - 1];
         JHVTime c = timeArray[ip];
@@ -76,21 +122,22 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
     }
 
     public V nearestValue(JHVTime time) {
-        return get(nearestKey(time));
+        return indexedValue(nearestIndex(time));
     }
 
+    @SuppressWarnings("unchecked")
     public V indexedValue(int idx) {
-        return get(key(idx));
+        return (V) valueArray[clamp(idx)];
     }
 
     public V floorValue(JHVTime time) {
-        Map.Entry<JHVTime, V> e = floorEntry(time);
-        return (e == null ? firstEntry() : e).getValue();
+        int idx = Arrays.binarySearch(timeArray, time);
+        return indexedValue(idx >= 0 ? idx : -idx - 2);
     }
 
     public V ceilingValue(JHVTime time) {
-        Map.Entry<JHVTime, V> e = ceilingEntry(time);
-        return (e == null ? lastEntry() : e).getValue();
+        int idx = Arrays.binarySearch(timeArray, time);
+        return indexedValue(idx >= 0 ? idx : -idx - 1);
     }
 
 }

@@ -9,8 +9,9 @@ python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 The default suite uses loopback servers and needs no external network or JPEG 2000
-native library. It also checks frame selection, synthesis and decoder delivery (`FramesTest`),
-request intervals and sampling (`ImageRequestSettingsTest`), and local FITS loading
+native library. It also checks shared time indexing (`TimeMapTest`), frame selection,
+synthesis and decoder delivery (`FramesTest`), request intervals and sampling
+(`ImageRequestSettingsTest`), and local FITS loading
 (`FramesLoadTest` and `LayerLoadTest`). The runner copies committed FITS inputs and creates
 a ZIP in its temporary directory. Image-memory checks use the bundled LWJGL native allocator:
 

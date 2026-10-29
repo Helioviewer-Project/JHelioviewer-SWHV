@@ -30,7 +30,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     if platform.system() == "Windows" and not temporary.isascii():
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
-    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "ImageRequestSettingsTest.java", "../uri/FramesLoadTest.java", "../uri/LayerLoadTest.java"]
+    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "TimeMapTest.java", "ImageRequestSettingsTest.java", "../uri/FramesLoadTest.java", "../uri/LayerLoadTest.java"]
     # Compile live tests offline too, so API changes cannot silently break them.
     sources.extend(["J2KFixture.java", "FrameDecoderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
@@ -38,6 +38,8 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
             "-Djava.io.tmpdir=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
+    print("Running TimeMapTest", flush=True)
+    subprocess.run([*java, "org.helioviewer.jhv.time.TimeMapTest"], check=True, timeout=60)
     print("Running ImageBufferCacheTest", flush=True)
     subprocess.run([*java, "-da", "-Dorg.lwjgl.util.DebugAllocator=true",
                     "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
