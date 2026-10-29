@@ -45,15 +45,15 @@ public final class Load {
     }
 
     public static void state(@Nonnull URI uri) {
-        LoadState.submit(null, uri);
+        LoadState.submit(Commands.Completion.NONE, uri);
     }
 
-    public static void state(@Nullable Commands.OperationContext context, @Nonnull URI uri) {
-        LoadState.submit(context, uri);
+    public static void state(Commands.Completion completion, @Nonnull URI uri) {
+        LoadState.submit(completion, uri);
     }
 
-    public static void state(@Nullable Commands.OperationContext context, @Nonnull String json) {
-        LoadState.submit(context, json);
+    public static void state(Commands.Completion completion, @Nonnull String json) {
+        LoadState.submit(completion, json);
     }
 
     public static void request(@Nonnull URI uri) {

@@ -64,25 +64,25 @@ final class LoadHandlers {
     }
 
     private static void loadState(Message msg, String senderId) throws Exception {
-        Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.load.state", "jhv.load.state.completed");
+        Commands.Completion completion = SampClient.completion(senderId, msg, "jhv.load.state", "jhv.load.state.completed");
 
         try {
             Object input = msg.getParam("url");
             if (input != null) {
                 URI uri = toURI(input.toString());
-                UiThread.post(() -> Load.state(context, uri));
+                UiThread.post(() -> Load.state(completion, uri));
                 return;
             }
             String value = SampHandlers.optionalString(msg, "value");
             if (value != null) {
-                UiThread.post(() -> Load.state(context, value));
+                UiThread.post(() -> Load.state(completion, value));
                 return;
             }
-            Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");
+            completion.finished(false, "Missing jhv.load.state url or value.", null);
         } catch (Exception e) {
             Log.warn("jhv.load.state", e);
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
-            Commands.notifyLoadStateFinished(context, false, message);
+            completion.finished(false, message, null);
         }
     }
 

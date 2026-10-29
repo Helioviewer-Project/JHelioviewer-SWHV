@@ -328,7 +328,7 @@ public final class Actions {
             if (ExportMovie.isRecording())
                 Commands.recordStop();
             else
-                Commands.recordStart(CompletionNotifications.recordingContext(), null);
+                Commands.recordStart(CompletionNotifications::recordingFinished, null);
         }
     }
 

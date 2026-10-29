@@ -13,17 +13,11 @@ import org.json.JSONObject;
 
 public final class Commands {
 
-    public record OperationContext(@Nullable String clientId, @Nullable String requestId,
-                                   @Nullable String mtype, @Nullable Completion completion) {
-        public void complete(boolean success, String message, @Nullable String output) {
-            if (completion != null)
-                completion.finished(this, success, message, output);
-        }
-    }
-
     @FunctionalInterface
     public interface Completion {
-        void finished(OperationContext context, boolean success, String message, @Nullable String output);
+        Completion NONE = (success, message, output) -> {};
+
+        void finished(boolean success, String message, @Nullable String output);
     }
 
     public static void setViewState(JSONObject input) {
@@ -80,8 +74,8 @@ public final class Commands {
         ViewState.applyRecording(input);
     }
 
-    public static void recordStart(@Nullable OperationContext context, @Nullable JSONObject input) {
-        ExportMovie.start(context, input);
+    public static void recordStart(Completion completion, @Nullable JSONObject input) {
+        ExportMovie.start(completion, input);
     }
 
     public static void recordStop() {
@@ -114,17 +108,6 @@ public final class Commands {
 
     public static void rotateView90(@Nullable String axis) {
         DisplayController.rotateView90(axis);
-    }
-
-    public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
-        if (context != null)
-            context.complete(success, message, null);
-    }
-
-    public static void notifyRecordingFinished(@Nullable OperationContext context, boolean success, String message,
-                                               @Nullable String output) {
-        if (context != null)
-            context.complete(success, message, output);
     }
 
     private Commands() {}

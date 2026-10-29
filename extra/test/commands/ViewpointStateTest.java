@@ -2,8 +2,11 @@ package org.helioviewer.jhv.layers;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.app.AppInit;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.app.state.ViewState;
@@ -69,9 +72,12 @@ public final class ViewpointStateTest {
         check(before.getJSONObject("data").getString("mode").equals(mode), "Saved legacy mode");
         JSONObject spiral = before.getJSONObject("data").getJSONObject("equatorial");
         check(spiral.getBoolean("spiral") == !enabled && spiral.getInt("spiralSpeed") == (enabled ? 1300 : 850), "Spiral settings not saved");
-        UiThread.postAndWait(() -> State.load(null, saved));
+        CompletableFuture<Boolean> completion = new CompletableFuture<>();
+        UiThread.postAndWait(() -> State.load((success, message, output) ->
+                completion.complete(success && message.equals("State loaded.") && output == null), saved));
         // State applies playback after its asynchronous layer-load completion callback.
         UiThread.postAndWait(() -> {});
+        check(completion.get(5, TimeUnit.SECONDS), "State restoration changed its completion payload");
         JSONObject after = UiThread.postAndWait(() -> {
             ViewpointLayer layer = Layers.getViewpointLayer();
             ViewpointLayerOptions.CameraMode expected = enabled ? ViewpointLayerOptions.CameraMode.valueOf(mode) : ViewpointLayerOptions.CameraMode.Observer;
@@ -127,7 +133,7 @@ public final class ViewpointStateTest {
         check(layer.isEnabled() && DisplayController.getViewpointUpdate() instanceof UpdateViewpoint.Location, "Location activation");
         layer.setCameraMode(ViewpointLayerOptions.CameraMode.Observer);
         JSONObject saved = sessionJson();
-        State.load(null, saved);
+        State.load(Commands.Completion.NONE, saved);
         check(Layers.getViewpointLayer().getCameraMode() == ViewpointLayerOptions.CameraMode.Observer, "Explicit Observer restore");
         layer = Layers.getViewpointLayer();
         layer.setCameraMode(ViewpointLayerOptions.CameraMode.ObserverAt1au);

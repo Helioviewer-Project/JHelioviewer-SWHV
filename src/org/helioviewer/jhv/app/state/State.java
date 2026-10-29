@@ -154,7 +154,7 @@ public final class State {
         TimelineLayers.restore(newList);
     }
 
-    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context, ViewState.ModeData modeData, int serial) {
+    private static void loadLayers(JSONObject data, Commands.Completion completion, ViewState.ModeData modeData, int serial) {
         ArrayList<Layer> restoredLayers = new ArrayList<>();
 
         JSONArray layers = data.optJSONArray("layers");
@@ -205,12 +205,12 @@ public final class State {
         Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
-        Callback callback = new Callback(context, newLayers, masterLayer, time, modeData, serial);
+        Callback callback = new Callback(completion, newLayers, masterLayer, time, modeData, serial);
         CompletableFuture.allOf(newLayers.keySet().stream().map(ImageLayer::whenLoadFinished).toArray(CompletableFuture[]::new))
                 .thenRun(() -> UiThread.post(callback::onSuccess));
     }
 
-    private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
+    private record Callback(Commands.Completion completion, Map<ImageLayer, Boolean> newLayers,
                             @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData, int serial) {
 
         private void applyRestoredPlaybackState() {
@@ -221,7 +221,7 @@ public final class State {
 
         void onSuccess() {
             if (serial != loadSerial) {
-                Commands.notifyLoadStateFinished(context, false, "Superseded by a newer state load.");
+                completion.finished(false, "Superseded by a newer state load.", null);
                 return;
             }
             for (ImageLayer layer : Layers.getImageLayers()) {
@@ -232,12 +232,12 @@ public final class State {
             if (masterLayer != null && Layers.getImageLayers().contains(masterLayer))
                 Layers.setActiveImageLayer(masterLayer);
             applyRestoredPlaybackState();
-            Commands.notifyLoadStateFinished(context, true, "State loaded.");
+            completion.finished(true, "State loaded.", null);
         }
 
     }
 
-    public static void load(@Nullable Commands.OperationContext context, JSONObject jo) {
+    public static void load(Commands.Completion completion, JSONObject jo) {
         int serial = ++loadSerial;
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
@@ -252,11 +252,11 @@ public final class State {
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
-            loadLayers(jo, context, modeData, serial);
+            loadLayers(jo, completion, modeData, serial);
         } catch (Exception e) {
             Log.error(e);
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
-            Commands.notifyLoadStateFinished(context, false, message);
+            completion.finished(false, message, null);
         }
     }
 

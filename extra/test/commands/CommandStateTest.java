@@ -143,27 +143,36 @@ public final class CommandStateTest {
         checkWarning(warnings, "size");
 
         List<Boolean> outcomes = new ArrayList<>();
-        Commands.OperationContext context = new Commands.OperationContext(null, null, null, (_, success, _, _) -> outcomes.add(success));
+        List<String> messages = new ArrayList<>();
+        Commands.Completion completion = (success, message, output) -> {
+            outcomes.add(success);
+            messages.add(message);
+            check(output == null, "Failed recording reported an output file");
+        };
         ExportMovie.setMainCanvasVisible(false);
-        Commands.recordStart(context, new JSONObject().put("mode", "FREE").put("size", "H1024").put("speed", "37"));
+        Commands.recordStart(completion, new JSONObject().put("mode", "FREE").put("size", "H1024").put("speed", "37"));
         check(!ExportMovie.isRecording() && outcomes.equals(List.of(false)), "Failed recording start did not report failure");
+        check(messages.equals(List.of("The timeline is not available.")), "Failed recording start changed its completion message");
         check(ViewState.recordingData().size() == ViewState.RecordingSize.H1024 && ViewState.playbackData().speed() == 37, "Failed start discarded applied settings");
         ExportMovie.setMainCanvasVisible(true);
 
         Message message = new Message("jhv.record.start").addParam("mode", "FREE").addParam("size", "H2048")
                 .addParam("advanceMode", "Stop").addParam("speed", "32").addParam("speedUnit", "FRAMES_PER_SECOND").addParam("firstFrame", "0");
-        Commands.recordStart(context, SampHandlers.parameters(message, "mode", "size", "advanceMode", "speed", "speedUnit"));
+        Commands.recordStart(completion, SampHandlers.parameters(message, "mode", "size", "advanceMode", "speed", "speedUnit"));
         check(ExportMovie.isRecording() && outcomes.size() == 1, "Recording did not start or completed prematurely");
         ViewState.PlaybackData playback = ViewState.playbackData();
         ViewState.RecordingData recording = ViewState.recordingData();
         check(playback.speed() == 32 && playback.advanceMode() == Player.AdvanceMode.Stop && playback.firstFrame() == 3
                 && recording.size() == ViewState.RecordingSize.H2048, "Recording parameters or unsupported frame parameter");
         int count = warnings.size();
-        Commands.recordStart(context, new JSONObject().put("mode", "invalid").put("size", "H4096").put("speed", "120"));
+        Commands.recordStart(completion, new JSONObject().put("mode", "invalid").put("size", "H4096").put("speed", "120"));
         check(outcomes.equals(List.of(false, false)) && warnings.size() == count, "Already-recording request was parsed or not refused");
         check(ViewState.playbackData().equals(playback) && ViewState.recordingData().equals(recording), "Already-recording request changed settings");
-        Commands.recordStart(context, null);
+        Commands.recordStart(completion, null);
         check(outcomes.equals(List.of(false, false, false)) && ExportMovie.isRecording(), "GUI start bypassed the recording guard");
+        check(messages.equals(List.of("The timeline is not available.", "Recording already in progress.", "Recording already in progress.")), "Recording refusal changed its completion message");
+        Commands.recordStart(Commands.Completion.NONE, null);
+        check(ExportMovie.isRecording() && outcomes.size() == 3, "Unobserved recording refusal changed the active operation");
         System.out.println("PASS: recording partial updates, combined start settings, failure completion and already-recording guard");
     }
 

@@ -17,16 +17,16 @@ final class LoadImageHandler {
 
     static AbstractMessageHandler create() {
         return SampHandlers.create("jhv.load.image", (senderId, sender, msg) -> {
-            Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.load.image", "jhv.load.image.completed");
+            Commands.Completion completion = SampClient.completion(senderId, msg, "jhv.load.image", "jhv.load.image.completed");
             try {
                 JSONObject imageParams = imageParams(msg);
                 if (!LoadHandlers.loadURIList(msg,
-                        uri -> waitImageLoad(context, Load.image(List.of(uri), imageParams)),
-                        uris -> waitImageLoad(context, Load.image(uris, imageParams)))) {
-                    context.complete(false, "Missing jhv.load.image url.", null);
+                        uri -> waitImageLoad(completion, Load.image(List.of(uri), imageParams)),
+                        uris -> waitImageLoad(completion, Load.image(uris, imageParams)))) {
+                    completion.finished(false, "Missing jhv.load.image url.", null);
                 }
             } catch (Exception e) {
-                context.complete(false, message(e), null);
+                completion.finished(false, message(e), null);
             }
         });
     }
@@ -41,8 +41,8 @@ final class LoadImageHandler {
         };
     }
 
-    private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<Boolean> future) {
-        future.thenAccept(success -> context.complete(success, success ? "Image loaded." : "Image load failed.", null));
+    private static void waitImageLoad(Commands.Completion completion, CompletableFuture<Boolean> future) {
+        future.thenAccept(success -> completion.finished(success, success ? "Image loaded." : "Image load failed.", null));
     }
 
     private static String message(Throwable t) {
