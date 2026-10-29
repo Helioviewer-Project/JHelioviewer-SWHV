@@ -42,7 +42,7 @@ public final class FramesLoadTest {
             if (frames.size() != 3 || !result.warnings().isEmpty() || result.baseName() != null)
                 throw new AssertionError("Three files did not give three frames without warnings");
             for (int i = 1; i < 3; i++) {
-                if (frames.time(i).milli <= frames.time(i - 1).milli)
+                if (frames.timeAt(i).milli <= frames.timeAt(i - 1).milli)
                     throw new AssertionError("Frames not sorted by time");
             }
             decodeAll(frames);
@@ -113,7 +113,7 @@ public final class FramesLoadTest {
             EventQueue.invokeAndWait(() -> decoder.reset(frames.serial()));
             Set<Long> checksums = new HashSet<>();
             for (int i = 0; i < frames.size(); i++) {
-                Frames.Frame frame = frames.get(i);
+                Frames.Frame frame = frames.valueAt(i);
                 ImageGrid size = frame.source().levels(frame.index()).getLevel(0);
                 double scale = size.height() / frame.metaData().getGeometry().bounds.height;
                 EventQueue.invokeAndWait(() -> {

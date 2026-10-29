@@ -293,7 +293,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     private void setImageData(@Nonnull ImageData newImageData) {
         long newMilli = newImageData.frame().time().milli;
-        boolean base = baseImageData == null || newMilli == frames.first().milli;
+        boolean base = baseImageData == null || newMilli == frames.firstTime().milli;
         if (base) {
             baseImageData = replaceImageData(baseImageData, newImageData);
         }
@@ -314,7 +314,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     @Nonnull
     public MetaData getMetaData() { //!
-        return imageData == null ? frames.metaData(frames.first()) : imageData.metaData();
+        return imageData == null ? frames.metaData(frames.firstTime()) : imageData.metaData();
     }
 
     @Override
@@ -338,7 +338,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         boolean moved = frames.select(frames.requested());
         Layers.fireCompletionUpdated(this);
         if (isVisibleIdx() != -1) {
-            Frames.Frame current = frames.get(frames.current());
+            Frames.Frame current = frames.valueAt(frames.current());
             if (moved)
                 decoder.redecode(frames, true);
             else if (current.source() == source && current.index() == frame)
@@ -373,11 +373,11 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     public long getStartTime() {
-        return request == null ? frames.first().milli : request.startTime(); // for locked timelines
+        return request == null ? frames.firstTime().milli : request.startTime(); // for locked timelines
     }
 
     public long getEndTime() {
-        return request == null ? frames.last().milli : request.endTime(); // for locked timelines
+        return request == null ? frames.lastTime().milli : request.endTime(); // for locked timelines
     }
 
     private boolean isLoadFinished() {

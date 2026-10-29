@@ -72,7 +72,7 @@ final class FrameDecoder {
         if (viewpoint == null || frames.serial() != installation)
             return;
         int index = frames.current();
-        Frames.Frame frame = frames.get(index);
+        Frames.Frame frame = frames.valueAt(index);
         Source source = frame.source();
         if (source == null)
             return;

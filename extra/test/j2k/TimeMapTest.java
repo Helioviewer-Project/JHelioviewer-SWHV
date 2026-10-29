@@ -20,14 +20,14 @@ public final class TimeMapTest {
         checkLookups(ordered, items);
         checkLookups(collected, items);
         items.clear();
-        check(ordered.size() == 3 && ordered.indexedValue(1).name().equals("b"), "Ordered input was not copied");
+        check(ordered.size() == 3 && ordered.valueAt(1).name().equals("b"), "Ordered input was not copied");
         ordered.buildIndex();
-        check(ordered.indexedValue(1).name().equals("b"), "Reindexing ordered input changed its values");
+        check(ordered.valueAt(1).name().equals("b"), "Reindexing ordered input changed its values");
 
         Item replacement = item(200, "new");
         collected.put(replacement.time(), replacement);
         collected.buildIndex();
-        check(collected.indexedValue(1) == replacement && collected.nearestValue(new JHVTime(210)) == replacement, "Replacement was not indexed");
+        check(collected.valueAt(1) == replacement && collected.nearestValue(new JHVTime(210)) == replacement, "Replacement was not indexed");
         collected.clear();
         check(collected.isEmpty() && collected.size() == 0, "Clear left entries");
         try {
@@ -52,17 +52,17 @@ public final class TimeMapTest {
         for (Item item : items)
             reference.put(item.time(), item);
         check(sequence.size() == items.size() && sequence.maxIndex() == items.size() - 1, "Size changed");
-        check(sequence.firstKey().equals(items.getFirst().time()) && sequence.lastKey().equals(items.getLast().time()), "Endpoints changed");
+        check(sequence.firstTime().equals(items.getFirst().time()) && sequence.lastTime().equals(items.getLast().time()), "Endpoints changed");
         for (int i = -2; i < items.size() + 2; i++) {
             Item expected = items.get(Math.clamp(i, 0, items.size() - 1));
-            check(sequence.indexedValue(i) == expected && sequence.key(i).equals(expected.time()), "Indexed access changed at " + i);
+            check(sequence.valueAt(i) == expected && sequence.timeAt(i).equals(expected.time()), "Indexed access changed at " + i);
         }
         for (long milli = 0; milli <= 500; milli++) {
             JHVTime time = new JHVTime(milli);
             JHVTime lower = reference.lowerKey(time);
             JHVTime higher = reference.higherKey(time);
-            check(sequence.lowerKey(time).equals(lower == null ? reference.firstKey() : lower), "Strict lower changed at " + milli);
-            check(sequence.higherKey(time).equals(higher == null ? reference.lastKey() : higher), "Strict higher changed at " + milli);
+            check(sequence.previousTime(time).equals(lower == null ? reference.firstKey() : lower), "Strict lower changed at " + milli);
+            check(sequence.nextTime(time).equals(higher == null ? reference.lastKey() : higher), "Strict higher changed at " + milli);
             JHVTime floor = reference.floorKey(time);
             JHVTime ceiling = reference.ceilingKey(time);
             check(sequence.floorValue(time) == reference.get(floor == null ? reference.firstKey() : floor), "Inclusive floor changed at " + milli);
@@ -77,7 +77,7 @@ public final class TimeMapTest {
                 }
             }
             check(sequence.nearestIndex(time) == nearest && sequence.nearestValue(time) == items.get(nearest)
-                    && sequence.nearestKey(time).equals(items.get(nearest).time()), "Nearest changed at " + milli);
+                    && sequence.nearestTime(time).equals(items.get(nearest).time()), "Nearest changed at " + milli);
         }
     }
 

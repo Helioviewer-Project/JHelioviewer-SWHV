@@ -97,7 +97,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
         List<ClipSet> clipSets = new ArrayList<>();
         boolean fits = false;
         for (int i = 0; i < size(); i++) {
-            Source source = indexedValue(i).source;
+            Source source = valueAt(i).source;
             if (source != null) {
                 distinct.add(source);
                 fits |= source.usesFITSParameters();
@@ -107,7 +107,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
         sources = List.copyOf(distinct);
         hasFITS = fits;
         clipSet = ClipSet.median(clipSets);
-        requested = firstKey();
+        requested = firstTime();
 
         for (Source source : sources)
             source.setListener(this);
@@ -160,34 +160,6 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
         });
     }
 
-    public Frame get(int i) {
-        return indexedValue(i);
-    }
-
-    public JHVTime time(int i) {
-        return key(i);
-    }
-
-    public JHVTime first() {
-        return firstKey();
-    }
-
-    public JHVTime last() {
-        return lastKey();
-    }
-
-    public JHVTime nearest(JHVTime time) {
-        return nearestKey(time);
-    }
-
-    public JHVTime lower(JHVTime time) {
-        return lowerKey(time);
-    }
-
-    public JHVTime higher(JHVTime time) {
-        return higherKey(time);
-    }
-
     public MetaData metaData(JHVTime time) {
         return nearestValue(time).metaData;
     }
@@ -202,7 +174,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
 
     // A remote frame whose coarsest level has not arrived.
     private boolean missing(int i) {
-        Frame frame = indexedValue(i);
+        Frame frame = valueAt(i);
         return frame.source != null && !frame.source.displayable(frame.index);
     }
 
@@ -225,7 +197,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
             else if (hi >= count)
                 i = lo;
             else
-                i = time.milli - key(lo).milli <= key(hi).milli - time.milli ? lo : hi;
+                i = time.milli - timeAt(lo).milli <= timeAt(hi).milli - time.milli ? lo : hi;
         }
         if (i == current)
             return false;
@@ -244,7 +216,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
 
     @Nullable
     public LUT defaultLUT() {
-        Frame first = indexedValue(0);
+        Frame first = valueAt(0);
         LUT lut = first.source == null ? null : first.source.lut();
         if (lut != null)
             return lut;
@@ -254,7 +226,7 @@ public final class Frames extends TimeMap<Frames.Frame> implements Source.Listen
     // Snapshot: null when unavailable, false when partial, true when complete.
     @Nullable
     public Boolean completion(int i) {
-        Frame frame = indexedValue(i);
+        Frame frame = valueAt(i);
         return frame.source == null ? Boolean.TRUE : frame.source.completion(frame.index);
     }
 

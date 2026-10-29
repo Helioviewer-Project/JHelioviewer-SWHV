@@ -207,7 +207,7 @@ public final class FrameDecoderTest {
                                 new Mat2((double) dimensions[2] / dimensions[0], 0, 0, -(double) dimensions[3] / dimensions[1]), Vec2.ZERO);
                     }
                 };
-                Frames.Frame frame = new Frames.Frame(opened.frames.time(0), metadata, Frames.EMPTY_METAXML, opened.source, 0);
+                Frames.Frame frame = new Frames.Frame(opened.frames.timeAt(0), metadata, Frames.EMPTY_METAXML, opened.source, 0);
                 int selected = FrameDecoder.level(frame, 1.0 / 16);
                 if (selected != dimensions[4])
                     throw new AssertionError("Wrong resolution for " + Arrays.toString(dimensions) + ": " + selected);
@@ -222,7 +222,7 @@ public final class FrameDecoderTest {
         Frames frames = opened.frames;
         FrameDecoder decoder = opened.decoder;
         ImageGrid size = opened.source.level(0, Integer.MAX_VALUE);
-        MetaData metadata = frames.get(0).metaData();
+        MetaData metadata = frames.valueAt(0).metaData();
         Position latest = Position.toFixedDistance(metadata.getViewpoint(), metadata.getViewpoint().distance);
         double scale = size.height() / metadata.getGeometry().bounds.height;
         clearImages();
@@ -309,14 +309,14 @@ public final class FrameDecoderTest {
             decoder.reset(frames.serial());
             frames.setListener((f, source, frame) -> {
                 boolean moved = f.select(f.requested());
-                Frames.Frame current = f.get(f.current());
+                Frames.Frame current = f.valueAt(f.current());
                 if (moved)
                     decoder.redecode(f, true);
                 else if (current.source() == source && current.index() == frame)
                     decoder.redecode(f, false);
             });
         });
-        return new Opened(frames, decoder, (J2KSource) frames.get(0).source());
+        return new Opened(frames, decoder, (J2KSource) frames.valueAt(0).source());
     }
 
     private static void close(Opened opened) throws Exception {
@@ -344,11 +344,11 @@ public final class FrameDecoderTest {
     // Asks for a frame at the level a display of that level's height would want.
     private static void show(Opened opened, int frame, int level, boolean priority) throws Exception {
         Frames frames = opened.frames;
-        MetaData metadata = frames.get(frame).metaData();
+        MetaData metadata = frames.valueAt(frame).metaData();
         double scale = opened.source.level(frame, level).height() / metadata.getGeometry().bounds.height;
         clearImages();
         EventQueue.invokeAndWait(() -> {
-            frames.select(frames.time(frame));
+            frames.select(frames.timeAt(frame));
             if (frames.current() == frame)
                 opened.decoder.decode(frames, metadata.getViewpoint(), scale, priority);
         });
@@ -580,7 +580,7 @@ public final class FrameDecoderTest {
                 if (keys.length != frames.size())
                     throw new AssertionError("Disk keys do not cover the timeline");
                 for (int i = 0; i < keys.length; i++) {
-                    MetaData metadata = frames.get(i).metaData();
+                    MetaData metadata = frames.valueAt(i).metaData();
                     String expected = metadata instanceof FitsMetaData fits ? "10+" + fits.getCacheTimestamp() : null;
                     if (!Objects.equals(keys[i], expected))
                         throw new AssertionError("Disk key uses a sorted position or a fallback time at frame " + i);

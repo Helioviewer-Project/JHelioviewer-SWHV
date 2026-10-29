@@ -100,8 +100,8 @@ public final class FramesTest {
             if (!frames.select(frames.requested()) || frames.current() != 1)
                 throw new AssertionError("A frame becoming available was not selected on retry");
             long t = base * 1000;
-            if (frames.nearest(new JHVTime(t + 101_400)).milli != t + 101_000 || frames.lower(new JHVTime(t + 101_000)).milli != t + 100_000
-                    || frames.higher(new JHVTime(t + 101_000)).milli != t + 102_000 || frames.higher(new JHVTime(t + 102_000)).milli != t + 102_000)
+            if (frames.nearestTime(new JHVTime(t + 101_400)).milli != t + 101_000 || frames.previousTime(new JHVTime(t + 101_000)).milli != t + 100_000
+                    || frames.nextTime(new JHVTime(t + 101_000)).milli != t + 102_000 || frames.nextTime(new JHVTime(t + 102_000)).milli != t + 102_000)
                 throw new AssertionError("Time navigation over all frames is wrong");
         } finally {
             frames.close();
@@ -111,11 +111,11 @@ public final class FramesTest {
     private static void synthesis() {
         long t = 1_800_000_000_000L;
         Frames same = Frames.synthetic(t, t, 60);
-        if (same.size() != 1 || same.first().milli != t)
+        if (same.size() != 1 || same.firstTime().milli != t)
             throw new AssertionError("Equal endpoints did not give one frame");
         same.close();
         Frames span = Frames.synthetic(t, t + 150_000, 60);
-        if (span.size() != 4 || span.last().milli != t + 150_000 || span.time(1).milli != t + 60_000)
+        if (span.size() != 4 || span.lastTime().milli != t + 150_000 || span.timeAt(1).milli != t + 60_000)
             throw new AssertionError("Synthetic span has the wrong frames: " + span.size());
         span.close();
     }
@@ -258,7 +258,7 @@ public final class FramesTest {
             if (!shown[0].await(5, TimeUnit.SECONDS))
                 throw new AssertionError("Initial frame was not delivered");
             EventQueue.invokeAndWait(() -> {
-                frames.select(frames.time(1));
+                frames.select(frames.timeAt(1));
                 source.ready[1] = true;
                 layer.frameReady(frames, source, 1);
                 if (notifiedSelection[0] != 1)
@@ -268,7 +268,7 @@ public final class FramesTest {
                 throw new AssertionError("Visible layer did not show the requested frame when it arrived");
             EventQueue.invokeAndWait(() -> {
                 layer.setVisible(-1);
-                frames.select(frames.time(2));
+                frames.select(frames.timeAt(2));
                 CompletableFuture<Boolean> finished = layer.whenLoadFinished();
                 if (finished.isDone())
                     throw new AssertionError("Load finished before the last frame arrived");

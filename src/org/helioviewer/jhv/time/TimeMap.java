@@ -67,26 +67,26 @@ public class TimeMap<V> {
         }
     }
 
-    public JHVTime firstKey() {
+    public JHVTime firstTime() {
         return timeArray[0];
     }
 
-    public JHVTime lastKey() {
+    public JHVTime lastTime() {
         return timeArray[timeArray.length - 1];
     }
 
     // The latest time before this one, or the first.
-    public JHVTime lowerKey(JHVTime time) {
+    public JHVTime previousTime(JHVTime time) {
         int idx = Arrays.binarySearch(timeArray, time);
         int i = (idx >= 0 ? idx : -idx - 1) - 1;
-        return key(i);
+        return timeAt(i);
     }
 
     // The earliest time after this one, or the last.
-    public JHVTime higherKey(JHVTime time) {
+    public JHVTime nextTime(JHVTime time) {
         int idx = Arrays.binarySearch(timeArray, time);
         int i = idx >= 0 ? idx + 1 : -idx - 1;
-        return key(i);
+        return timeAt(i);
     }
 
     public int maxIndex() {
@@ -97,11 +97,11 @@ public class TimeMap<V> {
         return Math.clamp(idx, 0, timeArray.length - 1);
     }
 
-    public JHVTime key(int idx) {
+    public JHVTime timeAt(int idx) {
         return timeArray[clamp(idx)];
     }
 
-    public JHVTime nearestKey(JHVTime time) {
+    public JHVTime nearestTime(JHVTime time) {
         return timeArray[nearestIndex(time)];
     }
 
@@ -122,22 +122,22 @@ public class TimeMap<V> {
     }
 
     public V nearestValue(JHVTime time) {
-        return indexedValue(nearestIndex(time));
+        return valueAt(nearestIndex(time));
     }
 
     @SuppressWarnings("unchecked")
-    public V indexedValue(int idx) {
+    public V valueAt(int idx) {
         return (V) valueArray[clamp(idx)];
     }
 
     public V floorValue(JHVTime time) {
         int idx = Arrays.binarySearch(timeArray, time);
-        return indexedValue(idx >= 0 ? idx : -idx - 2);
+        return valueAt(idx >= 0 ? idx : -idx - 2);
     }
 
     public V ceilingValue(JHVTime time) {
         int idx = Arrays.binarySearch(timeArray, time);
-        return indexedValue(idx >= 0 ? idx : -idx - 1);
+        return valueAt(idx >= 0 ? idx : -idx - 1);
     }
 
 }
