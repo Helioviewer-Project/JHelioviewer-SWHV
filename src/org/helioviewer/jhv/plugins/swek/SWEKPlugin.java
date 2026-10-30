@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.event.SWEKConfig;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.sources.HEKHandler;
-import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.swek.swing.SWEKSwingUI;
@@ -87,20 +86,11 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     }
 
     @Override
-    public void layerRemoved(int index, Layer removed) {
-        if (removed == layer)
-            detachLayer();
-    }
-
-    @Override
     public void layersCleared() {
-        if (layer != null && !Layers.getLayers().contains(layer))
-            detachLayer();
-    }
-
-    private void detachLayer() {
-        layer.detach();
-        layer = null;
+        if (layer != null && !Layers.getLayers().contains(layer)) {
+            layer.detach();
+            layer = null;
+        }
     }
 
     private void bindLayer() {

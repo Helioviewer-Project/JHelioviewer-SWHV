@@ -177,10 +177,6 @@ public final class Annotations {
         activeIndex = -1;
     }
 
-    private static Annotateable generate(JSONObject jo) {
-        return AnnotationMode.generate(jo.optString("type", AnnotationMode.Rectangle.toString()), jo);
-    }
-
     public static JSONObject toJson() {
         JSONArray ja = new JSONArray();
         annotations.forEach(annotation -> ja.put(annotation.toJson()));
@@ -199,7 +195,7 @@ public final class Annotations {
             for (int i = 0; i < len; i++) {
                 JSONObject obj = ja.optJSONObject(i);
                 if (obj != null) {
-                    annotations.add(generate(obj));
+                    annotations.add(AnnotationMode.fromJson(obj));
                 }
             }
             if (annotations.isEmpty())

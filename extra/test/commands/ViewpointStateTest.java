@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.annotation.AnnotationMode;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
@@ -110,8 +111,19 @@ public final class ViewpointStateTest {
                 .put("EVEPlugin", new JSONObject().put("stacked", true)));
         PluginManager.saveState(plugins);
         check(!plugins.getJSONObject("timelines").getBoolean("stacked"), "Legacy plugin key overrode the new key");
-        for (String type : List.of("Rectangle", "Circle", "Cross", "FOV", "Line", "Loop"))
+        for (String type : List.of("Rectangle", "Circle", "Cross", "FOV", "Line", "Loop")) {
             check(AnnotationMode.valueOf(type).generate(new JSONObject()).toJson().getString("type").equals(type), "Annotation type changed: " + type);
+            check(AnnotationMode.valueOf(type).generate(null).toJson().getString("type").equals(type), "Interactive annotation type changed: " + type);
+        }
+        for (String type : List.of("Rectangle", "Circle", "Cross", "FOV", "Line", "Loop", "unknown", "")) {
+            JSONObject annotation = new JSONObject();
+            if (!type.isEmpty())
+                annotation.put("type", type);
+            Annotations.fromJson(new JSONObject().put("annotateables", new JSONArray().put(annotation)));
+            String expected = type.equals("unknown") || type.isEmpty() ? "Rectangle" : type;
+            check(Annotations.toJson().getJSONArray("annotateables").getJSONObject(0).getString("type").equals(expected), "Restored annotation type changed: " + type);
+        }
+        Annotations.clear();
     }
 
     private static void roundTrip(String mode, boolean enabled, boolean oldFormat) throws Exception {

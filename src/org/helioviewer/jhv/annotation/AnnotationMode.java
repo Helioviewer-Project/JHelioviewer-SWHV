@@ -5,46 +5,21 @@ import org.helioviewer.jhv.app.Log;
 import org.json.JSONObject;
 
 public enum AnnotationMode {
-    Rectangle {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateRectangle(jo);
-        }
-    },
-    Circle {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateCircle(jo);
-        }
-    },
-    Cross {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateCross(jo);
-        }
-    },
-    FOV {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateFOV(jo);
-        }
-    },
-    Line {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateLine(jo);
-        }
-    },
-    Loop {
-        @Override
-        public Annotateable generate(JSONObject jo) {
-            return new AnnotateLoop(jo);
-        }
-    };
+    Rectangle, Circle, Cross, FOV, Line, Loop;
 
-    public abstract Annotateable generate(JSONObject jo);
+    public Annotateable generate(JSONObject jo) {
+        return switch (this) {
+            case Rectangle -> new AnnotateRectangle(jo);
+            case Circle -> new AnnotateCircle(jo);
+            case Cross -> new AnnotateCross(jo);
+            case FOV -> new AnnotateFOV(jo);
+            case Line -> new AnnotateLine(jo);
+            case Loop -> new AnnotateLoop(jo);
+        };
+    }
 
-    static Annotateable generate(String type, JSONObject jo) {
+    static Annotateable fromJson(JSONObject jo) {
+        String type = jo.optString("type", Rectangle.toString());
         try {
             return valueOf(type).generate(jo);
         } catch (IllegalArgumentException e) {
