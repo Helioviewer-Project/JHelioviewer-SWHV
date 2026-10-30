@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -33,7 +32,7 @@ public final class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull Consumer<List<DataItem>> onResult, String adql) {
-        Task.submitBackground("soar", new QueryItems(adql), onResult, "Error getting the data");
+        Task.submitBackground("soar", () -> toDataItems(query(adql)), onResult, "Error getting the data");
     }
 
     public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -45,7 +44,7 @@ public final class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull Consumer<List<String>> onResult) {
-        Task.submitBackground("soar", new QuerySoops(querySoops), onResult,
+        Task.submitBackground("soar", () -> toSoops(query(querySoops)), onResult,
                 "An error occurred querying the server");
     }
 
@@ -69,7 +68,7 @@ public final class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        Task.submitBackground(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
+        Task.submitBackground(uri.toString(), () -> SoarTable.get(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {
@@ -121,27 +120,6 @@ public final class SoarClient {
     private static JSONObject query(String adql) throws Exception {
         URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
         return JSONUtils.get(uri);
-    }
-
-    private record QueryItems(String adql) implements Callable<List<DataItem>> {
-        @Override
-        public List<DataItem> call() throws Exception {
-            return toDataItems(query(adql));
-        }
-    }
-
-    private record QuerySoops(String adql) implements Callable<List<String>> {
-        @Override
-        public List<String> call() throws Exception {
-            return toSoops(query(adql));
-        }
-    }
-
-    private record QueryTable(URI uri) implements Callable<List<DataItem>> {
-        @Override
-        public List<DataItem> call() throws Exception {
-            return SoarTable.get(uri);
-        }
     }
 
     private SoarClient() {}
