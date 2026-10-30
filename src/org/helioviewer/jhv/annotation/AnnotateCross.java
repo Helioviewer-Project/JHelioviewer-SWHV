@@ -34,10 +34,7 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, BufVertex vexBuf) {
-        if (startPoint == null)
-            return;
-
+    public void draw(MapView mv, Viewport vp, boolean pending, BufVertex vexBuf) {
         byte[] color = color(false);
         drawCross(mv, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
     }
@@ -53,10 +50,7 @@ final class AnnotateCross extends AbstractAnnotateable {
     public void mouseDragged(Viewport vp, int x, int y) {}
 
     @Override
-    public void mouseReleased() {}
-
-    @Override
-    public boolean beingDragged() {
+    public boolean isComplete() {
         return startPoint != null;
     }
 

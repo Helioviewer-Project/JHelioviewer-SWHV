@@ -16,12 +16,11 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     void zoom(Viewport vp) {
-        boolean dragged = beingDragged();
-        if ((startPoint == null || endPoint == null) && !dragged)
+        if (!isComplete())
             return;
 
-        Vec3 p0 = dragged ? dragStartPoint : startPoint;
-        Vec3 p1 = dragged ? dragEndPoint : endPoint;
+        Vec3 p0 = startPoint;
+        Vec3 p1 = endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
         double halfHeight = Math.abs(dy);
@@ -32,14 +31,10 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(MapView mv, double lineThickness, BufVertex lineBuf, BufVertex centerBuf) {
-        boolean dragged = beingDragged();
-        if ((startPoint == null || endPoint == null) && !dragged)
-            return;
-
-        byte[] color = color(dragged);
-        Vec3 p0 = dragged ? dragStartPoint : startPoint;
-        Vec3 p1 = dragged ? dragEndPoint : endPoint;
+    public void drawTransformed(MapView mv, double lineThickness, boolean pending, BufVertex lineBuf, BufVertex centerBuf) {
+        byte[] color = color(pending);
+        Vec3 p0 = startPoint;
+        Vec3 p1 = endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
         double centerX = p0.x + dx;

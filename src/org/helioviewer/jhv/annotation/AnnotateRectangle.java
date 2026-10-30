@@ -59,14 +59,10 @@ final class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, BufVertex vexBuf) {
-        boolean dragged = beingDragged();
-        if ((startPoint == null || endPoint == null) && !dragged)
-            return;
-
-        byte[] color = color(dragged);
-        Vec3 p0 = dragged ? dragStartPoint : startPoint;
-        Vec3 p1 = dragged ? dragEndPoint : endPoint;
+    public void draw(MapView mv, Viewport vp, boolean pending, BufVertex vexBuf) {
+        byte[] color = color(pending);
+        Vec3 p0 = startPoint;
+        Vec3 p1 = endPoint;
 
         if (p0 != geometryStart || p1 != geometryEnd) {
             updateGeometry(p0, p1);

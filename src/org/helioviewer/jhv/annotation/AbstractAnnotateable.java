@@ -26,9 +26,6 @@ abstract class AbstractAnnotateable implements Annotateable {
     Vec3 startPoint;
     Vec3 endPoint;
 
-    Vec3 dragStartPoint;
-    Vec3 dragEndPoint;
-
     private final double thickness;
     private final Colors baseColor;
 
@@ -94,10 +91,10 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, BufVertex vexBuf) {}
+    public void draw(MapView mv, Viewport vp, boolean pending, BufVertex vexBuf) {}
 
     @Override
-    public void drawTransformed(MapView mv, double lineThickness, BufVertex lineBuf, BufVertex centerBuf) {}
+    public void drawTransformed(MapView mv, double lineThickness, boolean pending, BufVertex lineBuf, BufVertex centerBuf) {}
 
     @Override
     public void mousePressed(Viewport vp, int x, int y) {
@@ -106,7 +103,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
         Vec3 pt = computeDragPoint(vp, x, y);
         if (pt != null)
-            dragStartPoint = pt;
+            startPoint = pt;
     }
 
     @Override
@@ -116,25 +113,12 @@ abstract class AbstractAnnotateable implements Annotateable {
 
         Vec3 pt = computeDragPoint(vp, x, y);
         if (pt != null)
-            dragEndPoint = pt;
+            endPoint = pt;
     }
 
     @Override
-    public void mouseReleased() {
-        if (!isDraggable())
-            return;
-
-        if (beingDragged()) {
-            startPoint = dragStartPoint;
-            endPoint = dragEndPoint;
-        }
-        dragStartPoint = null;
-        dragEndPoint = null;
-    }
-
-    @Override
-    public boolean beingDragged() {
-        return dragEndPoint != null && dragStartPoint != null;
+    public boolean isComplete() {
+        return startPoint != null && endPoint != null;
     }
 
     @Override
@@ -147,8 +131,8 @@ abstract class AbstractAnnotateable implements Annotateable {
         return active ? ACTIVE_THICKNESS_FACTOR * thickness : thickness;
     }
 
-    byte[] color(boolean dragged) {
-        return dragged ? dragColor : baseColor.bytes();
+    byte[] color(boolean pending) {
+        return pending ? dragColor : baseColor.bytes();
     }
 
     @Override

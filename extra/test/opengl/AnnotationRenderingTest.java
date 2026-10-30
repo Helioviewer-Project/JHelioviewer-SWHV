@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
@@ -18,6 +21,8 @@ import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.ConnectionLayer;
 import org.helioviewer.jhv.layers.Layer;
@@ -105,12 +110,113 @@ public final class AnnotationRenderingTest {
                     }
                 }
             }
+            gestureChecks(connections, time);
             check(!GLException.checkErrors("AnnotationRenderingTest"), "Annotation GL errors");
         } finally {
             Annotations.clear();
             renderer.destroy();
         }
         System.out.println("AnnotationRenderingTest passed");
+    }
+
+    private static void gestureChecks(ConnectionLayer connections, JHVTime time) {
+        connections.setConnectivity(new LoadConnectivity.Connectivity(time, List.of(), List.of(), List.of()));
+        connections.setHCS(List.of());
+        Display.mode = MapMode.Orthographic;
+        Position displayed = new Position(time, 215, 0, 0);
+        DisplayController.setViewpointUpdate(_ -> displayed, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+        DisplayController.cameraFromJson(new JSONObject().put("fov", 2 * Math.atan(2. / displayed.distance))
+                .put("dragRotation", Quat.ZERO.toJson()));
+        Viewport vp = Display.getViewport(0);
+        int x = vp.x + vp.width / 2, y = vp.yAWT + vp.height / 2;
+        PointerEvent press = pointer(x - 24, y - 16), drag = pointer(x + 24, y + 16);
+        PointerEvent outside = pointer(-10000, -10000);
+        Annotations.setBaseColor(Colors.Magenta);
+        for (AnnotationMode mode : AnnotationMode.values()) {
+            for (String endpoint : new String[]{"startPoint", "endPoint"}) {
+                JSONObject partial = new JSONObject().put("type", mode.name()).put("color", "Magenta")
+                        .put(endpoint, new Vec3(0, 0, 1).toJson());
+                Annotations.fromJson(new JSONObject().put("activeIndex", 0).put("annotateables", new JSONArray().put(partial)));
+                ByteBuffer pixels = gesturePixels(displayed, vp);
+                check((count(pixels) > 0) == (mode == AnnotationMode.Cross && endpoint.equals("startPoint")),
+                        mode + " partial saved annotation rendering");
+                if (mode == AnnotationMode.FOV) {
+                    JSONObject camera = DisplayController.cameraToJson();
+                    Annotations.zoom();
+                    check(camera.similar(DisplayController.cameraToJson()), "partial FOV changed the camera");
+                }
+            }
+            Annotations.clear();
+            ViewState.setAnnotationMode(mode);
+            gesturePixels(displayed, vp);
+            InputController.mousePressed(press);
+            InputController.mouseReleased(press);
+            check(Annotations.toJson().getJSONArray("annotateables").length() == (mode == AnnotationMode.Cross ? 1 : 0),
+                    mode + " press-only completion");
+
+            Annotations.clear();
+            InputController.mousePressed(press);
+            if (mode != AnnotationMode.Cross) {
+                check(Annotations.toJson().getJSONArray("annotateables").isEmpty(), mode + " pending annotation was saved");
+                InputController.mouseDragged(drag);
+                check(Annotations.toJson().getJSONArray("annotateables").isEmpty(), mode + " complete draft was saved");
+                ByteBuffer draft = gesturePixels(displayed, vp);
+                check(greenCount(draft) > 0 && count(draft) == 0, mode + " draft color");
+                if (mode == AnnotationMode.Rectangle || mode == AnnotationMode.Circle || mode == AnnotationMode.Loop) {
+                    InputController.mouseDragged(outside);
+                    check(draft.equals(gesturePixels(displayed, vp)), mode + " invalid drag replaced the last valid point");
+                }
+            } else {
+                check(Annotations.pending() == null && Annotations.toJson().getJSONArray("annotateables").length() == 1,
+                        "Cross did not commit immediately on press");
+            }
+            InputController.mouseReleased(drag);
+            JSONObject saved = Annotations.toJson();
+            JSONArray items = saved.getJSONArray("annotateables");
+            check(Annotations.pending() == null && items.length() == 1, mode + " completed annotation count");
+            JSONObject item = items.getJSONObject(0);
+            check(item.getString("type").equals(mode.name()) && item.has("startPoint")
+                    && item.has("endPoint") == (mode != AnnotationMode.Cross), mode + " saved endpoints");
+            ByteBuffer committed = gesturePixels(displayed, vp);
+            check(count(committed) > 0 && greenCount(committed) == 0, mode + " committed color");
+            Annotations.fromJson(saved);
+            check(committed.equals(gesturePixels(displayed, vp)), mode + " saved geometry changed on restore");
+
+            Annotations.clear();
+            InputController.mousePressed(press);
+            InputController.mouseDragged(drag);
+            Annotations.clear();
+            InputController.mouseReleased(drag);
+            check(Annotations.toJson().getJSONArray("annotateables").isEmpty(), mode + " cleared gesture was committed");
+
+            if (mode == AnnotationMode.Rectangle || mode == AnnotationMode.Circle || mode == AnnotationMode.Loop || mode == AnnotationMode.Cross) {
+                Annotations.clear();
+                InputController.mousePressed(outside);
+                InputController.mouseDragged(drag);
+                InputController.mouseReleased(drag);
+                check(Annotations.toJson().getJSONArray("annotateables").isEmpty(), mode + " invalid press was committed");
+            }
+        }
+        Annotations.clear();
+    }
+
+    private static PointerEvent pointer(int x, int y) {
+        return new PointerEvent(x, y, 1, 1, true, false, false, false, false);
+    }
+
+    private static ByteBuffer gesturePixels(Position displayed, Viewport vp) {
+        GLRenderer.display(displayed);
+        ByteBuffer pixels = BufferUtils.newByteBuffer(4 * vp.width * vp.height);
+        GL.glReadPixels(0, 0, vp.width, vp.height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+        return pixels;
+    }
+
+    private static int greenCount(ByteBuffer pixels) {
+        int count = 0;
+        for (int i = 0; i < pixels.capacity(); i += 4)
+            if ((pixels.get(i + 1) & 255) > (pixels.get(i) & 255))
+                count++;
+        return count;
     }
 
     private static void annotationChecks(MapView view, Viewport vp, ConnectionLayer connections, String context) {

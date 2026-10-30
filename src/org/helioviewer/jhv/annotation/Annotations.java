@@ -82,8 +82,7 @@ public final class Annotations {
     }
 
     public static void finishPending() {
-        if (pending != null && pending.beingDragged()) {
-            pending.mouseReleased();
+        if (pending != null && pending.isComplete()) {
             annotations.add(pending);
             activeIndex = annotations.size() - 1;
         }
@@ -138,15 +137,21 @@ public final class Annotations {
     }
 
     private static void renderAnnotation(MapView mv, Viewport vp, Annotateable annotation, boolean active) {
+        if (!annotation.isComplete())
+            return;
+
         double lineThickness = annotation.thickness(active);
-        annotation.draw(mv, vp, annotationsBuf);
+        annotation.draw(mv, vp, annotation == pending, annotationsBuf);
         annotationsLine.uploadAndClear(annotationsBuf);
         annotationsLine.renderLine(vp, lineThickness);
     }
 
     private static void renderTransformedAnnotation(MapView mv, Viewport vp, double pixFactor, Annotateable annotation, boolean active) {
+        if (!annotation.isComplete())
+            return;
+
         double lineThickness = annotation.thickness(active);
-        annotation.drawTransformed(mv, lineThickness, transformedBuf, centerBuf);
+        annotation.drawTransformed(mv, lineThickness, annotation == pending, transformedBuf, centerBuf);
         transformedLine.uploadAndClear(transformedBuf);
         transformedLine.renderLine(vp, lineThickness);
         center.uploadAndClear(centerBuf);

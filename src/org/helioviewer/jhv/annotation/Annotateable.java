@@ -13,17 +13,15 @@ public interface Annotateable {
     @Nullable
     String getData();
 
-    void draw(MapView mv, Viewport vp, BufVertex vexBuf);
+    void draw(MapView mv, Viewport vp, boolean pending, BufVertex vexBuf);
 
-    void drawTransformed(MapView mv, double lineThickness, BufVertex lineBuf, BufVertex centerBuf);
+    void drawTransformed(MapView mv, double lineThickness, boolean pending, BufVertex lineBuf, BufVertex centerBuf);
 
     void mousePressed(Viewport vp, int x, int y);
 
     void mouseDragged(Viewport vp, int x, int y);
 
-    void mouseReleased();
-
-    boolean beingDragged();
+    boolean isComplete();
 
     boolean isDraggable();
 
