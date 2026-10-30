@@ -53,21 +53,27 @@ public final class SWEKLayerTest {
         SWEKSession active = SWEKPlugin.sessionForRestore();
         SWEKLayer original = (SWEKLayer) Layers.getLayers().stream().filter(layer -> layer instanceof SWEKLayer).findFirst().orElseThrow();
         EventTimelineLayer timeline = SWEKPlugin.getTimelineLayer();
-        Method factory = State.class.getDeclaredMethod("json2Object", JSONObject.class);
+        Method factory = State.class.getDeclaredMethod("readLayer", JSONObject.class);
         factory.setAccessible(true);
         JSONObject state = new JSONObject().put("className", SWEKLayer.class.getName()).put("data", new JSONObject().put("icons", false));
         SWEKLayer restored = (SWEKLayer) factory.invoke(null, state);
         check(restored != null && !restored.isIcons() && !original.isEnabled(), "restoration keeps settings and immediately detaches the old scene layer");
+        check(factory.invoke(null, new JSONObject(state.toString()).put("type", "unknown")) == null, "Unknown type used the legacy class name");
+        check(factory.invoke(null, new JSONObject().put("type", "events")) == null, "Missing layer data was accepted");
         restored.setEnabled(true);
         List<Layer> layers = new ArrayList<>(Layers.getLayers());
         layers.remove(original);
         layers.add(restored);
         Layers.restore(layers);
         check(SWEKPlugin.sessionForRestore() == active, "state restore retains the active session");
-        Method timelineFactory = State.class.getDeclaredMethod("deserialize2Object", JSONObject.class);
+        Method timelineFactory = State.class.getDeclaredMethod("readTimeline", JSONObject.class);
         timelineFactory.setAccessible(true);
         Object restoredTimeline = timelineFactory.invoke(null, new JSONObject().put("className", EventTimelineLayer.class.getName()).put("data", new JSONObject()));
         check(restoredTimeline == timeline, "timeline restoration reuses the plugin-owned instance");
+        check(timelineFactory.invoke(null, new JSONObject().put("type", "events").put("data", new JSONObject())) == timeline,
+                "New timeline type replaced the plugin-owned instance");
+        check(timelineFactory.invoke(null, new JSONObject().put("type", "unknown").put("data", new JSONObject())) == null,
+                "Unknown timeline type was accepted");
         TimelineLayers.restore(List.of(timeline));
         check(TimelineLayers.get().stream().filter(layer -> layer instanceof EventTimelineLayer).count() == 1, "restoration does not duplicate timeline layers");
         layers.remove(restored);

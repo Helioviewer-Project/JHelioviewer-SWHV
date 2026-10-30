@@ -2,8 +2,6 @@ package org.helioviewer.jhv.app.state;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -18,18 +16,30 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.layers.ConnectionLayer;
+import org.helioviewer.jhv.layers.FOVLayer;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.layers.ModelLayer;
+import org.helioviewer.jhv.layers.TimestampLayer;
+import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssLayer;
+import org.helioviewer.jhv.plugins.swek.EventTimelineLayer;
+import org.helioviewer.jhv.plugins.swek.SWEKLayer;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.radio.RadioData;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -78,7 +88,20 @@ public final class State {
     }
 
     private static JSONObject layer2json(Layer layer, boolean master) {
-        JSONObject jo = new JSONObject().put("className", layer.getClass().getName()).put("name", layer.getName());
+        String type = switch (layer) {
+            case ImageLayer _ -> "image";
+            case ViewpointLayer _ -> "viewpoint";
+            case ConnectionLayer _ -> "connection";
+            case GridLayer _ -> "grid";
+            case FOVLayer _ -> "fov";
+            case TimestampLayer _ -> "timestamp";
+            case MiniviewLayer _ -> "miniview";
+            case ModelLayer _ -> "model";
+            case SWEKLayer _ -> "events";
+            case PfssLayer _ -> "pfss";
+            default -> throw new IllegalArgumentException("Unsupported saved layer: " + layer.getClass().getName());
+        };
+        JSONObject jo = new JSONObject().put("type", type).put("name", layer.getName());
         JSONObject dataObject = new JSONObject();
         layer.serialize(dataObject);
         jo.put("data", dataObject);
@@ -91,7 +114,13 @@ public final class State {
     private static void saveTimelineState(JSONObject main) {
         JSONArray ja = new JSONArray();
         for (TimelineLayer tl : TimelineLayers.get()) {
-            JSONObject jo = new JSONObject().put("className", tl.getClass().getName()).put("name", tl.getName());
+            String type = switch (tl) {
+                case Band _ -> "band";
+                case RadioData _ -> "radio";
+                case EventTimelineLayer _ -> "events";
+                default -> throw new IllegalArgumentException("Unsupported saved timeline: " + tl.getClass().getName());
+            };
+            JSONObject jo = new JSONObject().put("type", type).put("name", tl.getName());
             JSONObject dataObject = new JSONObject();
             tl.serialize(dataObject);
             jo.put("data", dataObject);
@@ -102,32 +131,52 @@ public final class State {
     }
 
     @Nullable
-    private static Object json2Object(JSONObject json) {
+    private static Layer readLayer(JSONObject json) {
         JSONObject data = json.optJSONObject("data");
         if (data == null)
             return null;
 
         try {
-            Class<?> c = Class.forName(json.optString("className"));
-            Constructor<?> cons = c.getConstructor(JSONObject.class);
-            return cons.newInstance(data);
-        } catch (Exception e) {
+            String type = json.optString("type", json.optString("className"));
+            return switch (type) {
+                case "viewpoint", "org.helioviewer.jhv.layers.ViewpointLayer" -> new ViewpointLayer(data);
+                case "connection", "org.helioviewer.jhv.layers.ConnectionLayer" -> new ConnectionLayer(data);
+                case "grid", "org.helioviewer.jhv.layers.GridLayer" -> new GridLayer(data);
+                case "fov", "org.helioviewer.jhv.layers.FOVLayer" -> new FOVLayer(data);
+                case "timestamp", "org.helioviewer.jhv.layers.TimestampLayer" -> new TimestampLayer(data);
+                case "miniview", "org.helioviewer.jhv.layers.MiniviewLayer" -> new MiniviewLayer(data);
+                case "model", "org.helioviewer.jhv.layers.ModelLayer" -> new ModelLayer(data);
+                case "events", "org.helioviewer.jhv.plugins.swek.SWEKLayer" -> new SWEKLayer(data);
+                case "pfss", "org.helioviewer.jhv.plugins.pfss.PfssLayer" -> new PfssLayer(data);
+                default -> {
+                    Log.warn("Unknown saved layer type: " + type);
+                    yield null;
+                }
+            };
+        } catch (Exception | Error e) {
             Log.error(e);
         }
         return null;
     }
 
     @Nullable
-    private static Object deserialize2Object(JSONObject json) {
+    private static TimelineLayer readTimeline(JSONObject json) {
         JSONObject data = json.optJSONObject("data");
         if (data == null)
             return null;
 
         try {
-            Class<?> c = Class.forName(json.optString("className"));
-            Method m = c.getDeclaredMethod("deserialize", JSONObject.class);
-            return m.invoke(null, data);
-        } catch (Exception e) {
+            String type = json.optString("type", json.optString("className"));
+            return switch (type) {
+                case "band", "org.helioviewer.jhv.timelines.band.Band" -> Band.deserialize(data);
+                case "radio", "org.helioviewer.jhv.timelines.radio.RadioData" -> RadioData.deserialize(data);
+                case "events", "org.helioviewer.jhv.plugins.swek.EventTimelineLayer" -> EventTimelineLayer.deserialize(data);
+                default -> {
+                    Log.warn("Unknown saved timeline type: " + type);
+                    yield null;
+                }
+            };
+        } catch (Exception | Error e) {
             Log.error(e);
         }
         return null;
@@ -141,7 +190,8 @@ public final class State {
             for (Object o : timelines) {
                 if (o instanceof JSONObject jo) {
                     try {
-                        if (deserialize2Object(jo) instanceof TimelineLayer layer) {
+                        TimelineLayer layer = readTimeline(jo);
+                        if (layer != null) {
                             newList.add(layer);
                             layer.setEnabled(jo.optBoolean("enabled", true));
                         }
@@ -162,7 +212,8 @@ public final class State {
             for (Object o : layers) {
                 if (o instanceof JSONObject jo) {
                     try {
-                        if (json2Object(jo) instanceof Layer layer) {
+                        Layer layer = readLayer(jo);
+                        if (layer != null) {
                             restoredLayers.add(layer);
                             layer.setEnabled(jo.optBoolean("enabled", false));
                         }

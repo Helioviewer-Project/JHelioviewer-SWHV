@@ -759,27 +759,29 @@ Meaning:
 
 ```json
 {
-  "className": "org.helioviewer.jhv.layers.GridLayer",
+  "type": "grid",
   "name": "Display name",
   "data": { "...": "layer or timeline view options..." },
   "enabled": true
 }
 ```
 
-Real `className` examples from the source:
+Supported layer types are `viewpoint`, `connection`, `grid`, `fov`, `timestamp`,
+`miniview`, `model`, `events`, and `pfss`. Timeline types are `band`, `radio`,
+and `events`.
 
-- layers:
-  - `org.helioviewer.jhv.layers.GridLayer`
-  - `org.helioviewer.jhv.layers.TimestampLayer`
-- timelines:
-  - `org.helioviewer.jhv.timelines.radio.RadioData`
-  - `org.helioviewer.jhv.timelines.band.Band`
+Readers also accept historical `className` entries for these types. New saves
+write only `type`. Unknown layer and timeline types are logged and skipped.
+
+Plugin state uses the keys `timelines`, `events`, and `pfss`. Readers also accept
+the historical keys `EVEPlugin`, `SWEKPlugin`, and `PfssPlugin`, with the new key
+taking precedence when both are present.
 
 `imageLayers` uses the same shape, plus optional `master`:
 
 ```json
 {
-  "className": "org.helioviewer.jhv.layers.ImageLayer",
+  "type": "image",
   "name": "Layer name",
   "data": { "...": "image-layer view options..." },
   "enabled": true,

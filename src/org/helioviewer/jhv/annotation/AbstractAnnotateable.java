@@ -162,7 +162,14 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     private String getTypeName() {
-        String className = getClass().getSimpleName();
-        return className.startsWith("Annotate") ? className.substring("Annotate".length()) : className;
+        return switch (this) {
+            case AnnotateRectangle _ -> "Rectangle";
+            case AnnotateCircle _ -> "Circle";
+            case AnnotateCross _ -> "Cross";
+            case AnnotateFOV _ -> "FOV";
+            case AnnotateLine _ -> "Line";
+            case AnnotateLoop _ -> "Loop";
+            default -> throw new IllegalStateException("Unknown annotation type: " + getClass().getName());
+        };
     }
 }

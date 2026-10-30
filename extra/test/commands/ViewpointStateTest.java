@@ -2,12 +2,15 @@ package org.helioviewer.jhv.layers;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -15,6 +18,10 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.thread.UiThread;
 
 import org.json.JSONArray;
@@ -34,11 +41,13 @@ public final class ViewpointStateTest {
                 Layers.restore(List.of());
                 check(Layers.getViewpointLayer().getCameraMode() == ViewpointLayerOptions.CameraMode.Observer, "New session mode");
                 check(DisplayController.getViewpointUpdate() == UpdateViewpoint.observer, "New session strategy");
+                checkFormatNames();
             });
             for (String mode : List.of("ObserverAt1au", "Location", "Heliosphere")) {
                 for (boolean enabled : new boolean[]{false, true})
-                    roundTrip(mode, enabled);
+                    roundTrip(mode, enabled, false);
             }
+            roundTrip("Location", true, true);
             UiThread.postAndWait(ViewpointStateTest::checkModeSwitching);
             UiThread.postAndWait(ViewpointStateTest::checkSkyAndSpiralSettings);
         } finally {
@@ -51,7 +60,27 @@ public final class ViewpointStateTest {
         System.out.println("ViewpointStateTest passed");
     }
 
-    private static void roundTrip(String mode, boolean enabled) throws Exception {
+    private static void checkFormatNames() {
+        PluginManager.setGUIEnabled(false);
+        for (String name : List.of("EVEPlugin", "SWEKPlugin", "PfssPlugin"))
+            Settings.setProperty("plugins." + name + ".active", "false");
+        PluginManager.addPlugin(new EVEPlugin());
+        PluginManager.addPlugin(new SWEKPlugin());
+        PluginManager.addPlugin(new PfssPlugin());
+        PluginManager.loadState(new JSONObject().put("EVEPlugin", new JSONObject().put("stacked", true)));
+        JSONObject plugins = new JSONObject();
+        PluginManager.saveState(plugins);
+        check(plugins.keySet().equals(Set.of("timelines", "events", "pfss")), "Saved plugin keys depend on class names");
+        check(plugins.getJSONObject("timelines").getBoolean("stacked"), "Legacy plugin key did not load");
+        PluginManager.loadState(new JSONObject().put("timelines", new JSONObject().put("stacked", false))
+                .put("EVEPlugin", new JSONObject().put("stacked", true)));
+        PluginManager.saveState(plugins);
+        check(!plugins.getJSONObject("timelines").getBoolean("stacked"), "Legacy plugin key overrode the new key");
+        for (String type : List.of("Rectangle", "Circle", "Cross", "FOV", "Line", "Loop"))
+            check(AnnotationMode.valueOf(type).generate(new JSONObject()).toJson().getString("type").equals(type), "Annotation type changed: " + type);
+    }
+
+    private static void roundTrip(String mode, boolean enabled, boolean oldFormat) throws Exception {
         JSONObject custom = new JSONObject().put("objects", new JSONArray()).put("syncInterval", false)
                 .put("startTime", "2025-01-01T00:00:00").put("endTime", "2025-01-02T00:00:00")
                 .put("planets", false).put("stars", false);
@@ -67,14 +96,21 @@ public final class ViewpointStateTest {
             DisplayController.rotateView90("Z");
         });
         JSONObject saved = UiThread.postAndWait(ViewpointStateTest::sessionJson);
+        check(!saved.toString().contains("\"className\""), "Writer emitted Java class names");
         JSONObject before = viewpointEntry(saved);
         check(before.getBoolean("enabled") == enabled, "Saved enabled flag");
         check(before.getJSONObject("data").getString("mode").equals(mode), "Saved legacy mode");
         JSONObject spiral = before.getJSONObject("data").getJSONObject("equatorial");
         check(spiral.getBoolean("spiral") == !enabled && spiral.getInt("spiralSpeed") == (enabled ? 1300 : 850), "Spiral settings not saved");
         CompletableFuture<Boolean> completion = new CompletableFuture<>();
+        JSONObject input = new JSONObject(saved.toString());
+        if (oldFormat) {
+            JSONObject entry = viewpointEntry(input);
+            entry.remove("type");
+            entry.put("className", "org.helioviewer.jhv.layers.ViewpointLayer");
+        }
         UiThread.postAndWait(() -> State.load((success, message, output) ->
-                completion.complete(success && message.equals("State loaded.") && output == null), saved));
+                completion.complete(success && message.equals("State loaded.") && output == null), input));
         // State applies playback after its asynchronous layer-load completion callback.
         UiThread.postAndWait(() -> {});
         check(completion.get(5, TimeUnit.SECONDS), "State restoration changed its completion payload");
@@ -159,7 +195,7 @@ public final class ViewpointStateTest {
     private static JSONObject viewpointEntry(JSONObject session) {
         for (Object entry : session.getJSONArray("layers")) {
             JSONObject layer = (JSONObject) entry;
-            if (layer.getString("className").equals(ViewpointLayer.class.getName()))
+            if (layer.getString("type").equals("viewpoint"))
                 return layer;
         }
         throw new AssertionError("Missing saved viewpoint");
