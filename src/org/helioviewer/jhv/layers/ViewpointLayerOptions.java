@@ -70,10 +70,6 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         jo.put("equatorial", equatorialOptions.toJson());
     }
 
-    boolean isDownloading() {
-        return locationOptions.isDownloading() || equatorialOptions.isDownloading();
-    }
-
     public CameraMode getCameraMode() {
         return cameraMode;
     }

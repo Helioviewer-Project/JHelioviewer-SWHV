@@ -201,18 +201,6 @@ public final class ViewpointLayerOptionsExpert {
         DisplayController.display();
     }
 
-    boolean isDownloading() {
-        for (PositionLoad load : loads.values()) {
-            if (load.isDownloading())
-                return true;
-        }
-        for (PositionLoad load : locationLoads) {
-            if (load.isDownloading())
-                return true;
-        }
-        return false;
-    }
-
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
         jo.put("frame", frame);

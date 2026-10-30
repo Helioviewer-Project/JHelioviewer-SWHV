@@ -31,7 +31,6 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.Transform;
-import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
@@ -92,8 +91,6 @@ public class ViewpointLayer extends AbstractLayer {
         }
     }
 
-    private JHVTime viewpointTime = Sun.StartEarth.time;
-
     public ViewpointLayer(JSONObject jo) {
         options = new ViewpointLayerOptions(jo);
     }
@@ -114,11 +111,8 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (vp.idx == 0) { // once!
-            updateTime(mv.viewpoint().time);
-            if (options.isLocation())
-                computeLocation(mv);
-        }
+        if (vp.idx == 0 && options.isLocation())
+            computeLocation(mv);
 
         if (!isVisible[vp.idx])
             return;
@@ -357,25 +351,6 @@ public class ViewpointLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "Viewpoint";
-    }
-
-    @Nullable
-    @Override
-    public String getTimeString() {
-        return viewpointTime.toString();
-    }
-
-    private void updateTime(JHVTime _viewpointTime) {
-        if (viewpointTime.milli == _viewpointTime.milli)
-            return;
-
-        viewpointTime = _viewpointTime;
-        Layers.fireTimeUpdated(this);
-    }
-
-    @Override
-    public boolean isDownloading() {
-        return options.isDownloading();
     }
 
     @Override

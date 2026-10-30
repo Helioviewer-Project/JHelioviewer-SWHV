@@ -72,10 +72,6 @@ public final class PositionLoad {
         }
     }
 
-    public boolean isDownloading() {
-        return !future.isDone();
-    }
-
     public boolean hasFailed() {
         return future.isCancelled() || (future.isDone() && getResponse() == null);
     }
