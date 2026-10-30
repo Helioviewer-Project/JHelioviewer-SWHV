@@ -37,11 +37,6 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "FOV";
     }

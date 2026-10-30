@@ -279,11 +279,6 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "Grid";
     }

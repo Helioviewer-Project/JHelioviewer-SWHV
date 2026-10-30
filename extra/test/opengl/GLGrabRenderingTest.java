@@ -130,7 +130,6 @@ public final class GLGrabRenderingTest {
         @Override public void renderScale(MapView mv, Viewport vp) { render(mv, vp); }
         @Override public void init() {}
         @Override public void dispose() {}
-        @Override public void remove() { Layers.remove(this); }
         @Override public String getName() { return "Export scale probe"; }
         @Override public void serialize(JSONObject jo) {}
     }

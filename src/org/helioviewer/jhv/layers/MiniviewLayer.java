@@ -52,11 +52,6 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "Miniview";
     }

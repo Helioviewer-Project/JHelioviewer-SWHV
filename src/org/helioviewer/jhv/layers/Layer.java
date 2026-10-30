@@ -21,7 +21,10 @@ public interface Layer {
 
     default void prerender() {}
 
-    void remove();
+    // Stops CPU work without requiring a GL context.
+    default void detach() {
+        setEnabled(false);
+    }
 
     String getName();
 
@@ -54,6 +57,7 @@ public interface Layer {
 
     void init();
 
+    // Releases GL resources, including during context recreation.
     void dispose();
 
     void serialize(JSONObject jo);

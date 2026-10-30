@@ -343,12 +343,6 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove() {
-        setEnabled(false);
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "Viewpoint";
     }

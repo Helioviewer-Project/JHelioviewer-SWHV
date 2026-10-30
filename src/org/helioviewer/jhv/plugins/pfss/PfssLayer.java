@@ -81,12 +81,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range {
     }
 
     @Override
-    public void remove() {
-        setEnabled(false);
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "PFSS Model";
     }

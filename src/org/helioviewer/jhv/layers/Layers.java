@@ -166,16 +166,13 @@ public final class Layers {
     }
 
     private static void detach(Layer layer) {
-        if (layer instanceof ImageLayer imageLayer)
-            imageLayer.detach();
-        if (layer instanceof ViewpointLayer)
-            layer.setEnabled(false);
+        layer.detach();
         if (!newLayers.remove(layer))
             removedLayers.add(layer);
     }
 
     public static void prerender() {
-        removeLayers();
+        disposeRemovedLayers();
         initLayers();
         layers.forEach(Layer::prerender);
     }
@@ -205,8 +202,8 @@ public final class Layers {
         newLayers.clear();
     }
 
-    private static void removeLayers() {
-        removedLayers.forEach(Layer::remove);
+    private static void disposeRemovedLayers() {
+        removedLayers.forEach(Layer::dispose);
         removedLayers.clear();
     }
 
@@ -256,7 +253,7 @@ public final class Layers {
     }
 
     public static void dispose() {
-        removeLayers();
+        disposeRemovedLayers();
         for (Layer layer : layers) {
             if (!newLayers.contains(layer))
                 layer.dispose();

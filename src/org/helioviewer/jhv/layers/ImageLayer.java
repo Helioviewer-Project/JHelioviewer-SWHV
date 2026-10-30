@@ -175,7 +175,8 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     // Release the CPU-side owners now; GL disposal still needs the render context.
-    void detach() {
+    @Override
+    public void detach() {
         removed = true;
         loader.abolish();
         decoder.dispose();
@@ -183,11 +184,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         frames.close();
         clearImageData();
         settleLoad();
-    }
-
-    @Override
-    public void remove() {
-        dispose();
     }
 
     @Override

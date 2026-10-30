@@ -150,11 +150,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
         if (!enabled) {

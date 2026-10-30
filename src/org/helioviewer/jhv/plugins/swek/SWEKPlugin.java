@@ -87,10 +87,8 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     @Override
     public void layersCleared() {
-        if (layer != null && !Layers.getLayers().contains(layer)) {
-            layer.detach();
+        if (layer != null && !Layers.getLayers().contains(layer))
             layer = null;
-        }
     }
 
     private void bindLayer() {

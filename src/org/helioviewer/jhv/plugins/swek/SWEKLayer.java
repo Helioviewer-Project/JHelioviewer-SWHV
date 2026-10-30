@@ -92,7 +92,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         icons = jo.optBoolean("icons", icons);
     }
 
-    void detach() {
+    @Override
+    public void detach() {
         setEnabled(false);
         ui = null;
     }
@@ -414,12 +415,6 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
             return;
         if (hover != null)
             drawText(vp, hover.events(), hover.x(), hover.y(), hover.time());
-    }
-
-    @Override
-    public void remove() {
-        setEnabled(false);
-        dispose();
     }
 
     @Override

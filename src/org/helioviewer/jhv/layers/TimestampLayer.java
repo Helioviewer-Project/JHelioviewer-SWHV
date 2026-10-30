@@ -116,11 +116,6 @@ public class TimestampLayer extends AbstractLayer {
     public void init() {}
 
     @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "Timestamp";
     }
