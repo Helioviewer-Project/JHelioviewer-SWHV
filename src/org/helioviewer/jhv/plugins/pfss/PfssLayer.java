@@ -105,7 +105,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range {
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        PfssLoader.submitList(start, end);
+        cache.submitList(start, end);
     }
 
     @Override
