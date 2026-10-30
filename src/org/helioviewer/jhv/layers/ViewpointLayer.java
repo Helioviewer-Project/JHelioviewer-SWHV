@@ -114,7 +114,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (vp.idx == 0 && options.isLocation())
             computeLocation(mv);
 
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         if (options.isLocation()) {
             renderLocation(mv);
@@ -255,7 +255,7 @@ public class ViewpointLayer extends AbstractLayer {
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        if (!isVisible[vp.idx] || !mv.isOrthographic()) { // the sky is drawn only in orthographic mode
+        if (!enabled || !mv.isOrthographic()) { // the sky is drawn only in orthographic mode
             clearHoverTextIfNeeded();
             return;
         }
@@ -403,7 +403,7 @@ public class ViewpointLayer extends AbstractLayer {
     private void putLocationSky(MapView mv) {
         double extent = 0;
         for (Viewport vp : Display.getViewports()) {
-            if (isVisible[vp.idx]) {
+            if (enabled) {
                 double width = mv.cameraWidth(vp);
                 extent = Math.max(extent, Math.hypot(width * vp.aspect / 2, width / 2));
             }

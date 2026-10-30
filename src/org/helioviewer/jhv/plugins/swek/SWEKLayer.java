@@ -348,7 +348,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         long currentTime = mv.viewpoint().time.milli;
         List<ActiveEvent> evs = activeEvents(currentTime);
@@ -375,7 +375,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
 
     @Override
     public void renderScale(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         long currentTime = mv.viewpoint().time.milli;
         List<ActiveEvent> evs = activeEvents(currentTime);

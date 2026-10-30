@@ -69,7 +69,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         if (connectivity != null)
             drawConnectivity(mv, vp);

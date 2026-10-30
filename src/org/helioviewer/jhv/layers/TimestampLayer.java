@@ -43,7 +43,7 @@ public class TimestampLayer extends AbstractLayer {
 
     @Override
     public void renderFloat(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
 
         String text = "";

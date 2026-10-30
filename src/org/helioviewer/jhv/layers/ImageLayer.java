@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 
 public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Frames.Listener {
 
+    private final boolean[] isVisible = {false, false, false, false, false, false}; // match max of Display.viewports.length
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage = new GLSLImage(displaySettings);
@@ -149,7 +151,26 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
+        Arrays.fill(isVisible, enabled);
         ImageLayers.arrangeMultiView();
+    }
+
+    public void setVisible(int j) {
+        Arrays.fill(isVisible, false);
+        if (j >= 0 && j < isVisible.length)
+            isVisible[j] = true;
+    }
+
+    public boolean isVisible(int idx) {
+        return isVisible[idx];
+    }
+
+    public int isVisibleIdx() {
+        for (int i = 0; i < isVisible.length; i++) {
+            if (isVisible[i])
+                return i;
+        }
+        return -1;
     }
 
     private void loaded(ImageLayerLoader.Result result) {

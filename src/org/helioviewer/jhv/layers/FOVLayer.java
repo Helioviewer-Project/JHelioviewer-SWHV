@@ -21,7 +21,7 @@ public class FOVLayer extends AbstractLayer {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         catalog.render(mv, vp);
     }

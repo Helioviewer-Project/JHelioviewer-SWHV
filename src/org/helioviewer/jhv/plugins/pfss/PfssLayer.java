@@ -46,7 +46,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
 
         PfssLoader.Data data;

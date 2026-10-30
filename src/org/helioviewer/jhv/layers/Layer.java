@@ -32,12 +32,6 @@ public interface Layer {
 
     void setEnabled(boolean b);
 
-    int isVisibleIdx();
-
-    boolean isVisible(int idx);
-
-    void setVisible(int idx);
-
     @Nullable
     default String getTimeString() {
         return null;
