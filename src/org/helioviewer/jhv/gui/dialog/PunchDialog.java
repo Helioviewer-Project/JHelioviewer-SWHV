@@ -85,7 +85,6 @@ public class PunchDialog extends StandardDialog {
     private int searchRequest;
     private boolean productsDownloaded;
     private boolean rangeUserChanged; // true once the user has explicitly set a range
-    private boolean updatingProducts;
 
     private static PunchDialog instance;
 
@@ -150,10 +149,7 @@ public class PunchDialog extends StandardDialog {
         dataSelector.add(searchButton);
 
         levelCombo.addActionListener(e -> loadProducts());
-        productCombo.addActionListener(e -> {
-            if (!updatingProducts)
-                loadCoverage();
-        });
+        productCombo.addActionListener(e -> loadCoverage());
         cadenceCombo.addActionListener(e -> clearResults());
 
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
@@ -243,12 +239,7 @@ public class PunchDialog extends StandardDialog {
         int request = ++productsRequest;
         productsDownloaded = false;
         coverageLabel.setText("Checking products...");
-        updatingProducts = true;
-        try {
-            productCombo.setModel(new DefaultComboBoxModel<>());
-        } finally {
-            updatingProducts = false;
-        }
+        productCombo.setModel(new DefaultComboBoxModel<>());
         if (levelCombo.getSelectedItem() instanceof String level)
             PunchClient.submitGetProducts(list -> setProducts(request, list), level);
     }
@@ -256,17 +247,11 @@ public class PunchDialog extends StandardDialog {
     private void setProducts(int request, List<String> list) {
         if (request != productsRequest)
             return;
-        updatingProducts = true;
-        try {
-            productCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
-            productsDownloaded = true; // mark loaded only after successful callback
-            if (list.contains("CAM"))
-                productCombo.setSelectedItem("CAM");
-            else if (!list.isEmpty())
-                productCombo.setSelectedIndex(0);
-        } finally {
-            updatingProducts = false;
-        }
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(list.toArray(String[]::new));
+        if (list.contains("CAM"))
+            model.setSelectedItem("CAM");
+        productCombo.setModel(model);
+        productsDownloaded = true; // mark loaded only after successful callback
         loadCoverage();
     }
 
