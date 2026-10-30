@@ -10,7 +10,9 @@ import java.awt.event.MouseWheelEvent;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,7 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
@@ -158,6 +161,7 @@ public final class SidebarTest {
         Rectangle visible = gridOptions.getVisibleRect();
         check(visible.height == gridOptions.getPreferredSize().height && visible.width == gridOptions.getWidth(),
                 "Grid controls clipped");
+        checkLayerTimeRepaints(panel, tabs, images, overlays, first);
 
         JSONObject camera = DisplayController.cameraToJson();
         UpdateViewpoint update = DisplayController.getViewpointUpdate();
@@ -362,6 +366,57 @@ public final class SidebarTest {
             frames.setFont(frameFont);
             clock.setText(original);
             clock.select(0, 0);
+        }
+    }
+
+    private static void checkLayerTimeRepaints(LayersPanel panel, JTabbedPane tabs, JTable images, JTable overlays, ImageLayer image) {
+        tabs.setSelectedIndex(0);
+        panel.setSize(panel.getWidth(), panel.getPreferredSize().height);
+        layoutTree(panel);
+        Interfaces.LazyComponent imageUpdates = (Interfaces.LazyComponent) images;
+        Interfaces.LazyComponent overlayUpdates = (Interfaces.LazyComponent) overlays;
+        imageUpdates.lazyRepaint();
+        overlayUpdates.lazyRepaint();
+        RepaintManager original = RepaintManager.currentManager(images);
+        Map<JComponent, Rectangle> regions = new IdentityHashMap<>();
+        RepaintManager.setCurrentManager(new RepaintManager() {
+            @Override
+            public void addDirtyRegion(JComponent component, int x, int y, int width, int height) {
+                if (component == images || component == overlays)
+                    regions.merge(component, new Rectangle(x, y, width, height), Rectangle::union);
+            }
+        });
+        try {
+            Layers.fireTimeUpdated(Layers.getViewpointLayer());
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            check(regions.isEmpty(), "Filtered Viewpoint update repainted layer tables");
+
+            Layers.fireTimeUpdated(image);
+            check(regions.isEmpty(), "Timestamp repaint bypassed UI timer");
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            int row = images.convertRowIndexToView(Layers.getLayers().indexOf(image));
+            Rectangle expected = images.getCellRect(row, LayersTableModel.TIME_COL, true).intersection(images.getVisibleRect());
+            check(!expected.isEmpty(), "Image time cell is outside the test viewport");
+            check(expected.equals(regions.get(images)) && !regions.containsKey(overlays), "Image update repainted unrelated time cells");
+
+            tabs.setSelectedIndex(1);
+            panel.setSize(panel.getWidth(), panel.getPreferredSize().height);
+            layoutTree(panel);
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            regions.clear();
+            Layer connection = Layers.getConnectionLayer();
+            Layers.fireTimeUpdated(connection);
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            row = overlays.convertRowIndexToView(Layers.getLayers().indexOf(connection));
+            expected = overlays.getCellRect(row, LayersTableModel.TIME_COL, true).intersection(overlays.getVisibleRect());
+            check(!expected.isEmpty(), "Overlay time cell is outside the test viewport");
+            check(expected.equals(regions.get(overlays)) && !regions.containsKey(images), "Overlay update repainted unrelated time cells");
+        } finally {
+            RepaintManager.setCurrentManager(original);
         }
     }
 

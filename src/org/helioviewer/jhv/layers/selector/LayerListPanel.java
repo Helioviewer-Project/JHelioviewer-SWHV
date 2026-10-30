@@ -66,7 +66,16 @@ final class LayerListPanel extends JPanel {
         @Override
         public void tableChanged(TableModelEvent e) {
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == LayersTableModel.TIME_COL) {
-                dirtyTimeColumn = true;
+                Rectangle visible = getVisibleRect();
+                int lastRow = Math.min(e.getLastRow(), getModel().getRowCount() - 1);
+                for (int modelRow = e.getFirstRow(); modelRow <= lastRow; modelRow++) {
+                    int row = convertRowIndexToView(modelRow);
+                    if (row >= 0) {
+                        Rectangle cell = getCellRect(row, LayersTableModel.TIME_COL, true).intersection(visible);
+                        if (!cell.isEmpty())
+                            repaint(cell.x, cell.y, cell.width, cell.height);
+                    }
+                }
                 return;
             }
 
@@ -106,31 +115,15 @@ final class LayerListPanel extends JPanel {
         private boolean dirty = false;
         @Nullable
         private Rectangle dirtyRect;
-        private boolean dirtyTimeColumn = false;
 
         @Override
         public void lazyRepaint() {
             if (dirty) {
                 super.repaint();
-            } else {
-                if (dirtyRect != null)
-                    super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
-                if (dirtyTimeColumn)
-                    repaintTimeColumn();
-            }
+            } else if (dirtyRect != null)
+                super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
             dirty = false;
             dirtyRect = null;
-            dirtyTimeColumn = false;
-        }
-
-        private void repaintTimeColumn() {
-            Rectangle visible = getVisibleRect();
-            Rectangle cell = getCellRect(0, LayersTableModel.TIME_COL, true);
-
-            int x0 = Math.max(cell.x, visible.x);
-            int x1 = Math.min(cell.x + cell.width, visible.x + visible.width);
-            if (x0 < x1)
-                super.repaint(x0, visible.y, x1 - x0, visible.height);
         }
 
     }
