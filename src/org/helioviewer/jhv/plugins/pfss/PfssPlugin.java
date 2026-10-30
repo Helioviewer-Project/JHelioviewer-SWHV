@@ -37,7 +37,7 @@ public class PfssPlugin extends Plugin {
 
     @Override
     protected void installGUI() {
-        LayerOptions.register(PfssLayer.class, layer -> new PfssLayerOptions((PfssLayer) layer));
+        LayerOptions.register(PfssLayer.class, PfssLayerOptions::new);
     }
 
     @Override

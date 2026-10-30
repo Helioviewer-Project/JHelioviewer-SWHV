@@ -49,7 +49,7 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
 
     public void install() {
         MainFrame.getLayersPanel().setEventsPanel(treePane);
-        LayerOptions.register(SWEKLayer.class, selectedLayer -> createLayerOptions((SWEKLayer) selectedLayer));
+        LayerOptions.register(SWEKLayer.class, SWEKSwingUI::createLayerOptions);
     }
 
     private static JPanel createLayerOptions(SWEKLayer layer) {

@@ -25,20 +25,20 @@ public final class LayerOptions implements Layers.Listener {
     private final IdentityHashMap<Layer, Component> panels = new IdentityHashMap<>();
 
     static {
-        register(ConnectionLayer.class, layer -> new ConnectionLayerOptions((ConnectionLayer) layer));
-        register(FOVLayer.class, layer -> new FOVTreePane(((FOVLayer) layer).getCatalog()));
-        register(GridLayer.class, layer -> new GridLayerOptions((GridLayer) layer));
-        register(ImageLayer.class, layer -> new ImageLayerOptions((ImageLayer) layer));
-        register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
-        register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
+        register(ConnectionLayer.class, ConnectionLayerOptions::new);
+        register(FOVLayer.class, layer -> new FOVTreePane(layer.getCatalog()));
+        register(GridLayer.class, GridLayerOptions::new);
+        register(ImageLayer.class, ImageLayerOptions::new);
+        register(MiniviewLayer.class, MiniviewLayerOptions::new);
+        register(TimestampLayer.class, TimestampLayerOptions::new);
     }
 
     LayerOptions() {
         Layers.addListener(this);
     }
 
-    public static void register(Class<? extends Layer> type, Function<Layer, Component> provider) {
-        providers.put(type, provider);
+    public static <T extends Layer> void register(Class<T> type, Function<T, Component> provider) {
+        providers.put(type, layer -> provider.apply(type.cast(layer)));
     }
 
     public static void unregister(Class<? extends Layer> type) {
@@ -47,13 +47,7 @@ public final class LayerOptions implements Layers.Listener {
 
     @Nullable
     Component getOptionsPanel(Layer layer) {
-        Component panel = panels.get(layer);
-        if (panel == null) {
-            panel = createOptionsPanel(layer);
-            if (panel != null)
-                panels.put(layer, panel);
-        }
-        return panel;
+        return panels.computeIfAbsent(layer, LayerOptions::createOptionsPanel);
     }
 
     @Nullable
