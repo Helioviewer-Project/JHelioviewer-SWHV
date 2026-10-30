@@ -236,16 +236,20 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         texBuf.putCoord(p3, texCoord[3]);
     }
 
-    private void drawIcon(RelatedEvents relatedEvents, SolarEvent evt) {
-        EventGeometry pi = evt.getPositionInformation();
-        if (pi == null)
-            return;
-
-        Vec3 pt = pi.centralPoint();
-        if (pt != null) {
-            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImage3d(pt.x, pt.y, pt.z, sz, sz);
+    private static boolean hasIcon(MapView mv, SolarEvent evt) {
+        if (evt.isCactus()) {
+            if (mv.isLatitudinal())
+                return false;
+            if (mv.isOrthographic() || mv.isRectWarp())
+                return true;
         }
+        EventGeometry pi = evt.getPositionInformation();
+        return pi != null && pi.centralPoint() != null;
+    }
+
+    private void drawIcon(RelatedEvents relatedEvents, Vec3 pt) {
+        double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+        drawImage3d(pt.x, pt.y, pt.z, sz, sz);
     }
 
     private void drawImageScale(double theta, double r, double width, double height) {
@@ -258,17 +262,10 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapView mv, Viewport vp, RelatedEvents relatedEvents, SolarEvent evt) {
-        EventGeometry pi = evt.getPositionInformation();
-        if (pi == null)
-            return;
-
-        Vec3 pt = pi.centralPoint();
-        if (pt != null) {
-            Vec2 tf = mv.projectToScreen(vp, pt);
-            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImageScale(tf.x, tf.y, sz, sz);
-        }
+    private void drawIconScale(MapView mv, Viewport vp, RelatedEvents relatedEvents, Vec3 pt) {
+        Vec2 tf = mv.projectToScreen(vp, pt);
+        double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+        drawImageScale(tf.x, tf.y, sz, sz);
     }
 
     private static void putLineScale(BufVertex vexBuf, float x0, float y0, float x1, float y1, byte[] color) {
@@ -326,13 +323,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         for (ActiveEvent active : evs) {
             RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
-            if (mv.isLatitudinal() && evt.isCactus())
+            if (!hasIcon(mv, evt))
                 continue;
-            if (!evt.isCactus()) {
-                EventGeometry pi = evt.getPositionInformation();
-                if (pi == null || pi.centralPoint() == null)
-                    continue;
-            }
             bindTexture(evt.getSupplier().group());
             glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(relatedEvents.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
@@ -370,8 +362,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
                 drawCactusArc(relatedEvents, evt, currentTime);
             } else {
                 drawPolygon(mv, vp, relatedEvents, evt);
-                if (icons) {
-                    drawIcon(relatedEvents, evt);
+                if (icons && hasIcon(mv, evt)) {
+                    drawIcon(relatedEvents, evt.getPositionInformation().centralPoint());
                 }
             }
         }
@@ -398,8 +390,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
                 drawCactusArcScale(vp, relatedEvents, evt, currentTime, scale);
             } else {
                 drawPolygon(mv, vp, relatedEvents, evt);
-                if (icons) {
-                    drawIconScale(mv, vp, relatedEvents, evt);
+                if (icons && hasIcon(mv, evt)) {
+                    drawIconScale(mv, vp, relatedEvents, evt.getPositionInformation().centralPoint());
                 }
             }
         }
