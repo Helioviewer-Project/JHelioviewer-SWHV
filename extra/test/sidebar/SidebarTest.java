@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RepaintManager;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
@@ -293,7 +295,7 @@ public final class SidebarTest {
             if (component instanceof JComboBox<?> box && box.getItemAt(0) instanceof ExportFormat)
                 formatBox = box;
             if (component instanceof JTextField field && "Program time".equals(field.getToolTipText()))
-                checkProgramTime(field);
+                checkProgramTime(movie, field);
         }
         check(formatBox != null && !formatBox.isEnabled() && formatBox.getSelectedItem() == ExportFormat.H265HQ,
                 "Initial Screenshot format state or saved video format");
@@ -314,13 +316,14 @@ public final class SidebarTest {
         ViewState.setRecordingMode(ViewState.RecordingMode.LOOP);
     }
 
-    private static void checkProgramTime(JTextField clock) {
+    private static void checkProgramTime(MoviePanel movie, JTextField clock) {
         String original = clock.getText();
         Font originalFont = clock.getFont();
         Container position = clock.getParent();
         Container transport = position.getParent();
         JComponent frames = (JComponent) position.getComponent(0);
         Font frameFont = frames.getFont();
+        RepaintManager repaintManager = RepaintManager.currentManager(clock);
         try {
             for (float scale : new float[]{1, 1.25f, 1.5f}) {
                 clock.setFont(originalFont.deriveFont(originalFont.getSize2D() * scale));
@@ -332,6 +335,7 @@ public final class SidebarTest {
                 check(clock.getWidth() >= size.width, "Transport row clipped timestamp");
                 for (String text : List.of("2026-10-21T11:56:23.000", "2026-10-22T00:00:00.123", "2026-10-23T23:59:59.999")) {
                     clock.setText(text);
+                    check(clock.getCaretPosition() == 0, "Timestamp update moved the caret");
                     check(clock.getPreferredSize().equals(size), "Timestamp update changed its reserved size");
                     clock.setScrollOffset(0);
                     double right = clock.modelToView2D(text.length()).getX();
@@ -340,13 +344,33 @@ public final class SidebarTest {
                     check(clock.modelToView2D(0).getX() >= 0 && right < size.width, "Timestamp clipped");
                 }
             }
-        } catch (javax.swing.text.BadLocationException exception) {
+
+            Field displayedTime = MoviePanel.class.getDeclaredField("displayedTime");
+            displayedTime.setAccessible(true);
+            displayedTime.setLong(movie, Long.MIN_VALUE);
+            ValidationProbe probe = new ValidationProbe();
+            RepaintManager.setCurrentManager(probe);
+            clock.select(5, 10);
+            movie.lazyRepaint();
+            check(!probe.queued, "Timestamp update queued validation");
+            check(clock.getSelectionStart() == 5 && clock.getSelectionEnd() == 10, "Timestamp update lost the selection");
+        } catch (javax.swing.text.BadLocationException | ReflectiveOperationException exception) {
             throw new AssertionError(exception);
         } finally {
+            RepaintManager.setCurrentManager(repaintManager);
             clock.setFont(originalFont);
             frames.setFont(frameFont);
             clock.setText(original);
             clock.select(0, 0);
+        }
+    }
+
+    private static final class ValidationProbe extends RepaintManager {
+        private boolean queued;
+
+        @Override
+        public void addInvalidComponent(JComponent component) {
+            queued = true;
         }
     }
 
