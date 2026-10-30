@@ -17,7 +17,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesParser.Item;
@@ -26,11 +25,10 @@ import org.helioviewer.jhv.io.DataSourcesParser.SourceItem;
 @SuppressWarnings("serial")
 public final class DataSourcesTree extends JTree {
 
-    private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
     public DataSourcesTree(Runnable activationHandler) {
-        nodeRoot = new DefaultMutableTreeNode("Datasets");
+        DefaultMutableTreeNode nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, DataSources.getServer(serverName).label()));
@@ -75,8 +73,7 @@ public final class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    @Nullable
-    public SourceItem setParsedData(DataSourcesParser parser) {
+    public void setParsedData(DataSourcesParser parser) {
         String server = parser.getServer();
         DefaultMutableTreeNode node = nodes.get(server);
         if (node != null) {
@@ -89,26 +86,19 @@ public final class DataSourcesTree extends JTree {
             }
             ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
         }
-
-        boolean preferred = server.equals(Settings.getProperty("dataSources.defaultServer"));
-        if (!preferred)
-            return null;
-
-        SourceItem defaultItem = parser.getDefault();
-        if (defaultItem != null)
-            setSelectedItem(defaultItem.server, defaultItem.sourceId);
-        return defaultItem;
     }
 
     public void setSelectedItem(String server, int sourceId) {
-        Enumeration<?> e = nodeRoot.depthFirstEnumeration();
+        DefaultMutableTreeNode serverNode = nodes.get(server);
+        if (serverNode == null)
+            return;
+
+        Enumeration<?> e = serverNode.depthFirstEnumeration();
         while (e.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-            if (node.isLeaf() && node.getUserObject() instanceof SourceItem item) {
-                if (item.sourceId == sourceId && item.server.equals(server)) {
-                    setSelectionPath(new TreePath(node.getPath()));
-                    break;
-                }
+            if (node.getUserObject() instanceof SourceItem item && item.sourceId == sourceId) {
+                setSelectionPath(new TreePath(node.getPath()));
+                break;
             }
         }
     }

@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
@@ -148,9 +149,15 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
 
     @Override
     public void setupSources(DataSourcesParser parser) {
-        DataSourcesParser.SourceItem item = sourcesTree.setParsedData(parser);
-        if (item != null)
+        sourcesTree.setParsedData(parser);
+        if (!parser.getServer().equals(Settings.getProperty("dataSources.defaultServer")))
+            return;
+
+        DataSourcesParser.SourceItem item = parser.getDefault();
+        if (item != null) {
+            sourcesTree.setSelectedItem(item.server, item.sourceId);
             settings.setInterval(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
+        }
     }
 
     private void loadSelectedDatasets() {
