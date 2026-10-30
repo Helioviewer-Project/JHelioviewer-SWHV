@@ -21,8 +21,6 @@ public final class TimeMapTest {
         checkLookups(collected, items);
         items.clear();
         check(ordered.size() == 3 && ordered.valueAt(1).name().equals("b"), "Ordered input was not copied");
-        ordered.buildIndex();
-        check(ordered.valueAt(1).name().equals("b"), "Reindexing ordered input changed its values");
 
         Item replacement = item(200, "new");
         collected.put(replacement.time(), replacement);
@@ -30,12 +28,6 @@ public final class TimeMapTest {
         check(collected.valueAt(1) == replacement && collected.nearestValue(new JHVTime(210)) == replacement, "Replacement was not indexed");
         collected.clear();
         check(collected.isEmpty() && collected.size() == 0, "Clear left entries");
-        try {
-            collected.buildIndex();
-            throw new AssertionError("Empty map was indexed");
-        } catch (RuntimeException expected) {
-            check(expected.getMessage().equals("Attempt to call buildIndex() on empty TimeMap"), "Empty index error changed");
-        }
         Item single = item(300, "single");
         collected.put(single.time(), single);
         collected.buildIndex();

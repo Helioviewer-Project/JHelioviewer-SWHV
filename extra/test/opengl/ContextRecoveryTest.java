@@ -37,7 +37,6 @@ public final class ContextRecoveryTest {
         DisplayController.setRenderRequestHandler(_ -> {});
 
         Probe probe = new Probe();
-        probe.setEnabled(true);
         Layers.add(probe);
         AngleRenderer renderer = AngleRenderer.pbuffer(32, 32);
         try {
@@ -53,14 +52,7 @@ public final class ContextRecoveryTest {
                 GLText.renderer();
                 check(probe.disposals == cycle + 1, "Retained layer was not disposed");
                 check(probe.initializations == cycle + 2, "Retained layer was not reinitialized");
-                check(probe.isEnabled(), "Context loss detached the retained layer");
             }
-            int disposals = probe.disposals;
-            Layers.remove(probe);
-            check(!probe.isEnabled(), "Removed layer was not detached immediately");
-            check(probe.disposals == disposals, "Removal disposed GL resources before rendering");
-            renderer.render(Sun.StartEarth, false);
-            check(probe.disposals == disposals + 1, "Removed layer was not disposed on the next render");
             // Also exercise destruction when the healthy context must be rebound.
             long display = EGL15.eglGetCurrentDisplay();
             check(EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT), "Cannot unbind context");

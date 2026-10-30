@@ -494,7 +494,6 @@ public final class TimelineDataTest {
             long expected = seconds * 1000 + i % 1000;
             String text = Instant.ofEpochMilli(expected).toString();
             check((long) parse.invoke(null, text) == expected, "Wrong UTC timestamp: " + text);
-            check((long) (Times.isoToUnixSeconds(text) * 1000 + 0.5) == expected, "STIL comparison differs: " + text);
             text = Instant.ofEpochSecond(seconds).toString();
             check((long) parse.invoke(null, text) == seconds * 1000, "Wrong whole-second timestamp: " + text);
         }

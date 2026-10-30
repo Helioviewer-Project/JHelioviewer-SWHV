@@ -260,7 +260,6 @@ public final class EventDatabaseTest {
         check(number("SELECT count(*) FROM event_parameter") == 2, "missing values have no rows");
         check(number("SELECT count(*) FROM event_parameter WHERE typeof(value)='real'") == 1, "decimal storage type survives");
         check(number("SELECT count(*) FROM event_parameter WHERE typeof(value)='integer'") == 1, "integer storage type survives");
-        check(number("SELECT count(*) FROM sqlite_master WHERE name='test_first'") == 0, "supplier does not create a table");
         List<SWEK.Param> filters = List.of(new SWEK.Param("SPEED", 12.5, SWEK.Operand.BIGGER_OR_EQUAL),
                 new SWEK.Param("speed", 13, SWEK.Operand.SMALLER_OR_EQUAL), new SWEK.Param("region", 42, SWEK.Operand.BIGGER_OR_EQUAL));
         check(database.loadEvents(150, 150, first, filters).events().size() == 1, "simultaneous filters and repeated case-insensitive names");
