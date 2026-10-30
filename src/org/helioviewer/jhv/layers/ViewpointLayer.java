@@ -51,10 +51,11 @@ public class ViewpointLayer extends AbstractLayer {
     private ViewpointOrbitWorker.Parameters uploadedParameters;
     private ViewpointOrbitWorker.Prepared readyOrbits;
 
+    private record LocationHover(double x, double y, Object object) {}
+
     private final GLSLShape locationPoints = new GLSLShape(true);
     private final BufVertex locationPointsBuf = new BufVertex();
-    private final List<Vec2> locationHoverXY = new ArrayList<>(); // after the drag rotation
-    private final List<Object> locationHoverObjects = new ArrayList<>(); // PositionLoad or Stars.Star
+    private final List<LocationHover> locationHover = new ArrayList<>(); // after the drag rotation
     private final double[] locationVector = new double[3];
     private final double[] locationPoint = new double[3];
     private final double[] locationScreen = new double[3];
@@ -268,14 +269,13 @@ public class ViewpointLayer extends AbstractLayer {
         double minDist2 = Double.MAX_VALUE;
 
         Object nearest = null;
-        for (int i = 0; i < locationHoverXY.size(); i++) {
-            Vec2 xy = locationHoverXY.get(i);
-            double deltaX = xy.x - mousePlaneX;
-            double deltaY = xy.y - mousePlaneY;
+        for (LocationHover point : locationHover) {
+            double deltaX = point.x - mousePlaneX;
+            double deltaY = point.y - mousePlaneY;
             double dist2 = deltaX * deltaX + deltaY * deltaY;
             if (dist2 < minDist2) {
                 minDist2 = dist2;
-                nearest = locationHoverObjects.get(i);
+                nearest = point.object;
             }
         }
         clearHoverTextIfNeeded();
@@ -393,8 +393,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     // the same points in every viewport, computed once per frame for the widest visible viewport
     private void computeLocation(MapView mv) {
-        locationHoverXY.clear();
-        locationHoverObjects.clear();
+        locationHover.clear();
         putLocationSky(mv);
         locationPoints.upload(locationPointsBuf);
         locationPointsBuf.clear();
@@ -482,8 +481,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (transit ? locationScreen[2] <= 0 : locationScreen[0] * locationScreen[0] + locationScreen[1] * locationScreen[1] < 1)
             return;
         locationPointsBuf.putVertex((float) locationScreen[0], (float) locationScreen[1], 0, size, color); // depth always within the clip planes
-        locationHoverXY.add(new Vec2(locationScreen[0], locationScreen[1]));
-        locationHoverObjects.add(object);
+        locationHover.add(new LocationHover(locationScreen[0], locationScreen[1], object));
     }
 
     private static double[] solarPole(double ra, double dec) {
