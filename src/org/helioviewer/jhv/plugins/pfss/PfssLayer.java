@@ -14,7 +14,7 @@ import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-public class PfssLayer extends AbstractLayer implements TimeListener.Range { // has to be public for state
+public class PfssLayer extends AbstractLayer implements TimeListener.Range {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
@@ -25,12 +25,11 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     private boolean fixedColor = false;
     private double radius = PfssSettings.MAX_RADIUS;
 
-    public PfssLayer(JSONObject jo) {
+    PfssLayer(JSONObject jo) {
         if (jo != null) {
             detail = Math.clamp(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
             radius = Math.clamp(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
-            PfssPlugin.restoreLayer(this);
         }
     }
 

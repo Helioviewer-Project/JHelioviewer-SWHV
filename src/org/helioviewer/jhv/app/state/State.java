@@ -30,8 +30,10 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssLayer;
+import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.EventTimelineLayer;
 import org.helioviewer.jhv.plugins.swek.SWEKLayer;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
@@ -146,8 +148,8 @@ public final class State {
                 case "timestamp", "org.helioviewer.jhv.layers.TimestampLayer" -> new TimestampLayer(data);
                 case "miniview", "org.helioviewer.jhv.layers.MiniviewLayer" -> new MiniviewLayer(data);
                 case "model", "org.helioviewer.jhv.layers.ModelLayer" -> new ModelLayer(data);
-                case "events", "org.helioviewer.jhv.plugins.swek.SWEKLayer" -> new SWEKLayer(data);
-                case "pfss", "org.helioviewer.jhv.plugins.pfss.PfssLayer" -> new PfssLayer(data);
+                case "events", "org.helioviewer.jhv.plugins.swek.SWEKLayer" -> PluginManager.getPlugin(SWEKPlugin.class).restoreLayer(data);
+                case "pfss", "org.helioviewer.jhv.plugins.pfss.PfssLayer" -> PluginManager.getPlugin(PfssPlugin.class).restoreLayer(data);
                 default -> {
                     Log.warn("Unknown saved layer type: " + type);
                     yield null;
@@ -170,7 +172,7 @@ public final class State {
             return switch (type) {
                 case "band", "org.helioviewer.jhv.timelines.band.Band" -> Band.deserialize(data);
                 case "radio", "org.helioviewer.jhv.timelines.radio.RadioData" -> RadioData.deserialize(data);
-                case "events", "org.helioviewer.jhv.plugins.swek.EventTimelineLayer" -> EventTimelineLayer.deserialize(data);
+                case "events", "org.helioviewer.jhv.plugins.swek.EventTimelineLayer" -> PluginManager.getPlugin(SWEKPlugin.class).getTimelineLayer();
                 default -> {
                     Log.warn("Unknown saved timeline type: " + type);
                     yield null;

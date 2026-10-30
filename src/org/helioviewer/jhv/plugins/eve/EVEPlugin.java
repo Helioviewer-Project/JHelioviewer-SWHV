@@ -11,38 +11,39 @@ public class EVEPlugin extends Plugin {
     private TimelinesGUI gui;
 
     public EVEPlugin() {
-        super("Timelines", "Visualize 1D and 2D time series");
+        super("timelines", "EVEPlugin", "Timelines", "Visualize 1D and 2D time series");
     }
 
     @Override
-    public void install() {
+    protected void install() {
         Timelines.install();
     }
 
     @Override
-    public void uninstall() {
+    protected void uninstall() {
         Timelines.uninstall();
     }
 
     @Override
-    public void installGUI() {
+    protected void installGUI() {
         if (gui == null)
             gui = new TimelinesGUI();
         gui.install();
     }
 
     @Override
-    public void uninstallGUI() {
-        gui.uninstall();
+    protected void uninstallGUI() {
+        if (gui != null)
+            gui.uninstall();
     }
 
     @Override
-    public void saveState(JSONObject jo) {
+    protected void writeState(JSONObject jo) {
         Timelines.saveState(jo);
     }
 
     @Override
-    public void loadState(JSONObject jo) {
+    protected void readState(JSONObject jo) {
         Timelines.loadState(jo);
     }
 

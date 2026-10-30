@@ -36,6 +36,7 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
     private static final int yOffset = 12;
 
     final SWEKSession session;
+    private final SWEKTreePane treePane;
     private final HashMap<SWEKSupplier, FilterDialog> filters = new HashMap<>();
     private final Set<SWEKEventInformationDialog> information = new HashSet<>();
     private Cursor lastCursor;
@@ -43,7 +44,10 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
 
     public SWEKSwingUI(SWEKSession _session) {
         session = _session;
-        SWEKTreePane treePane = new SWEKTreePane(session, this);
+        treePane = new SWEKTreePane(session, this);
+    }
+
+    public void install() {
         MainFrame.getLayersPanel().setEventsPanel(treePane);
         LayerOptions.register(SWEKLayer.class, selectedLayer -> createLayerOptions((SWEKLayer) selectedLayer));
     }

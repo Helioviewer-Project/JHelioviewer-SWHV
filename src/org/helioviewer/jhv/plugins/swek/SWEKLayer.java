@@ -41,7 +41,6 @@ import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-// has to be public for state
 public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listener, TimeListener.Range, InputMouseListener {
     record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
 
@@ -88,10 +87,9 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         session = _session;
     }
 
-    public SWEKLayer(JSONObject jo) {
-        this(SWEKPlugin.sessionForRestore());
+    SWEKLayer(SWEKSession _session, JSONObject jo) {
+        this(_session);
         icons = jo.optBoolean("icons", icons);
-        SWEKPlugin.restoreLayer(this);
     }
 
     void detach() {

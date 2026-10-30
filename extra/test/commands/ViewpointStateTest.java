@@ -63,8 +63,7 @@ public final class ViewpointStateTest {
     }
 
     private static void checkPfssRestoration() throws Exception {
-        PfssPlugin plugin = UiThread.postAndWait(() -> (PfssPlugin) PluginManager.getPlugins().stream()
-                .filter(PfssPlugin.class::isInstance).findFirst().orElseThrow());
+        PfssPlugin plugin = UiThread.postAndWait(() -> PluginManager.getPlugin(PfssPlugin.class));
         JSONObject settings = new JSONObject().put("detail", 3).put("fixedColor", true).put("radius", 1.7);
         JSONObject state = new JSONObject().put("layers", new JSONArray().put(new JSONObject()
                 .put("type", "pfss").put("enabled", false).put("data", settings)));

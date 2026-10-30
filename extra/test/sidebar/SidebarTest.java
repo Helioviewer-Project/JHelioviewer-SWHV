@@ -59,6 +59,7 @@ import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.thread.UiThread;
 
@@ -180,8 +181,10 @@ public final class SidebarTest {
         check(overlays.getValueAt(overlays.getSelectedRow(), 0) == grid, "Filtered deletion changed overlay selection");
 
         PfssPlugin plugin = new PfssPlugin();
-        plugin.installGUI();
-        plugin.install();
+        Settings.setProperty("plugins.PfssPlugin.active", "false");
+        PluginManager.setGUIEnabled(true);
+        PluginManager.addPlugin(plugin);
+        PluginManager.setActive(plugin, true);
         int pfssRow = rowNamed(overlays, "PFSS Model");
         overlays.setRowSelectionInterval(pfssRow, pfssRow);
         check(hasLabel(tabs.getComponentAt(1), "Detail") && hasLabel(tabs.getComponentAt(1), "Radius"), "PFSS editor not integrated");
@@ -260,8 +263,7 @@ public final class SidebarTest {
         tabs.setSelectedIndex(2);
         panel.setTimelinesPanel(null);
         check(tabs.getSelectedIndex() == 0 && !tabs.isEnabledAt(2) && timelineContents.getParent() == null, "Timelines uninstall retained its editor");
-        plugin.uninstall();
-        plugin.uninstallGUI();
+        PluginManager.setActive(plugin, false);
         checkRestoredViewpointDisclosure(panel);
         checkMovieOptions(panel);
     }

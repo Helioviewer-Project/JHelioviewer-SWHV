@@ -17,19 +17,17 @@ import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin implements Layers.Listener {
 
-    private static SWEKPlugin instance;
     private SWEKLayer layer;
     private EventTimelineLayer etl;
     private SWEKSession session;
     private SWEKSwingUI ui;
 
     public SWEKPlugin() {
-        super("Events", "Visualize space weather relevant events");
-        instance = this;
+        super("events", "SWEKPlugin", "Events", "Visualize space weather relevant events");
     }
 
     @Override
-    public void install() {
+    protected void install() {
         session = new SWEKSession(SWEKConfig.load(Map.of("HEK", new HEKHandler())));
         layer = new SWEKLayer(session);
         layer.setEnabled(true);
@@ -40,7 +38,7 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     }
 
     @Override
-    public void uninstall() {
+    protected void uninstall() {
         Layers.removeListener(this);
         TimelineLayers.remove(etl);
         etl = null;
@@ -49,51 +47,43 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
             Layers.remove(layer);
         }
         layer = null;
-        session.close();
+        if (session != null)
+            session.close();
         session = null;
     }
 
     @Override
-    public void installGUI() {
+    protected void installGUI() {
         ui = new SWEKSwingUI(session);
+        ui.install();
         etl.setUi(ui);
         bindLayer();
     }
 
     @Override
-    public void uninstallGUI() {
-        etl.setUi(null);
-        ui.close();
+    protected void uninstallGUI() {
+        if (etl != null)
+            etl.setUi(null);
+        if (ui != null)
+            ui.close();
         ui = null;
         bindLayer();
     }
 
-    @Override
-    public void saveState(JSONObject jo) {
-        // functionality to be restored later
-    }
-
-    @Override
-    public void loadState(JSONObject jo) {
-        // functionality to be restored later
-    }
-
-    static SWEKSession sessionForRestore() {
-        if (instance == null || instance.session == null)
+    public SWEKLayer restoreLayer(JSONObject data) {
+        if (session == null)
             throw new IllegalStateException("SWEK plugin is inactive");
-        return instance.session;
-    }
-
-    static void restoreLayer(SWEKLayer restored) {
-        if (instance.layer != null)
-            instance.layer.detach();
-        instance.layer = restored;
-        instance.bindLayer();
+        SWEKLayer restored = new SWEKLayer(session, data);
+        if (layer != null)
+            layer.detach();
+        layer = restored;
+        bindLayer();
+        return restored;
     }
 
     @Nullable
-    static EventTimelineLayer getTimelineLayer() {
-        return instance == null ? null : instance.etl;
+    public EventTimelineLayer getTimelineLayer() {
+        return etl;
     }
 
     @Override
