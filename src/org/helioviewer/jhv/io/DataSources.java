@@ -126,8 +126,14 @@ public class DataSources {
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {
-        if (parser != null && listener != null) // didn't fail
-            listener.setupSources(parser);
+        if (parser != null) { // didn't fail
+            for (DataSourcesParser.Group group : parser.getGroups()) {
+                for (DataSourcesParser.SourceItem item : group.sources())
+                    datasetMap.put(new DatasetId(item.server, item.sourceId), new Source(group.item().name, item.name));
+            }
+            if (listener != null)
+                listener.setupSources(parser);
+        }
 
         toLoad--;
         if (toLoad == 0 && loadCommandLineRequest) {
@@ -141,10 +147,6 @@ public class DataSources {
     private record Source(String observatory, String dataset) {}
 
     private static final Map<DatasetId, Source> datasetMap = new ConcurrentHashMap<>();
-
-    static void insertDataset(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
-        datasetMap.put(new DatasetId(server, sourceId), new Source(observatory, dataset));
-    }
 
     static int selectDataset(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
         for (Map.Entry<DatasetId, Source> entry : datasetMap.entrySet()) {

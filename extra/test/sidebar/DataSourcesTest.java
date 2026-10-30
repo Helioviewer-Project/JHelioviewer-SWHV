@@ -33,6 +33,7 @@ public final class DataSourcesTest {
         DataSourcesParser parser = new DataSourcesParser("ROB", catalog());
         checkParser(parser);
         UiThread.postAndWait(() -> {
+            checkRegistration(parser);
             checkTree(parser);
             checkDialog(parser);
         });
@@ -79,24 +80,46 @@ public final class DataSourcesTest {
                 && first.start == Instant.parse("2020-01-02T03:04:05Z").toEpochMilli()
                 && first.end == Instant.parse("2021-02-03T04:05:06Z").toEpochMilli(), "source fields and UTC extent");
         check(parser.getDefault().sourceId == 50, "last default in traversal order wins");
-        check(DataSources.selectDataset("ROB", "Group-2 A", "171") == 2, "flattened source registration");
-        check(DataSources.selectDataset("ROB", "Group-2 A", "empty") == -1, "empty source is not registered");
+        check(DataSources.selectDataset("ROB", "Group-2 A", "171") == -1, "parsing does not register datasets");
 
         DataSourcesParser empty = new DataSourcesParser("empty", new JSONObject());
         check(empty.getGroups().isEmpty() && empty.getDefault() == null, "empty catalog");
         DataSourcesParser skipped = new DataSourcesParser("skipped", new JSONObject().put("x", group("G",
                 new JSONObject().put("x", leaf("skip", 1, true).put("start", JSONObject.NULL)))));
         check(skipped.getGroups().getFirst().sources().isEmpty() && skipped.getDefault() == null, "skipped default is ignored");
-        DataSourcesParser duplicate = new DataSourcesParser("duplicate", new JSONObject()
-                .put("group2", group("Earlier", new JSONObject().put("x", leaf("old", 7, false))))
-                .put("group10", group("Later", new JSONObject().put("x", leaf("new", 7, false)))));
-        check(duplicate.getGroups().size() == 2 && DataSources.selectDataset("duplicate", "Earlier", "old") == -1
-                && DataSources.selectDataset("duplicate", "Later", "new") == 7, "later registration replaces a duplicate ID");
         try {
-            new DataSourcesParser("invalid", new JSONObject().put("x", leaf("root", 1, false)));
+            new DataSourcesParser("invalid", new JSONObject()
+                    .put("group2", group("G", new JSONObject().put("x", leaf("partial", 1, false))))
+                    .put("group10", leaf("root", 2, false)));
             throw new AssertionError("top-level source was accepted as a group");
         } catch (JSONException expected) {
         }
+        check(DataSources.selectDataset("invalid", "G", "partial") == -1, "failed parsing does not register partial datasets");
+    }
+
+    private static void checkRegistration(DataSourcesParser parser) {
+        boolean[] notified = {false};
+        DataSources.setListener(loaded -> {
+            check(loaded == parser && DataSources.selectDataset("ROB", "Group-2 A", "171") == 2,
+                    "datasets are registered before catalog notification");
+            notified[0] = true;
+        });
+        try {
+            DataSources.setupSources(null);
+            check(!notified[0], "failed catalog delivery does not notify the listener");
+            DataSources.setupSources(parser);
+            check(notified[0], "successful catalog delivery notifies the listener");
+        } finally {
+            DataSources.setListener(null);
+        }
+        check(DataSources.selectDataset("ROB", "Group-2 A", "empty") == -1, "empty source is not registered");
+        DataSourcesParser duplicate = new DataSourcesParser("duplicate", new JSONObject()
+                .put("group2", group("Earlier", new JSONObject().put("x", leaf("old", 7, false))))
+                .put("group10", group("Later", new JSONObject().put("x", leaf("new", 7, false)))));
+        DataSources.setupSources(duplicate);
+        check(duplicate.getGroups().size() == 2 && DataSources.selectDataset("duplicate", "Earlier", "old") == -1
+                && DataSources.selectDataset("duplicate", "Later", "new") == 7,
+                "registration without a listener preserves last duplicate ID wins");
     }
 
     private static void checkTree(DataSourcesParser parser) {

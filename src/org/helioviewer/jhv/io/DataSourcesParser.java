@@ -65,7 +65,7 @@ public class DataSourcesParser {
             Item item = new Item(name, group.getString("description"));
             ArrayList<SourceItem> sources = new ArrayList<>();
             groups.add(new Group(item, sources));
-            parse(sources, item.name, group.getJSONObject("children"), "");
+            parse(sources, group.getJSONObject("children"), "");
         }
     }
 
@@ -90,7 +90,7 @@ public class DataSourcesParser {
         return str1 + ' ' + str2;
     }
 
-    private void parse(List<SourceItem> sources, String group, JSONObject root, String prefix) {
+    private void parse(List<SourceItem> sources, JSONObject root, String prefix) {
         TreeSet<String> sorted = new TreeSet<>(NaturalSort.comparator);
         sorted.addAll(root.keySet());
 
@@ -108,11 +108,10 @@ public class DataSourcesParser {
                 SourceItem item = new SourceItem(server, mergeNames(prefix, name), json.getString("description"), sourceId, start, end);
                 sources.add(item);
 
-                DataSources.insertDataset(sourceId, server, group, item.toString());
                 if (json.optBoolean("default", false))
                     defaultItem = item;
             } else
-                parse(sources, group, json.getJSONObject("children"), mergeNames(prefix, name));
+                parse(sources, json.getJSONObject("children"), mergeNames(prefix, name));
         }
     }
 
