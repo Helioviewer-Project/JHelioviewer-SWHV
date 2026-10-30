@@ -59,8 +59,6 @@ class FOVPlatform {
 
     void add(FOVInstrument instrument) {
         instruments.add(instrument);
-        instrument.setCenterX(control2Center(centerX));
-        instrument.setCenterY(control2Center(centerY));
     }
 
     List<FOVInstrument> instruments() {
@@ -115,7 +113,9 @@ class FOVPlatform {
         renderer.begin3DRendering();
         renderer.setSurfacePut();
 
-        instruments.forEach(instrument -> instrument.putGeometry(obsPosition.distance, LINEWIDTH_FOV, color, renderer, lineBuf, centerBuf));
+        double pointingX = control2Center(centerX);
+        double pointingY = control2Center(centerY);
+        instruments.forEach(instrument -> instrument.putGeometry(obsPosition.distance, pointingX, pointingY, LINEWIDTH_FOV, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.uploadAndClear(centerBuf);
         instrumentCenters.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
@@ -150,13 +150,11 @@ class FOVPlatform {
 
     void setCenterX(double centerX) {
         this.centerX = centerX;
-        instruments.forEach(instrument -> instrument.setCenterX(control2Center(centerX)));
         DisplayController.display();
     }
 
     void setCenterY(double centerY) {
         this.centerY = centerY;
-        instruments.forEach(instrument -> instrument.setCenterY(control2Center(centerY)));
         DisplayController.display();
     }
 

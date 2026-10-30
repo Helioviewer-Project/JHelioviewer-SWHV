@@ -20,9 +20,6 @@ class FOVInstrument {
 
     private boolean enabled;
 
-    private double centerX = 0;
-    private double centerY = 0;
-
     FOVInstrument(String _name, FOVType _type, double innerDeg, double wideDeg, double highDeg, JSONObject jo) {
         name = _name;
         type = _type;
@@ -32,15 +29,7 @@ class FOVInstrument {
         enabled = jo.optBoolean(name, false);
     }
 
-    void setCenterX(double _centerX) {
-        centerX = _centerX;
-    }
-
-    void setCenterY(double _centerY) {
-        centerY = _centerY;
-    }
-
-    void putGeometry(double distance, double lineWidth, byte[] color, SdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
+    void putGeometry(double distance, double centerX, double centerY, double lineWidth, byte[] color, SdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
         if (!enabled)
             return;
 
