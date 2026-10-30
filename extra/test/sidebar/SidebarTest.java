@@ -4,9 +4,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -348,6 +350,37 @@ public final class SidebarTest {
                     check(clock.modelToView2D(0).getX() >= 0 && right < size.width, "Timestamp clipped");
                 }
             }
+
+            int[] repaints = {0};
+            RepaintManager.setCurrentManager(new RepaintManager() {
+                @Override
+                public void addDirtyRegion(JComponent component, int x, int y, int width, int height) {
+                    if (component == clock)
+                        repaints[0]++;
+                }
+            });
+            movie.lazyRepaint();
+            repaints[0] = 0;
+            clock.repaint();
+            clock.repaint(0, 0, clock.getWidth(), clock.getHeight());
+            check(repaints[0] == 0, "Unfocused timestamp repaint bypassed UI timer");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Timestamp repaint requests were not batched");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Clean timestamp repainted again");
+
+            clock.setText("2026-10-30T12:34:56.789");
+            movie.lazyRepaint();
+            repaints[0] = 0;
+            BufferedImage image = new BufferedImage(clock.getWidth(), clock.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            clock.paint(graphics);
+            graphics.dispose();
+            check(repaints[0] == 0, "Painting queued a redundant timestamp repaint");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Paint-generated timestamp repaint was lost");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Timestamp repaint did not settle while paused");
 
             Field displayedTime = MoviePanel.class.getDeclaredField("displayedTime");
             displayedTime.setAccessible(true);
