@@ -28,12 +28,12 @@ import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssLayer;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.EventTimelineLayer;
 import org.helioviewer.jhv.plugins.swek.SWEKLayer;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.timelines.TimelinesPlugin;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
@@ -142,7 +142,7 @@ public final class State {
             String type = json.optString("type", json.optString("className"));
             return switch (type) {
                 case "viewpoint", "org.helioviewer.jhv.layers.ViewpointLayer" -> new ViewpointLayer(data);
-                case "connection", "org.helioviewer.jhv.layers.ConnectionLayer" -> new ConnectionLayer(data);
+                case "connection", "org.helioviewer.jhv.layers.ConnectionLayer" -> new ConnectionLayer();
                 case "grid", "org.helioviewer.jhv.layers.GridLayer" -> new GridLayer(data);
                 case "fov", "org.helioviewer.jhv.layers.FOVLayer" -> new FOVLayer(data);
                 case "timestamp", "org.helioviewer.jhv.layers.TimestampLayer" -> new TimestampLayer(data);
@@ -171,7 +171,7 @@ public final class State {
             String type = json.optString("type", json.optString("className"));
             return switch (type) {
                 case "band", "org.helioviewer.jhv.timelines.band.Band" -> Band.deserialize(data);
-                case "radio", "org.helioviewer.jhv.timelines.radio.RadioData" -> RadioData.deserialize(data);
+                case "radio", "org.helioviewer.jhv.timelines.radio.RadioData" -> new RadioData(data);
                 case "events", "org.helioviewer.jhv.plugins.swek.EventTimelineLayer" -> PluginManager.getPlugin(SWEKPlugin.class).getTimelineLayer();
                 default -> {
                     Log.warn("Unknown saved timeline type: " + type);
@@ -297,10 +297,10 @@ public final class State {
             ViewState.setRefresh(false); // no periodic reload may replace a layer while restoration waits for it
             ViewState.setProjection(modeData.projection()); // to be set before viewpoint
 
-            if (PluginManager.isActive(EVEPlugin.class))
+            if (PluginManager.isActive(TimelinesPlugin.class))
                 loadTimelines(jo);
             else
-                Log.info("Skipping timeline state because EVEPlugin is inactive");
+                Log.info("Skipping timeline state because the Timelines plugin is inactive");
 
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)

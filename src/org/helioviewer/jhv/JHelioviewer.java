@@ -25,9 +25,9 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.opengl.AnglePbuffer;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.timelines.TimelinesPlugin;
 import org.helioviewer.jhv.thread.QueueUiThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.thread.UiThread;
@@ -130,7 +130,7 @@ public class JHelioviewer {
     private static void loadPlugins() {
         try {
             Log.info("Load enabled plugins");
-            PluginManager.addPlugin(new EVEPlugin());
+            PluginManager.addPlugin(new TimelinesPlugin());
             PluginManager.addPlugin(new SWEKPlugin());
             PluginManager.addPlugin(new PfssPlugin());
         } catch (Exception e) {

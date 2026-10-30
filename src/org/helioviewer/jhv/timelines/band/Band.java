@@ -117,7 +117,7 @@ public final class Band extends TimelineLayer {
         jo.put("multicolor", multicolor);
     }
 
-    public static TimelineLayer deserialize(JSONObject jo) throws Exception { // has to be implemented for state
+    public static Band deserialize(JSONObject jo) throws Exception {
         JSONObject jobt = jo.optJSONObject("bandType");
         if (jobt == null)
             throw new Exception("Missing bandType: " + jo);

@@ -19,10 +19,10 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssLayer;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.plugins.timelines.TimelinesPlugin;
 import org.helioviewer.jhv.thread.UiThread;
 
 import org.json.JSONArray;
@@ -97,7 +97,8 @@ public final class ViewpointStateTest {
         PluginManager.setGUIEnabled(false);
         for (String name : List.of("EVEPlugin", "SWEKPlugin", "PfssPlugin"))
             Settings.setProperty("plugins." + name + ".active", "false");
-        PluginManager.addPlugin(new EVEPlugin());
+        PluginManager.addPlugin(new TimelinesPlugin());
+        check(!PluginManager.isActive(TimelinesPlugin.class), "Timelines plugin ignored the historical activation preference");
         PluginManager.addPlugin(new SWEKPlugin());
         PluginManager.addPlugin(new PfssPlugin());
         PluginManager.loadState(new JSONObject().put("EVEPlugin", new JSONObject().put("stacked", true)));

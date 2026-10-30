@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.plugins.eve;
+package org.helioviewer.jhv.plugins.timelines;
 
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -6,11 +6,11 @@ import org.helioviewer.jhv.timelines.gui.TimelinesGUI;
 
 import org.json.JSONObject;
 
-public class EVEPlugin extends Plugin {
+public class TimelinesPlugin extends Plugin {
 
     private TimelinesGUI gui;
 
-    public EVEPlugin() {
+    public TimelinesPlugin() {
         super("timelines", "EVEPlugin", "Timelines", "Visualize 1D and 2D time series");
     }
 

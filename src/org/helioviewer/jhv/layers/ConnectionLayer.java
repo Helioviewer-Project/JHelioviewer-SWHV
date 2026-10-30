@@ -67,8 +67,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     @Override
     public void serialize(JSONObject jo) {}
 
-    public ConnectionLayer(JSONObject ignoredJo) {}
-
     @Override
     public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
