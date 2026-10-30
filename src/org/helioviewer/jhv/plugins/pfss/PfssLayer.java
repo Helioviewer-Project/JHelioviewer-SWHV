@@ -30,6 +30,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
             detail = Math.clamp(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
             radius = Math.clamp(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
+            PfssPlugin.restoreLayer(this);
         }
     }
 

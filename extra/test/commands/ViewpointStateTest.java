@@ -20,6 +20,7 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
+import org.helioviewer.jhv.plugins.pfss.PfssLayer;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 import org.helioviewer.jhv.thread.UiThread;
@@ -50,6 +51,7 @@ public final class ViewpointStateTest {
             roundTrip("Location", true, true);
             UiThread.postAndWait(ViewpointStateTest::checkModeSwitching);
             UiThread.postAndWait(ViewpointStateTest::checkSkyAndSpiralSettings);
+            checkPfssRestoration();
         } finally {
             UiThread.postAndWait(() -> {
                 Layers.getViewpointLayer().setCameraMode(ViewpointLayerOptions.CameraMode.Observer);
@@ -58,6 +60,38 @@ public final class ViewpointStateTest {
             });
         }
         System.out.println("ViewpointStateTest passed");
+    }
+
+    private static void checkPfssRestoration() throws Exception {
+        PfssPlugin plugin = UiThread.postAndWait(() -> (PfssPlugin) PluginManager.getPlugins().stream()
+                .filter(PfssPlugin.class::isInstance).findFirst().orElseThrow());
+        JSONObject settings = new JSONObject().put("detail", 3).put("fixedColor", true).put("radius", 1.7);
+        JSONObject state = new JSONObject().put("layers", new JSONArray().put(new JSONObject()
+                .put("type", "pfss").put("enabled", false).put("data", settings)));
+        for (boolean active : new boolean[]{true, false}) {
+            CompletableFuture<Boolean> loaded = new CompletableFuture<>();
+            UiThread.postAndWait(() -> {
+                PluginManager.setActive(plugin, active);
+                State.load((success, message, output) -> loaded.complete(success), state);
+            });
+            check(loaded.get(5, TimeUnit.SECONDS), "PFSS state failed to load");
+            UiThread.postAndWait(() -> {
+                PluginManager.setActive(plugin, true);
+                check(Layers.getLayers().stream().filter(PfssLayer.class::isInstance).count() == 1,
+                        "PFSS activation duplicated the restored layer");
+                PluginManager.setActive(plugin, false);
+                check(Layers.getLayers().stream().noneMatch(PfssLayer.class::isInstance),
+                        "PFSS uninstall retained the restored layer");
+                PluginManager.setActive(plugin, true);
+                List<Layer> restored = Layers.getLayers().stream().filter(PfssLayer.class::isInstance).toList();
+                check(restored.size() == 1, "PFSS reactivation changed the layer count");
+                JSONObject actual = new JSONObject();
+                restored.getFirst().serialize(actual);
+                check(actual.similar(settings), "PFSS reactivation lost restored settings");
+                check(!restored.getFirst().isEnabled(), "PFSS reactivation enabled the layer");
+                PluginManager.setActive(plugin, false);
+            });
+        }
     }
 
     private static void checkFormatNames() {

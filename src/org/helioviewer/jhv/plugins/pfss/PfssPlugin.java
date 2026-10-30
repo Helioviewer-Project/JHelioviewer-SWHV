@@ -9,7 +9,7 @@ import org.json.JSONObject;
 public class PfssPlugin extends Plugin {
 
     private static final PfssCache pfssCache = new PfssCache();
-    private static final PfssLayer layer = new PfssLayer(null);
+    private static PfssLayer layer = new PfssLayer(null);
 
     public PfssPlugin() {
         super("PFSS", "Visualize PFSS model data");
@@ -19,13 +19,20 @@ public class PfssPlugin extends Plugin {
         return pfssCache;
     }
 
+    static void restoreLayer(PfssLayer restored) {
+        layer.setEnabled(false);
+        layer = restored;
+    }
+
     @Override
     public void install() {
-        Layers.add(layer);
+        if (!Layers.getLayers().contains(layer))
+            Layers.add(layer);
     }
 
     @Override
     public void uninstall() {
+        layer.setEnabled(false);
         Layers.remove(layer);
         pfssCache.clear();
     }
