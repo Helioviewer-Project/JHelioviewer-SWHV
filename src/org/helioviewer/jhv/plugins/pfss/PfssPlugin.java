@@ -8,19 +8,15 @@ import org.json.JSONObject;
 
 public class PfssPlugin extends Plugin {
 
-    private static final PfssCache pfssCache = new PfssCache();
-    private PfssLayer layer = new PfssLayer(null);
+    private final PfssCache pfssCache = new PfssCache();
+    private PfssLayer layer = new PfssLayer(pfssCache, null);
 
     public PfssPlugin() {
         super("pfss", "PfssPlugin", "PFSS", "Visualize PFSS model data");
     }
 
-    static PfssCache getPfssCache() {
-        return pfssCache;
-    }
-
     public PfssLayer restoreLayer(JSONObject data) {
-        PfssLayer restored = new PfssLayer(data);
+        PfssLayer restored = new PfssLayer(pfssCache, data);
         layer.setEnabled(false);
         layer = restored;
         return restored;
