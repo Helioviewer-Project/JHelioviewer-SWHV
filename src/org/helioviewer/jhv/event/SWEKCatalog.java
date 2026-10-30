@@ -3,6 +3,7 @@ package org.helioviewer.jhv.event;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,7 +11,7 @@ import java.util.TreeMap;
 public final class SWEKCatalog {
 
     private final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
-    private final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
+    private final LinkedHashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new LinkedHashMap<>();
     private final HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> indexedParametersBySupplier = new HashMap<>();
     private final List<SWEK.Relation> relations;
     private final List<SWEKGroup> groups;
@@ -19,15 +20,12 @@ public final class SWEKCatalog {
     public SWEKCatalog(int _configHash, List<SWEKSupplier> definitions, List<SWEK.Relation> _relations) {
         configHash = _configHash;
         relations = List.copyOf(_relations);
-        List<SWEKGroup> groupOrder = new ArrayList<>();
         for (SWEKSupplier supplier : definitions) {
             if (suppliers.putIfAbsent(supplier.id(), supplier) != null)
                 throw new IllegalArgumentException("Duplicate supplier ID: " + supplier.id());
-            if (!suppliersByGroup.containsKey(supplier.group()))
-                groupOrder.add(supplier.group());
             suppliersByGroup.computeIfAbsent(supplier.group(), _ -> new ArrayList<>()).add(supplier);
         }
-        groups = List.copyOf(groupOrder);
+        groups = List.copyOf(suppliersByGroup.keySet());
         suppliersByGroup.replaceAll((group, values) -> List.copyOf(values));
         indexRelations();
     }

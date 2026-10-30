@@ -210,6 +210,10 @@ public final class SWEKIntegrationTest {
         definitions.add(target);
         catalog = new SWEKCatalog(0, definitions, List.of());
         check(catalog.getSupplier("test") == supplier, "catalog lookup uses the explicit supplier ID");
+        SWEKSupplier sibling = new SWEKSupplier(activeRegion, "sibling", "sibling", source, "sibling", List.of());
+        SWEKCatalog ordered = new SWEKCatalog(0, List.of(supplier, target, sibling), List.of());
+        check(ordered.getGroups().equals(List.of(activeRegion, flare)), "groups retain first-seen order with interleaved suppliers");
+        check(ordered.getSuppliers(activeRegion).equals(List.of(supplier, sibling)), "suppliers retain definition order within each group");
         try {
             new SWEKCatalog(0, List.of(supplier, target, new SWEKSupplier(flare, "Different supplier", "Different display", targetSource, "test", List.of())), List.of());
             throw new AssertionError("duplicate supplier ID was accepted");
