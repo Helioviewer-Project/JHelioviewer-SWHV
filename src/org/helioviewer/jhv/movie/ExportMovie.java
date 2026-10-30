@@ -135,8 +135,7 @@ public final class ExportMovie {
         recordingSession = null;
         for (Runnable runnable : encodeExecutor.shutdownNow()) {
             if (runnable instanceof FrameConsumer frameConsumer) {
-                NativeImageFactory.free(frameConsumer.timelineImage);
-                MappedImageFactory.free(frameConsumer.mainImage);
+                frameConsumer.release();
             }
         }
     }
@@ -315,9 +314,13 @@ public final class ExportMovie {
                 Log.error(e);
                 writer.recordFailure(e);
             } finally {
-                NativeImageFactory.free(timelineImage);
-                MappedImageFactory.free(mainImage);
+                release();
             }
+        }
+
+        private void release() {
+            NativeImageFactory.free(timelineImage);
+            MappedImageFactory.free(mainImage);
         }
     }
 
