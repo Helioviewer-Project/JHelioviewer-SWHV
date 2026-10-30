@@ -102,7 +102,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
 
     public void showNewLayerSelector() {
         layerToReplace = null;
-        showDialog(false);
+        showDialog();
     }
 
     public void changeDataset(ImageLayer layer) {
@@ -110,10 +110,11 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         APIRequest req = layer.getAPIRequest();
         if (req != null)
             sourcesTree.setSelectedItem(req.server(), req.sourceId());
-        showDialog(true);
+        showDialog();
     }
 
-    private void showDialog(boolean changeMode) {
+    private void showDialog() {
+        boolean changeMode = layerToReplace != null;
         setTitle(changeMode ? "Change Dataset" : "New Image Layer");
         actionButton.setText(changeMode ? "Change" : "Add");
         sourcesTree.getSelectionModel().setSelectionMode(
