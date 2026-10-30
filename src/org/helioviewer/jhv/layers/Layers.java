@@ -174,7 +174,7 @@ public final class Layers {
     public static void prerender() {
         disposeRemovedLayers();
         initLayers();
-        layers.forEach(Layer::prerender);
+        forEachImageLayer(ImageLayer::prerender);
     }
 
     public static void render(MapView mv, Viewport vp) {
@@ -191,10 +191,6 @@ public final class Layers {
 
     public static void renderFullFloat(Viewport vp) {
         layers.forEach(layer -> layer.renderFullFloat(vp));
-    }
-
-    public static void renderMiniview(MapView mv, Viewport vp) {
-        layers.forEach(layer -> layer.renderMiniview(mv, vp));
     }
 
     private static void initLayers() {
@@ -312,17 +308,11 @@ public final class Layers {
         layers.clear();
 
         newLayers.addAll(normalizedLayers);
-
-        viewpointLayer = null;
-        miniviewLayer = null;
-        connectionLayer = null;
+        layers.addAll(normalizedLayers);
 
         for (Layer layer : normalizedLayers) {
-            if (layer instanceof ImageLayer) {
-                layers.add(imageLayersCount++, layer);
-            } else {
-                layers.add(layer);
-            }
+            if (layer instanceof ImageLayer)
+                imageLayersCount++;
             cacheLayer(layer);
         }
 

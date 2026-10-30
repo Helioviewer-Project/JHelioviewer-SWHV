@@ -1056,10 +1056,6 @@ def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, floa
     return (-half_width, half_width, -half_height, half_height)
 
 
-def pixel_center_to_texcoord(px: float, py: float, image2d: np.ndarray) -> tuple[float, float]:
-    return (px / image2d.shape[1], py / image2d.shape[0])
-
-
 def texture_texel(image2d: np.ndarray, texel_x: int, texel_y: int) -> float:
     return float(image2d[image2d.shape[0] - 1 - texel_y, texel_x])
 

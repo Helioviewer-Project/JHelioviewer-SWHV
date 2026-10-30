@@ -17,10 +17,6 @@ public interface Layer {
 
     default void renderFullFloat(Viewport vp) {}
 
-    default void renderMiniview(MapView mv, Viewport vp) {}
-
-    default void prerender() {}
-
     // Stops CPU work without requiring a GL context.
     default void detach() {
         setEnabled(false);

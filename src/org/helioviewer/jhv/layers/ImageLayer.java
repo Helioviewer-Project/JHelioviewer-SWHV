@@ -207,7 +207,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         settleLoad();
     }
 
-    @Override
     public void prerender() {
         ImageData current = imageData;
         if (current == null) {
@@ -217,11 +216,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         ImageBuffer differenceBuffer = displaySettings.getDifferenceMode() == DifferenceMode.None
                 ? null : comparisonData.imageBuffer();
         glImage.streamImages(current.imageBuffer(), differenceBuffer);
-    }
-
-    @Override
-    public void renderMiniview(MapView mv, Viewport vp) {
-        render(mv, vp);
     }
 
     @Override
