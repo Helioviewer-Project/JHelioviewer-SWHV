@@ -49,23 +49,32 @@ public class DataSourcesParser {
 
     }
 
-    public record Node(Item item, List<Node> children) {}
+    public record Group(Item item, List<SourceItem> sources) {}
 
     private final String server;
-    private final ArrayList<Node> nodes = new ArrayList<>();
+    private final ArrayList<Group> groups = new ArrayList<>();
     private SourceItem defaultItem;
 
     DataSourcesParser(String _server, JSONObject json) {
         server = _server;
-        parse(nodes, "", json, null);
+        TreeSet<String> sorted = new TreeSet<>(NaturalSort.comparator);
+        sorted.addAll(json.keySet());
+        for (String key : sorted) {
+            JSONObject group = json.getJSONObject(key);
+            String name = group.getString("name").replace((char) 8287, ' ').replace('_', '-');
+            Item item = new Item(name, group.getString("description"));
+            ArrayList<SourceItem> sources = new ArrayList<>();
+            groups.add(new Group(item, sources));
+            parse(sources, item.name, group.getJSONObject("children"), "");
+        }
     }
 
     public String getServer() {
         return server;
     }
 
-    public List<Node> getNodes() {
-        return Collections.unmodifiableList(nodes);
+    public List<Group> getGroups() {
+        return Collections.unmodifiableList(groups);
     }
 
     @Nullable
@@ -81,7 +90,7 @@ public class DataSourcesParser {
         return str1 + ' ' + str2;
     }
 
-    private void parse(List<Node> siblings, String group, JSONObject root, @Nullable String str) {
+    private void parse(List<SourceItem> sources, String group, JSONObject root, String prefix) {
         TreeSet<String> sorted = new TreeSet<>(NaturalSort.comparator);
         sorted.addAll(root.keySet());
 
@@ -89,28 +98,21 @@ public class DataSourcesParser {
             JSONObject json = root.getJSONObject(key);
             String name = json.getString("name").replace((char) 8287, ' '); // for Windows
 
-            if (str != null /* can't happen */ && json.has("sourceId")) { // leaf
+            if (json.has("sourceId")) { // leaf
                 if (json.isNull("start") || json.isNull("end")) // skip empty datasets
                     continue;
 
                 int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
-                SourceItem item = new SourceItem(server, mergeNames(str, name), json.getString("description"), sourceId, start, end);
-                siblings.add(new Node(item, List.of()));
+                SourceItem item = new SourceItem(server, mergeNames(prefix, name), json.getString("description"), sourceId, start, end);
+                sources.add(item);
 
                 DataSources.insertDataset(sourceId, server, group, item.toString());
                 if (json.optBoolean("default", false))
                     defaultItem = item;
-            } else {
-                if (str == null) { // show only top level, else flatten hierarchy
-                    Item item = new Item(name.replace('_', '-'), json.getString("description"));
-                    ArrayList<Node> children = new ArrayList<>();
-                    siblings.add(new Node(item, children));
-                    parse(children, item.name, json.getJSONObject("children"), "");
-                } else
-                    parse(siblings, group, json.getJSONObject("children"), mergeNames(str, name));
-            }
+            } else
+                parse(sources, group, json.getJSONObject("children"), mergeNames(prefix, name));
         }
     }
 

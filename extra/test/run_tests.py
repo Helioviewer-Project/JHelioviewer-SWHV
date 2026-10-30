@@ -22,7 +22,7 @@ SCRIPTS = {
 }
 JAVA_TESTS = {
     "commands": ["io.samp.CommandStateTest", "layers.ViewpointStateTest"],
-    "sidebar": ["layers.selector.SidebarTest", "opengl.WindowsCanvasTest"],
+    "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest"],
     "astronomy": ["astronomy.PositionResponseTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
     "opengl": ["opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],

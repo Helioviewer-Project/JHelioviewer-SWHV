@@ -75,21 +75,18 @@ public final class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    private static DefaultMutableTreeNode toTreeNode(DataSourcesParser.Node node) {
-        DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(node.item(), !(node.item() instanceof SourceItem));
-        for (DataSourcesParser.Node child : node.children())
-            treeNode.add(toTreeNode(child));
-        return treeNode;
-    }
-
     @Nullable
     public SourceItem setParsedData(DataSourcesParser parser) {
         String server = parser.getServer();
         DefaultMutableTreeNode node = nodes.get(server);
         if (node != null) {
             node.removeAllChildren();
-            for (DataSourcesParser.Node child : parser.getNodes())
-                node.add(toTreeNode(child));
+            for (DataSourcesParser.Group group : parser.getGroups()) {
+                DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group.item());
+                for (SourceItem item : group.sources())
+                    groupNode.add(new DefaultMutableTreeNode(item, false));
+                node.add(groupNode);
+            }
             ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
         }
 
