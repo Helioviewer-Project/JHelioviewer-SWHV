@@ -76,7 +76,7 @@ final class EventCollection {
     }
 
     boolean contains(RelatedEvents relatedEvents) {
-        return relatedEvents != null && relatedEvents.getEvents().stream().anyMatch(event -> getRelatedEvents(event.getUniqueID()) == relatedEvents);
+        return relatedEvents != null && relatedEventsByStart.getOrDefault(relatedEvents.getStart(), List.of()).contains(relatedEvents);
     }
 
     void addEvent(SolarEvent event) {
