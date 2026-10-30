@@ -134,7 +134,7 @@ public final class MetaDataDialog extends StandardDialog {
         int request = ++metadataRequest;
 
         ImageData imageData = layer.getImageData();
-        Frames.Frame frame = imageData == null ? layer.frames().get(0) : imageData.frame();
+        Frames.Frame frame = imageData == null ? layer.frames().valueAt(0) : imageData.frame();
         MetaData metadata = frame.metaData();
         URI sourceUri = metadata.getSourceUri();
         boolean hasSourceUri = !sourceUri.equals(MetaData.UNKNOWN_SOURCE_URI);

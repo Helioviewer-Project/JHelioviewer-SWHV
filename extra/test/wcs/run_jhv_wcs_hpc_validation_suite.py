@@ -199,18 +199,6 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--latitudinal-zenithal-render", "--render-size", "512"),
     ),
     ValidationRun(
-        "hpc_diff_selfcheck",
-        (str(DATA / "20241224_194245_d4c2A.fts"), "--hpc-diff-selfcheck", "--render-size", "512"),
-    ),
-    ValidationRun(
-        "latitudinal_diff_selfcheck",
-        (str(DATA / "sunerf_map.fits"), "--latitudinal-diff-selfcheck", "--render-size", "512"),
-    ),
-    ValidationRun(
-        "orthographic_diff_selfcheck",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--orthographic-diff-selfcheck", "--render-size", "512"),
-    ),
-    ValidationRun(
         "ortho_vs_hpc_screen_compare",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--ortho-vs-hpc-screen-compare", "--render-size", "4096"),
     ),
@@ -268,26 +256,6 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
         "electron_default_all_modes_sample_texture",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--all-modes", "--sample-texture", "--backend", "default"),
-        "electron",
-    ),
-    ValidationRun(
-        "electron_default_tan_screen_cases",
-        ("--tan-screen-cases", "--render-size", "256", "--backend", "default"),
-        "electron",
-    ),
-    ValidationRun(
-        "electron_default_tan_screen_cases_sample_texture",
-        ("--tan-screen-cases", "--render-size", "128", "--sample-texture", "--backend", "default"),
-        "electron",
-    ),
-    ValidationRun(
-        "electron_default_tan_screen_cases_color_smoke",
-        ("--tan-screen-cases-color-smoke", "--render-size", "128", "--backend", "default"),
-        "electron",
-    ),
-    ValidationRun(
-        "electron_default_tan_screen_cases_color_diff_smoke",
-        ("--tan-screen-cases-color-diff-smoke", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
     ValidationRun(

@@ -394,10 +394,15 @@ lib/jhv/linux-amd64/libJNISpice.so
 
 Supplemental notices: SPICE.txt.
 
-lib/jhv/linux-amd64/libjhvj2k.so
---------------------------------
+lib/jhv/linux-amd64/libjhvj2k_kdu.so
+------------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/linux-amd64/libjhvj2k_opj.so
+------------------------------------
+
+Supplemental notices: OpenJPEG-Notices.txt, esajpip.txt.
 
 lib/jhv/linux-amd64/libjhvwcs.so
 --------------------------------
@@ -429,10 +434,15 @@ lib/jhv/macos-amd64/libJNISpice.dylib
 
 Supplemental notices: SPICE.txt.
 
-lib/jhv/macos-amd64/libjhvj2k.dylib
------------------------------------
+lib/jhv/macos-amd64/libjhvj2k_kdu.dylib
+---------------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/macos-amd64/libjhvj2k_opj.dylib
+---------------------------------------
+
+Supplemental notices: OpenJPEG-Notices.txt, esajpip.txt.
 
 lib/jhv/macos-amd64/libjhvwcs.dylib
 -----------------------------------
@@ -464,10 +474,15 @@ lib/jhv/macos-arm64/libJNISpice.dylib
 
 Supplemental notices: SPICE.txt.
 
-lib/jhv/macos-arm64/libjhvj2k.dylib
------------------------------------
+lib/jhv/macos-arm64/libjhvj2k_kdu.dylib
+---------------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/macos-arm64/libjhvj2k_opj.dylib
+---------------------------------------
+
+Supplemental notices: OpenJPEG-Notices.txt, esajpip.txt.
 
 lib/jhv/macos-arm64/libjhvwcs.dylib
 -----------------------------------
@@ -489,10 +504,15 @@ lib/jhv/windows-amd64/ffmpeg
 
 Separately maintained notices: FFmpeg-Notices.txt.
 
-lib/jhv/windows-amd64/jhvj2k.dll
---------------------------------
+lib/jhv/windows-amd64/jhvj2k_kdu.dll
+------------------------------------
 
 Supplemental notices: esajpip.txt.
+
+lib/jhv/windows-amd64/jhvj2k_opj.dll
+------------------------------------
+
+Supplemental notices: OpenJPEG-Notices.txt, esajpip.txt.
 
 lib/jhv/windows-amd64/jhvwcs.dll
 --------------------------------

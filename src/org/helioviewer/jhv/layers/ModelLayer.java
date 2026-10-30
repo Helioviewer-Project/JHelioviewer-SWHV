@@ -45,7 +45,7 @@ public final class ModelLayer extends AbstractLayer {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (isVisible[vp.idx])
+        if (enabled)
             model.render(mv, vp);
     }
 
@@ -57,11 +57,6 @@ public final class ModelLayer extends AbstractLayer {
     @Override
     public void dispose() {
         model.dispose();
-    }
-
-    @Override
-    public void remove() {
-        dispose();
     }
 
     @Override

@@ -17,23 +17,16 @@ public interface Layer {
 
     default void renderFullFloat(Viewport vp) {}
 
-    default void renderMiniview(MapView mv, Viewport vp) {}
-
-    default void prerender() {}
-
-    void remove();
+    // Stops CPU work without requiring a GL context.
+    default void detach() {
+        setEnabled(false);
+    }
 
     String getName();
 
     boolean isEnabled();
 
     void setEnabled(boolean b);
-
-    int isVisibleIdx();
-
-    boolean isVisible(int idx);
-
-    void setVisible(int idx);
 
     @Nullable
     default String getTimeString() {
@@ -54,6 +47,7 @@ public interface Layer {
 
     void init();
 
+    // Releases GL resources, including during context recreation.
     void dispose();
 
     void serialize(JSONObject jo);

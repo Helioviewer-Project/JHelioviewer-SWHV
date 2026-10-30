@@ -1,56 +1,10 @@
 #ifndef JHV_J2K_SOURCE_H
 #define JHV_J2K_SOURCE_H
 #include <climits>
-#include <cstdio>
 #include <new>
 #include <stdexcept>
 #include <vector>
-#include "jhv_kdu_decode.h"
-#include "client/hvc_decode.h"
-using namespace kdu_core;
-
-// Kakadu's view of one immutable client input.
-class decoder_input : public kdu_compressed_source {
-    hvc_input *input;
-    size_t length, position = 0;
-public:
-    decoder_input(hvc *_client, size_t _frame, int _reduce) : input(hvc_input_open(_client, _frame, _reduce)) {
-        if (!input) throw std::runtime_error(hvc_error(_client));
-        length = hvc_input_size(input);
-    }
-    ~decoder_input() { hvc_input_close(input); }
-    decoder_input(const decoder_input &) = delete;
-    decoder_input &operator=(const decoder_input &) = delete;
-    int get_capabilities() override { return KDU_SOURCE_CAP_SEQUENTIAL | KDU_SOURCE_CAP_SEEKABLE; }
-    int read(kdu_byte *out, int size) override {
-        if (size < 0) throw std::runtime_error("negative codestream read");
-        char error[256];
-        size_t count = hvc_input_read(input, position, out, static_cast<size_t>(size), error, sizeof error);
-        if (count == SIZE_MAX) throw std::runtime_error(error);
-        position += count;
-        return static_cast<int>(count);
-    }
-    bool seek(kdu_long offset) override {
-        if (offset < 0 || static_cast<uint64_t>(offset) > length) return false;
-        position = static_cast<size_t>(offset);
-        return true;
-    }
-    kdu_long get_pos() override { return static_cast<kdu_long>(position); }
-    // Run use on a fresh codestream over this input, destroying it on every path.
-    template<class F> const char *with_stream(F use) {
-        kdu_codestream stream;
-        try {
-            seek(0);
-            stream.create(this);
-            const char *result = use(stream);
-            stream.destroy();
-            return result;
-        } catch (...) {
-            if (stream.exists()) stream.destroy();
-            throw;
-        }
-    }
-};
+#include "jhv_j2k_decoder.h"
 
 // One client and the decoder's description of its frames. The host serializes calls.
 class jhv_j2k_source {
@@ -62,14 +16,6 @@ public:
 private:
     hvc *client = nullptr;
     std::vector<description> descriptions;
-
-    // What JHV shows of a file whose color description is not supported.
-    static void first_component(hv_render &render) {
-        render = hv_render();
-        render.colour_space = 17;
-        render.channel_count = 1;
-        render.channel[0].palette_column = -1;
-    }
 
     static int inspect(hvc *source, size_t frame, void *context,
                        hvc_info *info, char *error, size_t error_size) noexcept;

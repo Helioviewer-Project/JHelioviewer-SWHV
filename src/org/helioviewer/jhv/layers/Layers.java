@@ -100,7 +100,7 @@ public final class Layers {
 
     static {
         DEFAULT_LAYERS.put(ViewpointLayer.class, () -> new ViewpointLayer(null));
-        DEFAULT_LAYERS.put(ConnectionLayer.class, () -> new ConnectionLayer(null));
+        DEFAULT_LAYERS.put(ConnectionLayer.class, ConnectionLayer::new);
         DEFAULT_LAYERS.put(GridLayer.class, () -> new GridLayer(null));
         DEFAULT_LAYERS.put(FOVLayer.class, () -> new FOVLayer(null));
         DEFAULT_LAYERS.put(TimestampLayer.class, () -> new TimestampLayer(null));
@@ -166,18 +166,15 @@ public final class Layers {
     }
 
     private static void detach(Layer layer) {
-        if (layer instanceof ImageLayer imageLayer)
-            imageLayer.detach();
-        if (layer instanceof ViewpointLayer)
-            layer.setEnabled(false);
+        layer.detach();
         if (!newLayers.remove(layer))
             removedLayers.add(layer);
     }
 
     public static void prerender() {
-        removeLayers();
+        disposeRemovedLayers();
         initLayers();
-        layers.forEach(Layer::prerender);
+        forEachImageLayer(ImageLayer::prerender);
     }
 
     public static void render(MapView mv, Viewport vp) {
@@ -196,17 +193,13 @@ public final class Layers {
         layers.forEach(layer -> layer.renderFullFloat(vp));
     }
 
-    public static void renderMiniview(MapView mv, Viewport vp) {
-        layers.forEach(layer -> layer.renderMiniview(mv, vp));
-    }
-
     private static void initLayers() {
         newLayers.forEach(Layer::init);
         newLayers.clear();
     }
 
-    private static void removeLayers() {
-        removedLayers.forEach(Layer::remove);
+    private static void disposeRemovedLayers() {
+        removedLayers.forEach(Layer::dispose);
         removedLayers.clear();
     }
 
@@ -256,7 +249,7 @@ public final class Layers {
     }
 
     public static void dispose() {
-        removeLayers();
+        disposeRemovedLayers();
         for (Layer layer : layers) {
             if (!newLayers.contains(layer))
                 layer.dispose();
@@ -315,17 +308,11 @@ public final class Layers {
         layers.clear();
 
         newLayers.addAll(normalizedLayers);
-
-        viewpointLayer = null;
-        miniviewLayer = null;
-        connectionLayer = null;
+        layers.addAll(normalizedLayers);
 
         for (Layer layer : normalizedLayers) {
-            if (layer instanceof ImageLayer) {
-                layers.add(imageLayersCount++, layer);
-            } else {
-                layers.add(layer);
-            }
+            if (layer instanceof ImageLayer)
+                imageLayersCount++;
             cacheLayer(layer);
         }
 

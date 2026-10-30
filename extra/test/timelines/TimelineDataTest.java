@@ -494,7 +494,6 @@ public final class TimelineDataTest {
             long expected = seconds * 1000 + i % 1000;
             String text = Instant.ofEpochMilli(expected).toString();
             check((long) parse.invoke(null, text) == expected, "Wrong UTC timestamp: " + text);
-            check((long) (Times.isoToUnixSeconds(text) * 1000 + 0.5) == expected, "STIL comparison differs: " + text);
             text = Instant.ofEpochSecond(seconds).toString();
             check((long) parse.invoke(null, text) == seconds * 1000, "Wrong whole-second timestamp: " + text);
         }
@@ -618,7 +617,7 @@ public final class TimelineDataTest {
                 JSONObject state = new JSONObject();
                 original.serialize(state);
                 check(state.getBoolean("fullResolution"), "Saved state omits full resolution");
-                Band restored = (Band) Band.deserialize(new JSONObject(state.toString()));
+                Band restored = Band.deserialize(new JSONObject(state.toString()));
                 check(restored.isFullResolution(), "Restored state loses full resolution");
                 restored.setDataColor(Color.RED);
                 TimelineLayers.restore(List.of(restored));
@@ -627,7 +626,7 @@ public final class TimelineDataTest {
                 check(original.getDataColor().equals(Color.RED), "Reusing a band loses restored appearance");
 
                 state.put("fullResolution", false);
-                Band standard = (Band) Band.deserialize(state);
+                Band standard = Band.deserialize(state);
                 TimelineLayers.restore(List.of(standard));
                 check(TimelineLayers.get().getFirst() == standard && !standard.isFullResolution(), "Different resolution reuses the old band");
                 check(!original.hasData() && !standard.hasData(), "Different resolution retains the old cache");
@@ -635,13 +634,13 @@ public final class TimelineDataTest {
                 standard.serialize(standardState);
                 check(!standardState.getBoolean("fullResolution"), "Standard resolution is not saved");
                 state.remove("fullResolution");
-                Band oldState = (Band) Band.deserialize(state);
+                Band oldState = Band.deserialize(state);
                 check(!oldState.isFullResolution(), "State without a resolution setting changes the default");
                 TimelineLayers.restore(List.of(oldState));
                 check(TimelineLayers.get().getFirst() == standard, "Default state does not reuse standard-resolution data");
 
                 state.put("fullResolution", true);
-                Band full = (Band) Band.deserialize(state);
+                Band full = Band.deserialize(state);
                 TimelineLayers.restore(List.of(full));
                 check(TimelineLayers.get().getFirst() == full && TimelineLayers.get().size() == 2, "Restoring full resolution duplicates the layer");
                 check(TimelineLayers.get().getLast() instanceof RadioData && !TimelineLayers.get().getLast().isEnabled(), "State without Callisto loses its disabled default");

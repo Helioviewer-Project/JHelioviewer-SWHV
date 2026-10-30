@@ -427,8 +427,8 @@
       ]
     },
     {
-      "path": "lib/jhv/linux-amd64/libjhvj2k.so",
-      "sha256": "f6efff933911e61be19edbc0b65ea31175250c8a01c04ea3ed70ef350afcb04e",
+      "path": "lib/jhv/linux-amd64/libjhvj2k_kdu.so",
+      "sha256": "f092e0d928948e2a8a04874b8e0d6df129f16a1851b6638711cb1985c1870a0e",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -436,7 +436,21 @@
       ],
       "external_notices": [],
       "native_members": [
-        "lib/jhv/linux-amd64/libjhvj2k.so"
+        "lib/jhv/linux-amd64/libjhvj2k_kdu.so"
+      ]
+    },
+    {
+      "path": "lib/jhv/linux-amd64/libjhvj2k_opj.so",
+      "sha256": "52fccfa19beb0b7d65780fb2b7c31e8329fdd1ccb68bc0ffc186f80c0fe15a28",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/OpenJPEG-Notices.txt",
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/linux-amd64/libjhvj2k_opj.so"
       ]
     },
     {
@@ -518,8 +532,8 @@
       ]
     },
     {
-      "path": "lib/jhv/macos-amd64/libjhvj2k.dylib",
-      "sha256": "7959a64aefe04d321a1b91131c3366674e73fd7e5367ed953086a242d9208115",
+      "path": "lib/jhv/macos-amd64/libjhvj2k_kdu.dylib",
+      "sha256": "ad0d0fe0adea5ede94eb69792979269a8668f6c6a6dec8b6d4e4895ec3e71335",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -527,7 +541,21 @@
       ],
       "external_notices": [],
       "native_members": [
-        "lib/jhv/macos-amd64/libjhvj2k.dylib"
+        "lib/jhv/macos-amd64/libjhvj2k_kdu.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-amd64/libjhvj2k_opj.dylib",
+      "sha256": "29be0840d6243ee170fec16188f80530d72462b21db85fbbfa712cfd015a2ede",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/OpenJPEG-Notices.txt",
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libjhvj2k_opj.dylib"
       ]
     },
     {
@@ -609,8 +637,8 @@
       ]
     },
     {
-      "path": "lib/jhv/macos-arm64/libjhvj2k.dylib",
-      "sha256": "3b9e0087ae09ecec5e02805c7a0d7e8f3de523a4280d158088004fb65b68af8e",
+      "path": "lib/jhv/macos-arm64/libjhvj2k_kdu.dylib",
+      "sha256": "579728df23e21450bd494ac7b5ee28ac4ab9a6c312cf3674511b830d2a037814",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -618,7 +646,21 @@
       ],
       "external_notices": [],
       "native_members": [
-        "lib/jhv/macos-arm64/libjhvj2k.dylib"
+        "lib/jhv/macos-arm64/libjhvj2k_kdu.dylib"
+      ]
+    },
+    {
+      "path": "lib/jhv/macos-arm64/libjhvj2k_opj.dylib",
+      "sha256": "42e6dd58828945b0eb9c42136ecb3797650e62b798172a7a21991b934ce0592a",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/OpenJPEG-Notices.txt",
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libjhvj2k_opj.dylib"
       ]
     },
     {
@@ -674,8 +716,8 @@
       ]
     },
     {
-      "path": "lib/jhv/windows-amd64/jhvj2k.dll",
-      "sha256": "267408dafff687921b7f36fc06629bd1adaeea89f70b5297e507811cbab3a50f",
+      "path": "lib/jhv/windows-amd64/jhvj2k_kdu.dll",
+      "sha256": "131ced35c30c35e985b1cf5b7aea35df9d057223332fdd0be6e7d1cf67d8d0aa",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -683,7 +725,21 @@
       ],
       "external_notices": [],
       "native_members": [
-        "lib/jhv/windows-amd64/jhvj2k.dll"
+        "lib/jhv/windows-amd64/jhvj2k_kdu.dll"
+      ]
+    },
+    {
+      "path": "lib/jhv/windows-amd64/jhvj2k_opj.dll",
+      "sha256": "a592a2edf024461f2c39dc5be466de715eabd1e6407733991a72e0a27d98e0c2",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/OpenJPEG-Notices.txt",
+        "extra/licenses/esajpip.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/jhvj2k_opj.dll"
       ]
     },
     {

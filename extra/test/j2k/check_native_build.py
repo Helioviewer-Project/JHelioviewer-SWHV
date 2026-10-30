@@ -55,10 +55,92 @@ def palette_fixtures(folder):
     image("signed-index", index_signed=True)
 
 
+def resolution_fixtures(folder):
+    # Lossless zero-filled 64x64 gray images with three and four resolutions.
+    streams = {
+        3: bytes.fromhex("ff4fff510029000000000040000000400000000000000000000000400000004000000000000000000001070101ff52000c00000001000204040001ff5c000a4040484850484850ff640025000143726561746564206279204f70656e4a5045472076657273696f6e20322e352e34ff90000a00000000001a0001ff93df8038115054aff4c87f8080ffd9"),
+        4: bytes.fromhex("ff4fff510029000000000040000000400000000000000000000000400000004000000000000000000001070101ff52000c00000001000304040001ff5c000d4040484850484850484850ff640025000143726561746564206279204f70656e4a5045472076657273696f6e20322e352e34ff90000a0000000000190001ff93df8028115054a36f808080ffd9"),
+    }
+
+    def split(stream):
+        at, markers = 2, {}
+        while stream[at:at + 2] != b"\xff\x90":
+            size = int.from_bytes(stream[at + 2:at + 4], "big") + 2
+            markers[stream[at + 1]] = stream[at:at + size]
+            at += size
+        return stream[:at], markers, stream[at:-2]
+
+    _, markers3, tile3 = split(streams[3])
+    main4, markers4, tile4 = split(streams[4])
+
+    def marker(code, body):
+        return bytes([255, code]) + struct.pack(">H", len(body) + 2) + body
+
+    def coc(markers):
+        cod = markers[0x52]
+        return marker(0x53, b"\0" + cod[4:5] + cod[9:])
+
+    def qcc(markers):
+        return marker(0x5d, b"\0" + markers[0x5c][4:])
+
+    def tile(data, extra=b"", index=0, part=0, parts=1, unknown_length=False):
+        value = bytearray(data[:12] + extra + data[12:])
+        value[4:6] = struct.pack(">H", index)
+        value[6:10] = struct.pack(">I", 0 if unknown_length else len(value))
+        value[10:12] = bytes([part, parts])
+        return bytes(value)
+
+    def box(kind, body):
+        return struct.pack(">I4s", len(body) + 8, kind) + body
+
+    def image(name, levels, main, tiles, width=64, components=1):
+        header = box(b"ihdr", struct.pack(">IIHBBBB", 64, width, components, 7, 7, 0, 0))
+        header += box(b"colr", b"\1\0\0" + struct.pack(">I", 17))
+        data = box(b"jP  ", b"\r\n\x87\n") + box(b"ftyp", b"jp2 \0\0\0\0jp2 ")
+        data += box(b"jp2h", header) + box(b"jp2c", main + b"".join(tiles) + b"\xff\xd9")
+        (folder / f"resolutions-{levels}-{name}.jp2").write_bytes(data)
+
+    coding3 = markers3[0x52] + markers3[0x5c]
+    image("tile-cod", 3, main4, [tile(tile3, coding3)])
+    image("tile-coc", 3, main4, [tile(tile3, coc(markers3) + qcc(markers3))])
+    image("coc-over-cod", 4, main4,
+          [tile(tile4, markers3[0x52] + coc(markers4) + markers3[0x5c] + qcc(markers4))])
+    image("main-coc", 3, main4 + coc(markers3) + qcc(markers3), [tile3])
+    wide = bytearray(main4)
+    wide[8:12] = struct.pack(">I", 128)
+    image("second-tile", 3, bytes(wide), [tile4, tile(tile3, coding3, index=1)], width=128)
+    image("first-tile", 3, bytes(wide), [tile(tile3, coding3), tile(tile4, index=1)], width=128)
+    image("unknown-length", 3, main4, [tile(tile3, coding3, unknown_length=True)])
+    # This image's last two resolution packets are the one-byte empty packets.
+    payload = tile3[14:]
+    parts = [tile(tile3[:14] + payload[:-2], coding3, part=0, parts=3),
+             tile(tile3[:14] + payload[-2:-1], part=1, parts=3),
+             tile(tile3[:14] + payload[-1:], part=2, parts=3)]
+    image("tile-parts", 3, main4, parts)
+    bad_cod = bytearray(markers3[0x52])
+    bad_cod[2:4] = b"\xff\xff"
+    image("bad-cod-length", 0, main4, [tile(tile3, bytes(bad_cod))])
+    bad_coc = bytearray(coc(markers3))
+    bad_coc[4] = 1
+    image("bad-component", 0, main4, [tile(tile3, bytes(bad_coc))])
+    bad_part = bytearray(tile(tile3, coding3))
+    bad_part[6:10] = struct.pack(">I", 13)
+    image("bad-part-length", 0, main4, [bytes(bad_part)])
+
+    # Component 0 has four resolutions; unused component 1 has three.
+    mixed = bytes.fromhex("ff4fff51002c000000000040000000400000000000000000000000400000004000000000000000000002070101070101ff52000c00000001000304040001ff5c000d4040484850484850484850ff53000901000204040001ff5d000b014040484850484850ff640025000143726561746564206279204f70656e4a5045472076657273696f6e20322e352e34ff90000a0000000000250001ff93df8028115054a36fdf8038115054aff4c87f8080808080ffd9")
+    mixed_main, _, mixed_tile = split(mixed)
+    image("unused-component", 3, mixed_main, [mixed_tile], components=2)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("libraries", type=Path, help="directory containing the built native libraries")
     parser.add_argument("--esajpip", type=Path, required=True, help="esajpip source checkout")
+    parser.add_argument("--decoder", choices=("kdu", "openjpeg"), default="kdu",
+                        help="bridge to validate (default: kdu)")
+    parser.add_argument("--tolerance", type=int, default=0,
+                        help="largest per-byte difference from Kakadu's compositor, for an OpenJPEG bridge")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]
     fixtures = args.esajpip.resolve() / "tests"
@@ -76,13 +158,15 @@ def main():
     classpath = os.pathsep.join(str(path) for path in jars)
     with tempfile.TemporaryDirectory(prefix="jhv-native-check-") as directory:
         palette_fixtures(Path(directory))
+        resolution_fixtures(Path(directory))
         subprocess.run([
             "javac", "--release", "25", "-nowarn", "-cp", classpath, "-d", directory,
             str(root / "src/org/helioviewer/jhv/wcs/ImageGrid.java"),
             str(root / "src/org/helioviewer/jhv/source/J2KNative.java"),
             str(root / "extra/test/j2k/J2KNativeTest.java"),
         ], check=True, timeout=60)
-        java_args = ["--enable-native-access=ALL-UNNAMED", "-cp", classpath + os.pathsep + directory,
+        bridge = "jhvj2k_kdu" if args.decoder == "kdu" else "jhvj2k_opj"
+        java_args = ["--enable-native-access=ALL-UNNAMED", f"-Dj2k.bridge={bridge}", f"-Dj2k.tolerance={args.tolerance}", "-cp", classpath + os.pathsep + directory,
                      "org.helioviewer.jhv.source.J2KNativeTest"]
         subprocess.run(["java", "-Xmx64m", *java_args, "--responses", str(args.libraries.resolve())], check=True, timeout=30)
         subprocess.run([

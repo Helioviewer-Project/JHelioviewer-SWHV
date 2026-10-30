@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.DefaultCaret;
 
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
@@ -38,7 +39,10 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
 
-    private final JTextField programTime = new JTextField() {
+    private static final class TimestampField extends JTextField {
+
+        private boolean dirty;
+
         @Override
         public Dimension getPreferredSize() {
             Dimension size = super.getPreferredSize();
@@ -46,7 +50,29 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
             size.width++;
             return size;
         }
-    };
+
+        // Timestamps have constant width, updates need no relayout.
+        @Override
+        public void revalidate() {}
+
+        // Swing's scroll model can request another repaint during painting.
+        @Override
+        public void repaint(long delay, int x, int y, int width, int height) {
+            if (isFocusOwner())
+                super.repaint(delay, x, y, width, height);
+            else
+                dirty = true;
+        }
+
+        private void flushRepaint() {
+            if (dirty) {
+                dirty = false;
+                super.repaint(0L, 0, 0, getWidth(), getHeight());
+            }
+        }
+    }
+
+    private final TimestampField programTime = new TimestampField();
     private long displayedTime = Long.MIN_VALUE;
 
     private final JideButton playButton;
@@ -79,6 +105,8 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         programTime.setBorder(BorderFactory.createEmptyBorder());
         programTime.setHorizontalAlignment(JTextField.RIGHT);
         programTime.setToolTipText("Program time");
+        // Timestamp updates must not move the caret.
+        ((DefaultCaret) programTime.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         lazyRepaint();
         UITimer.register(this);
 
@@ -219,6 +247,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
             if (selectionStart != selectionEnd)
                 programTime.select(selectionStart, selectionEnd);
         }
+        programTime.flushRepaint();
     }
 
     private void updatePlaybackConfig() {

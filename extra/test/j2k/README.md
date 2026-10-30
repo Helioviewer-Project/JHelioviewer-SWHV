@@ -9,8 +9,9 @@ python3 extra/test/j2k/run_j2k_tests.py
 ```
 
 The default suite uses loopback servers and needs no external network or JPEG 2000
-native library. It also checks frame selection, synthesis and decoder delivery (`FramesTest`),
-request intervals and sampling (`ImageRequestSettingsTest`), and local FITS loading
+native library. It also checks shared time indexing (`TimeMapTest`), frame selection,
+synthesis and decoder delivery (`FramesTest`), request intervals and sampling
+(`ImageRequestSettingsTest`), and local FITS loading
 (`FramesLoadTest` and `LayerLoadTest`). The runner copies committed FITS inputs and creates
 a ZIP in its temporary directory. Image-memory checks use the bundled LWJGL native allocator:
 
@@ -68,7 +69,9 @@ python3 extra/test/j2k/run_j2k_tests.py --live
 ```
 
 The native libraries come from `lib/jhv/<platform>/`. `--bridge PATH`
-overrides its bridge with a supplied `libjhvj2k`; Kakadu still comes from that directory
+overrides its bridge with a supplied library; `--decoder kdu` (the default) selects
+`libjhvj2k_kdu`, and `--decoder openjpeg` selects `libjhvj2k_opj`.
+Kakadu still comes from that directory
 and must be compatible with that bridge.
 The live runner supports macOS arm64, macOS x86-64 and Linux x86-64.
 GC-dependent abandoned-timeline cleanup is opt-in with `--live --cleaner`.

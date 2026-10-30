@@ -134,7 +134,7 @@ public final class GridLayer extends AbstractLayer {
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         if (gridNeedsInit) {
             GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes);
@@ -186,7 +186,7 @@ public final class GridLayer extends AbstractLayer {
 
     @Override
     public void renderScale(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         if (mv.isRadialWarp())
             radialWarpGrid.render(mv, vp, labelAlpha > 0, lonStep, gridColorBytes, gridLineScale, labelColor, gridLabelSize, gridLabelAngle);
@@ -276,11 +276,6 @@ public final class GridLayer extends AbstractLayer {
         radialThickLineFar.dispose();
         flatGrid.dispose();
         radialWarpGrid.dispose();
-    }
-
-    @Override
-    public void remove() {
-        dispose();
     }
 
     @Override

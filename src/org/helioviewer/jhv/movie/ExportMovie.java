@@ -41,10 +41,9 @@ public final class ExportMovie {
     private static @Nullable TimelineFrameSource timelineFrameSource;
     private static boolean mainCanvasVisible = true;
 
-    public static void start(@Nullable Commands.OperationContext context, @Nullable JSONObject input) {
+    public static void start(Commands.Completion completion, @Nullable JSONObject input) {
         if (isRecording()) {
-            if (context != null)
-                Commands.notifyRecordingFinished(context, false, "Recording already in progress.", null);
+            completion.finished(false, "Recording already in progress.", null);
             return;
         }
 
@@ -56,7 +55,7 @@ public final class ExportMovie {
 
             ViewState.PlaybackData playbackData = ViewState.playbackData();
             int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Player.FPS_ABSOLUTE;
-            recordingSession = new RecordingSession(context, ViewState.recordingData(), fps);
+            recordingSession = new RecordingSession(completion, ViewState.recordingData(), fps);
             notifyStatusChanged();
             recordingSession.start();
         } catch (Exception e) {
@@ -67,7 +66,7 @@ public final class ExportMovie {
                 failedSession.disposeGrabber();
             notifyStatusChanged();
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "Recording failed." : e.getMessage();
-            Commands.notifyRecordingFinished(context, false, message, null);
+            completion.finished(false, message, null);
         }
     }
 
@@ -143,7 +142,7 @@ public final class ExportMovie {
     }
 
     private static final class RecordingSession {
-        private final @Nullable Commands.OperationContext operationContext;
+        private final Commands.Completion completion;
         private final ViewState.RecordingMode mode;
         private final int width;
         private final int height;
@@ -153,9 +152,9 @@ public final class ExportMovie {
         private boolean canvasFramePending;
         private boolean stopAfterFrame;
 
-        RecordingSession(@Nullable Commands.OperationContext _operationContext,
+        RecordingSession(Commands.Completion _completion,
                          ViewState.RecordingData recordingData, int fps) {
-            operationContext = _operationContext;
+            completion = _completion;
             mode = recordingData.mode();
             ViewState.Size size = recordingData.size().getSize();
             width = mode == ViewState.RecordingMode.SHOT ?
@@ -294,7 +293,7 @@ public final class ExportMovie {
             recordingSession = null;
             disposeGrabber();
             notifyStatusChanged();
-            encodeExecutor.execute(new CloseWriter(writer, operationContext));
+            encodeExecutor.execute(new CloseWriter(writer, completion));
         }
 
         void disposeGrabber() {
@@ -323,17 +322,17 @@ public final class ExportMovie {
     }
 
     private record CloseWriter(ExportWriter writer,
-                               @Nullable Commands.OperationContext operationContext) implements Runnable {
+                               Commands.Completion completion) implements Runnable {
         @Override
         public void run() {
             try {
                 String output = writer.close();
-                Commands.notifyRecordingFinished(operationContext, true, "Recording finished.", output);
+                completion.finished(true, "Recording finished.", output);
             } catch (Exception e) {
                 Log.error(e);
                 String message = e.getMessage() == null || e.getMessage().isBlank() ?
                         "Recording failed." : e.getMessage();
-                Commands.notifyRecordingFinished(operationContext, false, message, null);
+                completion.finished(false, message, null);
             }
             System.gc();
         }

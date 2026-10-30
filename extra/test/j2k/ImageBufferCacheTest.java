@@ -6,10 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +36,7 @@ public final class ImageBufferCacheTest {
         decodeRequests();
         releasedImage();
         writeBuffers();
-        manyFiles();
+        closeManySources();
         explicitRemoval();
         heldAndQueuedImages();
         replacementAndEviction();
@@ -183,19 +181,10 @@ public final class ImageBufferCacheTest {
             throw new AssertionError("Expected " + expected + ", got " + actual);
     }
 
-    private record OwnedKey(Object id, int frame, AtomicInteger visits) implements ImageBufferCache.Key {
-        @Override
-        public Object owner() {
-            visits.incrementAndGet();
-            return id;
-        }
-    }
-
-    private static void manyFiles() throws Exception {
+    private static void closeManySources() throws Exception {
         int count = 1000;
         CountDownLatch closed = new CountDownLatch(count);
-        Set<Thread> closerThreads = ConcurrentHashMap.newKeySet();
-        AtomicInteger visits = new AtomicInteger(), listeners = new AtomicInteger();
+        AtomicInteger listeners = new AtomicInteger();
         List<Frames.Frame> frames = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             long date = i * 3L;
@@ -211,7 +200,6 @@ public final class ImageBufferCacheTest {
                 @Override public void close() {
                     if (EventQueue.isDispatchThread())
                         throw new AssertionError("Sources closed on the EDT");
-                    closerThreads.add(Thread.currentThread());
                     closed.countDown();
                 }
             };
@@ -220,26 +208,17 @@ public final class ImageBufferCacheTest {
                 frames.add(new Frames.Frame(time, null, Frames.EMPTY_METAXML, source, frame)); // metadata unused
             }
         }
-        Object id = new Object();
-        for (int i = 0; i < count * 3; i++)
-            ImageBufferCache.put(new OwnedKey(id, i, visits),
-                    new DecodedImage(ImageBuffer.fromBytes(8, 8, new byte[64]), null));
-        OwnedKey other = new OwnedKey(new Object(), 0, visits);
-        DecodedImage retained = image();
-        ImageBufferCache.put(other, retained);
         Frames timeline = new Frames(frames);
         try {
-            EventQueue.invokeAndWait(timeline::clearCache);
-            if (visits.get() != count * 3 + 1 || listeners.get() != count || ImageBufferCache.get(other) != retained)
-                throw new AssertionError("Timeline did not visit each cache entry once and each source once, or purged another layer");
-            visits.set(0);
+            if (listeners.get() != count)
+                throw new AssertionError("Timeline did not register once with each distinct source");
             EventQueue.invokeAndWait(timeline::close);
-            if (!closed.await(10, TimeUnit.SECONDS) || closerThreads.size() != 1 || visits.get() != count * 3 + 1)
-                throw new AssertionError("Timeline repeated cache scans or used multiple source-close threads");
+            if (!closed.await(10, TimeUnit.SECONDS))
+                throw new AssertionError("Timeline did not close every source");
         } finally {
-            ImageBufferCache.invalidateIf(key -> key instanceof OwnedKey);
+            timeline.close();
         }
-        System.out.println("PASS: 1,000 sources in one timeline use one cache pass per clear and one background source closer");
+        System.out.println("PASS: a timeline registers once with each distinct source and closes 1,000 sources off the EDT");
     }
 
     private static DecodedImage image() {

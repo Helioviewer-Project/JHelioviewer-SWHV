@@ -178,7 +178,7 @@ public final class GLRenderer {
 
         GL.glDisable(GL.DEPTH_TEST);
         miniview.renderBackground();
-        Layers.renderMiniview(miniView, vp);
+        Layers.forEachImageLayer(layer -> layer.render(miniView, vp));
         GL.glEnable(GL.DEPTH_TEST);
     }
 

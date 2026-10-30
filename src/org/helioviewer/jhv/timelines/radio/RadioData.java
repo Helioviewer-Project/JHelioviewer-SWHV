@@ -67,10 +67,6 @@ public final class RadioData extends TimelineLayer {
         setEnabled(false);
     }
 
-    public static TimelineLayer deserialize(JSONObject jo) { // has to be implemented for state
-        return new RadioData(jo);
-    }
-
     @Override
     public void serialize(JSONObject jo) {
         jo.put("colormap", lut.name());

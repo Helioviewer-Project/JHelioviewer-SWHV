@@ -20,9 +20,9 @@ final class RecordHandlers {
     }
 
     private static void recordStart(Message msg, String senderId) {
-        Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.record.start", "jhv.record.start.completed");
+        Commands.Completion completion = SampClient.completion(senderId, msg, "jhv.record.start", "jhv.record.start.completed");
         JSONObject parameters = SampHandlers.parameters(msg, "mode", "size", "advanceMode", "speed", "speedUnit");
-        UiThread.post(() -> Commands.recordStart(context, parameters));
+        UiThread.post(() -> Commands.recordStart(completion, parameters));
     }
 
     private RecordHandlers() {}

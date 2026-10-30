@@ -2,20 +2,10 @@
 #define JHV_KDU_GEOMETRY_H
 
 #include "kdu_compressed.h"
-#include "jpeg2000/hv_render.h"
+#include "jhv_j2k_decoder.h"
 
-struct jhv_j2k_level {
-    int x, y, width, height;
-};
-
-struct jhv_j2k_geometry {
-    int plane_count;
-    int channels;               // decoded output: 1 gray or palette indices, 3 color
-    int resolutions, layers;
-    jhv_j2k_level level[33];    // exact decoder coordinates, full resolution first
-};
-
-// Inspect a freshly created, seekable codestream, before opening decoder tiles.
+// Inspect a seekable codestream in persistent mode. May be called again with
+// a different selection; the caller sets persistence before creating any tiles.
 // render must describe this codestream's supported grayscale/RGB channels.
 // Palette-mapped channels select the palette's single index component, which
 // decodes like a grayscale plane; the host applies the color table.

@@ -39,6 +39,8 @@ final class WcsInterpreter {
                 ctype2 = "HPLT-TAN";
             }
             boolean surface = ctype1.endsWith("CAR") || ctype1.endsWith("CEA");
+            boolean legacyCeaLatitude = ctype1.endsWith("CEA") && metadata.getString("CUNIT2")
+                    .map(unit -> unit.strip().equalsIgnoreCase("Sine Latitude")).orElse(true);
             header.addValue("CTYPE1", ctype1, null);
             header.addValue("CTYPE2", ctype2, null);
             for (int axis = 1; axis <= 2; axis++) {
@@ -47,6 +49,8 @@ final class WcsInterpreter {
                     unit = "arcsec";
                 else if (unit.equals("degree") || unit.equals("degrees"))
                     unit = "deg";
+                if (axis == 2 && legacyCeaLatitude)
+                    unit = "deg";
                 header.addValue("CUNIT" + axis, unit, null);
             }
             if (!header.containsKey("CRPIX1"))
@@ -54,7 +58,7 @@ final class WcsInterpreter {
             if (!header.containsKey("CRPIX2"))
                 header.addValue("CRPIX2", (height + 1) / 2., null);
 
-            if (ctype1.endsWith("CEA") && metadata.getString("CUNIT2").isEmpty())
+            if (legacyCeaLatitude)
                 convertLegacyCeaLatitude(header, useCd);
 
             // CROTA2 is the standard latitude-axis rotation. Preserve the observer
@@ -69,7 +73,7 @@ final class WcsInterpreter {
         }
     }
 
-    // Historical CEA maps without CUNIT2 store the plane's normalized Y row.
+    // Historical CEA maps with missing CUNIT2 or "Sine Latitude" store the plane's normalized Y row.
     // CRVAL2 remains a celestial latitude in degrees.
     private static void convertLegacyCeaLatitude(Header header, boolean useCd) throws HeaderCardException {
         if (useCd) {

@@ -95,8 +95,8 @@ public class Player {
         Frames frames = Layers.getActiveImageLayer().frames();
         int maximum = frames.size() - 1;
         // A replacement timeline can have the same frame count but different times.
-        playbackFirstTime = frames.time(Math.clamp(firstFrame, 0, maximum));
-        playbackLastTime = frames.time(Math.clamp(lastFrame, 0, maximum));
+        playbackFirstTime = frames.timeAt(Math.clamp(firstFrame, 0, maximum));
+        playbackLastTime = frames.timeAt(Math.clamp(lastFrame, 0, maximum));
         if (playbackFirstFrame == firstFrame && playbackLastFrame == lastFrame)
             return;
 
@@ -133,8 +133,8 @@ public class Player {
     private static void relativeTimeAdvance() {
         Frames frames = Layers.getActiveImageLayer().frames();
         JHVTime next = nextTime(advanceMode, lastTimestamp,
-                time -> JHVTime.clamp(frames.lower(time), playbackFirstTime, playbackLastTime),
-                time -> JHVTime.clamp(frames.higher(time), playbackFirstTime, playbackLastTime));
+                time -> JHVTime.clamp(frames.previousTime(time), playbackFirstTime, playbackLastTime),
+                time -> JHVTime.clamp(frames.nextTime(time), playbackFirstTime, playbackLastTime));
 
         if (next == null)
             pause();
@@ -181,22 +181,22 @@ public class Player {
 
     public static void setTime(JHVTime dateTime) {
         Frames frames = Layers.getActiveImageLayer().frames();
-        syncTime(JHVTime.clamp(frames.nearest(dateTime), playbackFirstTime, playbackLastTime));
+        syncTime(JHVTime.clamp(frames.nearestTime(dateTime), playbackFirstTime, playbackLastTime));
     }
 
     public static void setFrame(int frame) {
         Frames frames = Layers.getActiveImageLayer().frames();
-        syncTime(JHVTime.clamp(frames.time(frame), playbackFirstTime, playbackLastTime));
+        syncTime(JHVTime.clamp(frames.timeAt(frame), playbackFirstTime, playbackLastTime));
     }
 
     public static void nextFrame() {
         Frames frames = Layers.getActiveImageLayer().frames();
-        syncTime(JHVTime.clamp(frames.higher(lastTimestamp), playbackFirstTime, playbackLastTime));
+        syncTime(JHVTime.clamp(frames.nextTime(lastTimestamp), playbackFirstTime, playbackLastTime));
     }
 
     public static void previousFrame() {
         Frames frames = Layers.getActiveImageLayer().frames();
-        syncTime(JHVTime.clamp(frames.lower(lastTimestamp), playbackFirstTime, playbackLastTime));
+        syncTime(JHVTime.clamp(frames.previousTime(lastTimestamp), playbackFirstTime, playbackLastTime));
     }
 
     private static JHVTime lastTimestamp = TimeUtils.START;
@@ -233,7 +233,7 @@ public class Player {
 
         Frames frames = Layers.getActiveImageLayer().frames();
         int activeFrame = frames.current();
-        boolean last = dateTime.equals(playbackLastTime) && frames.time(activeFrame).equals(playbackLastTime);
+        boolean last = dateTime.equals(playbackLastTime) && frames.timeAt(activeFrame).equals(playbackLastTime);
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame));
         ExportMovie.playbackFrameReady(last);

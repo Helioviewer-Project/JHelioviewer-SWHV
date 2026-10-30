@@ -881,19 +881,6 @@ def plane_internal_array_to_pixel_center(plane_internal: np.ndarray, meta: JHVMe
     return np.column_stack((px, py))
 
 
-def pixel_center_to_plane_internal(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
-    rotated_internal = (
-        (pixel_center[0] - meta.crpix1_gl) * meta.unit_per_pixel_x,
-        -(pixel_center[1] - texture_reference_pixel_y(meta)) * meta.unit_per_pixel_y,
-    )
-    return transform_mat2(meta.image_to_plane, rotated_internal)
-
-
-def pixel_center_to_world_deg(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
-    world_rad = project_plane_internal_to_world(pixel_center_to_plane_internal(pixel_center, meta), meta)
-    return (math.degrees(world_rad[0]), math.degrees(world_rad[1]))
-
-
 def mirrored_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     if meta.projection == "CAR":
         lon, lat = world_rad
@@ -1069,16 +1056,8 @@ def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, floa
     return (-half_width, half_width, -half_height, half_height)
 
 
-def pixel_center_to_texcoord(px: float, py: float, image2d: np.ndarray) -> tuple[float, float]:
-    return (px / image2d.shape[1], py / image2d.shape[0])
-
-
 def texture_texel(image2d: np.ndarray, texel_x: int, texel_y: int) -> float:
     return float(image2d[image2d.shape[0] - 1 - texel_y, texel_x])
-
-
-def wcsPlaneToPixelCenter(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
-    return plane_internal_to_pixel_center(plane_internal, meta)
 
 
 def wcsRect(meta: JHVMeta) -> tuple[float, float, float, float]:
@@ -1171,20 +1150,6 @@ def sample_texture_linear(image2d: np.ndarray, texcoord: tuple[float, float], wr
         (1.0 - tx) * ty * v01 +
         tx * ty * v11
     )
-
-
-def sample_observer_image_linear(image2d: np.ndarray, px: float, py: float) -> float:
-    return sample_texture_linear(image2d, pixel_center_to_texcoord(px, py, image2d))
-
-
-def sample_surface_map_linear(image2d: np.ndarray, px: float, py: float, meta: JHVMeta) -> float:
-    return sample_texture_linear(image2d, pixel_center_to_texcoord(px, py, image2d), wrap_x=surface_map_wraps_x(meta))
-
-
-def sample_source_linear(image2d: np.ndarray, px: float, py: float, meta: JHVMeta) -> float:
-    if meta.projection in SURFACE_MAP_PROJECTIONS:
-        return sample_surface_map_linear(image2d, px, py, meta)
-    return sample_observer_image_linear(image2d, px, py)
 
 
 def sample_texture_linear_array(image2d: np.ndarray, u: np.ndarray, v: np.ndarray, wrap_x: bool = False) -> np.ndarray:
@@ -2074,57 +2039,6 @@ def render_square_signed_image(
     return image
 
 
-def evaluate_diff_selfcheck(
-    size: int,
-    screen_positions,
-    texcoords_at_pixel,
-    sample_value,
-) -> tuple[np.ndarray, np.ndarray, int, int, float, float]:
-    base_img = np.full((size, size), np.nan, dtype=np.float64)
-    diff_img = np.full((size, size), np.nan, dtype=np.float64)
-    max_texcoord_err = 0.0
-    max_sample_err = 0.0
-    compared = 0
-    validity_mismatches = 0
-
-    for iy, ix, screen_pos in screen_positions(size):
-        texcoord, diff_texcoord = texcoords_at_pixel(screen_pos)
-        base_sample = sample_value(texcoord)
-        diff_sample = sample_value(diff_texcoord)
-        base_img[iy, ix] = base_sample
-        err = abs(base_sample - diff_sample) if math.isfinite(base_sample) and math.isfinite(diff_sample) else math.nan
-        diff_img[iy, ix] = err
-        base_valid = math.isfinite(texcoord[0]) and math.isfinite(texcoord[1])
-        diff_valid = math.isfinite(diff_texcoord[0]) and math.isfinite(diff_texcoord[1])
-        validity_mismatches += int(base_valid != diff_valid)
-        if base_valid and diff_valid:
-            compared += 1
-            max_texcoord_err = max(
-                max_texcoord_err,
-                max(abs(texcoord[0] - diff_texcoord[0]), abs(texcoord[1] - diff_texcoord[1])),
-            )
-        if math.isfinite(err):
-            max_sample_err = max(max_sample_err, err)
-
-    return base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err
-
-
-def square_screen_positions(size: int):
-    for iy in range(size):
-        sy = 1.0 - (iy / (size - 1) if size > 1 else 0.5)
-        for ix in range(size):
-            sx = ix / (size - 1) if size > 1 else 0.5
-            yield iy, ix, (sx, sy)
-
-
-def signed_square_screen_positions(size: int):
-    for iy in range(size):
-        sy = 1.0 - 2.0 * (iy / (size - 1) if size > 1 else 0.5)
-        for ix in range(size):
-            sx = -1.0 + 2.0 * (ix / (size - 1) if size > 1 else 0.5)
-            yield iy, ix, (sx, sy)
-
-
 def is_surface_map_projection(meta: JHVMeta) -> bool:
     return meta.projection in SURFACE_MAP_PROJECTIONS
 
@@ -2314,134 +2228,6 @@ def run_surface_map_render_compare(
     print(f"diff_png={diff_path}")
     if not math.isfinite(max_px_err) or max_px_err > max_error_px:
         print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
-        return 1
-    return 0
-
-
-def run_hpc_diff_selfcheck(
-    fits_file: Path,
-    output_dir: Path,
-    render_size: int,
-    meta: JHVMeta,
-    image_data: np.ndarray,
-) -> int:
-    require_2d_image(image_data, "HPC diff selfcheck")
-
-    bounds_deg = hpc_bounds_degrees(meta, 1.0)
-    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
-        render_size,
-        square_screen_positions,
-        lambda scrpos: renderHpcTexcoords(
-                scrpos,
-                bounds_deg,
-                meta,
-                image_data,
-                diff_meta=meta,
-                diff_image2d=image_data,
-            )[:2],
-        lambda texcoord: sample_texture_linear(image_data, texcoord),
-    )
-
-    base_path = output_dir / f"{fits_file.stem}_hpc_diff_self_base.png"
-    diff_path = output_dir / f"{fits_file.stem}_hpc_diff_self_diff.png"
-    save_png(base_path, base_img)
-    save_png(diff_path, diff_img)
-
-    print(f"file={fits_file}")
-    print(f"mode=hpc_diff_selfcheck size={render_size}")
-    print(f"compared_samples={compared}")
-    print(f"validity_mismatches={validity_mismatches}")
-    print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
-    print(f"sample_max_abs_error={max_sample_err:.6e}")
-    print(f"base_png={base_path}")
-    print(f"diff_png={diff_path}")
-    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
-        print("FAILED: identical HPC inputs produced different results")
-        return 1
-    return 0
-
-
-def run_latitudinal_diff_selfcheck(
-    fits_file: Path,
-    output_dir: Path,
-    render_size: int,
-    meta: JHVMeta,
-    image_data: np.ndarray,
-) -> int:
-    require_2d_image(image_data, "Latitudinal diff selfcheck")
-    if not is_surface_map_projection(meta):
-        raise ValueError("Latitudinal diff selfcheck currently supports CAR/CEA surface maps only")
-
-    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
-        render_size,
-        square_screen_positions,
-        lambda scrpos: renderLatitudinalTexcoords(
-                scrpos,
-                LATI_SURFACE_BOUNDS_DEG,
-                meta,
-                image_data,
-                diff_meta=meta,
-                diff_image2d=image_data,
-            ),
-        lambda texcoord: sample_texture_linear(image_data, texcoord, wrap_x=True),
-    )
-
-    base_path = output_dir / f"{fits_file.stem}_lati_diff_self_base.png"
-    diff_path = output_dir / f"{fits_file.stem}_lati_diff_self_diff.png"
-    save_png(base_path, base_img)
-    save_png(diff_path, diff_img)
-
-    print(f"file={fits_file}")
-    print(f"mode=latitudinal_diff_selfcheck size={render_size}")
-    print(f"compared_samples={compared}")
-    print(f"validity_mismatches={validity_mismatches}")
-    print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
-    print(f"sample_max_abs_error={max_sample_err:.6e}")
-    print(f"base_png={base_path}")
-    print(f"diff_png={diff_path}")
-    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
-        print("FAILED: identical Latitudinal inputs produced different results")
-        return 1
-    return 0
-
-
-def run_orthographic_diff_selfcheck(
-    fits_file: Path,
-    output_dir: Path,
-    render_size: int,
-    meta: JHVMeta,
-    image_data: np.ndarray,
-) -> int:
-    require_2d_image(image_data, "Orthographic diff selfcheck")
-
-    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
-        render_size,
-        signed_square_screen_positions,
-        lambda screen_xy: renderOrthographicTexcoords(
-                screen_xy,
-                meta,
-                image_data,
-                diff_meta=meta,
-                diff_image2d=image_data,
-            )[:2],
-        lambda texcoord: sample_texture_linear(image_data, texcoord, wrap_x=is_surface_map_projection(meta)),
-    )
-
-    base_path = output_dir / f"{fits_file.stem}_ortho_diff_self_base.png"
-    diff_path = output_dir / f"{fits_file.stem}_ortho_diff_self_diff.png"
-    save_png(base_path, base_img)
-    save_png(diff_path, diff_img)
-
-    print(f"file={fits_file}")
-    print(f"mode=orthographic_diff_selfcheck size={render_size}")
-    print(f"compared_samples={compared}")
-    print(f"validity_mismatches={validity_mismatches}")
-    print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
-    print(f"sample_max_abs_error={max_sample_err:.6e}")
-    print(f"base_png={base_path}")
-    print(f"diff_png={diff_path}")
-    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
-        print("FAILED: identical Orthographic inputs produced different results")
         return 1
     return 0
 
@@ -3076,9 +2862,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--surface-map-render-compare", action="store_true", help="Render CAR/CEA surface maps through JHV and Astropy over a dense lon/lat grid and write diagnostic PNGs")
     parser.add_argument("--latitudinal-zenithal-render", action="store_true", help="Render the legacy zenithal latitudinal path mirrored from imageLati.frag")
     parser.add_argument("--orthographic-render", action="store_true", help="Render the orthographic path mirrored from imageOrtho.frag")
-    parser.add_argument("--hpc-diff-selfcheck", action="store_true", help="Exercise the mirrored HPC diff branch with identical source/meta on both sides")
-    parser.add_argument("--latitudinal-diff-selfcheck", action="store_true", help="Exercise the mirrored Latitudinal diff branch with identical source/meta on both sides")
-    parser.add_argument("--orthographic-diff-selfcheck", action="store_true", help="Exercise the mirrored Orthographic diff branch with identical source/meta on both sides")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC over the full rendered comparison frame")
     parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare Orthographic TAN against formal-TAN over the full image frame")
     parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare Orthographic TAN against the JHV HPC display sampling over the full rendered comparison frame")
@@ -3127,15 +2910,6 @@ def main() -> int:
 
     if args.orthographic_render:
         return run_orthographic_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
-
-    if args.hpc_diff_selfcheck:
-        return run_hpc_diff_selfcheck(args.fits_file, args.output_dir, args.render_size, meta, image_data)
-
-    if args.latitudinal_diff_selfcheck:
-        return run_latitudinal_diff_selfcheck(args.fits_file, args.output_dir, args.render_size, meta, image_data)
-
-    if args.orthographic_diff_selfcheck:
-        return run_orthographic_diff_selfcheck(args.fits_file, args.output_dir, args.render_size, meta, image_data)
 
     if args.hpc_render_compare:
         return run_hpc_render_compare(

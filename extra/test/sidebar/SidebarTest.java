@@ -4,12 +4,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +29,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RepaintManager;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
@@ -31,6 +37,7 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
@@ -52,6 +59,7 @@ import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.thread.UiThread;
 
@@ -156,6 +164,7 @@ public final class SidebarTest {
         Rectangle visible = gridOptions.getVisibleRect();
         check(visible.height == gridOptions.getPreferredSize().height && visible.width == gridOptions.getWidth(),
                 "Grid controls clipped");
+        checkLayerTimeRepaints(panel, tabs, images, overlays, first);
 
         JSONObject camera = DisplayController.cameraToJson();
         UpdateViewpoint update = DisplayController.getViewpointUpdate();
@@ -172,8 +181,10 @@ public final class SidebarTest {
         check(overlays.getValueAt(overlays.getSelectedRow(), 0) == grid, "Filtered deletion changed overlay selection");
 
         PfssPlugin plugin = new PfssPlugin();
-        plugin.installGUI();
-        plugin.install();
+        Settings.setProperty("plugins.PfssPlugin.active", "false");
+        PluginManager.setGUIEnabled(true);
+        PluginManager.addPlugin(plugin);
+        PluginManager.setActive(plugin, true);
         int pfssRow = rowNamed(overlays, "PFSS Model");
         overlays.setRowSelectionInterval(pfssRow, pfssRow);
         check(hasLabel(tabs.getComponentAt(1), "Detail") && hasLabel(tabs.getComponentAt(1), "Radius"), "PFSS editor not integrated");
@@ -252,8 +263,7 @@ public final class SidebarTest {
         tabs.setSelectedIndex(2);
         panel.setTimelinesPanel(null);
         check(tabs.getSelectedIndex() == 0 && !tabs.isEnabledAt(2) && timelineContents.getParent() == null, "Timelines uninstall retained its editor");
-        plugin.uninstall();
-        plugin.uninstallGUI();
+        PluginManager.setActive(plugin, false);
         checkRestoredViewpointDisclosure(panel);
         checkMovieOptions(panel);
     }
@@ -293,7 +303,7 @@ public final class SidebarTest {
             if (component instanceof JComboBox<?> box && box.getItemAt(0) instanceof ExportFormat)
                 formatBox = box;
             if (component instanceof JTextField field && "Program time".equals(field.getToolTipText()))
-                checkProgramTime(field);
+                checkProgramTime(movie, field);
         }
         check(formatBox != null && !formatBox.isEnabled() && formatBox.getSelectedItem() == ExportFormat.H265HQ,
                 "Initial Screenshot format state or saved video format");
@@ -314,13 +324,14 @@ public final class SidebarTest {
         ViewState.setRecordingMode(ViewState.RecordingMode.LOOP);
     }
 
-    private static void checkProgramTime(JTextField clock) {
+    private static void checkProgramTime(MoviePanel movie, JTextField clock) {
         String original = clock.getText();
         Font originalFont = clock.getFont();
         Container position = clock.getParent();
         Container transport = position.getParent();
         JComponent frames = (JComponent) position.getComponent(0);
         Font frameFont = frames.getFont();
+        RepaintManager repaintManager = RepaintManager.currentManager(clock);
         try {
             for (float scale : new float[]{1, 1.25f, 1.5f}) {
                 clock.setFont(originalFont.deriveFont(originalFont.getSize2D() * scale));
@@ -332,6 +343,7 @@ public final class SidebarTest {
                 check(clock.getWidth() >= size.width, "Transport row clipped timestamp");
                 for (String text : List.of("2026-10-21T11:56:23.000", "2026-10-22T00:00:00.123", "2026-10-23T23:59:59.999")) {
                     clock.setText(text);
+                    check(clock.getCaretPosition() == 0, "Timestamp update moved the caret");
                     check(clock.getPreferredSize().equals(size), "Timestamp update changed its reserved size");
                     clock.setScrollOffset(0);
                     double right = clock.modelToView2D(text.length()).getX();
@@ -340,13 +352,115 @@ public final class SidebarTest {
                     check(clock.modelToView2D(0).getX() >= 0 && right < size.width, "Timestamp clipped");
                 }
             }
-        } catch (javax.swing.text.BadLocationException exception) {
+
+            int[] repaints = {0};
+            RepaintManager.setCurrentManager(new RepaintManager() {
+                @Override
+                public void addDirtyRegion(JComponent component, int x, int y, int width, int height) {
+                    if (component == clock)
+                        repaints[0]++;
+                }
+            });
+            movie.lazyRepaint();
+            repaints[0] = 0;
+            clock.repaint();
+            clock.repaint(0, 0, clock.getWidth(), clock.getHeight());
+            check(repaints[0] == 0, "Unfocused timestamp repaint bypassed UI timer");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Timestamp repaint requests were not batched");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Clean timestamp repainted again");
+
+            clock.setText("2026-10-30T12:34:56.789");
+            movie.lazyRepaint();
+            repaints[0] = 0;
+            BufferedImage image = new BufferedImage(clock.getWidth(), clock.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            clock.paint(graphics);
+            graphics.dispose();
+            check(repaints[0] == 0, "Painting queued a redundant timestamp repaint");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Paint-generated timestamp repaint was lost");
+            movie.lazyRepaint();
+            check(repaints[0] == 1, "Timestamp repaint did not settle while paused");
+
+            Field displayedTime = MoviePanel.class.getDeclaredField("displayedTime");
+            displayedTime.setAccessible(true);
+            displayedTime.setLong(movie, Long.MIN_VALUE);
+            ValidationProbe probe = new ValidationProbe();
+            RepaintManager.setCurrentManager(probe);
+            clock.select(5, 10);
+            movie.lazyRepaint();
+            check(!probe.queued, "Timestamp update queued validation");
+            check(clock.getSelectionStart() == 5 && clock.getSelectionEnd() == 10, "Timestamp update lost the selection");
+        } catch (javax.swing.text.BadLocationException | ReflectiveOperationException exception) {
             throw new AssertionError(exception);
         } finally {
+            RepaintManager.setCurrentManager(repaintManager);
             clock.setFont(originalFont);
             frames.setFont(frameFont);
             clock.setText(original);
             clock.select(0, 0);
+        }
+    }
+
+    private static void checkLayerTimeRepaints(LayersPanel panel, JTabbedPane tabs, JTable images, JTable overlays, ImageLayer image) {
+        tabs.setSelectedIndex(0);
+        panel.setSize(panel.getWidth(), panel.getPreferredSize().height);
+        layoutTree(panel);
+        Interfaces.LazyComponent imageUpdates = (Interfaces.LazyComponent) images;
+        Interfaces.LazyComponent overlayUpdates = (Interfaces.LazyComponent) overlays;
+        imageUpdates.lazyRepaint();
+        overlayUpdates.lazyRepaint();
+        RepaintManager original = RepaintManager.currentManager(images);
+        Map<JComponent, Rectangle> regions = new IdentityHashMap<>();
+        RepaintManager.setCurrentManager(new RepaintManager() {
+            @Override
+            public void addDirtyRegion(JComponent component, int x, int y, int width, int height) {
+                if (component == images || component == overlays)
+                    regions.merge(component, new Rectangle(x, y, width, height), Rectangle::union);
+            }
+        });
+        try {
+            Layers.fireTimeUpdated(Layers.getViewpointLayer());
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            check(regions.isEmpty(), "Filtered Viewpoint update repainted layer tables");
+
+            Layers.fireTimeUpdated(image);
+            check(regions.isEmpty(), "Timestamp repaint bypassed UI timer");
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            int row = images.convertRowIndexToView(Layers.getLayers().indexOf(image));
+            Rectangle expected = images.getCellRect(row, LayersTableModel.TIME_COL, true).intersection(images.getVisibleRect());
+            check(!expected.isEmpty(), "Image time cell is outside the test viewport");
+            check(expected.equals(regions.get(images)) && !regions.containsKey(overlays), "Image update repainted unrelated time cells");
+
+            tabs.setSelectedIndex(1);
+            panel.setSize(panel.getWidth(), panel.getPreferredSize().height);
+            layoutTree(panel);
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            regions.clear();
+            Layer connection = Layers.getConnectionLayer();
+            Layers.fireTimeUpdated(connection);
+            imageUpdates.lazyRepaint();
+            overlayUpdates.lazyRepaint();
+            row = overlays.convertRowIndexToView(Layers.getLayers().indexOf(connection));
+            expected = overlays.getCellRect(row, LayersTableModel.TIME_COL, true).intersection(overlays.getVisibleRect());
+            check(!expected.isEmpty(), "Overlay time cell is outside the test viewport");
+            check(expected.equals(regions.get(overlays)) && !regions.containsKey(images), "Overlay update repainted unrelated time cells");
+        } finally {
+            RepaintManager.setCurrentManager(original);
+        }
+    }
+
+    private static final class ValidationProbe extends RepaintManager {
+        private boolean queued;
+
+        @Override
+        public void addInvalidComponent(JComponent component) {
+            queued = true;
         }
     }
 

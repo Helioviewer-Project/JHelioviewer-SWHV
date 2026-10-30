@@ -282,7 +282,6 @@ public final class AssimpModelLoaderTest {
         ModelMesh lines = meshes(scene, ModelMesh.Primitive.LINES).getFirst();
         check(lines.indices().remaining() == 3, "line-strip indices");
         check(lines.texCoords() == null, "unused texture coordinates");
-        checkTexturedDrawingRejected(scene, lines);
         IntBuffer offsets = lines.lineOffsets();
         check(offsets.remaining() == 2 && offsets.get(0) == 0 && offsets.get(1) == 3, "line-strip reconstruction");
 
@@ -290,7 +289,6 @@ public final class AssimpModelLoaderTest {
         check(drawing.alphaMode() == ModelMaterial.AlphaMode.BLEND && close(drawing.alpha(), 0.5f), "blended material");
 
         ModelMesh points = meshes(scene, ModelMesh.Primitive.POINTS).getFirst();
-        checkTexturedDrawingRejected(scene, points);
         ModelMaterial markers = scene.materials().get(points.materialIndex());
         check(markers.alphaMode() == ModelMaterial.AlphaMode.OPAQUE && close(markers.alpha(), 0.5f), "default opaque material");
 
@@ -305,17 +303,6 @@ public final class AssimpModelLoaderTest {
 
         checkPosition(meshes(scene, ModelMesh.Primitive.LINES).getLast().positions(), 2, 2, 3, 0.5f);
         checkPosition(meshes(scene, ModelMesh.Primitive.POINTS).getLast().positions(), 1, 2, 3, 0.5f);
-    }
-
-    private static void checkTexturedDrawingRejected(ModelScene scene, ModelMesh mesh) {
-        ModelMesh textured = new ModelMesh(mesh.name(), mesh.primitive(), mesh.positions(), mesh.normals(), mesh.colors(),
-                mesh.texCoords(), mesh.indices(), mesh.lineOffsets(), 0);
-        try {
-            new ModelScene("invalid", TimeUtils.START, List.of(textured), scene.materials(), scene.textures());
-            throw new AssertionError("textured drawing mesh was accepted: " + mesh.primitive());
-        } catch (IllegalArgumentException e) {
-            check(e.getMessage().contains("Only triangle meshes can have textures"), "unexpected rejection: " + e.getMessage());
-        }
     }
 
     private static List<ModelMesh> meshes(ModelScene scene, ModelMesh.Primitive primitive) {

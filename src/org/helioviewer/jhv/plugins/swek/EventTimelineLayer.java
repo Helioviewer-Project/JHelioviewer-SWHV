@@ -24,7 +24,6 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 import org.json.JSONObject;
 
-// has to be public for state
 public final class EventTimelineLayer extends TimelineLayer implements SWEKSession.Listener {
 
     // Toolkit part of a click on an event: the event information window.
@@ -46,11 +45,6 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
 
     void setUi(@Nullable Ui _ui) {
         ui = _ui;
-    }
-
-    @Nullable
-    public static TimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
-        return SWEKPlugin.getTimelineLayer();
     }
 
     @Override

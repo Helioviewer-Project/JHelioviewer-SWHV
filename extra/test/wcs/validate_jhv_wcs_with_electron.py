@@ -1413,153 +1413,6 @@ def compare_tan_all_modes_color_smoke_batch(
     return 1 if failed else 0
 
 
-def compare_tan_screen_case_batch(
-    electron: Path,
-    output_dir: Path,
-    render_size: int,
-    max_error_px: float,
-    max_sample_error: float,
-    sample_texture: bool,
-    backend: str,
-    report_validity_mismatches: bool,
-) -> int:
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    jobs: list[dict] = []
-    metadata: list[dict] = []
-    for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR.parent / "data" / filename
-        image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
-        if meta.projection not in PROJECTION_CODES:
-            raise ValueError(f"Electron WebGL TAN screen validation does not support projection {meta.projection!r} for {fits_file}")
-
-        bounds = hpc_bounds_degrees(meta, 1.0)
-        hpc_job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend, f"{name}_hpc")
-        jobs.append(hpc_job)
-        metadata.append({
-            "mode": "hpc",
-            "fits_file": fits_file,
-            "image_data": image_data,
-            "meta": meta,
-            "pixel_wcs": pixel_wcs,
-            "bounds": bounds,
-        })
-
-        ortho_job = make_mode_job("ortho", fits_file, render_size, output_dir, sample_texture, meta, backend)
-        ortho_job["name"] = f"{name}_ortho"
-        ortho_job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_ortho_{'sample' if sample_texture else 'texcoord'}.rgba32f")
-        jobs.append(ortho_job)
-        metadata.append({
-            "mode": "ortho",
-            "fits_file": fits_file,
-            "image_data": image_data,
-            "meta": meta,
-            "projection_wcs": projection_wcs,
-            "pixel_wcs": pixel_wcs,
-        })
-
-    results = run_electron_jobs(electron, jobs, backend)
-    failed = False
-    for job, info, result in zip(jobs, metadata, results, strict=True):
-        pixels = read_job_pixels(job)
-        if info["mode"] == "hpc":
-            code = evaluate_hpc_shader_to_astropy(
-                info["fits_file"],
-                render_size,
-                max_error_px,
-                max_sample_error,
-                sample_texture,
-                info["image_data"],
-                info["meta"],
-                info["pixel_wcs"],
-                info["bounds"],
-                job,
-                result,
-                pixels,
-                report_validity_mismatches,
-            )
-        else:
-            code = evaluate_shader_to_cpu(
-                info["mode"],
-                info["fits_file"],
-                render_size,
-                max_error_px,
-                max_sample_error,
-                sample_texture,
-                info["image_data"],
-                info["meta"],
-                info["projection_wcs"],
-                info["pixel_wcs"],
-                job,
-                result,
-                pixels,
-                report_validity_mismatches,
-            )
-        failed = failed or code != 0
-
-    return 1 if failed else 0
-
-
-def compare_tan_screen_color_smoke_batch(
-    electron: Path,
-    output_dir: Path,
-    render_size: int,
-    backend: str,
-    diff_mode: bool = False,
-) -> int:
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    jobs: list[dict] = []
-    metadata: list[dict] = []
-    suffix = "color_diff_smoke" if diff_mode else "color_smoke"
-    for name, filename, hdu in TAN_SCREEN_CASES:
-        fits_file = SCRIPT_DIR.parent / "data" / filename
-        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
-        if meta.projection not in PROJECTION_CODES:
-            raise ValueError(f"Electron WebGL TAN color smoke does not support projection {meta.projection!r} for {fits_file}")
-
-        hpc_job = common_job(
-            "hpc",
-            fits_file,
-            render_size,
-            output_dir,
-            meta,
-            hpc_bounds_degrees(meta, 1.0),
-            True,
-            backend,
-            f"{name}_hpc_{suffix}",
-            color_smoke=not diff_mode,
-            color_diff_smoke=diff_mode,
-        )
-        jobs.append(hpc_job)
-        metadata.append({"fits_file": fits_file})
-
-        ortho_job = make_mode_job(
-            "ortho",
-            fits_file,
-            render_size,
-            output_dir,
-            True,
-            meta,
-            backend,
-            color_smoke=not diff_mode,
-            color_diff_smoke=diff_mode,
-        )
-        ortho_job["name"] = f"{name}_ortho_{suffix}"
-        kind = "color_diff" if diff_mode else "color"
-        ortho_job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_ortho_{suffix}_{kind}.rgba32f")
-        jobs.append(ortho_job)
-        metadata.append({"fits_file": fits_file})
-
-    results = run_electron_jobs(electron, jobs, backend)
-    failed = False
-    for job, info, result in zip(jobs, metadata, results, strict=True):
-        pixels = read_job_pixels(job)
-        failed = evaluate_color_smoke(info["fits_file"], render_size, job, result, pixels) != 0 or failed
-
-    return 1 if failed else 0
-
-
 def compare_hpc_projection_batch(
     electron: Path,
     output_dir: Path,
@@ -2365,7 +2218,6 @@ def main() -> int:
     )
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--tan-all-modes-cases", action="store_true")
-    parser.add_argument("--tan-screen-cases", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
     parser.add_argument("--hpc-projection-backend-compare", action="store_true")
     parser.add_argument("--hpc-render-cases", action="store_true")
@@ -2373,8 +2225,6 @@ def main() -> int:
     parser.add_argument("--hpc-projection-cases-diff-selfcheck", action="store_true")
     parser.add_argument("--hpc-projection-cases-color-smoke", action="store_true")
     parser.add_argument("--hpc-projection-cases-color-diff-smoke", action="store_true")
-    parser.add_argument("--tan-screen-cases-color-smoke", action="store_true")
-    parser.add_argument("--tan-screen-cases-color-diff-smoke", action="store_true")
     parser.add_argument("--tan-all-modes-cases-color-smoke", action="store_true")
     parser.add_argument("--tan-all-modes-cases-color-diff-smoke", action="store_true")
     parser.add_argument("--surface-map-cases-color-smoke", action="store_true")
@@ -2435,18 +2285,6 @@ def main() -> int:
             args.report_validity_mismatches,
         )
 
-    if args.tan_screen_cases:
-        return compare_tan_screen_case_batch(
-            args.electron,
-            args.output_dir,
-            args.render_size,
-            args.max_error_px,
-            args.max_sample_error,
-            args.sample_texture,
-            args.backend,
-            args.report_validity_mismatches,
-        )
-
     if args.hpc_render_cases:
         return compare_hpc_render_case_batch(
             args.electron,
@@ -2490,23 +2328,6 @@ def main() -> int:
 
     if args.hpc_projection_cases_color_diff_smoke:
         return compare_hpc_projection_color_smoke_batch(
-            args.electron,
-            args.output_dir,
-            args.render_size,
-            args.backend,
-            True,
-        )
-
-    if args.tan_screen_cases_color_smoke:
-        return compare_tan_screen_color_smoke_batch(
-            args.electron,
-            args.output_dir,
-            args.render_size,
-            args.backend,
-        )
-
-    if args.tan_screen_cases_color_diff_smoke:
-        return compare_tan_screen_color_smoke_batch(
             args.electron,
             args.output_dir,
             args.render_size,

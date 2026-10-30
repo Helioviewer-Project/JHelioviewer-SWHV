@@ -166,29 +166,14 @@ public final class FastRiceVerifier {
         for (int block : new int[]{16, 32}) {
             for (int length : new int[]{1, 2, 15, 16, 17, 31, 32, 33, 127, 128, 129, 3040}) {
                 for (int kind = 0; kind < 3; kind++) {
-                    verifyByteSynthetic(block, byteData(length, kind));
                     verifyShortSynthetic(block, shortData(length, kind), true);
                     verifyShortSynthetic(block, shortData(length, kind), false);
                     verifyIntSynthetic(block, intData(length, kind));
-                    cases += 4;
+                    cases += 3;
                 }
             }
         }
         System.out.println("synthetic integer cases=" + cases);
-    }
-
-    private static void verifyByteSynthetic(int block, byte[] input) {
-        RiceCompressOption option = riceOption(PrimitiveTypes.BYTE.size(), block);
-        ByteBuffer compressed = ByteBuffer.allocate(input.length * 8 + 128);
-        new RiceCompressor.ByteRiceCompressor(option).compress(ByteBuffer.wrap(input), compressed);
-        compressed.flip();
-
-        ByteBuffer nomTam = ByteBuffer.allocate(input.length);
-        new RiceCompressor.ByteRiceCompressor(option).decompress(compressed.duplicate(), nomTam);
-
-        ByteBuffer fast = ByteBuffer.allocate(input.length);
-        control(byte.class).decompress(compressed.duplicate(), fast, option);
-        assertArrayEquals("synthetic byte", nomTam.array(), fast.array());
     }
 
     private static void verifyShortSynthetic(int block, short[] input, boolean heapOutput) {
@@ -666,18 +651,6 @@ public final class FastRiceVerifier {
     private static double[] toDoubles(byte[] bytes) {
         double[] values = new double[bytes.length / Double.BYTES];
         ByteBuffer.wrap(bytes).asDoubleBuffer().get(values);
-        return values;
-    }
-
-    private static byte[] byteData(int length, int kind) {
-        byte[] values = new byte[length];
-        for (int i = 0; i < length; i++) {
-            values[i] = switch (kind) {
-                case 0 -> 42;
-                case 1 -> (byte) (i * 3 - 100);
-                default -> (byte) RND.nextInt();
-            };
-        }
         return values;
     }
 

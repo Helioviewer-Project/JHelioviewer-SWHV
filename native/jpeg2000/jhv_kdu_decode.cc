@@ -6,24 +6,16 @@
 
 const char *jhv_kdu_decode(kdu_core::kdu_codestream &stream, const hv_render &render,
                           const jhv_j2k_geometry &geometry, int reduce,
-                          const jhv_j2k_level &region, uint8_t *output, size_t capacity) {
+                          const jhv_j2k_level &region, uint8_t *output) {
     using namespace kdu_core;
     using namespace kdu_supp;
-    if (reduce < 0 || reduce >= geometry.resolutions)
-        return "JPEG 2000 reduction out of range";
     const jhv_j2k_level &level = geometry.level[reduce];
-    if (region.x < 0 || region.y < 0 || region.width <= 0 || region.height <= 0 ||
-        static_cast<int64_t>(region.x) + region.width > level.width ||
-        static_cast<int64_t>(region.y) + region.height > level.height)
-        return "JPEG 2000 region out of range";
     int64_t x = static_cast<int64_t>(level.x) + region.x;
     int64_t y = static_cast<int64_t>(level.y) + region.y;
     if (x < INT_MIN || y < INT_MIN || x + region.width > INT_MAX ||
         y + region.height > INT_MAX)
         return "JPEG 2000 region exceeds decoder coordinate range";
     size_t bytes = geometry.channels == 1 ? 1 : 4;
-    uint64_t required = static_cast<uint64_t>(region.width) * region.height * bytes;
-    if (!output || required > capacity) return "JPEG 2000 output buffer too small";
     kdu_channel_mapping mapping;
     bool indexed = render.channel[0].palette_column >= 0;
     // A palette's channels all name its index component: decode that plane once.

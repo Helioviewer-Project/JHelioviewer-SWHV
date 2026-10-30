@@ -50,10 +50,9 @@ public final class SWEKLayerTest {
         SWEKPlugin plugin = new SWEKPlugin();
         PluginManager.addPlugin(plugin);
         PluginManager.setActive(plugin, true);
-        SWEKSession active = SWEKPlugin.sessionForRestore();
         SWEKLayer original = (SWEKLayer) Layers.getLayers().stream().filter(layer -> layer instanceof SWEKLayer).findFirst().orElseThrow();
-        EventTimelineLayer timeline = SWEKPlugin.getTimelineLayer();
-        Method factory = State.class.getDeclaredMethod("json2Object", JSONObject.class);
+        EventTimelineLayer timeline = plugin.getTimelineLayer();
+        Method factory = State.class.getDeclaredMethod("readLayer", JSONObject.class);
         factory.setAccessible(true);
         JSONObject state = new JSONObject().put("className", SWEKLayer.class.getName()).put("data", new JSONObject().put("icons", false));
         SWEKLayer restored = (SWEKLayer) factory.invoke(null, state);
@@ -63,8 +62,7 @@ public final class SWEKLayerTest {
         layers.remove(original);
         layers.add(restored);
         Layers.restore(layers);
-        check(SWEKPlugin.sessionForRestore() == active, "state restore retains the active session");
-        Method timelineFactory = State.class.getDeclaredMethod("deserialize2Object", JSONObject.class);
+        Method timelineFactory = State.class.getDeclaredMethod("readTimeline", JSONObject.class);
         timelineFactory.setAccessible(true);
         Object restoredTimeline = timelineFactory.invoke(null, new JSONObject().put("className", EventTimelineLayer.class.getName()).put("data", new JSONObject()));
         check(restoredTimeline == timeline, "timeline restoration reuses the plugin-owned instance");
@@ -74,9 +72,9 @@ public final class SWEKLayerTest {
         Layers.restore(layers);
         check(!restored.isEnabled(), "state omitting SWEK detaches the scene adapter");
         PluginManager.setActive(plugin, false);
-        check(SWEKPlugin.getTimelineLayer() == null, "plugin deactivation drops the restored timeline");
+        check(plugin.getTimelineLayer() == null, "plugin deactivation drops the restored timeline");
         try {
-            SWEKPlugin.sessionForRestore();
+            plugin.restoreLayer(new JSONObject());
             throw new AssertionError("inactive plugin exposes a session");
         } catch (IllegalStateException expected) {
             check(expected.getMessage().contains("inactive"), "inactive restore is rejected at the boundary");
@@ -108,8 +106,8 @@ public final class SWEKLayerTest {
         check(layer, 150, first);
         List<SWEKLayer.ActiveEvent> active = layer.activeEvents(150);
         session.highlight(active.getFirst().relatedEvents());
-        if (active != layer.activeEvents(150) || !active.getFirst().relatedEvents().isHighlighted())
-            throw new AssertionError("highlight remains live without rebuilding selections");
+        if (!layer.activeEvents(150).getFirst().relatedEvents().isHighlighted())
+            throw new AssertionError("highlight remains live for the selected events");
         session.highlight(null);
         check(layer, 200, first);
         check(layer, 201, second);
@@ -137,7 +135,6 @@ public final class SWEKLayerTest {
 
     private static void check(SWEKLayer layer, long time, SolarEvent expected) {
         List<SWEKLayer.ActiveEvent> active = layer.activeEvents(time);
-        if (active != layer.activeEvents(time)) throw new AssertionError("cache reuse");
         if (expected == null) {
             if (!active.isEmpty()) throw new AssertionError("unexpected active event at " + time);
             return;

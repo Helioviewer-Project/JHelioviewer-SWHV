@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 
 public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Frames.Listener {
 
+    private final boolean[] isVisible = {false, false, false, false, false, false}; // match max of Display.viewports.length
     private final ImageDisplaySettings displaySettings = new ImageDisplaySettings();
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage = new GLSLImage(displaySettings);
@@ -149,7 +151,26 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
+        Arrays.fill(isVisible, enabled);
         ImageLayers.arrangeMultiView();
+    }
+
+    public void setVisible(int j) {
+        Arrays.fill(isVisible, false);
+        if (j >= 0 && j < isVisible.length)
+            isVisible[j] = true;
+    }
+
+    public boolean isVisible(int idx) {
+        return isVisible[idx];
+    }
+
+    public int isVisibleIdx() {
+        for (int i = 0; i < isVisible.length; i++) {
+            if (isVisible[i])
+                return i;
+        }
+        return -1;
     }
 
     private void loaded(ImageLayerLoader.Result result) {
@@ -175,7 +196,8 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     // Release the CPU-side owners now; GL disposal still needs the render context.
-    void detach() {
+    @Override
+    public void detach() {
         removed = true;
         loader.abolish();
         decoder.dispose();
@@ -185,12 +207,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         settleLoad();
     }
 
-    @Override
-    public void remove() {
-        dispose();
-    }
-
-    @Override
     public void prerender() {
         ImageData current = imageData;
         if (current == null) {
@@ -200,11 +216,6 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         ImageBuffer differenceBuffer = displaySettings.getDifferenceMode() == DifferenceMode.None
                 ? null : comparisonData.imageBuffer();
         glImage.streamImages(current.imageBuffer(), differenceBuffer);
-    }
-
-    @Override
-    public void renderMiniview(MapView mv, Viewport vp) {
-        render(mv, vp);
     }
 
     @Override
@@ -293,7 +304,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     private void setImageData(@Nonnull ImageData newImageData) {
         long newMilli = newImageData.frame().time().milli;
-        boolean base = baseImageData == null || newMilli == frames.first().milli;
+        boolean base = baseImageData == null || newMilli == frames.firstTime().milli;
         if (base) {
             baseImageData = replaceImageData(baseImageData, newImageData);
         }
@@ -314,7 +325,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
     @Nonnull
     public MetaData getMetaData() { //!
-        return imageData == null ? frames.metaData(frames.first()) : imageData.metaData();
+        return imageData == null ? frames.metaData(frames.firstTime()) : imageData.metaData();
     }
 
     @Override
@@ -338,7 +349,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         boolean moved = frames.select(frames.requested());
         Layers.fireCompletionUpdated(this);
         if (isVisibleIdx() != -1) {
-            Frames.Frame current = frames.get(frames.current());
+            Frames.Frame current = frames.valueAt(frames.current());
             if (moved)
                 decoder.redecode(frames, true);
             else if (current.source() == source && current.index() == frame)
@@ -373,11 +384,11 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     }
 
     public long getStartTime() {
-        return request == null ? frames.first().milli : request.startTime(); // for locked timelines
+        return request == null ? frames.firstTime().milli : request.startTime(); // for locked timelines
     }
 
     public long getEndTime() {
-        return request == null ? frames.last().milli : request.endTime(); // for locked timelines
+        return request == null ? frames.lastTime().milli : request.endTime(); // for locked timelines
     }
 
     private boolean isLoadFinished() {

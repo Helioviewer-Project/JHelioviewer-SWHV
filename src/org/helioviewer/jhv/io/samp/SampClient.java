@@ -96,32 +96,31 @@ public final class SampClient extends HubConnector {
         setAutoconnect(10);
     }
 
-    static Commands.OperationContext operationContext(String senderId, Message msg, String mtype, String completionMType) {
+    static Commands.Completion completion(String senderId, Message msg, String mtype, String completionMType) {
         String requestId = SampHandlers.optionalString(msg, "requestId");
-        return new Commands.OperationContext(senderId, requestId, mtype,
-                (context, success, message, output) -> UiThread.post(() ->
-                        notifyCompletion(context, completionMType, success, message, output)));
+        return (success, message, output) -> UiThread.post(() ->
+                notifyCompletion(senderId, requestId, mtype, completionMType, success, message, output));
     }
 
-    private static void notifyCompletion(Commands.OperationContext context, String completionMType,
+    private static void notifyCompletion(String clientId, @Nullable String requestId, String mtype, String completionMType,
                                          boolean success, String message, @Nullable String output) {
         if (instance == null)
             return;
         Message msg = new Message(completionMType);
-        if (context.clientId() != null)
-            msg.addParam("clientId", context.clientId());
-        if (context.requestId() != null)
-            msg.addParam("requestId", context.requestId());
-        if (context.mtype() != null)
-            msg.addParam("mtype", context.mtype());
+        if (clientId != null)
+            msg.addParam("clientId", clientId);
+        if (requestId != null)
+            msg.addParam("requestId", requestId);
+        if (mtype != null)
+            msg.addParam("mtype", mtype);
         msg.addParam("status", success ? "success" : "failure");
         msg.addParam("message", message);
         if (output != null)
             msg.addParam("output", output);
         try {
             HubConnection c = instance.getConnection();
-            if (c != null && context.clientId() != null)
-                c.notify(context.clientId(), msg);
+            if (c != null && clientId != null)
+                c.notify(clientId, msg);
         } catch (Exception e) {
             Log.warn(e);
         }

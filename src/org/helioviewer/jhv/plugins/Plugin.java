@@ -6,72 +6,96 @@ import org.json.JSONObject;
 
 public abstract class Plugin {
 
+    private final String stateId;
+    private final String preferenceId;
     private final String name;
     private final String description;
     private boolean active;
 
-    protected Plugin(String _name, String _description) {
+    protected Plugin(String _stateId, String _preferenceId, String _name, String _description) {
+        stateId = _stateId;
+        preferenceId = _preferenceId;
         name = _name;
         description = _description;
-        active = loadActive();
     }
 
-    public abstract void install();
+    protected abstract void install();
 
-    public abstract void uninstall();
+    protected abstract void uninstall();
 
-    public void installGUI() {}
+    protected void installGUI() {}
 
-    public void uninstallGUI() {}
+    protected void uninstallGUI() {}
 
-    public abstract void saveState(JSONObject jo);
+    protected void writeState(JSONObject jo) {}
 
-    public abstract void loadState(JSONObject jo);
+    protected void readState(JSONObject jo) {}
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public String getDescription() {
+    public final String getDescription() {
         return description;
     }
 
-    public boolean isActive() {
+    public final boolean isActive() {
         return active;
     }
 
-    private boolean loadActive() {
-        String p = Settings.getProperty("plugins." + this + ".active");
-        return p == null || Boolean.parseBoolean(p);
+    final void start(boolean guiEnabled) {
+        String p = Settings.getProperty("plugins." + preferenceId + ".active");
+        if (p == null || Boolean.parseBoolean(p))
+            activate(guiEnabled);
     }
 
     final void setActive(boolean _active, boolean guiEnabled) {
         if (active == _active)
             return;
 
-        active = _active;
-        Settings.setProperty("plugins." + this + ".active", Boolean.toString(active));
-        if (active)
+        if (_active)
             activate(guiEnabled);
         else
             deactivate(guiEnabled);
+        Settings.setProperty("plugins." + preferenceId + ".active", Boolean.toString(active));
     }
 
-    final void activate(boolean guiEnabled) {
-        install();
-        if (guiEnabled)
-            installGUI();
+    private void activate(boolean guiEnabled) {
+        try {
+            install();
+            if (guiEnabled)
+                installGUI();
+            active = true;
+        } catch (RuntimeException | Error failure) {
+            try {
+                deactivate(guiEnabled);
+            } catch (RuntimeException | Error cleanupFailure) {
+                failure.addSuppressed(cleanupFailure);
+            }
+            throw failure;
+        }
     }
 
-    final void deactivate(boolean guiEnabled) {
-        if (guiEnabled)
-            uninstallGUI();
-        uninstall();
+    private void deactivate(boolean guiEnabled) {
+        active = false;
+        try {
+            if (guiEnabled)
+                uninstallGUI();
+        } finally {
+            uninstall();
+        }
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();
+    final void saveState(JSONObject plugins) {
+        JSONObject data = new JSONObject();
+        writeState(data);
+        plugins.put(stateId, data);
+    }
+
+    final void loadState(JSONObject plugins) {
+        JSONObject data = plugins.optJSONObject(stateId, plugins.optJSONObject(preferenceId));
+        if (data != null)
+            readState(data);
     }
 
 }

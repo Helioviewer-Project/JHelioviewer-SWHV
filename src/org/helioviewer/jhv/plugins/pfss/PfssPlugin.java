@@ -8,42 +8,41 @@ import org.json.JSONObject;
 
 public class PfssPlugin extends Plugin {
 
-    private static final PfssCache pfssCache = new PfssCache();
-    private static final PfssLayer layer = new PfssLayer(null);
+    private final PfssCache pfssCache = new PfssCache();
+    private PfssLayer layer = new PfssLayer(pfssCache, null);
 
     public PfssPlugin() {
-        super("PFSS", "Visualize PFSS model data");
+        super("pfss", "PfssPlugin", "PFSS", "Visualize PFSS model data");
     }
 
-    static PfssCache getPfssCache() {
-        return pfssCache;
+    public PfssLayer restoreLayer(JSONObject data) {
+        PfssLayer restored = new PfssLayer(pfssCache, data);
+        layer.setEnabled(false);
+        layer = restored;
+        return restored;
     }
 
     @Override
-    public void install() {
-        Layers.add(layer);
+    protected void install() {
+        if (!Layers.getLayers().contains(layer))
+            Layers.add(layer);
     }
 
     @Override
-    public void uninstall() {
+    protected void uninstall() {
+        layer.setEnabled(false);
         Layers.remove(layer);
         pfssCache.clear();
     }
 
     @Override
-    public void installGUI() {
+    protected void installGUI() {
         LayerOptions.register(PfssLayer.class, layer -> new PfssLayerOptions((PfssLayer) layer));
     }
 
     @Override
-    public void uninstallGUI() {
+    protected void uninstallGUI() {
         LayerOptions.unregister(PfssLayer.class);
     }
-
-    @Override
-    public void saveState(JSONObject jo) {}
-
-    @Override
-    public void loadState(JSONObject jo) {}
 
 }

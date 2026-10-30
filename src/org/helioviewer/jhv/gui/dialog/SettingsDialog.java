@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.DataSources;
@@ -202,7 +203,16 @@ public final class SettingsDialog extends StandardDialog {
         c.gridx = 1;
         for (Plugin plugin : PluginManager.getPlugins()) {
             JCheckBox plugCheck = new JCheckBox("<html>" + plugin.getName() + "<br/><small>" + plugin.getDescription(), plugin.isActive());
-            plugCheck.addActionListener(e -> PluginManager.setActive(plugin, plugCheck.isSelected()));
+            plugCheck.addActionListener(e -> {
+                try {
+                    PluginManager.setActive(plugin, plugCheck.isSelected());
+                } catch (RuntimeException failure) {
+                    Log.error("Failed to change " + plugin.getName(), failure);
+                    Message.err("Failed to change " + plugin.getName(), failure.getMessage());
+                } finally {
+                    plugCheck.setSelected(plugin.isActive());
+                }
+            });
             settings.add(plugCheck, c);
             c.gridy++;
         }

@@ -67,11 +67,9 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     @Override
     public void serialize(JSONObject jo) {}
 
-    public ConnectionLayer(JSONObject ignoredJo) {}
-
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
         if (connectivity != null)
             drawConnectivity(mv, vp);
@@ -149,11 +147,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
         geometryLine.dispose();
         geometryPoint.dispose();
-    }
-
-    @Override
-    public void remove() {
-        dispose();
     }
 
     @Override

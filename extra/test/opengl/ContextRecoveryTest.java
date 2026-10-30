@@ -124,11 +124,6 @@ public final class ContextRecoveryTest {
         }
 
         @Override
-        public void remove() {
-            dispose();
-        }
-
-        @Override
         public String getName() {
             return "Recovery probe";
         }

@@ -14,18 +14,19 @@ import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-public class PfssLayer extends AbstractLayer implements TimeListener.Range { // has to be public for state
+public class PfssLayer extends AbstractLayer implements TimeListener.Range {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
-    private final PfssCache cache = PfssPlugin.getPfssCache();
+    private final PfssCache cache;
     private final GLSLLine glslLine = new GLSLLine(true);
 
     private int detail = 0;
     private boolean fixedColor = false;
     private double radius = PfssSettings.MAX_RADIUS;
 
-    public PfssLayer(JSONObject jo) {
+    PfssLayer(PfssCache _cache, JSONObject jo) {
+        cache = _cache;
         if (jo != null) {
             detail = Math.clamp(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
@@ -46,7 +47,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
 
     @Override
     public void render(MapView mv, Viewport vp) {
-        if (!isVisible[vp.idx])
+        if (!enabled)
             return;
 
         PfssLoader.Data data;
@@ -81,12 +82,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     }
 
     @Override
-    public void remove() {
-        setEnabled(false);
-        dispose();
-    }
-
-    @Override
     public String getName() {
         return "PFSS Model";
     }
@@ -111,7 +106,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        PfssLoader.submitList(start, end);
+        cache.submitList(start, end);
     }
 
     @Override

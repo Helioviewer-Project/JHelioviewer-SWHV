@@ -1,5 +1,6 @@
 #include "jhv_j2k.h"
 #include "jhv_j2k_source.h"
+#include <cstdio>
 #include <cstring>
 #include <memory>
 #include <mutex>
@@ -20,33 +21,13 @@ struct jhv_j2k_job {
           input(_source->raw(), _frame, _level), level(_level) {}
 };
 
-// Kakadu's messages are process-wide: with concurrent decodes the text handed
-// to a call is the latest, not necessarily its own.
-static kdu_message_queue &errors() { static kdu_message_queue queue; return queue; }
-static kdu_message_queue &warnings() { static kdu_message_queue queue; return queue; }
-static void take(kdu_message_queue &queue, char *text, size_t capacity = 256) {
-    static std::mutex popping;
-    std::lock_guard<std::mutex> lock(popping);
-    size_t used = std::strlen(text);
-    while (const char *message = queue.pop_message()) {
-        if (used < capacity - 1) std::snprintf(text + used, capacity - used, "%s%s", used ? " " : "", message);
-        used = std::strlen(text);
-    }
-}
-
 // Contain C++ and decoder exceptions at the C API and inspector boundaries.
 template<class T, class F> static T guarded(char *error, T failed, F call, size_t capacity = 256) noexcept {
     error[0] = 0;
     try { return call(); }
-    catch (kdu_exception code) {
-        take(errors(), error, capacity);
-        if (!error[0]) std::snprintf(error, capacity, "JPEG 2000 decoder error (%d)", code);
-        return failed;
-    }
     catch (const std::bad_alloc &) { std::snprintf(error, capacity, "JPEG 2000 native allocation failed"); }
     catch (const std::exception &e) { std::snprintf(error, capacity, "%s", e.what()); }
     catch (...) { std::snprintf(error, capacity, "Unexpected JPEG 2000 native failure"); }
-    take(errors(), error, capacity);
     return failed;
 }
 
@@ -59,18 +40,7 @@ const jhv_j2k_source::description &jhv_j2k_source::describe(size_t frame) {
     // The coarsest level suffices: every header is kept at any reduction.
     decoder_input input(client, frame, INT_MAX);
     description result = description();
-    const char *reason = input.with_stream([&](kdu_codestream &stream) {
-        if (hvc_render_read(client, frame, stream.get_num_components(true), &result.render))
-            first_component(result.render);
-        return jhv_kdu_read_geometry(stream, result.render, result.geometry);
-    });
-    if (reason && result.render.channel_count > 1 && result.render.channel[0].palette_column < 0) {
-        first_component(result.render);
-        reason = input.with_stream([&](kdu_codestream &stream) {
-            return jhv_kdu_read_geometry(stream, result.render, result.geometry);
-        });
-    }
-    if (reason) throw std::runtime_error(reason);
+    jhv_decoder_describe(input, client, frame, result.render, result.geometry);
     stored = result;
     return stored;
 }
@@ -79,7 +49,7 @@ int jhv_j2k_source::inspect(hvc *, size_t frame, void *context,
                             hvc_info *info, char *error, size_t error_size) noexcept {
     return guarded(error, -1, [&] {
         const description &result = static_cast<jhv_j2k_source *>(context)->describe(frame);
-        info->components = result.geometry.plane_count;
+        info->components = result.geometry.coded_components;
         info->resolutions = result.geometry.resolutions;
         info->layers = result.geometry.layers;
         for (int r = 0; r < info->resolutions; r++) {
@@ -93,12 +63,7 @@ int jhv_j2k_source::inspect(hvc *, size_t frame, void *context,
 jhv_j2k *jhv_j2k_open(const char *path, char *error) {
     return guarded(error, static_cast<jhv_j2k *>(nullptr), [&] {
         static std::once_flag once;
-        std::call_once(once, [] {
-            errors().configure(32, false, true);
-            warnings().configure(32, false, false);
-            kdu_customize_errors(&errors());
-            kdu_customize_warnings(&warnings());
-        });
+        std::call_once(once, jhv_decoder_init);
         std::unique_ptr<jhv_j2k> handle(new jhv_j2k);
         handle->source = path ? std::make_shared<jhv_j2k_source>(path) : std::make_shared<jhv_j2k_source>();
         return handle.release();
@@ -190,14 +155,23 @@ int64_t jhv_j2k_decode(jhv_j2k_job *job, int x, int y, int width, int height,
     int64_t size = guarded<int64_t>(error, -1, [&] {
         jhv_j2k_level region = {x, y, width, height};
         const jhv_j2k_source::description &description = job->description;
-        const char *reason = job->input.with_stream([&](kdu_codestream &stream) {
-            return jhv_kdu_decode(stream, description.render, description.geometry,
-                                  job->level, region, out, capacity);
-        });
+        const jhv_j2k_geometry &geometry = description.geometry;
+        if (job->level < 0 || job->level >= geometry.resolutions)
+            throw std::runtime_error("JPEG 2000 reduction out of range");
+        const jhv_j2k_level &level = geometry.level[job->level];
+        if (x < 0 || y < 0 || width <= 0 || height <= 0 ||
+            static_cast<int64_t>(x) + width > level.width ||
+            static_cast<int64_t>(y) + height > level.height)
+            throw std::runtime_error("JPEG 2000 region out of range");
+        uint64_t required = static_cast<uint64_t>(width) * height * (geometry.channels == 1 ? 1 : 4);
+        if (!out || required > capacity || required > INT64_MAX)
+            throw std::runtime_error("JPEG 2000 output buffer too small");
+        const char *reason = jhv_decoder_decode(job->input, description.render, description.geometry,
+                                                job->level, region, out, capacity);
         if (reason) throw std::runtime_error(reason);
-        return int64_t(width) * height * (description.geometry.channels == 1 ? 1 : 4);
+        return static_cast<int64_t>(required);
     });
-    if (size >= 0) take(warnings(), error);
+    if (size >= 0) jhv_decoder_warnings(error);
     return size;
 }
 void jhv_j2k_end_decode(jhv_j2k_job *job) { delete job; }

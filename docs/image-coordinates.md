@@ -27,7 +27,7 @@ have their origin at the lower left and belong to the viewport and screen transf
 SPICE and PUNCH JP2 headers can retain additional WCS axes from their original FITS cubes. It adapts
 missing units, the known legacy axis pairs `Solar-X`/`Solar-Y` (also underscore spellings), `GONGX`/`GONGY`,
 `arcsec`/`arcsec` and LASCO's `0`/`0` to `HPLN-TAN`/`HPLT-TAN`, ignoring case. Unit aliases include
-`degree(s)` and LASCO's `0` (arcseconds). Historical CEA rows with missing `CUNIT2`
+`degree(s)` and LASCO's `0` (arcseconds). Historical CEA rows with missing `CUNIT2` or `Sine Latitude`
 are normalized Y coordinates; their celestial `CRVAL2` remains in degrees. Observer CROTA fallbacks
 are also adapted into FITS cards. Missing CDELT scales still require a CD matrix, preserving the loader's
 `BasicMetaData` fallback for images without calibrated geometry. WCSLIB interprets the

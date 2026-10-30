@@ -158,7 +158,8 @@ final class J2KNative implements AutoCloseable {
         }
     }
 
-    // A refused entry leaves the source unchanged.
+    // Validation refusal leaves the source unchanged. Allocation failure may
+    // retain earlier validated bins; retrying is safe.
     synchronized void importFrame(int frame, byte[] entry) throws IOException {
         requireOpen();
         try (Arena arena = Arena.ofConfined()) {

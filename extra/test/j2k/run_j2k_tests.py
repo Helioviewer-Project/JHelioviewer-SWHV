@@ -18,7 +18,8 @@ from urllib.request import urlopen
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--live", action="store_true", help="also test live ROB retrieval (requires network and the native libraries)")
 parser.add_argument("--cleaner", action="store_true", help="with --live, also exercise GC-dependent abandoned-view cleanup")
-parser.add_argument("--bridge", help="libjhvj2k to use instead of the one in lib/jhv")
+parser.add_argument("--bridge", help="bridge library to use instead of the selected one in lib/jhv")
+parser.add_argument("--decoder", choices=("kdu", "openjpeg"), default="kdu", help="live decoder (default: kdu)")
 args = parser.parse_args()
 if args.cleaner and not args.live:
     parser.error("--cleaner requires --live")
@@ -29,7 +30,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     work = Path(temporary)
     if platform.system() == "Windows" and not temporary.isascii():
         parser.error("Set TMPDIR to a writable ASCII path so the Windows test cache stays isolated")
-    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "ImageRequestSettingsTest.java", "../uri/FramesLoadTest.java", "../uri/LayerLoadTest.java"]
+    sources = ["JPIPCacheManagerTest.java", "HTTPStreamTest.java", "JPIPSocketTest.java", "ImageBufferCacheTest.java", "J2KReaderTest.java", "FramesTest.java", "TimeMapTest.java", "ImageRequestSettingsTest.java", "../uri/FramesLoadTest.java", "../uri/LayerLoadTest.java"]
     # Compile live tests offline too, so API changes cannot silently break them.
     sources.extend(["J2KFixture.java", "FrameDecoderTest.java", "CallistoTest.java"])
     subprocess.run(["javac", "-cp", classpath, "-d", temporary,
@@ -37,6 +38,8 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
     java = ["java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + temporary,
             "-Djava.io.tmpdir=" + temporary,
             "--enable-native-access=ALL-UNNAMED", "-cp", os.pathsep.join([temporary, classpath])]
+    print("Running TimeMapTest", flush=True)
+    subprocess.run([*java, "org.helioviewer.jhv.time.TimeMapTest"], check=True, timeout=60)
     print("Running ImageBufferCacheTest", flush=True)
     subprocess.run([*java, "-da", "-Dorg.lwjgl.util.DebugAllocator=true",
                     "org.helioviewer.jhv.image.ImageBufferCacheTest"], check=True, timeout=60)
@@ -88,11 +91,12 @@ with tempfile.TemporaryDirectory(prefix="jhv-jpip-tests-") as temporary:
         else:
             parser.error("Live test currently supports macOS and Linux x86-64")
         # The bridge finds Kakadu next to itself.
-        libraries = [str(work / ("libkdu_jni" + suffix)), str(work / ("libjhvj2k" + suffix))]
+        bridge = "libjhvj2k_kdu" if args.decoder == "kdu" else "libjhvj2k_opj"
+        libraries = [str(work / ("libkdu_jni" + suffix)), str(work / (bridge + suffix))]
         native_directory = root / "lib/jhv" / (target if target == "macos-arm64" else target + "-amd64")
         Path(libraries[0]).write_bytes((native_directory / ("libkdu_jni" + suffix)).read_bytes())
         Path(libraries[1]).write_bytes(Path(args.bridge).read_bytes() if args.bridge
-                                      else (native_directory / ("libjhvj2k" + suffix)).read_bytes())
+                                      else (native_directory / (bridge + suffix)).read_bytes())
         uri = "jpip://jpip.swhv.oma.be/aia_171/2026/09/09/2026_09_09__12_00_33_349__SDO_AIA_AIA_171.jp2"
         movie_request = ("https://api.swhv.oma.be/hv_docpage/v2/getJPX/?sourceId=10"
                          "&startTime=2026-09-08T12:00:00Z&endTime=2026-09-10T12:00:00Z"

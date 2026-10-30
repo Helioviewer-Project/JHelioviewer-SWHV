@@ -5,18 +5,14 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.dialog.TextDialog;
 import org.helioviewer.jhv.io.Directories;
 
 public final class CompletionNotifications {
 
-    public static Commands.OperationContext recordingContext() {
-        return new Commands.OperationContext(null, null, "record",
-                (context, success, message, output) -> {
-                    if (success)
-                        EventQueue.invokeLater(() -> showRecordingFinished(output));
-                });
+    public static void recordingFinished(boolean success, String message, @Nullable String output) {
+        if (success)
+            EventQueue.invokeLater(() -> showRecordingFinished(output));
     }
 
     public static void fileReady(String path) {
