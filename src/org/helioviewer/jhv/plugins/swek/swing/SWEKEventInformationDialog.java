@@ -32,26 +32,22 @@ final class SWEKEventInformationDialog extends JDialog {
 
     private final SWEKSession session;
     private final SWEKSwingUI ui;
-    private JPanel allTablePanel;
+    private final JPanel allTablePanel = new JPanel(new GridBagLayout());
 
     private CollapsiblePane standardParameters;
     private CollapsiblePane allParameters;
     private CollapsiblePane relatedEventsPanel;
     private CollapsiblePane otherRelatedEventsPanel;
 
-    private SolarEvent event;
-
-    SWEKEventInformationDialog(SWEKSwingUI _ui, RelatedEvents related, SolarEvent _event) {
-        super(MainFrame.get(), _event.getSupplier().group().getName());
+    SWEKEventInformationDialog(SWEKSwingUI _ui, RelatedEvents related, SolarEvent event) {
+        super(MainFrame.get(), event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         ui = _ui;
         session = ui.session;
-        event = _event;
 
-        initAllTablePanel();
-        initParameterCollapsiblePanels(true, false);
+        initParameterCollapsiblePanels(event, true, false);
         List<SolarEvent> relatedEvents = related.getAssociatedEvents(event);
         if (!relatedEvents.isEmpty())
             relatedEventsPanel = createRelatedEventsCollapsiblePane(related, relatedEvents);
@@ -87,13 +83,12 @@ final class SWEKEventInformationDialog extends JDialog {
         if (!isDisplayable()) // closed (disposed) before the result arrived, pack() would recreate the native peer
             return;
 
-        event = details.event();
         List<SolarEvent> relatedEvents = details.relatedEvents();
         if (!relatedEvents.isEmpty())
             otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane(relatedEvents);
 
         // the stored event carries the full parameter set; keep what the user expanded meanwhile
-        initParameterCollapsiblePanels(standardParameters.isExpanded(), allParameters.isExpanded());
+        initParameterCollapsiblePanels(details.event(), standardParameters.isExpanded(), allParameters.isExpanded());
         repack();
         repaint();
     }
@@ -102,11 +97,7 @@ final class SWEKEventInformationDialog extends JDialog {
         if (isDisplayable() && !AppThread.isInterrupted(t)) Log.error(t);
     }
 
-    private void initAllTablePanel() {
-        allTablePanel = new JPanel(new GridBagLayout());
-    }
-
-    private void initParameterCollapsiblePanels(boolean standardExpanded, boolean allExpanded) {
+    private void initParameterCollapsiblePanels(SolarEvent event, boolean standardExpanded, boolean allExpanded) {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
         standardParameters = createCollapsiblePane("Standard Parameters", standardParameterPanel, standardExpanded);
 
@@ -131,26 +122,13 @@ final class SWEKEventInformationDialog extends JDialog {
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
         gc.anchor = GridBagConstraints.PAGE_START;
-        gc.weighty = standardParameters.isExpanded() ? 1 : 0;
-        allTablePanel.add(standardParameters, gc);
 
-        gc.gridy = 1;
-        gc.weighty = allParameters.isExpanded() ? 1 : 0;
-        allTablePanel.add(allParameters, gc);
-
-        int gridYPosition = 2;
-
-        if (relatedEventsPanel != null) {
-            gc.gridy = gridYPosition;
-            gc.weighty = relatedEventsPanel.isExpanded() ? 1 : 0;
-            allTablePanel.add(relatedEventsPanel, gc);
-            gridYPosition++;
-        }
-
-        if (otherRelatedEventsPanel != null) {
-            gc.gridy = gridYPosition;
-            gc.weighty = otherRelatedEventsPanel.isExpanded() ? 1 : 0;
-            allTablePanel.add(otherRelatedEventsPanel, gc);
+        for (CollapsiblePane pane : new CollapsiblePane[]{standardParameters, allParameters, relatedEventsPanel, otherRelatedEventsPanel}) {
+            if (pane == null)
+                continue;
+            gc.weighty = pane.isExpanded() ? 1 : 0;
+            allTablePanel.add(pane, gc);
+            gc.gridy++;
         }
     }
 
