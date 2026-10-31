@@ -28,8 +28,6 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.SDOCutout;
-import org.helioviewer.jhv.movie.ExportMovie;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -299,9 +297,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Player.isPlaying())
-                Commands.pause();
-            Commands.previousFrame();
+            Commands.stepBackward();
         }
     }
 
@@ -312,9 +308,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Player.isPlaying())
-                Commands.pause();
-            Commands.nextFrame();
+            Commands.stepForward();
         }
     }
 
@@ -325,10 +319,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (ExportMovie.isRecording())
-                Commands.recordStop();
-            else
-                Commands.recordStart(CompletionNotifications::recordingFinished, null);
+            Commands.toggleRecording(CompletionNotifications::recordingFinished);
         }
     }
 

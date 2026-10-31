@@ -22,8 +22,8 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.StatusPanel;
+import org.helioviewer.jhv.gui.component.SwingPanel;
 import org.helioviewer.jhv.gui.component.ToolBar;
 import org.helioviewer.jhv.gui.status.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.status.PositionStatusPanel;
@@ -38,6 +38,7 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.ui.MoviePanel;
 
 public final class MainFrame {
 
@@ -109,6 +110,8 @@ public final class MainFrame {
     private static MainContentPanel mainContentPanel;
 
     private static LayersPanel layersPanel;
+    private static MoviePanel moviePanel;
+    private static SwingPanel movieView;
 
     private static MenuBar menuBar;
 
@@ -118,7 +121,9 @@ public final class MainFrame {
         Message.setHandler(new MessageHandler());
 
         layersPanel = new LayersPanel();
-        layersPanel.setTransportPanel(MoviePanel.getInstance());
+        moviePanel = new MoviePanel(CompletionNotifications::recordingFinished);
+        movieView = new SwingPanel(moviePanel);
+        layersPanel.setTransportPanel(movieView);
 
         leftPane = new JPanel(new BorderLayout());
         leftPane.add(layersPanel, BorderLayout.NORTH);
@@ -255,14 +260,15 @@ public final class MainFrame {
     }
 
     public static void stabilizeLeftPaneWidth() {
-        MoviePanel moviePanel = MoviePanel.getInstance();
         // Freeze the left pane to the widest startup state so the scrollbar never overlaps options panels.
         moviePanel.setAdvanced(true);
+        movieView.refresh();
         int contentWidth = measureSidebarWidth(null);
         contentWidth = Math.max(contentWidth, measureSidebarWidth(Layers.getConnectionLayer()));
 
         layersPanel.setOptionsPanel(null);
         moviePanel.setAdvanced(false);
+        movieView.refresh();
         leftPane.revalidate();
 
         int scrollbarWidth = leftScrollPane.getVerticalScrollBar().getPreferredSize().width;

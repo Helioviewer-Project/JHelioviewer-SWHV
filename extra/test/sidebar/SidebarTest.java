@@ -6,10 +6,15 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -18,20 +23,28 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleState;
 import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.AppInit;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
@@ -41,8 +54,9 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
+import org.helioviewer.jhv.gui.component.SwingPanel;
+import org.helioviewer.jhv.gui.component.TimeSlider;
 import org.helioviewer.jhv.gui.component.ToolBar;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.DataSources;
@@ -62,6 +76,9 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.thread.UiThread;
+import org.helioviewer.jhv.ui.MoviePanel;
+import org.helioviewer.jhv.ui.Panel;
+import org.helioviewer.jhv.ui.Screen;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -77,6 +94,7 @@ public final class SidebarTest {
         DataSources.initSources();
         try {
             UiThread.postAndWait(SidebarTest::checkSidebar);
+            checkQueuedPanelUpdates();
             checkFitsOptions();
         } finally {
             UiThread.postAndWait(() -> {
@@ -86,6 +104,43 @@ public final class SidebarTest {
             });
         }
         System.out.println("SidebarTest passed");
+    }
+
+    private static void checkQueuedPanelUpdates() throws Exception {
+        int[] builds = {0};
+        String[] text = {"Initial"};
+        SwingPanel[] view = new SwingPanel[1];
+        Runnable[] changed = new Runnable[1];
+        UiThread.postAndWait(() -> {
+            view[0] = new SwingPanel(new Screen() {
+                private final Panel buffer = new Panel();
+
+                @Override
+                public Panel build() {
+                    check(UiThread.isUiThread(), "Panel snapshot built off the UI thread");
+                    builds[0]++;
+                    return buffer.reset().label(text[0]);
+                }
+
+                @Override
+                public void listen(Runnable listener) {
+                    changed[0] = listener;
+                }
+            });
+            text[0] = "Updated";
+            for (int i = 0; i < 100; i++)
+                changed[0].run();
+            check(builds[0] == 1, "Notification rebuilt a panel inside model mutation");
+        });
+        // No UITimer is running. A single event-queue turn must apply the whole notification burst.
+        UiThread.postAndWait(() -> {
+            check("Updated".equals(find(view[0], JLabel.class).getText()), "Panel update waited for the repaint timer");
+            check(builds[0] == 2, "Panel notifications were not coalesced");
+            text[0] = "Background wake";
+        });
+        changed[0].run();
+        UiThread.postAndWait(() ->
+                check("Background wake".equals(find(view[0], JLabel.class).getText()), "Background notification did not reach the UI thread"));
     }
 
     private static void checkSidebar() {
@@ -266,6 +321,8 @@ public final class SidebarTest {
         PluginManager.setActive(plugin, false);
         checkRestoredViewpointDisclosure(panel);
         checkMovieOptions(panel);
+        checkGenericAdapter();
+        checkTimeSliderAdapter();
     }
 
     private static void checkRestoredViewpointDisclosure(LayersPanel panel) {
@@ -294,37 +351,278 @@ public final class SidebarTest {
     private static void checkMovieOptions(LayersPanel panel) {
         Settings.setProperty("video.format", ExportFormat.H265HQ.name());
         ViewState.setRecordingMode(ViewState.RecordingMode.SHOT);
-        MoviePanel movie = MoviePanel.getInstance();
+        MoviePanel definition = new MoviePanel(Commands.Completion.NONE);
+        try {
+            checkMovieOptions(panel, definition);
+        } finally {
+            definition.dispose();
+        }
+    }
+
+    private static void checkMovieOptions(LayersPanel panel, MoviePanel definition) {
+        definition.setAdvanced(true);
+        SwingPanel movie = new SwingPanel(definition);
         panel.setTransportPanel(movie);
         List<Component> components = new ArrayList<>();
         collect(movie, Component.class, components);
         JComboBox<?> formatBox = null;
         for (Component component : components) {
-            if (component instanceof JComboBox<?> box && box.getItemAt(0) instanceof ExportFormat)
+            if (component instanceof JComboBox<?> box && ExportFormat.values()[0].toString().equals(box.getItemAt(0)))
                 formatBox = box;
             if (component instanceof JTextField field && "Program time".equals(field.getToolTipText()))
                 checkProgramTime(movie, field);
         }
-        check(formatBox != null && !formatBox.isEnabled() && formatBox.getSelectedItem() == ExportFormat.H265HQ,
+        check(formatBox != null && !formatBox.isEnabled() && ExportFormat.H265HQ.toString().equals(formatBox.getSelectedItem()),
                 "Initial Screenshot format state or saved video format");
         for (ExportFormat format : ExportFormat.values()) {
             findButton(movie, ViewState.RecordingMode.LOOP.toString()).doClick();
             check(formatBox.isEnabled(), "Loop format disabled");
-            formatBox.setSelectedItem(format);
+            formatBox.setSelectedItem(format.toString());
             check(Settings.getProperty("video.format").equals(format.name()), "Video format selection not saved");
             findButton(movie, ViewState.RecordingMode.SHOT.toString()).doClick();
-            movie.recordingStatusChanged();
             check(!formatBox.isEnabled(), "Screenshot format enabled");
-            check(formatBox.getSelectedItem() == format && Settings.getProperty("video.format").equals(format.name()),
+            check(format.toString().equals(formatBox.getSelectedItem()) && Settings.getProperty("video.format").equals(format.name()),
                     "Screenshot overwrote video format");
             findButton(movie, ViewState.RecordingMode.FREE.toString()).doClick();
-            check(formatBox.isEnabled() && formatBox.getSelectedItem() == format,
+            check(formatBox.isEnabled() && format.toString().equals(formatBox.getSelectedItem()),
                     "Unlimited recording did not retain video format");
         }
         ViewState.setRecordingMode(ViewState.RecordingMode.LOOP);
+        movie.refresh();
+        checkMovieAdapter(movie, definition);
     }
 
-    private static void checkProgramTime(MoviePanel movie, JTextField clock) {
+    // Widgets stay across refreshes, an edit survives passive updates, and the transport keeps its hit areas.
+    private static void checkMovieAdapter(SwingPanel movie, MoviePanel definition) {
+        List<Component> widgets = new ArrayList<>();
+        collect(movie, Component.class, widgets);
+        int[] structure = {0};
+        ContainerAdapter watcher = new ContainerAdapter() {
+            @Override
+            public void componentAdded(ContainerEvent event) {
+                structure[0]++;
+            }
+
+            @Override
+            public void componentRemoved(ContainerEvent event) {
+                structure[0]++;
+            }
+        };
+        for (Component widget : widgets) {
+            if (widget instanceof Container container)
+                container.addContainerListener(watcher);
+        }
+
+        JSpinner speed = find(movie, JSpinner.class);
+        JFormattedTextField editor = ((JSpinner.DefaultEditor) speed.getEditor()).getTextField();
+        int committed = ViewState.playbackData().speed();
+        editor.setText("45");
+        ViewState.setPlaybackAdvanceMode(Player.AdvanceMode.Stop);
+        movie.refresh();
+        check("45".equals(editor.getText()) && ViewState.playbackData().speed() == committed, "Passive update touched a spinner edit");
+        ViewState.setPlaybackSpeed(committed + 1, ViewState.playbackData().speedUnit());
+        movie.refresh();
+        check("45".equals(editor.getText()), "External speed replaced an edit in progress");
+        // JFormattedTextField's Escape action restores its value this way; the unshown test has no focus owner.
+        editor.setValue(editor.getValue());
+        movie.lazyRepaint();
+        check(String.valueOf(committed + 1).equals(editor.getText()) && ViewState.playbackData().speed() == committed + 1,
+                "Canceling a spinner edit lost the pending external speed");
+        ViewState.setPlaybackSpeed(committed + 2, ViewState.playbackData().speedUnit());
+        movie.refresh();
+        check(String.valueOf(committed + 2).equals(editor.getText()), "External speed was not shown");
+        ViewState.setPlaybackSpeed(committed, ViewState.playbackData().speedUnit());
+        ViewState.setPlaybackAdvanceMode(Player.AdvanceMode.Loop);
+        movie.refresh();
+
+        for (int i = 0; i < 100; i++)
+            movie.refresh();
+        check(structure[0] == 0, "Refresh rebuilt widgets");
+        List<Component> after = new ArrayList<>();
+        collect(movie, Component.class, after);
+        check(after.equals(widgets), "Refresh replaced widgets");
+
+        movie.setSize(movie.getPreferredSize());
+        layoutTree(movie);
+        Map<String, Dimension> hits = Map.of("Step to previous frame", new Dimension(24, 26), "Play movie", new Dimension(32, 32), "Step to next frame", new Dimension(24, 26),
+                "Record movie", new Dimension(24, 26), "Playback and recording options", new Dimension(24, 26));
+        List<AbstractButton> buttons = new ArrayList<>();
+        collect(movie, AbstractButton.class, buttons);
+        for (Map.Entry<String, Dimension> hit : hits.entrySet()) {
+            AbstractButton button = buttons.stream().filter(candidate -> hit.getKey().equals(candidate.getToolTipText())).findFirst().orElseThrow();
+            check(button.getSize().equals(hit.getValue()), "Hit area of " + hit.getKey());
+            boolean toggle = hit.getKey().equals("Record movie") || hit.getKey().equals("Playback and recording options");
+            check(button.getAccessibleContext().getAccessibleRole() == (toggle ? AccessibleRole.TOGGLE_BUTTON : AccessibleRole.PUSH_BUTTON),
+                    "Accessible role of " + hit.getKey());
+            check(button.getAccessibleContext().getAccessibleStateSet().contains(AccessibleState.CHECKED) == button.isSelected(),
+                    "Accessible checked state of " + hit.getKey());
+        }
+        check(find(movie, TimeSlider.class).getHeight() == 20, "Time slider height");
+        for (Component widget : widgets) {
+            if (widget instanceof Container container)
+                container.removeContainerListener(watcher);
+        }
+        definition.setAdvanced(false);
+        movie.refresh();
+        check(!speed.getParent().getParent().isVisible(), "Closed options stayed visible");
+        for (AbstractButton button : buttons) {
+            if ("Playback and recording options".equals(button.getToolTipText())) {
+                check(button.getAccessibleContext().getAccessibleRole() == AccessibleRole.TOGGLE_BUTTON,
+                        "Closed options lost their toggle role");
+                check(!button.getAccessibleContext().getAccessibleStateSet().contains(AccessibleState.CHECKED),
+                        "Closed options remain checked");
+            }
+        }
+    }
+
+    // An ordinary definition the adapter knows nothing about.
+    private static void checkGenericAdapter() {
+        int[] callbacks = {0};
+        int[] owners = {0};
+        boolean[] checked = {false};
+        int[] value = {1};
+        boolean[] disabled = {false};
+        boolean[] extra = {true};
+        Screen definition = new Screen() {
+            private final Panel buffer = new Panel();
+
+            @Override
+            public Panel build() {
+                Panel p = buffer.reset().owner(7)
+                        .column().enabled(!disabled[0])
+                        .row().check(1, "Check", checked[0]).combo(2, new String[]{"One", "Two"}, value[0]).numberSpinner(3, value[0], 0, 5, 1).button(4, "Press").rowEnd()
+                        .columnEnd();
+                if (extra[0])
+                    p.label("Extra");
+                return p;
+            }
+
+            @Override
+            public void command(int owner, int item, Panel.Command command) {
+                callbacks[0]++;
+            }
+
+            @Override
+            public void checked(int owner, int item, boolean on) {
+                callbacks[0]++;
+                owners[0] = owner;
+            }
+
+            @Override
+            public void choice(int owner, int item, int index) {
+                callbacks[0]++;
+            }
+
+            @Override
+            public void number(int owner, int item, double number) {
+                callbacks[0]++;
+            }
+        };
+        SwingPanel view = new SwingPanel(definition);
+        JCheckBox check = find(view, JCheckBox.class);
+        JComboBox<?> combo = find(view, JComboBox.class);
+        JSpinner spinner = find(view, JSpinner.class);
+        AbstractButton press = findButton(view, "Press");
+        JLabel label = find(view, JLabel.class);
+        checked[0] = true;
+        value[0] = 0;
+        view.refresh();
+        check(check.isSelected() && combo.getSelectedIndex() == 0 && ((Number) spinner.getModel().getValue()).intValue() == 0, "Refresh did not show the model");
+        check(callbacks[0] == 0, "A programmatic refresh fired an action");
+        check.doClick();
+        check(callbacks[0] == 1 && owners[0] == 7, "User input did not reach the definition with its owner");
+
+        disabled[0] = true;
+        view.refresh();
+        check(!check.isEnabled() && !combo.isEnabled() && !press.isEnabled() && !spinner.isEnabled()
+                && !((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().isEnabled(), "A disabled column left controls enabled");
+        press.doClick();
+        check(callbacks[0] == 1, "A disabled control acted");
+        disabled[0] = false;
+        view.refresh();
+        check(press.isEnabled() && check.isEnabled(), "Controls stayed disabled");
+
+        extra[0] = false;
+        view.refresh();
+        check(!label.isVisible(), "An omitted control stayed visible");
+        extra[0] = true;
+        view.refresh();
+        check(label.isVisible() && find(view, JLabel.class) == label, "A returning control was not reused");
+        try {
+            new SwingPanel(() -> new Panel().rowEnd());
+            check(false, "An unsupported kind was ignored");
+        } catch (IllegalArgumentException expected) {
+            check(expected.getMessage().contains("ROW_END"), "Unsupported kind message");
+        }
+    }
+
+    // Slider gestures become typed callbacks bounded by the snapshot; the model comes back through the next one.
+    private static void checkTimeSliderAdapter() {
+        List<String> calls = new ArrayList<>();
+        int[] range = {20, 80};
+        SwingPanel view = new SwingPanel(new Screen() {
+            private final Panel buffer = new Panel();
+
+            @Override
+            public Panel build() {
+                return buffer.reset().timeSlider(1, 50, range[0], range[1], 99, new byte[100]).sizePoints(0, 20);
+            }
+
+            @Override
+            public void command(int owner, int item, Panel.Command command) {
+                calls.add(command.name());
+            }
+
+            @Override
+            public void choice(int owner, int item, int value) {
+                calls.add("seek " + value);
+            }
+
+            @Override
+            public void setRange(int owner, int item, double low, double high) {
+                range[0] = (int) low;
+                range[1] = (int) high;
+                calls.add("range " + range[0] + ' ' + range[1]);
+            }
+        });
+        view.setSize(400, 40);
+        layoutTree(view);
+        view.printAll(new BufferedImage(400, 40, BufferedImage.TYPE_INT_ARGB).createGraphics());
+        TimeSlider slider = find(view, TimeSlider.class);
+
+        press(slider, MouseEvent.MOUSE_PRESSED, 5, 0);
+        press(slider, MouseEvent.MOUSE_RELEASED, 5, 0);
+        check(calls.equals(List.of("SCRUB_START", "seek 20", "SCRUB_END")), "A scrub left the playback range: " + calls);
+
+        calls.clear();
+        press(slider, MouseEvent.MOUSE_PRESSED, 25, InputEvent.ALT_DOWN_MASK);
+        press(slider, MouseEvent.MOUSE_RELEASED, 25, InputEvent.ALT_DOWN_MASK);
+        check(calls.equals(List.of("SCRUB_START", "range 25 80", "SCRUB_END")), "Trim: " + calls);
+
+        calls.clear();
+        int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        press(slider, MouseEvent.MOUSE_PRESSED, 50, shortcut);
+        press(slider, MouseEvent.MOUSE_DRAGGED, 60, shortcut);
+        press(slider, MouseEvent.MOUSE_RELEASED, 60, shortcut);
+        check(calls.equals(List.of("SCRUB_START", "range 25 80", "range 35 90", "SCRUB_END")), "Range drag: " + calls);
+
+        calls.clear();
+        for (int rotation : new int[]{-1, 1})
+            slider.dispatchEvent(new MouseWheelEvent(slider, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), 0, 10, 10, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, rotation));
+        for (int key : new int[]{KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT, KeyEvent.VK_SPACE})
+            slider.getActionForKeyStroke(KeyStroke.getKeyStroke(key, 0, false)).actionPerformed(new ActionEvent(slider, 0, ""));
+        check(calls.equals(List.of("INCREASE", "DECREASE", "STEP_FORWARD", "STEP_BACKWARD", "PLAY_PAUSE")), "Wheel and keys: " + calls);
+    }
+
+    private static void press(TimeSlider slider, int id, int frame, int modifiers) {
+        BasicSliderUI ui = (BasicSliderUI) slider.getUI();
+        int x = 0;
+        while (ui.valueForXPosition(x) < frame)
+            x++;
+        slider.dispatchEvent(new MouseEvent(slider, id, System.currentTimeMillis(), modifiers | InputEvent.BUTTON1_DOWN_MASK, x, slider.getHeight() / 2, 1, false, MouseEvent.BUTTON1));
+    }
+
+    private static void checkProgramTime(SwingPanel movie, JTextField clock) {
         String original = clock.getText();
         Font originalFont = clock.getFont();
         Container position = clock.getParent();
@@ -384,16 +682,19 @@ public final class SidebarTest {
             movie.lazyRepaint();
             check(repaints[0] == 1, "Timestamp repaint did not settle while paused");
 
-            Field displayedTime = MoviePanel.class.getDeclaredField("displayedTime");
-            displayedTime.setAccessible(true);
-            displayedTime.setLong(movie, Long.MIN_VALUE);
+            clock.setFont(originalFont);
+            frames.setFont(frameFont);
+            movie.refresh();
             ValidationProbe probe = new ValidationProbe();
             RepaintManager.setCurrentManager(probe);
+            clock.setText("2026-10-30T12:34:56.789");
+            String stale = clock.getText();
             clock.select(5, 10);
-            movie.lazyRepaint();
+            movie.refresh();
+            check(!clock.getText().equals(stale), "Refresh did not show the model time");
             check(!probe.queued, "Timestamp update queued validation");
             check(clock.getSelectionStart() == 5 && clock.getSelectionEnd() == 10, "Timestamp update lost the selection");
-        } catch (javax.swing.text.BadLocationException | ReflectiveOperationException exception) {
+        } catch (javax.swing.text.BadLocationException exception) {
             throw new AssertionError(exception);
         } finally {
             RepaintManager.setCurrentManager(repaintManager);

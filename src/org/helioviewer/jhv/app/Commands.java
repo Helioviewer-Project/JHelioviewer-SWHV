@@ -70,6 +70,18 @@ public final class Commands {
         Player.previousFrame();
     }
 
+    public static void stepForward() {
+        if (Player.isPlaying())
+            pause();
+        nextFrame();
+    }
+
+    public static void stepBackward() {
+        if (Player.isPlaying())
+            pause();
+        previousFrame();
+    }
+
     public static void setRecording(JSONObject input) {
         ViewState.applyRecording(input);
     }
@@ -80,6 +92,13 @@ public final class Commands {
 
     public static void recordStop() {
         ExportMovie.shallStop();
+    }
+
+    public static void toggleRecording(Completion completion) {
+        if (ExportMovie.isRecording())
+            recordStop();
+        else
+            recordStart(completion, null);
     }
 
     public static void zoomIn() {
