@@ -217,7 +217,6 @@ public final class SWEKSession implements AutoCloseable {
         activeSuppliers.clear();
         groupChanged = _ -> {};
         listeners.clear();
-        if (lastHighlighted != null) lastHighlighted.highlight(false);
         lastHighlighted = null;
         eventCollection = new EventCollection();
         filters.clear();
@@ -236,17 +235,15 @@ public final class SWEKSession implements AutoCloseable {
         listeners.forEach(Listener::cacheUpdated);
     }
 
+    public boolean isHighlighted(RelatedEvents event) {
+        return event == lastHighlighted;
+    }
+
     public void highlight(RelatedEvents event) {
         if (closed) return;
         if (event == lastHighlighted) return;
-        boolean changed = false;
-        if (event != null)
-            changed = event.highlight(true);
-        if (lastHighlighted != null)
-            changed = lastHighlighted.highlight(false) || changed;
         lastHighlighted = event;
-        if (changed)
-            fireHighlightChanged();
+        fireHighlightChanged();
     }
 
     private void fireHighlightChanged() {

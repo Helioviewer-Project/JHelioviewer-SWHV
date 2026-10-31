@@ -156,7 +156,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = session.isHighlighted(relatedEvents) ? bufThick : bufEvent;
         byte[] color = Colors.bytes(relatedEvents.getColor());
 
         drawInterpolated(angularResolution, distSun, distSun, thetaStart, thetaEnd, q, color, vexBuf);
@@ -165,7 +165,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         drawInterpolated(lineResolution, SWEKData.CACTUS_START_RADIUS, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
 
         if (icons) {
-            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = session.isHighlighted(relatedEvents) ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             for (float[] el : texCoord) {
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
                 double deltar = sz * (el[1] * 2 - 1);
@@ -187,7 +187,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
             return;
         }
 
-        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = session.isHighlighted(relatedEvents) ? bufThick : bufEvent;
         byte[] color = Colors.bytes(relatedEvents.getColor());
 
         // draw bounds
@@ -248,7 +248,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     }
 
     private void drawIcon(RelatedEvents relatedEvents, Vec3 pt) {
-        double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+        double sz = session.isHighlighted(relatedEvents) ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
         drawImage3d(pt.x, pt.y, pt.z, sz, sz);
     }
 
@@ -264,7 +264,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
 
     private void drawIconScale(MapView mv, Viewport vp, RelatedEvents relatedEvents, Vec3 pt) {
         Vec2 tf = mv.projectToScreen(vp, pt);
-        double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+        double sz = session.isHighlighted(relatedEvents) ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
         drawImageScale(tf.x, tf.y, sz, sz);
     }
 
@@ -281,7 +281,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = session.isHighlighted(relatedEvents) ? bufThick : bufEvent;
         byte[] color = Colors.bytes(relatedEvents.getColor());
 
         float yStart = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
@@ -298,7 +298,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
             putLineScale(vexBuf, (float) ((scale.toUnitX(0) - 0.5) * vp.aspect), yArc, (float) ((scale.toUnitX(arcEnd - 360) - 0.5) * vp.aspect), yArc, color);
 
         if (icons) {
-            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = session.isHighlighted(relatedEvents) ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect, yArc, sz, sz);
         }
     }

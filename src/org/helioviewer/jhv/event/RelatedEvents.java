@@ -19,7 +19,6 @@ public class RelatedEvents {
     private final Color color;
 
     private List<Interval> intervals;
-    private boolean highlighted;
 
     public RelatedEvents(SolarEvent event) {
         this(event, eventColors.getNextColor());
@@ -45,17 +44,6 @@ public class RelatedEvents {
 
     public Color getColor() {
         return color;
-    }
-
-    public boolean isHighlighted() {
-        return highlighted;
-    }
-
-    boolean highlight(boolean isHighlighted) {
-        if (isHighlighted == highlighted)
-            return false;
-        highlighted = isHighlighted;
-        return true;
     }
 
     public SolarEvent getClosestTo(long timestamp) {

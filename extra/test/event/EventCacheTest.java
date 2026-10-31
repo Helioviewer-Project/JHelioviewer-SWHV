@@ -221,7 +221,7 @@ public final class EventCacheTest {
         SWEKSession.Listener listener = new SWEKSession.Listener() {
             @Override
             public void cacheUpdated() {
-                check(!highlighted.isHighlighted(), "split clears detached highlight before cache notification");
+                check(!session.isHighlighted(highlighted), "split clears detached highlight before cache notification");
                 check(session.getRelatedEvents(201) != session.getRelatedEvents(202), "notification sees finished split");
                 notifications[0]++;
             }
@@ -269,7 +269,7 @@ public final class EventCacheTest {
         SWEKSession.Listener listener = new SWEKSession.Listener() {
             @Override
             public void highlightChanged() {
-                check(!group.isHighlighted(), "highlight cleared before notification");
+                check(!session.isHighlighted(group), "highlight cleared before notification");
                 check(session.getRelatedEvents(100) == group, "highlight notification precedes group removal");
                 notifications[0]++;
             }
@@ -289,7 +289,7 @@ public final class EventCacheTest {
         session.highlight(detached);
         session.replaceEvents(new EventBatch(1, List.of(event), List.of()));
         session.removeSupplier(supplier);
-        check(detached.isHighlighted(), "detached detail group is not mistaken for cached group");
+        check(session.isHighlighted(detached), "detached detail group is not mistaken for cached group");
         session.highlight(null);
     }
 

@@ -191,7 +191,7 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         return new EventPlotConfiguration(event, x0, y, w, 3, time);
     }
 
-    private static void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
+    private void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
         RelatedEvents event = plot.event;
         int x0 = plot.x;
         int y = plot.y;
@@ -199,7 +199,7 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         int h = plot.height;
         int spacePerLine = h;
         boolean containsMouse = plot.contains(mousePosition);
-        boolean hl = event.isHighlighted() && (mousePosition == null || containsMouse); // null mousePosition from image canvas
+        boolean hl = session.isHighlighted(event) && (mousePosition == null || containsMouse); // null mousePosition from image canvas
         int sz = Math.min(w, 8);
         if (hl) {
             x0 -= 10;

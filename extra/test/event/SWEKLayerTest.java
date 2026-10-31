@@ -106,7 +106,7 @@ public final class SWEKLayerTest {
         check(layer, 150, first);
         List<SWEKLayer.ActiveEvent> active = layer.activeEvents(150);
         session.highlight(active.getFirst().relatedEvents());
-        if (!layer.activeEvents(150).getFirst().relatedEvents().isHighlighted())
+        if (!session.isHighlighted(layer.activeEvents(150).getFirst().relatedEvents()))
             throw new AssertionError("highlight remains live for the selected events");
         session.highlight(null);
         check(layer, 200, first);
