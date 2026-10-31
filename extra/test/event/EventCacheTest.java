@@ -452,7 +452,7 @@ public final class EventCacheTest {
 
     private static final class PaginatedHandler extends SWEKHandler {
         private final List<Integer> pages = new ArrayList<>();
-        private final byte[] json = JSONUtils.compressJSON(new JSONObject()).toByteArray();
+        private final byte[] json = JSONUtils.compressJSON(new JSONObject());
 
         PaginatedHandler() throws Exception {}
 

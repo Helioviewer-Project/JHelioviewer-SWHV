@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.event.sources;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.time.DateTimeException;
@@ -88,9 +87,7 @@ public class HEKHandler extends SWEKHandler {
                 Log.warn("Ignoring malformed HEK field " + fieldName + " in " + uid, e);
             }
         }
-        try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-            return new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, indexedValues);
-        }
+        return new SWEKHandler.RemoteEvent(JSONUtils.compressJSON(result), start, end, archiv, uid, indexedValues);
     }
 
     private static List<SolarEvent.LinkRef> parseAssociations(JSONObject eventJSON, Set<String> acceptedUids) {

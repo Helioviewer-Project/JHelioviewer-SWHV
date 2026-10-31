@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.event.sources;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,9 +52,7 @@ public class FHNWHandler extends SWEKHandler {
 
                 long archiv = start;
                 String uid = result.getString("granule_uid");
-                try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                    event2dbList.add(new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, Map.of()));
-                }
+                event2dbList.add(new SWEKHandler.RemoteEvent(JSONUtils.compressJSON(result), start, end, archiv, uid, Map.of()));
             } else
                 Log.warn("Inconsistent event parameter list length");
         }

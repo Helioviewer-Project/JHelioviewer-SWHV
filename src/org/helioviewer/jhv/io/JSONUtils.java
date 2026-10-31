@@ -56,13 +56,13 @@ public class JSONUtils {
         }
     }
 
-    public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
+    public static byte[] compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFSIZ);
         try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);
              BufferedWriter out = new BufferedWriter(new OutputStreamWriter(gz, StandardCharsets.UTF_8))) {
             json.write(out);
         }
-        return baos;
+        return baos.toByteArray();
     }
 
 }

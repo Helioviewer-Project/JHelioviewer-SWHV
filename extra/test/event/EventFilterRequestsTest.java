@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
-import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -82,9 +81,8 @@ public final class EventFilterRequestsTest {
     }
 
     private static SWEKHandler.RemoteEvent event(String uid, int value, long start, long end) throws Exception {
-        try (ByteArrayOutputStream output = JSONUtils.compressJSON(new JSONObject().put("event_title", uid).put("value", value))) {
-            return new SWEKHandler.RemoteEvent(output.toByteArray(), start, end, start, uid, Map.of("value", value));
-        }
+        return new SWEKHandler.RemoteEvent(JSONUtils.compressJSON(new JSONObject().put("event_title", uid).put("value", value)),
+                start, end, start, uid, Map.of("value", value));
     }
 
     private static void check(boolean condition, String message) {

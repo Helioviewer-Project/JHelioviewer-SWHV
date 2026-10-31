@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.event;
 
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -173,10 +172,7 @@ public final class EventDatabaseTest {
                 "test_data", supplier.getParameterList());
         suppliers.add(dataSupplier);
         setRelations(List.of());
-        byte[] json;
-        try (ByteArrayOutputStream output = JSONUtils.compressJSON(new JSONObject().put("noposition", true).put("event_title", "test"))) {
-            json = output.toByteArray();
-        }
+        byte[] json = JSONUtils.compressJSON(new JSONObject().put("noposition", true).put("event_title", "test"));
         SWEKHandler.RemoteEvent first = new SWEKHandler.RemoteEvent(json, 100, 300, 100, "first",
                 Map.of("jhv_goesflux", 1e-5));
         SWEKHandler.RemoteEvent second = new SWEKHandler.RemoteEvent(json, 200, 400, 100, "second",
@@ -371,10 +367,7 @@ public final class EventDatabaseTest {
     }
 
     private static SWEKHandler.RemoteEvent event(String uid, long start, long end, Map<String, Number> parameters) throws Exception {
-        byte[] json;
-        try (ByteArrayOutputStream output = JSONUtils.compressJSON(new JSONObject().put("event_title", uid))) {
-            json = output.toByteArray();
-        }
+        byte[] json = JSONUtils.compressJSON(new JSONObject().put("event_title", uid));
         return new SWEKHandler.RemoteEvent(json, start, end, 100, uid, parameters);
     }
 
@@ -469,9 +462,7 @@ public final class EventDatabaseTest {
     }
 
     private static SWEKHandler.RemoteEvent decodingEvent(String uid, long start) throws Exception {
-        try (ByteArrayOutputStream output = JSONUtils.compressJSON(new JSONObject().put("title", uid))) {
-            return new SWEKHandler.RemoteEvent(output.toByteArray(), start, start + 1, start, uid, Map.of());
-        }
+        return new SWEKHandler.RemoteEvent(JSONUtils.compressJSON(new JSONObject().put("title", uid)), start, start + 1, start, uid, Map.of());
     }
 
     private static final class BlockingHandler extends HEKHandler {
