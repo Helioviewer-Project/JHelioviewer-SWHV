@@ -24,20 +24,6 @@ final class HEKGeometry {
     private static final Pattern POINT = Pattern.compile("\\s*POINT\\s*\\(([^()]*)\\)\\s*", Pattern.CASE_INSENSITIVE);
     private static final Pattern POLYGON = Pattern.compile("\\s*POLYGON\\s*\\(\\s*\\(([^()]*)\\)\\s*\\)\\s*", Pattern.CASE_INSENSITIVE);
 
-    private final List<HgsPoint> hgsBoundedBox;
-    private final List<HgsPoint> hgsBoundCC;
-    private final HgsPoint hgsCentralPoint;
-    private final Double hgsLongitudeDeg;
-    private final Double hgsLatitudeDeg;
-
-    HEKGeometry(JSONObject result) {
-        hgsBoundedBox = result.isNull("hgs_bbox") ? null : parsePolygon(result.optString("hgs_bbox"));
-        hgsBoundCC = result.isNull("hgs_boundcc") ? null : parsePolygon(result.optString("hgs_boundcc"));
-        hgsCentralPoint = result.isNull("hgs_coord") ? null : parsePoint(result.optString("hgs_coord"));
-        hgsLongitudeDeg = result.isNull("hgs_x") ? null : parseNumber(result.optString("hgs_x"));
-        hgsLatitudeDeg = result.isNull("hgs_y") ? null : parseNumber(result.optString("hgs_y"));
-    }
-
     private static List<HgsPoint> parsePolygon(String value) {
         Matcher matcher = POLYGON.matcher(value);
         if (!matcher.matches()) return List.of();
@@ -104,14 +90,18 @@ final class HEKGeometry {
     }
 
     @Nullable
-    EventGeometry position(long start, boolean cactus) {
-        List<HgsPoint> hgsBoundedBox = checkAndFixBoundingBox(this.hgsBoundedBox);
-        if (hgsBoundedBox == null && hgsCentralPoint == null && (hgsLongitudeDeg == null || hgsLatitudeDeg == null) && hgsBoundCC == null)
+    static EventGeometry position(JSONObject result, long start, boolean cactus) {
+        List<HgsPoint> hgsBoundedBox = result.isNull("hgs_bbox") ? null : parsePolygon(result.optString("hgs_bbox"));
+        List<HgsPoint> hgsBoundCC = result.isNull("hgs_boundcc") ? null : parsePolygon(result.optString("hgs_boundcc"));
+        HgsPoint centralPoint = result.isNull("hgs_coord") ? null : parsePoint(result.optString("hgs_coord"));
+        Double hgsLongitudeDeg = result.isNull("hgs_x") ? null : parseNumber(result.optString("hgs_x"));
+        Double hgsLatitudeDeg = result.isNull("hgs_y") ? null : parseNumber(result.optString("hgs_y"));
+        hgsBoundedBox = checkAndFixBoundingBox(hgsBoundedBox);
+        if (hgsBoundedBox == null && centralPoint == null && (hgsLongitudeDeg == null || hgsLatitudeDeg == null) && hgsBoundCC == null)
             return null;
 
         List<HgsPoint> boundary = hgsBoundCC != null && !hgsBoundCC.isEmpty() ? hgsBoundCC : hgsBoundedBox;
         if (boundary == null) boundary = List.of();
-        HgsPoint centralPoint = hgsCentralPoint;
         if (centralPoint == null && hgsLongitudeDeg != null && hgsLatitudeDeg != null)
             centralPoint = point(hgsLongitudeDeg, hgsLatitudeDeg);
 

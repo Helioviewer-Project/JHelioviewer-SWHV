@@ -153,7 +153,7 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     public SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        return new SolarEvent(supplier, id, start, end, new HEKGeometry(json).position(start, supplier.isCactus()),
+        return new SolarEvent(supplier, id, start, end, HEKGeometry.position(json, start, supplier.isCactus()),
                 readCMEParameters(json, supplier), HEKParser.parseResult(json, supplier, full));
     }
 
