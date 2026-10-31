@@ -16,10 +16,15 @@ import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin implements Layers.Listener {
 
+    // The toolkit side of the plugin, for one activation.
+    public interface Ui extends SWEKLayer.CanvasUi, EventTimelineLayer.Ui {
+        void close();
+    }
+
     private SWEKLayer layer;
     private EventTimelineLayer etl;
     private SWEKSession session;
-    private SWEKSwingUI ui;
+    private Ui ui;
 
     public SWEKPlugin() {
         super("events", "SWEKPlugin", "Events", "Visualize space weather relevant events");
@@ -53,14 +58,23 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
 
     @Override
     protected void installGUI() {
-        ui = new SWEKSwingUI(session);
-        ui.install();
-        etl.setUi(ui);
-        bindLayer();
+        SWEKSwingUI swing = new SWEKSwingUI(session);
+        swing.install();
+        attachUi(swing);
     }
 
     @Override
     protected void uninstallGUI() {
+        detachUi();
+    }
+
+    private void attachUi(Ui _ui) {
+        ui = _ui;
+        etl.setUi(ui);
+        bindLayer();
+    }
+
+    private void detachUi() {
         if (etl != null)
             etl.setUi(null);
         if (ui != null)

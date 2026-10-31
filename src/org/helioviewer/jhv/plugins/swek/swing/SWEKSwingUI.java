@@ -25,11 +25,11 @@ import org.helioviewer.jhv.gui.AwtInputAdapter;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
-import org.helioviewer.jhv.plugins.swek.EventTimelineLayer;
 import org.helioviewer.jhv.plugins.swek.SWEKLayer;
+import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
 
 // Swing side of SWEK: tree pane, filter and information windows, canvas cursor, layer options.
-public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer.Ui {
+public final class SWEKSwingUI implements SWEKPlugin.Ui {
 
     private static final Cursor handCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -63,6 +63,7 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
         return panel;
     }
 
+    @Override
     public void close() {
         closed = true;
         LayerOptions.unregister(SWEKLayer.class);

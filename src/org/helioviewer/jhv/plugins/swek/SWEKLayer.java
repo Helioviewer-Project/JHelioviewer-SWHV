@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.base.PngPixels;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapScale;
@@ -113,7 +114,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            SWEKIconBank.Pixels pixels = SWEKIconBank.getPixels(group.getIconKey());
+            PngPixels pixels = SWEKIconBank.getPixels(group.getIconKey());
             tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
             try {
                 tex.upload2D(GLTexture.Format.RGBA8, pixels.width(), pixels.height(), GL.LINEAR, ByteBuffer.wrap(pixels.rgba()));

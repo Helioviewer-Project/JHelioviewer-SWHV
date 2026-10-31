@@ -7,8 +7,15 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +30,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -30,6 +39,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -37,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.text.DefaultCaret;
 
+import org.helioviewer.jhv.base.PngPixels;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -57,7 +68,13 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         void apply(Panel p, int control);
     }
 
-    private record Widget(JComponent component, Update update) {}
+    // Children of the control go into content.
+    private record Widget(JComponent component, JComponent content, Update update) {
+
+        Widget(JComponent component, Update update) {
+            this(component, component, update);
+        }
+    }
 
     private record Key(Panel.Kind kind, int owner, int id, int choice, int position) {}
 
@@ -77,13 +94,25 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private final AtomicBoolean refreshQueued = new AtomicBoolean();
     private boolean syncing;
     private volatile boolean dirty;
+    private int fitted;
 
     public SwingPanel(Screen _screen) {
         screen = _screen;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         screen.listen(this::changed);
         refresh();
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
         UITimer.register(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        UITimer.unregister(this);
+        super.removeNotify();
     }
 
     // Any thread. Coalesces notifications on the event queue without waiting for the repaint timer.
@@ -107,10 +136,21 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     public void refresh() {
         dirty = false;
         syncing = true;
+        Panel p;
         try {
-            reconcile(screen.build(), 0, this, nodes, null, true, false);
+            p = screen.build();
+            reconcile(p, 0, this, nodes, null, true, false);
         } finally {
             syncing = false;
+        }
+        int revision = p.size() == 0 ? 0 : p.value(0, Panel.IntField.FIT);
+        if (revision != fitted) {
+            fitted = revision;
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window != null && window.isDisplayable()) {
+                window.pack();
+                window.repaint();
+            }
         }
     }
 
@@ -140,8 +180,11 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             node.widget.update.apply(p, i);
 
             i = switch (kind) {
-                case ROW -> reconcile(p, i + 1, component, node.children, Panel.Kind.ROW_END, enabled, true);
-                case COLUMN -> reconcile(p, i + 1, component, node.children, Panel.Kind.COLUMN_END, enabled, false);
+                case ROW -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.ROW_END, enabled, true);
+                case COLUMN -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.COLUMN_END, enabled, false);
+                case SECTION -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.SECTION_END, enabled, false);
+                case SCROLL -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.SCROLL_END, enabled, false);
+                case TABLE -> p.tableEnd(i) + 1;
                 default -> i + 1;
             };
         }
@@ -154,7 +197,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         int owner = p.value(i, Panel.IntField.OWNER);
         int item = p.value(i, Panel.IntField.ID);
         return switch (kind) {
-            case ROW -> new Widget(new JPanel(new RowLayout(p.has(i, Panel.RIGHT), inRow)), (s, c) -> {});
+            case ROW -> row(p, i, owner, inRow);
             case COLUMN -> new Widget(column(), (s, c) -> {});
             case SPACE -> space(p, i);
             case LABEL -> p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? label(inRow) : reservedLabel();
@@ -165,6 +208,10 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             case NUMBER_SPINNER -> spinner(p, i, owner, item);
             case TEXT -> text(p, i);
             case TIME_SLIDER -> timeSlider(p, i, owner, item);
+            case IMAGE -> image();
+            case SECTION -> section(p, i, owner);
+            case SCROLL -> scroll(p, i);
+            case TABLE -> table(p, i);
             default -> throw new IllegalArgumentException("Swing has no " + kind);
         };
     }
@@ -184,6 +231,25 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         component.setFont(p.has(i, Panel.MONO) ? (small ? UIGlobals.uiFontMonoSmall : UIGlobals.uiFontMono) : UIGlobals.uiFontSmall);
     }
 
+    private Widget row(Panel p, int i, int owner, boolean inRow) {
+        Line row = new Line(new RowLayout(p.has(i, Panel.RIGHT), inRow));
+        int hover = p.value(i, Panel.IntField.SECONDARY_ID);
+        if (hover != 0) {
+            row.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    act(() -> screen.command(owner, hover, Panel.Command.ENTER));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    act(() -> screen.command(owner, hover, Panel.Command.EXIT));
+                }
+            });
+        }
+        return new Widget(row, (s, c) -> {});
+    }
+
     private static JPanel column() {
         JPanel column = new JPanel();
         column.setLayout(new BoxLayout(column, BoxLayout.PAGE_AXIS));
@@ -194,7 +260,12 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private static Widget space(Panel p, int i) {
         if (!p.has(i, Panel.POINT_SIZE))
             throw new IllegalArgumentException("Swing space needs point sizes");
-        return new Widget((JComponent) Box.createRigidArea(new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT))), (s, c) -> {});
+        JComponent space = (JComponent) Box.createRigidArea(new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT)));
+        return new Widget(space, (s, c) -> {
+            int foreground = s.value(c, Panel.IntField.FOREGROUND);
+            space.setOpaque(foreground != 0);
+            space.setBackground(foreground == 0 ? null : new Color(foreground & 0xFFFFFF));
+        });
     }
 
     private static Widget label(boolean inRow) {
@@ -218,7 +289,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     }
 
     private Widget button(Panel p, int i, int owner, int item) {
-        AbstractButton button = p.has(i, Panel.CHECKABLE) ? new JideToggleButton() : new JideButton();
+        AbstractButton button = p.has(i, Panel.CHECKABLE) ? new JideToggleButton() : p.has(i, Panel.FLAT) ? new JideButton() : new JButton();
         Color normal = button.getForeground();
         int iconSize = p.value(i, Panel.IntField.ICON_SIZE);
         if (iconSize > 0)
@@ -349,6 +420,34 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
                 (int) s.value(c, Panel.DoubleField.MIN), (int) s.value(c, Panel.DoubleField.MAX), s.value(c, Panel.IntField.LAST_FRAME), s.payload(c)));
     }
 
+    private static Widget image() {
+        Picture picture = new Picture();
+        return new Widget(picture, (p, i) -> picture.update(p.payload(i), p.value(i, Panel.IntField.WIDTH)));
+    }
+
+    private Widget section(Panel p, int i, int owner) {
+        int item = p.value(i, Panel.IntField.SECONDARY_ID);
+        if (item == 0)
+            throw new IllegalArgumentException("Swing section needs an id");
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        Section section = new Section(p.string(i, Panel.IntField.LABEL), content, p.has(i, Panel.OPEN), owner, item);
+        return new Widget(section, content, (s, c) -> section.update(s.string(c, Panel.IntField.LABEL), s.has(c, Panel.OPEN)));
+    }
+
+    private static Widget scroll(Panel p, int i) {
+        if (p.value(i, Panel.IntField.HEIGHT) != 0)
+            throw new IllegalArgumentException("Swing scroll needs a free height");
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        return new Widget(new JScrollPane(content), content, (s, c) -> {});
+    }
+
+    private Widget table(Panel p, int i) {
+        PanelTable table = new PanelTable(p, i, screen, this::act);
+        return new Widget(new JScrollPane(table), table::update);
+    }
+
     // Preferred sizes in a line. A nested row takes the rest of the line at full height and fills its children's height.
     private record RowLayout(boolean right, boolean fill) implements LayoutManager {
 
@@ -391,6 +490,67 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
                     component.setBounds(x, (height - h) / 2, w, h);
                     x += w;
                 }
+            }
+        }
+    }
+
+    // A row keeps its height when a window gives its column more.
+    private static final class Line extends JPanel {
+
+        Line(LayoutManager layout) {
+            super(layout);
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            return new Dimension(super.getMaximumSize().width, getPreferredSize().height);
+        }
+    }
+
+    // Reports its toggles and shows the state of the snapshot.
+    private final class Section extends CollapsiblePane {
+
+        private final int owner;
+        private final int item;
+
+        Section(String title, JComponent content, boolean open, int _owner, int _item) {
+            super(title, content, open);
+            owner = _owner;
+            item = _item;
+        }
+
+        void update(String title, boolean open) {
+            setTitle(title);
+            if (isExpanded() != open)
+                super.actionPerformed(null);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            super.actionPerformed(e);
+            act(() -> screen.checked(owner, item, isExpanded()));
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            Dimension size = super.getMaximumSize();
+            return isExpanded() ? size : new Dimension(size.width, getPreferredSize().height);
+        }
+    }
+
+    private static final class Picture extends JLabel {
+
+        private byte[] png = {};
+
+        void update(byte[] _png, int width) {
+            if (Arrays.equals(png, _png))
+                return;
+            png = _png;
+            try {
+                BufferedImage image = PngPixels.decode(png).image();
+                setIcon(new ImageIcon(image.getWidth() == width ? image : image.getScaledInstance(width, -1, Image.SCALE_SMOOTH)));
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Swing image needs a decodable file", e);
             }
         }
     }

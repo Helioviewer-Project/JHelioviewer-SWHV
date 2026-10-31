@@ -2,50 +2,35 @@ package org.helioviewer.jhv.plugins.swek;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.base.PngPixels;
 import org.helioviewer.jhv.io.FileUtils;
-
-import org.lwjgl.stb.STBImage;
 
 public final class SWEKIconBank {
 
-    // Top-to-bottom, premultiplied RGBA. Cached pixels are owned by the Java heap.
-    record Pixels(int width, int height, byte[] rgba) {}
+    private static final HashMap<String, PngPixels> icons = new HashMap<>();
+    private static final HashMap<String, byte[]> files = new HashMap<>();
 
-    private static final HashMap<String, Pixels> icons = new HashMap<>();
-
-    static Pixels getPixels(String iconName) {
-        return icons.computeIfAbsent(resource(iconName), SWEKIconBank::decode);
+    static PngPixels getPixels(String iconName) {
+        return icons.computeIfAbsent(resource(iconName), value -> {
+            try {
+                return PngPixels.decode(png(iconName));
+            } catch (IOException e) {
+                throw new IllegalStateException("Cannot decode SWEK icon " + value, e);
+            }
+        });
     }
 
-    private static Pixels decode(String resource) {
-        try (InputStream input = FileUtils.getResource(resource)) {
-            ByteBuffer encoded = BufferUtils.directByteBuffer(ByteBuffer.wrap(input.readAllBytes()));
-            int[] width = new int[1];
-            int[] height = new int[1];
-            int[] channels = new int[1];
-            ByteBuffer decoded = STBImage.stbi_load_from_memory(encoded, width, height, channels, 4);
-            if (decoded == null)
-                throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
-            try {
-                byte[] rgba = new byte[decoded.remaining()];
-                // stbi_image_free needs the original buffer position.
-                decoded.get(0, rgba);
-                for (int i = 0; i < rgba.length; i += 4) {
-                    int alpha = rgba[i + 3] & 0xff;
-                    for (int channel = 0; channel < 3; channel++)
-                        rgba[i + channel] = (byte) (((rgba[i + channel] & 0xff) * alpha + 127) / 255);
-                }
-                return new Pixels(width[0], height[0], rgba);
-            } finally {
-                STBImage.stbi_image_free(decoded);
+    // The icon's PNG file.
+    public static byte[] png(String iconName) {
+        return files.computeIfAbsent(resource(iconName), value -> {
+            try (InputStream input = FileUtils.getResource(value)) {
+                return input.readAllBytes();
+            } catch (IOException e) {
+                throw new IllegalStateException("Cannot load SWEK icon " + value, e);
             }
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot load SWEK icon " + resource, e);
-        }
+        });
     }
 
     public static String resource(String iconName) {

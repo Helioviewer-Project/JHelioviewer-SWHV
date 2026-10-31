@@ -19,6 +19,10 @@ public final class UITimer {
             lazyComponents.add(component);
     }
 
+    public static void unregister(Interfaces.LazyComponent component) {
+        lazyComponents.remove(component);
+    }
+
     private static void action() {
         BusyIndicator.incrementAngle();
         lazyComponents.forEach(Interfaces.LazyComponent::lazyRepaint);

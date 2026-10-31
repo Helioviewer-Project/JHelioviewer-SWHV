@@ -17,6 +17,7 @@ tests = {
     "EventFilterRequestsTest": "event",
     "SWEKIntegrationTest": "event",
     "SWEKLayerTest": "plugins.swek",
+    "EventInformationScreenTest": "plugins.swek",
 }
 classpath = os.pathsep.join([str(root / "bin"), str(root / "resources"), str(root / "lib"), *(str(p) for p in (root / "lib").rglob("*.jar"))])
 with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
@@ -27,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
     fixture.write_bytes(gzip.decompress((root / "extra/test/event/hek-events.json.gz").read_bytes()))
     subprocess.run([
         "javac", "-cp", classpath, "-d", str(classes),
-        *("extra/test/event/" + name + ".java" for name in tests),
+        *("extra/test/event/" + name + ".java" for name in tests), "extra/test/event/EventInformationFixture.java",
     ], cwd=root, check=True)
 
     def run(name, *args, cache=None, resources=None):

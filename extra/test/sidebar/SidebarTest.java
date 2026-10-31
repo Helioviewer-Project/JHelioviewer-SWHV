@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers.selector;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -15,6 +16,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -25,10 +29,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleState;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -41,6 +48,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.AppInit;
@@ -52,7 +61,9 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.CollapsiblePane;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.SwingPanel;
@@ -94,6 +105,7 @@ public final class SidebarTest {
         DataSources.initSources();
         try {
             UiThread.postAndWait(SidebarTest::checkSidebar);
+            UiThread.postAndWait(SidebarTest::checkWindowAdapter);
             checkQueuedPanelUpdates();
             checkFitsOptions();
         } finally {
@@ -553,6 +565,138 @@ public final class SidebarTest {
             check(false, "An unsupported kind was ignored");
         } catch (IllegalArgumentException expected) {
             check(expected.getMessage().contains("ROW_END"), "Unsupported kind message");
+        }
+    }
+
+    // A screen in a window of its own: every input reaches the screen, what the screen answers is what shows, and disposal ends the panel's timer hold.
+    private static void checkWindowAdapter() {
+        List<String> calls = new ArrayList<>();
+        boolean[] open = {true};
+        int[] fit = {1};
+        boolean[] descending = {false};
+        boolean[] selected = {false, false};
+        Screen definition = new Screen() {
+            private final Panel buffer = new Panel();
+
+            @Override
+            public Panel build() {
+                Panel p = buffer.reset().row().hover(5).image(pixel(), 16).button(6, "Details").rowEnd().fit(fit[0]);
+                p.section(1, "Rows", open[0]).owner(2).table(2, 1, 0).identity(1).sizePoints(0, 80).fill().columnWidth(0, 60).columnWidth(1, 90).stretchColumns(1)
+                        .activateColumns().doubleClickColumns().multiple(true).headerRow().tableRow(0, false).button(10, "Name");
+                p.button(11, "Value").sorted(descending[0]).rowEnd();
+                int[] rows = descending[0] ? new int[]{1, 0} : new int[]{0, 1};
+                for (int row : rows) {
+                    p.tableRow(100 + row, selected[row]).label("Row " + row);
+                    if (row == 0)
+                        p.link("Open", "https://example.com/" + row).wrap();
+                    else
+                        p.label("Plain").wrap();
+                    p.rowEnd();
+                }
+                return p.tableEnd().owner(0).sectionEnd().scroll(0).fill().label("Scrolled").scrollEnd();
+            }
+
+            @Override
+            public void command(int owner, int item, Panel.Command command) {
+                calls.add(owner + " " + item + ' ' + command);
+                if (item == 11)
+                    descending[0] = !descending[0];
+                else if (item >= 100)
+                    selected[item - 100] = command != Panel.Command.SELECT_REMOVE;
+            }
+
+            @Override
+            public void checked(int owner, int item, boolean value) {
+                calls.add("checked " + item + ' ' + value);
+                open[0] = value;
+                fit[0]++;
+            }
+        };
+        int[] packs = {0};
+        JDialog dialog = new JDialog() {
+            @Override
+            public void pack() {
+                packs[0]++;
+                super.pack();
+            }
+        };
+        SwingPanel view = new SwingPanel(definition);
+        dialog.add(view);
+        check(!lazyRegistered(view), "A panel without a window holds the timer");
+        dialog.pack();
+        check(lazyRegistered(view), "A displayable panel left the timer");
+        layoutTree(view);
+        check(find(view, JButton.class).getText().equals("Details") && find(view, JLabel.class).getIcon().getIconWidth() == 16, "Plain button and image");
+
+        JPanel row = (JPanel) view.getComponent(0);
+        row.dispatchEvent(new MouseEvent(row, MouseEvent.MOUSE_ENTERED, 0, 0, 1, 1, 0, false));
+        row.dispatchEvent(new MouseEvent(row, MouseEvent.MOUSE_EXITED, 0, 0, 1, 1, 0, false));
+        check(calls.equals(List.of("0 5 ENTER", "0 5 EXIT")), "Hover: " + calls);
+
+        JTable table = find(view, JTable.class);
+        calls.clear();
+        table.setRowSelectionInterval(1, 1);
+        check(calls.equals(List.of("2 101 SELECT_ADD")) && selected[1], "Selection: " + calls);
+        calls.clear();
+        table.getRowSorter().toggleSortOrder(1);
+        check(calls.equals(List.of("2 11 CLICK")), "Header click: " + calls);
+        check(table.getValueAt(0, 0).equals("Row 1") && table.getValueAt(1, 1).toString().contains("example.com/0"), "Rows in the screen's order");
+        check(table.isRowSelected(0) && !table.isRowSelected(1), "The selection follows its row");
+        check(table.getRowSorter().getSortKeys().equals(List.of(new RowSorter.SortKey(1, SortOrder.DESCENDING))), "Header sort");
+        Rectangle link = table.getCellRect(1, 1, false);
+        table.dispatchEvent(new MouseEvent(table, MouseEvent.MOUSE_MOVED, 0, 0, link.x + 2, link.y + 2, 0, false));
+        check(table.getCursor().getType() == Cursor.HAND_CURSOR, "A link cell after a sort shows no hand");
+        Rectangle plain = table.getCellRect(0, 1, false);
+        table.dispatchEvent(new MouseEvent(table, MouseEvent.MOUSE_MOVED, 0, 0, plain.x + 2, plain.y + 2, 0, false));
+        check(table.getCursor().getType() == Cursor.DEFAULT_CURSOR, "A plain cell after a sort shows a hand");
+
+        calls.clear();
+        dialog.validate();
+        int height = dialog.getPreferredSize().height;
+        CollapsiblePane section = find(view, CollapsiblePane.class);
+        find(section, AbstractButton.class).doClick();
+        check(calls.equals(List.of("checked 1 false")), "Section: " + calls);
+        check(!section.isExpanded() && packs[0] == 2 && dialog.getPreferredSize().height < height, "A collapsed section did not fit the window");
+        check(section.getMaximumSize().height == section.getPreferredSize().height, "A collapsed section takes spare height");
+
+        open[0] = true;
+        fit[0]++;
+        view.refresh();
+        check(section.isExpanded() && packs[0] == 3 && dialog.getPreferredSize().height == height, "The screen's state did not come back");
+        check(section.getMaximumSize().height > 1000 && row.getMaximumSize().height == row.getPreferredSize().height, "Spare height goes to the viewports");
+
+        dialog.dispose();
+        check(!lazyRegistered(view), "A disposed panel holds the timer");
+        fit[0]++;
+        view.refresh();
+        check(!dialog.isDisplayable() && packs[0] == 3, "A late update brought a disposed window back");
+
+        try {
+            new SwingPanel(() -> new Panel().section("Unowned", true).sectionEnd());
+            check(false, "A section without an id was accepted");
+        } catch (IllegalArgumentException expected) {
+            check(expected.getMessage().contains("section"), "Unowned section message");
+        }
+    }
+
+    private static byte[] pixel() {
+        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "png", bytes);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        return bytes.toByteArray();
+    }
+
+    private static boolean lazyRegistered(Object component) {
+        try {
+            Field field = UITimer.class.getDeclaredField("lazyComponents");
+            field.setAccessible(true);
+            return ((List<?>) field.get(null)).contains(component);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
         }
     }
 

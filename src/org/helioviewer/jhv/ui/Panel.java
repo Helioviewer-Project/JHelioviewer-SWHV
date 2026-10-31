@@ -17,7 +17,7 @@ public final class Panel {
         CHOICES_START, CHOICES_COUNT, KEY, MODIFIERS, FOREGROUND,
         LABEL, TEXT, TIP, ICON, FILTER, NAME, DIRECTORY,
         ACTIVATE_COLUMNS, DOUBLE_CLICK_COLUMNS, ICON_SIZE, SECONDARY_ID, BYTES_START, BYTES_COUNT, COLUMN_START,
-        COPY_COLUMNS, SEARCH_COLUMNS, ROW_HEIGHT, WIDTH_TEXT, DESCRIPTION, ALIGN_GRID, ALIGN_COLUMN, FLEX_COLUMNS, CELL_SPAN, LARGE, DOUBLE_INDEX
+        COPY_COLUMNS, SEARCH_COLUMNS, ROW_HEIGHT, WIDTH_TEXT, DESCRIPTION, ALIGN_GRID, ALIGN_COLUMN, FLEX_COLUMNS, CELL_SPAN, LARGE, DOUBLE_INDEX, FIT
     }
     public enum DoubleField {
         VALUE, VALUE2, MIN, MAX, STEP, SCALE(1), REPEAT;
@@ -34,7 +34,7 @@ public final class Panel {
     }
     // What a button does when clicked.
     public enum Act { COMMAND, FILE, SAVE, URL, PASTE }
-    public enum Command { CLICK, DOUBLE_CLICK, PRESS, SELECT_ONLY, SELECT_ADD, SELECT_REMOVE, SCRUB_START, SCRUB_END, PLAY_PAUSE, STEP_BACKWARD, STEP_FORWARD, INCREASE, DECREASE }
+    public enum Command { CLICK, DOUBLE_CLICK, PRESS, SELECT_ONLY, SELECT_ADD, SELECT_REMOVE, SCRUB_START, SCRUB_END, PLAY_PAUSE, STEP_BACKWARD, STEP_FORWARD, INCREASE, DECREASE, ENTER, EXIT }
     public enum Key { NONE, COMMA, Q, N, O, S, R, V, DIGIT0, DIGIT9, EQUALS, MINUS, P, LEFT, RIGHT, T, SLASH }
     public enum Notice { INFO, WARNING, ERROR }
 
@@ -104,6 +104,7 @@ public final class Panel {
     public static final int INITIAL_FOCUS = 33554432;
     public static final int POINT_SIZE = 268435456;
     public static final int CELL_EDITOR = 536870912;
+    public static final int FILL = 1073741824; // the viewport takes its share of a resized window's height
 
     private static final Kind[] KINDS = Kind.values();
 
@@ -451,6 +452,11 @@ public final class Panel {
         return add(Kind.ROW_END, 0, "");
     }
 
+    // The row reports Command.ENTER and Command.EXIT with this item as the pointer crosses it.
+    public Panel hover(int id) {
+        return field(IntField.SECONDARY_ID, id);
+    }
+
     public Panel column() {
         return add(Kind.COLUMN, 0, "");
     }
@@ -552,6 +558,11 @@ public final class Panel {
 
     public Panel section(String title, boolean open) {
         return add(Kind.SECTION, 0, title).flag(OPEN, open);
+    }
+
+    // A section whose state the screen owns: each toggle reports checked() with the new state.
+    public Panel section(int id, String title, boolean open) {
+        return section(title, open).identity(id).field(IntField.SECONDARY_ID, id);
     }
 
     // The first row of this section stays beside its title, even when collapsed.
@@ -732,6 +743,21 @@ public final class Panel {
         return flag(DRAGGABLE);
     }
 
+    public Panel fill() {
+        return flag(FILL);
+    }
+
+    // A table header button: this column leads the rows' order, INDEX holding 1 ascending or 2 descending.
+    public Panel sorted(boolean descending) {
+        return field(IntField.INDEX, descending ? 2 : 1);
+    }
+
+    // A window fits this snapshot again whenever the revision changes. Stored on the first control; zero keeps the window's size.
+    public Panel fit(int revision) {
+        ints[IntField.FIT.ordinal()] = revision;
+        return this;
+    }
+
     public Panel multiple(boolean multiple) {
         return flag(MULTIPLE, multiple);
     }
@@ -788,6 +814,19 @@ public final class Panel {
 
     private String span(int span) {
         return new String(chars, spans[SPAN_STRIDE * span], spans[SPAN_STRIDE * span + 1]);
+    }
+
+    // The declared point width of a table column.
+    public int columnPoints(int control, int column) {
+        return columns[COLUMN_STRIDE * (value(control, IntField.COLUMN_START) + column)];
+    }
+
+    // The control closing the table at this control.
+    public int tableEnd(int control) {
+        int end = control;
+        while (kind(end) != Kind.TABLE_END)
+            end++;
+        return end;
     }
 
     public String[] choices(int control) {
