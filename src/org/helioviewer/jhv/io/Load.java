@@ -84,10 +84,6 @@ public final class Load {
         LoadSunJSON.submit(json);
     }
 
-    public static void hapi(@Nonnull URI uri) {
-        BandImporter.loadHapi(uri);
-    }
-
     public static void hapi(@Nonnull List<URI> uris) {
         uris.forEach(BandImporter::loadHapi);
     }

@@ -31,9 +31,9 @@ final class LoadHandlers {
         // advertise we can load CDF, although we can do only MAG and SWA
         client.addMessageHandler(singleURIHandler("table.load.cdf", Load::cdf));
         client.addMessageHandler(LoadImageHandler.create());
-        client.addMessageHandler(uriListHandler("jhv.load.cdf", Load::cdf, Load::cdf));
+        client.addMessageHandler(uriListHandler("jhv.load.cdf", Load::cdf));
         // Add handler for the HAPI csv files
-        client.addMessageHandler(uriListHandler("jhv.load.hapi", Load::hapi, Load::hapi));
+        client.addMessageHandler(uriListHandler("jhv.load.hapi", Load::hapi));
         client.addMessageHandler(uriOrValueHandler("jhv.load.request", Load::request, Load::request));
         client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Load::sunJSON, Load::sunJSON));
         client.addMessageHandler(SampHandlers.create("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
@@ -43,9 +43,8 @@ final class LoadHandlers {
         return SampHandlers.create(type, (senderId, sender, msg) -> loadURI(msg, consumer));
     }
 
-    private static AbstractMessageHandler uriListHandler(String type, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) {
-        return SampHandlers.create(type, (senderId, sender, msg) ->
-                loadURIList(msg, singleConsumer, listConsumer));
+    private static AbstractMessageHandler uriListHandler(String type, Consumer<List<URI>> consumer) {
+        return SampHandlers.create(type, (senderId, sender, msg) -> loadURIList(msg, consumer));
     }
 
     private static AbstractMessageHandler uriOrValueHandler(String type, Consumer<URI> uriConsumer, Consumer<String> valueConsumer) {
@@ -86,23 +85,24 @@ final class LoadHandlers {
         }
     }
 
-    private static boolean loadURI(Message msg, Consumer<URI> consumer) throws Exception {
-        URI uri = requiredURI(msg);
-        if (uri == null)
-            return false;
+    private static void loadURI(Message msg, Consumer<URI> consumer) throws Exception {
+        Object url = msg.getParam("url");
+        if (url == null)
+            return;
+        URI uri = toURI(url.toString());
         UiThread.post(() -> consumer.accept(uri));
-        return true;
     }
 
-    static boolean loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) throws Exception {
+    static boolean loadURIList(Message msg, Consumer<List<URI>> consumer) throws Exception {
         Object url = msg.getParam("url");
-        if (!(url instanceof Iterable<?> urls))
-            return loadURI(msg, singleConsumer);
+        if (url == null)
+            return false;
 
+        Iterable<?> urls = url instanceof Iterable<?> items ? items : List.of(url);
         ArrayList<URI> uris = new ArrayList<>();
         for (Object obj : urls)
             uris.add(toURI(obj.toString()));
-        UiThread.post(() -> listConsumer.accept(uris));
+        UiThread.post(() -> consumer.accept(uris));
         return true;
     }
 
@@ -111,13 +111,6 @@ final class LoadHandlers {
         if (uri.getScheme() == null) // assume local file
             uri = Path.of(url).toUri();
         return uri;
-    }
-
-    private static URI requiredURI(Message msg) throws Exception {
-        Object url = msg.getParam("url");
-        if (url == null)
-            return null;
-        return toURI(url.toString());
     }
 
     private LoadHandlers() {}

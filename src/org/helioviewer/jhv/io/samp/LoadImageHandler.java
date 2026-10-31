@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.io.samp;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,7 +20,6 @@ final class LoadImageHandler {
             try {
                 JSONObject imageParams = imageParams(msg);
                 if (!LoadHandlers.loadURIList(msg,
-                        uri -> waitImageLoad(completion, Load.image(List.of(uri), imageParams)),
                         uris -> waitImageLoad(completion, Load.image(uris, imageParams)))) {
                     completion.finished(false, "Missing jhv.load.image url.", null);
                 }
