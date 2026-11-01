@@ -3,7 +3,9 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.table.DefaultTableModel;
@@ -15,6 +17,7 @@ import org.helioviewer.jhv.event.EventInformationFixture;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.ui.Panel;
 
 // The shared information screen against the real event database: one summary, its details arriving, and the input of either toolkit.
@@ -215,25 +218,51 @@ public final class EventInformationScreenTest {
         open.session().close();
     }
 
-    // Results of closed windows land after a later window's result, which the same pool serves.
-    private static void lateResultsAfterClose() throws Exception {
-        EventInformationFixture.Open open = EventInformationFixture.open();
-        List<EventInformationScreen> closed = new ArrayList<>();
-        int[] notified = {0};
-        EventQueue.invokeAndWait(() -> {
-            for (int i = 0; i < 20; i++) {
-                EventInformationScreen screen = new EventInformationScreen(open.session(), open.related(), open.event(), (_, _) -> {});
-                screen.listen(() -> notified[0]++);
-                screen.close();
-                closed.add(screen);
+    // Hold the actual success or failure callback until the request's initial state is ready.
+    private static void completeRequest(Runnable request) throws Exception {
+        BlockingQueue<Runnable> callbacks = new LinkedBlockingQueue<>();
+        UiThread.install(new UiThread.Impl() {
+            @Override
+            public void post(Runnable task) {
+                callbacks.add(task);
+            }
+
+            @Override
+            public boolean isUiThread() {
+                return EventQueue.isDispatchThread();
             }
         });
-        loaded(open, (_, _) -> {}).close();
-        EventQueue.invokeAndWait(() -> {});
-        for (EventInformationScreen screen : closed) {
-            Panel p = screen.build();
-            check(p.value(0, Panel.IntField.FIT) == 1 && sectionOpen(p, "Other Related Events") == null, "A closed window took late details");
+        try {
+            EventQueue.invokeAndWait(request);
+            Runnable callback = callbacks.poll(10, TimeUnit.SECONDS);
+            check(callback != null, "Details request never completed");
+            EventQueue.invokeAndWait(callback);
+        } finally {
+            UiThread.install(new UiThread.Impl() {
+                @Override
+                public void post(Runnable task) {
+                    EventQueue.invokeLater(task);
+                }
+
+                @Override
+                public boolean isUiThread() {
+                    return EventQueue.isDispatchThread();
+                }
+            });
         }
+    }
+
+    private static void lateResultsAfterClose() throws Exception {
+        EventInformationFixture.Open open = EventInformationFixture.open();
+        EventInformationScreen[] closed = new EventInformationScreen[1];
+        int[] notified = {0};
+        completeRequest(() -> {
+            closed[0] = new EventInformationScreen(open.session(), open.related(), open.event(), (_, _) -> {});
+            closed[0].listen(() -> notified[0]++);
+            closed[0].close();
+        });
+        Panel p = closed[0].build();
+        check(p.value(0, Panel.IntField.FIT) == 1 && sectionOpen(p, "Other Related Events") == null, "A closed window took late details");
         check(notified[0] == 0, "A closed window notified its view");
         open.session().close();
     }
@@ -242,21 +271,24 @@ public final class EventInformationScreenTest {
         EventInformationFixture.Open open = EventInformationFixture.open();
         // Not in the database: the query fails.
         SolarEvent unknown = new SolarEvent(open.event().getSupplier(), 999_999, 1, 2);
-        EventInformationScreen failing = new EventInformationScreen(open.session(), new RelatedEvents(unknown), unknown, (_, _) -> {});
+        EventInformationScreen[] failing = new EventInformationScreen[1];
         boolean[] notified = {false};
-        failing.listen(() -> notified[0] = true);
-        loaded(open, (_, _) -> {}).close();
-        EventQueue.invokeAndWait(() -> {});
-        check(!notified[0] && failing.build().value(0, Panel.IntField.FIT) == 1, "A failed query changed the window");
-        check(sectionOpen(failing.build(), "Standard Parameters") == Boolean.TRUE, "A failed query lost the summary");
-        failing.close();
+        completeRequest(() -> {
+            failing[0] = new EventInformationScreen(open.session(), new RelatedEvents(unknown), unknown, (_, _) -> {});
+            failing[0].listen(() -> notified[0] = true);
+        });
+        check(!notified[0] && failing[0].build().value(0, Panel.IntField.FIT) == 1, "A failed query changed the window");
+        check(sectionOpen(failing[0].build(), "Standard Parameters") == Boolean.TRUE, "A failed query lost the summary");
+        failing[0].close();
         open.session().close();
         // A closed session cancels the query.
-        EventInformationScreen canceled = new EventInformationScreen(open.session(), open.related(), open.event(), (_, _) -> {});
-        canceled.listen(() -> notified[0] = true);
-        EventQueue.invokeAndWait(() -> {});
-        check(!notified[0], "A canceled query changed the window");
-        canceled.close();
+        EventInformationScreen[] canceled = new EventInformationScreen[1];
+        completeRequest(() -> {
+            canceled[0] = new EventInformationScreen(open.session(), open.related(), open.event(), (_, _) -> {});
+            canceled[0].listen(() -> notified[0] = true);
+        });
+        check(!notified[0] && canceled[0].build().value(0, Panel.IntField.FIT) == 1, "A canceled query changed the window");
+        canceled[0].close();
     }
 
     private static Boolean sectionOpen(Panel p, String title) {

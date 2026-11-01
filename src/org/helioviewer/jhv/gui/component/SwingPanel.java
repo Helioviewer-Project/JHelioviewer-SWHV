@@ -22,7 +22,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -619,12 +618,11 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             // getValue() commits the editor, so compare with the model while refreshing.
             double value = snapshot.value(control, Panel.DoubleField.VALUE);
             if (model.getNumber().doubleValue() != value) {
-                if (editing(field))
-                    dirty = true;
-                else if (decimal)
-                    spinner.setValue(value);
+                // Update the editor first: JHVSpinner.getValue() commits its text during model notifications.
+                if (decimal)
+                    field.setValue(value);
                 else
-                    spinner.setValue((int) value);
+                    field.setValue((int) value);
             }
         });
     }
@@ -670,14 +668,6 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
                 editor.getTextField().setValue(value);
             }
         });
-    }
-
-    private static boolean editing(JFormattedTextField field) {
-        try {
-            return !field.getText().equals(field.getFormatter().valueToString(field.getValue()));
-        } catch (ParseException e) {
-            return true;
-        }
     }
 
     private Widget slider(Panel p, int i, int owner, int item) {

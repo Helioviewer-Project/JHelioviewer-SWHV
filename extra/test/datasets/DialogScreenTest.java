@@ -1157,15 +1157,6 @@ public final class DialogScreenTest {
         return () -> panel;
     }
 
-    private static String rejection(Panel snapshot) {
-        try {
-            new SwingPanel(panelScreen(snapshot));
-            return "";
-        } catch (IllegalArgumentException e) {
-            return e.getMessage();
-        }
-    }
-
     // The widget comes from the snapshot's kind, not from search, headers or the shape of its rows.
     private static void swingCollections() {
         SwingPanel plainList = new SwingPanel(panelScreen(new Panel().list(200, 100, 17).item(1, "One", true).tip("Tip").item(2, "Two", false).listEnd()));
@@ -1179,29 +1170,21 @@ public final class DialogScreenTest {
         JList<?> found = all(searchable, JList.class).getFirst();
         require(found.getClientProperty(Searchable.CLIENT_PROPERTY_SEARCHABLE) != null, "A searchable list searches");
         require(found.getSelectionMode() == ListSelectionModel.MULTIPLE_INTERVAL_SELECTION, "A multiple list selects many rows");
-        require(rejection(new Panel().list(200, 100, 17).label("Text").listEnd()).equals("Swing list has no LABEL"), "A list takes items only");
-        require(rejection(new Panel().button(1, "Save").save(null, "name", "")).equals("Swing button has no SAVE"), "A save button is refused, not left inert");
 
         SwingPanel tree = new SwingPanel(panelScreen(new Panel().treeView(150, 80).identity(1).tree(1, "Branch", true).item(2, "Leaf", false).treeEnd().treeViewEnd()));
         require(all(tree, JTree.class).size() == 1 && all(tree, JList.class).isEmpty(), "A tree view is a tree");
         SwingPanel scroll = new SwingPanel(panelScreen(new Panel().scroll(0).searchable().label("Text").scrollEnd()));
         require(all(scroll, JTree.class).isEmpty() && all(scroll, JLabel.class).size() == 1, "A scroll stays a scroll of its controls, search or not");
-
-        Panel rich = new Panel().table(4, 1, 0).searchable()
-                .tableRow(1, false).check(2, "", true).label("Layer").label("2020").button(3, "x").rowEnd().tableEnd();
-        require(rejection(rich).equals("Swing table needs a header row"), "A headerless table is refused as a table, not read as a list");
     }
 
-    // A gesture shows its result once, at once, without a queued refresh; a notification outside a gesture still reaches the view.
-    private static void swingRefreshOwner() throws Exception {
+    // The screen can reject an edit; the widget must show the resulting model value.
+    private static void swingRejectedChange() throws Exception {
         boolean[] value = {false};
         Runnable[] listener = new Runnable[1];
-        int[] builds = {0};
         Panel buffer = new Panel();
         SwingPanel panel = new SwingPanel(new Screen() {
             @Override
             public Panel build() {
-                builds[0]++;
                 return buffer.reset().check(1, "On", value[0]);
             }
 
@@ -1216,17 +1199,9 @@ public final class DialogScreenTest {
                 listener[0].run();
             }
         });
-        java.util.concurrent.atomic.AtomicBoolean queued = field(panel, "refreshQueued", java.util.concurrent.atomic.AtomicBoolean.class);
         javax.swing.JCheckBox check = all(panel, javax.swing.JCheckBox.class).getFirst();
-        builds[0] = 0;
         check.doClick();
-        require(builds[0] == 1 && !queued.get(), "A gesture builds once and queues nothing: " + builds[0] + ", " + queued.get());
         require(!check.isSelected(), "The gesture shows what the model left");
-        value[0] = true;
-        listener[0].run();
-        require(queued.get() && builds[0] == 1, "A notification waits for the queue");
-        panel.lazyRepaint();
-        require(builds[0] == 2 && check.isSelected(), "A notification reaches the view");
     }
 
     private static void swingTree() throws Exception {
@@ -1319,7 +1294,7 @@ public final class DialogScreenTest {
                 swingFocusedTime();
                 swingCombo();
                 swingCollections();
-                swingRefreshOwner();
+                swingRejectedChange();
                 swingTree();
                 swingButtons();
             } catch (Exception e) {

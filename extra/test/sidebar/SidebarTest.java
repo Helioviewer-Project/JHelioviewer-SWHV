@@ -439,12 +439,13 @@ public final class SidebarTest {
         check("45".equals(editor.getText()) && ViewState.playbackData().speed() == committed, "Passive update touched a spinner edit");
         ViewState.setPlaybackSpeed(committed + 1, ViewState.playbackData().speedUnit());
         movie.refresh();
-        check("45".equals(editor.getText()), "External speed replaced an edit in progress");
-        // JFormattedTextField's Escape action restores its value this way; the unshown test has no focus owner.
-        editor.setValue(editor.getValue());
-        movie.lazyRepaint();
-        check(String.valueOf(committed + 1).equals(editor.getText()) && ViewState.playbackData().speed() == committed + 1,
-                "Canceling a spinner edit lost the pending external speed");
+        check(String.valueOf(committed + 1).equals(editor.getText()), "External speed did not replace the stale draft");
+        try {
+            editor.commitEdit();
+        } catch (java.text.ParseException e) {
+            throw new AssertionError(e);
+        }
+        check(ViewState.playbackData().speed() == committed + 1, "A stale draft overwrote the external speed");
         ViewState.setPlaybackSpeed(committed + 2, ViewState.playbackData().speedUnit());
         movie.refresh();
         check(String.valueOf(committed + 2).equals(editor.getText()), "External speed was not shown");
