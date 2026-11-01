@@ -118,12 +118,12 @@ public final class TimelineScreen extends DialogScreen {
 
     @Override
     public Panel build() {
-        Panel p = buffer.reset().column().margin(3, 3, 3, 3).scroll(0).identity(TREE).sizePoints(WIDTH, HEIGHT).searchable().initialFocus();
+        Panel p = buffer.reset().column().margin(3, 3, 3, 3).treeView(WIDTH, HEIGHT).identity(TREE).initialFocus();
         if (catalogs.isEmpty() && empty != null)
             p.item(0, empty, false).enabled(false);
         for (int i = 0; i < catalogs.size(); i++)
             node(p, catalogs.get(i), i == 0);
-        return p.scrollEnd().check(FULL_RESOLUTION, "Full time resolution", fullResolution).fill().tip("Load original HAPI samples without one-minute rebinning.")
+        return p.treeViewEnd().check(FULL_RESOLUTION, "Full time resolution", fullResolution).fill().tip("Load original HAPI samples without one-minute rebinning.")
                 .columnEnd().row().right().gap(5).button(CANCEL, "Cancel").button(ADD, "Add").defaultButton().rowEnd();
     }
 

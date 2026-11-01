@@ -10,7 +10,7 @@ public final class Panel {
         LABEL, SPACE, BUTTON, TOOL, CHECK, RADIO, TOGGLE, COMBO, SWATCH, SLIDER, RANGE, NUMBER_SPINNER, TEXT_SPINNER, TEXT, TEXT_AREA, LINK, IMAGE,
         SPINNER, SEPARATOR, TIME_SLIDER, ITEM, MENU_ITEM,
         ROW, ROW_END, COLUMN, COLUMN_END, GRID, GRID_END, TABLE, TABLE_END, SECTION, SECTION_END, SCROLL, SCROLL_END, MENU, MENU_END, TREE, TREE_END,
-        TIME_FIELD, SPLIT_BUTTON, SPLIT, SPLIT_END, PROGRESS_TOGGLE, MESSAGE_ICON
+        TIME_FIELD, SPLIT_BUTTON, SPLIT, SPLIT_END, PROGRESS_TOGGLE, MESSAGE_ICON, LIST, LIST_END, TREE_VIEW, TREE_VIEW_END
     }
     public enum IntField {
         KIND, ID, OWNER, FLAGS, INDEX, CHOICE, POPUP, WIDTH, HEIGHT, COLUMNS, STRETCH, MAX_ROWS, DECIMALS, LAST_FRAME, ACTION,
@@ -100,12 +100,13 @@ public final class Panel {
     public static final int HEADER_ROW = 2097152; // the section's first row stays beside its title
     public static final int RESET = 4194304; // the slider resets to its reset value, not the first value seen
     public static final int FLAT = 8388608; // a button framed only while hovered
-    public static final int SEARCHABLE = 16777216; // typing selects matching table rows without filtering them
+    public static final int SEARCHABLE = 16777216; // typing selects matching rows without filtering them
     public static final int INITIAL_FOCUS = 33554432;
     public static final int SELECTABLE = 67108864; // a tree row selected as a whole; a branch expands only by its handle
+    public static final int SWING_MARGIN = 134217728;
     public static final int POINT_SIZE = 268435456;
     public static final int CELL_EDITOR = 536870912;
-    public static final int FILL = 1073741824; // the viewport takes its share of a resized window's height; a check takes clicks across its column
+    public static final int FILL = 1073741824; // the viewport takes its share of a resized window's height; a check takes clicks across its column; a row's controls take its height
 
     private static final Kind[] KINDS = Kind.values();
 
@@ -421,7 +422,7 @@ public final class Panel {
                 .field(IntField.LAST_FRAME, maximum).payload(completion);
     }
 
-    // A selectable row of a tree.
+    // A selectable row of a tree or a list.
     public Panel item(int id, String label, boolean selected) {
         return add(Kind.ITEM, id, label).flag(SELECTED, selected);
     }
@@ -557,6 +558,15 @@ public final class Panel {
         return add(Kind.TABLE_END, 0, "");
     }
 
+    // A scrolling column of item() rows in point sizes, wider rows scrolling sideways.
+    public Panel list(int width, int height, int rowHeight) {
+        return add(Kind.LIST, 0, "").sizePoints(width, height).rowHeight(rowHeight).field(IntField.SEARCH_COLUMNS, 1).activateColumns(0).doubleClickColumns(0);
+    }
+
+    public Panel listEnd() {
+        return add(Kind.LIST_END, 0, "");
+    }
+
     public Panel section(String title, boolean open) {
         return add(Kind.SECTION, 0, title).flag(OPEN, open);
     }
@@ -616,6 +626,15 @@ public final class Panel {
 
     public Panel treeEnd() {
         return add(Kind.TREE_END, 0, "");
+    }
+
+    // A scrolling tree of tree() branches and item() rows in a point size; typing selects matching rows.
+    public Panel treeView(int width, int height) {
+        return add(Kind.TREE_VIEW, 0, "").sizePoints(width, height);
+    }
+
+    public Panel treeViewEnd() {
+        return add(Kind.TREE_VIEW_END, 0, "");
     }
 
     // Modifiers of the last control.
@@ -693,6 +712,11 @@ public final class Panel {
         return field(IntField.MARGIN, top << 24 | left << 16 | bottom << 8 | right);
     }
 
+    // Points kept clear only in Swing, whose dialogs have no separators or window margin.
+    public Panel swingMargin(int top, int left, int bottom, int right) {
+        return margin(top, left, bottom, right).flag(SWING_MARGIN);
+    }
+
     // The height of a row in control rows, for a control centered against a taller neighbor.
     public Panel height(int rows) {
         return field(IntField.HEIGHT, rows);
@@ -749,6 +773,11 @@ public final class Panel {
 
     public Panel password() {
         return flag(PASSWORD);
+    }
+
+    // The number behind a text field and its limits.
+    public Panel numeric(double value, double min, double max) {
+        return values(value, min, max, 0);
     }
 
     public Panel readOnly(boolean readOnly) {
@@ -841,20 +870,26 @@ public final class Panel {
         return columns[COLUMN_STRIDE * (value(control, IntField.COLUMN_START) + column)];
     }
 
-    // The control closing the table at this control.
-    public int tableEnd(int control) {
-        int end = control;
-        while (kind(end) != Kind.TABLE_END)
-            end++;
-        return end;
+    private int end(int control, Kind end) {
+        int i = control;
+        while (kind(i) != end)
+            i++;
+        return i;
     }
 
-    // The control closing the scroll at this control.
-    public int scrollEnd(int control) {
-        int end = control;
-        while (kind(end) != Kind.SCROLL_END)
-            end++;
-        return end;
+    // The control closing the table at this control.
+    public int tableEnd(int control) {
+        return end(control, Kind.TABLE_END);
+    }
+
+    // The control closing the list at this control.
+    public int listEnd(int control) {
+        return end(control, Kind.LIST_END);
+    }
+
+    // The control closing the tree view at this control.
+    public int treeViewEnd(int control) {
+        return end(control, Kind.TREE_VIEW_END);
     }
 
     public String[] choices(int control) {

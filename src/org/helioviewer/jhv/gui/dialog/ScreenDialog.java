@@ -31,10 +31,14 @@ public class ScreenDialog extends StandardDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                screen.close();
+                closeWindow();
             }
         });
         screen.onDismiss(() -> setVisible(false));
+    }
+
+    protected void closeWindow() {
+        screen.close();
     }
 
     @Override

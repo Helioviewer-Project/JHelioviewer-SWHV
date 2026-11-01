@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JRootPane;
@@ -50,15 +53,19 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.text.DefaultCaret;
 
 import org.helioviewer.jhv.base.PngPixels;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.time.TimeField;
+import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.ui.Panel;
 import org.helioviewer.jhv.ui.Screen;
 
@@ -101,6 +108,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private final ArrayList<Interfaces.LazyComponent> lazy = new ArrayList<>();
     private final AtomicBoolean refreshQueued = new AtomicBoolean();
     private boolean syncing;
+    private volatile boolean acting;
     private volatile boolean dirty;
     private int fitted;
     private JComponent initialFocus;
@@ -129,10 +137,10 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         super.removeNotify();
     }
 
-    // Any thread. Coalesces notifications on the event queue without waiting for the repaint timer.
+    // Any thread. Coalesces notifications on the event queue without waiting for the repaint timer; a gesture's end shows them itself.
     private void changed() {
         dirty = true;
-        if (refreshQueued.compareAndSet(false, true)) {
+        if (!acting && refreshQueued.compareAndSet(false, true)) {
             SwingUtilities.invokeLater(() -> {
                 refreshQueued.set(false);
                 lazyRepaint();
@@ -153,7 +161,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         Panel p;
         try {
             p = screen.build();
-            reconcile(p, 0, this, nodes, null, true);
+            reconcile(p, 0, this, nodes, null, isEnabled());
         } finally {
             syncing = false;
         }
@@ -186,7 +194,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
                 parent.add(component, index);
             component.setVisible(true);
             if (parent instanceof Cells cells)
-                cells.place(component, p.value(i, Panel.IntField.CELL_SPAN), p.has(i, Panel.END_ROW));
+                cells.place(component, p.value(i, Panel.IntField.CELL_SPAN), p.has(i, Panel.END_ROW), p.has(i, Panel.RIGHT));
             else if (end == Panel.Kind.COLUMN_END || parent == this)
                 component.setAlignmentX(LEFT_ALIGNMENT);
             if (p.has(i, Panel.INITIAL_FOCUS))
@@ -196,7 +204,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             if (component.isEnabled() != enabled)
                 ComponentUtils.setEnabled(component, enabled);
             String tip = p.string(i, Panel.IntField.TIP);
-            tip = tip.isEmpty() ? null : tip;
+            tip = tip.isEmpty() ? null : tipText(tip);
             if (!Objects.equals(component.getToolTipText(), tip))
                 component.setToolTipText(tip);
             node.widget.update.apply(p, i);
@@ -206,8 +214,10 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
                 case COLUMN -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.COLUMN_END, enabled);
                 case GRID -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.GRID_END, enabled);
                 case SECTION -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.SECTION_END, enabled);
-                case SCROLL -> p.has(i, Panel.SEARCHABLE) ? p.scrollEnd(i) + 1 : reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.SCROLL_END, enabled);
+                case SCROLL -> reconcile(p, i + 1, node.widget.content, node.children, Panel.Kind.SCROLL_END, enabled);
                 case TABLE -> p.tableEnd(i) + 1;
+                case LIST -> p.listEnd(i) + 1;
+                case TREE_VIEW -> p.treeViewEnd(i) + 1;
                 default -> i + 1;
             };
         }
@@ -225,6 +235,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             case COLUMN -> new Widget(column(p, i), (s, c) -> {});
             case GRID -> grid(p, i);
             case SPACE -> space(p, i);
+            case SEPARATOR -> new Widget((JComponent) Box.createRigidArea(new Dimension()), (s, c) -> {});
             case LABEL -> p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? label(parent instanceof RowLayout row && row.gap == 0) : reservedLabel();
             case BUTTON -> button(p, i, owner, item);
             case CHECK -> check(p.has(i, Panel.FILL), owner, item);
@@ -232,22 +243,36 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             case COMBO -> p.string(i, Panel.IntField.LABEL).isEmpty() ? combo(p, i, owner, item) : picker(p, i, owner, item);
             case SPLIT_BUTTON -> splitButton(p, i, owner, item);
             case NUMBER_SPINNER -> spinner(p, i, owner, item);
-            case TEXT -> text(p, i);
+            case SLIDER -> slider(p, i, owner, item);
+            case TEXT -> !p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? text(p, i)
+                    : p.value(i, Panel.DoubleField.MIN) < p.value(i, Panel.DoubleField.MAX) ? numericField(p, i, owner, item) : editor(p, i, owner, item);
             case TIME_FIELD -> timeField(p, i, owner, item);
             case TIME_SLIDER -> timeSlider(p, i, owner, item);
             case IMAGE -> image();
             case SECTION -> section(p, i, owner);
             case SCROLL -> scroll(p, i);
             case TABLE -> table(p, i);
+            case LIST -> list(p, i);
+            case TREE_VIEW -> treeView(p, i);
             default -> throw new IllegalArgumentException("Swing has no " + kind);
         };
+    }
+
+    // Shows the plain x^y and x^(y) of shared tips as superscripts.
+    private static String tipText(String tip) {
+        return tip.indexOf('^') < 0 ? tip : "<html><body>" + tip.replaceAll("\\^\\((.*?)\\)|\\^(\\S)", "<sup>$1$2</sup>");
     }
 
     // User input runs its callback, then shows the model it left. Programmatic updates report nothing.
     private void act(Runnable callback) {
         if (!syncing) {
-            callback.run();
-            refresh();
+            acting = true;
+            try {
+                callback.run();
+            } finally {
+                acting = false;
+                refresh();
+            }
         }
     }
 
@@ -259,7 +284,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     }
 
     private Widget row(Panel p, int i, int owner, boolean inRow) {
-        Line row = new Line(new RowLayout(p.has(i, Panel.RIGHT), inRow, p.value(i, Panel.IntField.GAP)));
+        Line row = new Line(new RowLayout(p.has(i, Panel.RIGHT), inRow || p.has(i, Panel.FILL), p.value(i, Panel.IntField.GAP)));
         applyMargin(p, i, row);
         int hover = p.value(i, Panel.IntField.SECONDARY_ID);
         if (hover != 0) {
@@ -293,7 +318,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     }
 
     private static Widget grid(Panel p, int i) {
-        Cells cells = new Cells(p.value(i, Panel.IntField.COLUMNS), p.value(i, Panel.IntField.STRETCH) - 1);
+        Cells cells = new Cells(p.value(i, Panel.IntField.COLUMNS), p.value(i, Panel.IntField.STRETCH) - 1, p.value(i, Panel.IntField.GAP), p.has(i, Panel.RIGHT));
         applyMargin(p, i, cells);
         return new Widget(cells, (s, c) -> {});
     }
@@ -339,8 +364,19 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             button.setPreferredSize(new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT)));
         if (p.has(i, Panel.REPEAT))
             HoldRepeat.install(button, (int) Math.round(1000 * p.value(i, Panel.DoubleField.REPEAT)));
-        button.addActionListener(e -> act(() -> screen.command(owner, item, Panel.Command.CLICK)));
+        Panel.Act action = Panel.Act.values()[p.value(i, Panel.IntField.ACTION)];
+        String[] directory = new String[1];
+        switch (action) {
+            case COMMAND -> button.addActionListener(e -> act(() -> screen.command(owner, item, Panel.Command.CLICK)));
+            case FILE -> {
+                String[] extensions = p.choices(i);
+                boolean multiple = p.has(i, Panel.MULTIPLE);
+                button.addActionListener(e -> chooseFiles(directory[0], extensions, multiple, owner, item));
+            }
+            default -> throw new IllegalArgumentException("Swing button has no " + action);
+        }
         return new Widget(button, (s, c) -> {
+            directory[0] = s.string(c, Panel.IntField.DIRECTORY);
             String icon = s.string(c, Panel.IntField.ICON);
             String label = s.string(c, Panel.IntField.LABEL);
             button.setText(icon.isEmpty() ? label : icon);
@@ -354,11 +390,27 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         });
     }
 
+    private void chooseFiles(String directory, String[] extensions, boolean multiple, int owner, int item) {
+        FileDialog dialog = new FileDialog(MainFrame.get(), "Choose a file", FileDialog.LOAD);
+        dialog.setFilenameFilter(ExtensionFileFilter.of(extensions));
+        dialog.setDirectory(directory);
+        dialog.setMultipleMode(multiple);
+        dialog.setVisible(true);
+        File[] files = dialog.getFiles();
+        if (files.length > 0) {
+            String[] paths = new String[files.length];
+            Arrays.setAll(paths, n -> files[n].toString());
+            act(() -> screen.files(owner, item, paths));
+        }
+    }
+
     private Widget check(boolean fill, int owner, int item) {
         JCheckBox check = fill ? new WideCheck() : new JCheckBox();
         check.addActionListener(e -> act(() -> screen.checked(owner, item, check.isSelected())));
         return new Widget(check, (p, i) -> {
-            check.setText(p.string(i, Panel.IntField.LABEL));
+            String description = p.string(i, Panel.IntField.DESCRIPTION);
+            String label = p.string(i, Panel.IntField.LABEL);
+            check.setText(description.isEmpty() ? label : "<html>" + label + "<br/><small>" + description);
             check.setSelected(p.has(i, Panel.SELECTED));
         });
     }
@@ -366,6 +418,11 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private Widget radio(Panel p, int i, int owner, int item) {
         int choice = p.value(i, Panel.IntField.CHOICE);
         JRadioButton radio = new JRadioButton();
+        // Keeps the field it leads apart from it.
+        if (p.kind(i + 1) == Panel.Kind.TEXT) {
+            Insets margin = radio.getMargin();
+            radio.setMargin(new Insets(margin.top, margin.left, margin.bottom, margin.right + 5));
+        }
         groups.computeIfAbsent(new Key(Panel.Kind.RADIO, owner, item, 0, 0), key -> new ButtonGroup()).add(radio);
         radio.addActionListener(e -> act(() -> screen.choice(owner, item, choice)));
         return new Widget(radio, (s, c) -> {
@@ -455,6 +512,28 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         }
     }
 
+    private Widget slider(Panel p, int i, int owner, int item) {
+        double min = p.value(i, Panel.DoubleField.MIN);
+        double max = p.value(i, Panel.DoubleField.MAX);
+        int scale = (int) Math.round(1 / p.value(i, Panel.DoubleField.STEP));
+        JHVSlider slider = new JHVSlider(min, max, Math.clamp(p.value(i, Panel.DoubleField.VALUE), min, max), scale);
+        slider.setPreferredSize(new Dimension(100, slider.getPreferredSize().height));
+        slider.addChangeListener(e -> act(() -> screen.number(owner, item, slider.getDoubleValue())));
+        if (p.has(i, Panel.ACTIVATE))
+            slider.addMouseListener(press(owner, item));
+        return new Widget(slider, (s, c) -> slider.setDoubleValue(s.value(c, Panel.DoubleField.VALUE)));
+    }
+
+    // Runs after the widget's own handling of the press.
+    private MouseAdapter press(int owner, int item) {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                act(() -> screen.command(owner, item, Panel.Command.PRESS));
+            }
+        };
+    }
+
     private Widget timeField(Panel p, int i, int owner, int item) {
         TimeField[] holder = new TimeField[1];
         TimeField field = new TimeField(p.string(i, Panel.IntField.TIP), () -> act(() -> screen.number(owner, item, holder[0].getTime())));
@@ -480,6 +559,52 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         return new Widget(field, (s, c) -> {
             applyFont(s, c, field);
             field.update(s.string(c, Panel.IntField.TEXT));
+        });
+    }
+
+    // Reports each edit.
+    private Widget editor(Panel p, int i, int owner, int item) {
+        if (!p.has(i, Panel.LIVE))
+            throw new IllegalArgumentException("Swing text needs live or numeric");
+        int columns = p.value(i, Panel.IntField.WIDTH);
+        JTextField field = p.has(i, Panel.PASSWORD) ? new JPasswordField(columns) : new JTextField(columns);
+        Runnable typed = () -> act(() -> screen.setText(owner, item, field.getText()));
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                typed.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                typed.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                typed.run();
+            }
+        });
+        return new Widget(field, (s, c) -> {
+            field.setEditable(!s.has(c, Panel.READ_ONLY));
+            String text = s.string(c, Panel.IntField.TEXT);
+            if (!text.equals(field.getText()))
+                field.setText(text);
+        });
+    }
+
+    // Commits on Enter and focus loss; an invalid edit stays through Enter and reverts on focus loss.
+    private Widget numericField(Panel p, int i, int owner, int item) {
+        JFormattedTextField field = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", p.value(i, Panel.DoubleField.MIN), p.value(i, Panel.DoubleField.MAX)));
+        field.setColumns(p.value(i, Panel.IntField.WIDTH));
+        field.addPropertyChangeListener("value", e -> act(() -> screen.setText(owner, item, field.getText())));
+        if (p.has(i, Panel.ACTIVATE))
+            field.addMouseListener(press(owner, item));
+        return new Widget(field, (s, c) -> {
+            double value = s.value(c, Panel.DoubleField.VALUE);
+            if (!(field.getValue() instanceof Number number) || number.doubleValue() != value)
+                field.setValue(value);
+            field.setEditable(!s.has(c, Panel.READ_ONLY));
         });
     }
 
@@ -528,24 +653,34 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private Widget scroll(Panel p, int i) {
         if (p.value(i, Panel.IntField.HEIGHT) != 0 && !p.has(i, Panel.POINT_SIZE))
             throw new IllegalArgumentException("Swing scroll needs a free height or point size");
-        boolean tree = p.has(i, Panel.SEARCHABLE);
-        JComponent content = tree ? new PanelTree(p, i, screen, this::act) : new JPanel();
-        if (!tree)
-            content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         JScrollPane pane = new JScrollPane(content);
-        if (p.has(i, Panel.POINT_SIZE)) pane.setPreferredSize(new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT)));
-        return new Widget(pane, content, tree ? ((PanelTree) content)::update : (s, c) -> {});
+        if (p.has(i, Panel.POINT_SIZE)) pane.setPreferredSize(pointSize(p, i));
+        return new Widget(pane, content, (s, c) -> {});
     }
 
     private Widget table(Panel p, int i) {
-        if (!p.has(i, Panel.HEADER_ROW)) {
-            PanelList list = new PanelList(p, i, screen, this::act);
-            JScrollPane pane = new JScrollPane(list);
-            pane.setPreferredSize(new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT)));
-            return new Widget(pane, list::update);
-        }
         PanelTable table = new PanelTable(p, i, screen, this::act);
         return new Widget(new JScrollPane(table), table::update);
+    }
+
+    private Widget list(Panel p, int i) {
+        PanelList list = new PanelList(p, i, screen, this::act);
+        JScrollPane pane = new JScrollPane(list);
+        pane.setPreferredSize(pointSize(p, i));
+        return new Widget(pane, list::update);
+    }
+
+    private Widget treeView(Panel p, int i) {
+        PanelTree tree = new PanelTree(p, i, screen, this::act);
+        JScrollPane pane = new JScrollPane(tree);
+        pane.setPreferredSize(pointSize(p, i));
+        return new Widget(pane, tree, tree::update);
+    }
+
+    private static Dimension pointSize(Panel p, int i) {
+        return new Dimension(p.value(i, Panel.IntField.WIDTH), p.value(i, Panel.IntField.HEIGHT));
     }
 
     // Preferred sizes in a line, apart by the gap. A nested row or grid takes the rest of the line at full height and fills its children's height.
@@ -600,18 +735,24 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         }
     }
 
-    // Cells by rows. The stretch column takes the width left by the others, as does a cell across all columns.
+    // Cells by rows, columns apart by the gap. The stretch column takes the width left by the others, as does a cell across all columns.
+    // A right grid aligns its first column to the right. An empty cell after the stretch column gives that column's cell its width.
     private static final class Cells extends JPanel {
 
         private final GridBagLayout grid = new GridBagLayout();
         private final int columns;
         private final int stretch;
+        private final int gap;
+        private final boolean right;
         private int column;
         private int row;
+        private Component stretched;
 
-        Cells(int _columns, int _stretch) {
+        Cells(int _columns, int _stretch, int _gap, boolean _right) {
             columns = _columns;
             stretch = _stretch;
+            gap = _gap;
+            right = _right;
             setLayout(grid);
         }
 
@@ -619,12 +760,20 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             column = row = 0;
         }
 
-        void place(Component component, int span, boolean endRow) {
+        void place(Component component, int span, boolean endRow, boolean rightCell) {
+            if (column == stretch)
+                stretched = component;
+            else if (stretched != null && column == stretch + 1 && component instanceof Box.Filler && component.getPreferredSize().width == 0) {
+                GridBagConstraints c = grid.getConstraints(stretched);
+                c.gridwidth++;
+                grid.setConstraints(stretched, c);
+            }
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = column;
             c.gridy = row;
             c.gridwidth = Math.max(span, 1);
-            c.anchor = GridBagConstraints.LINE_START;
+            c.anchor = rightCell || right && column == 0 ? GridBagConstraints.LINE_END : GridBagConstraints.LINE_START;
+            c.insets.left = column == 0 ? 0 : gap;
             boolean fills = column == stretch || c.gridwidth == columns;
             c.fill = fills ? GridBagConstraints.BOTH : GridBagConstraints.NONE;
             c.weightx = fills ? 1 : 0;

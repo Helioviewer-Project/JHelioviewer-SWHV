@@ -118,7 +118,7 @@ public final class MenuBar extends JMenuBar {
         movieMenu.add(Actions.RECORD);
         add(movieMenu);
 
-        Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog()::showDialog);
+        Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", () -> SettingsDialog.getInstance().showDialog());
         if (Platform.isMacOS()) {
             DesktopIntegration.setPreferencesHandler(e -> settingsAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");

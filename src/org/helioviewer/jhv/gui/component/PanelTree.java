@@ -19,7 +19,7 @@ import org.helioviewer.jhv.ui.Screen;
 
 import com.jidesoft.swing.SearchableUtils;
 
-// The branches and items of a searchable scroll as one tree. The screen owns the rows and the selection; the tree keeps what is expanded.
+// A tree view's branches and items as one tree. The screen owns the rows and the selection; the tree keeps what is expanded.
 @SuppressWarnings("serial")
 final class PanelTree extends JTree {
 
@@ -79,7 +79,7 @@ final class PanelTree extends JTree {
     }
 
     void update(Panel p, int control) {
-        int end = p.scrollEnd(control);
+        int end = p.treeViewEnd(control);
         ArrayList<Row> newRows = new ArrayList<>();
         int depth = 0;
         for (int i = control + 1; i < end; i++) {

@@ -14,6 +14,7 @@ import javax.swing.JProgressBar;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.CircularProgressUI;
+import org.helioviewer.jhv.gui.component.SwingPanel;
 import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -24,6 +25,7 @@ import org.helioviewer.jhv.layers.filters.ImageFilterPanel;
 import org.helioviewer.jhv.layers.filters.LUTPanel;
 import org.helioviewer.jhv.layers.filters.RangeSliderFilterPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
+import org.helioviewer.jhv.ui.FitsOptions;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -31,7 +33,7 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 final class ImageLayerOptions extends JPanel {
 
-    private final FITSSettings fitsSettings;
+    private final SwingPanel fitsSettings;
     private final JideToggleButton fitsButton = new JideToggleButton(Buttons.fitsRight);
     private final LUTPanel lutPanel;
 
@@ -41,7 +43,7 @@ final class ImageLayerOptions extends JPanel {
 
     ImageLayerOptions(ImageLayer layer) {
         super(new GridBagLayout());
-        fitsSettings = new FITSSettings(layer.getProcessingSettings());
+        fitsSettings = new SwingPanel(new FitsOptions(layer.getProcessingSettings()));
         FilterDetails differencePanel = DifferencePanel.create(layer);
         FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
         FilterDetails blendPanel = SliderFilterPanel.blend(layer);
@@ -167,7 +169,7 @@ final class ImageLayerOptions extends JPanel {
         c.gridwidth = 3;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(fitsSettings, c);
-        alignColumns(this, adjustmentsPanel, fitsSettings);
+        alignColumns(this, adjustmentsPanel, (JPanel) fitsSettings.getComponent(0));
         // Usually refreshed through ImageLayer activation; initialize here too in case that activation already happened before panel creation.
         refresh(layer);
     }

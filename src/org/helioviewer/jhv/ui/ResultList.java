@@ -68,12 +68,12 @@ final class ResultList<T> {
 
     void build(Panel p, String selection) {
         line(p, found);
-        p.table(1, 0, 0).sizePoints(WIDTH, HEIGHT).columnWidth(0, WIDTH).rowHeight(ROW_HEIGHT).multiple(true).searchable();
+        p.list(WIDTH, HEIGHT, ROW_HEIGHT).multiple(true).searchable();
         for (int row = 0; row < items.size(); row++) {
             T item = items.get(row);
-            p.tableRow(FIRST_ROW + row, selected.get(row)).label(label.apply(item)).tip(tip.apply(item)).rowEnd();
+            p.item(FIRST_ROW + row, label.apply(item), selected.get(row)).tip(tip.apply(item));
         }
-        line(p.tableEnd(), selection);
+        line(p.listEnd(), selection);
     }
 
     // Whether the command belongs to a row.

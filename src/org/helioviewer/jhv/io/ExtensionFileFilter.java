@@ -10,6 +10,10 @@ public class ExtensionFileFilter {
     public static final FilenameFilter Timeline = new Filter(new String[]{"json", "cdf"});
     public static final FilenameFilter JHV = new Filter(new String[]{"jhv"});
 
+    public static FilenameFilter of(String[] extensions) {
+        return new Filter(extensions);
+    }
+
     private record Filter(String[] extensions) implements FilenameFilter {
         @Override
         public boolean accept(File dir, String name) {

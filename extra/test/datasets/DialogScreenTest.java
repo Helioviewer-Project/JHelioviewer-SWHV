@@ -23,6 +23,7 @@ import java.util.function.LongConsumer;
 import javax.swing.AbstractButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
@@ -72,7 +73,7 @@ public final class DialogScreenTest {
     private static final long DAY = TimeUtils.DAY_IN_MILLIS;
     private static final long JAN_1 = 1735689600000L;
 
-    private static void require(boolean ok, String message) {
+    static void require(boolean ok, String message) {
         if (!ok)
             throw new AssertionError(message);
     }
@@ -237,7 +238,7 @@ public final class DialogScreenTest {
         screen.choice(0, p.value(nthCombo(p, n), Panel.IntField.ID), value);
     }
 
-    private static boolean shows(Screen screen, String label) {
+    static boolean shows(Screen screen, String label) {
         Panel p = screen.build();
         for (int i = 0; i < p.size(); i++) {
             if (p.string(i, Panel.IntField.LABEL).equals(label))
@@ -763,7 +764,7 @@ public final class DialogScreenTest {
     // Real Swing widgets, without a window.
 
     // UIGlobals.setLaf without its cursors, which need a display.
-    private static void theme() throws Exception {
+    static void theme() throws Exception {
         com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
         com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont(Platform.isLinux() ? "small.font" : "medium.font"));
@@ -794,7 +795,7 @@ public final class DialogScreenTest {
         }
     }
 
-    private static SwingPanel swing(Screen screen) {
+    static SwingPanel swing(Screen screen) {
         SwingPanel panel = new SwingPanel(screen);
         JRootPane root = new JRootPane();
         root.setContentPane(panel);
@@ -810,7 +811,7 @@ public final class DialogScreenTest {
         layout(panel);
     }
 
-    private static <T> List<T> all(Container container, Class<T> type) {
+    static <T> List<T> all(Container container, Class<T> type) {
         List<T> found = new ArrayList<>();
         for (Component child : container.getComponents()) {
             if (type.isInstance(child) && child.isVisible())
@@ -821,7 +822,7 @@ public final class DialogScreenTest {
         return found;
     }
 
-    private static AbstractButton button(Container container, String text) {
+    static AbstractButton button(Container container, String text) {
         for (AbstractButton button : all(container, AbstractButton.class)) {
             if (text.equals(button.getText()))
                 return button;
@@ -829,7 +830,7 @@ public final class DialogScreenTest {
         throw new AssertionError("No button " + text);
     }
 
-    private static void key(JComponent component, String stroke) {
+    static void key(JComponent component, String stroke) {
         Object name = component.getInputMap().get(KeyStroke.getKeyStroke(stroke));
         require(name != null, "No binding for " + stroke);
         component.getActionMap().get(name).actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, stroke));
@@ -1152,6 +1153,82 @@ public final class DialogScreenTest {
         require(cell.getToolTipText().equals(TimeUtils.format(1700000000000L - DAY) + " - " + TimeUtils.format(1700020000000L - DAY)), "Orbit tooltip in the list");
     }
 
+    private static Screen panelScreen(Panel panel) {
+        return () -> panel;
+    }
+
+    private static String rejection(Panel snapshot) {
+        try {
+            new SwingPanel(panelScreen(snapshot));
+            return "";
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
+    }
+
+    // The widget comes from the snapshot's kind, not from search, headers or the shape of its rows.
+    private static void swingCollections() {
+        SwingPanel plainList = new SwingPanel(panelScreen(new Panel().list(200, 100, 17).item(1, "One", true).tip("Tip").item(2, "Two", false).listEnd()));
+        JList<?> list = all(plainList, JList.class).getFirst();
+        require(list.getModel().getSize() == 2 && list.isSelectedIndex(0) && !list.isSelectedIndex(1), "A list shows its items and their selection");
+        require(list.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION, "A list selects one row unless declared multiple");
+        require(list.getClientProperty(Searchable.CLIENT_PROPERTY_SEARCHABLE) == null, "A list searches only when declared searchable");
+        require(all(plainList, JScrollPane.class).getFirst().getPreferredSize().equals(new Dimension(200, 100)), "A list has its declared viewport");
+
+        SwingPanel searchable = new SwingPanel(panelScreen(new Panel().list(200, 100, 17).multiple(true).searchable().item(1, "One", false).listEnd()));
+        JList<?> found = all(searchable, JList.class).getFirst();
+        require(found.getClientProperty(Searchable.CLIENT_PROPERTY_SEARCHABLE) != null, "A searchable list searches");
+        require(found.getSelectionMode() == ListSelectionModel.MULTIPLE_INTERVAL_SELECTION, "A multiple list selects many rows");
+        require(rejection(new Panel().list(200, 100, 17).label("Text").listEnd()).equals("Swing list has no LABEL"), "A list takes items only");
+        require(rejection(new Panel().button(1, "Save").save(null, "name", "")).equals("Swing button has no SAVE"), "A save button is refused, not left inert");
+
+        SwingPanel tree = new SwingPanel(panelScreen(new Panel().treeView(150, 80).identity(1).tree(1, "Branch", true).item(2, "Leaf", false).treeEnd().treeViewEnd()));
+        require(all(tree, JTree.class).size() == 1 && all(tree, JList.class).isEmpty(), "A tree view is a tree");
+        SwingPanel scroll = new SwingPanel(panelScreen(new Panel().scroll(0).searchable().label("Text").scrollEnd()));
+        require(all(scroll, JTree.class).isEmpty() && all(scroll, JLabel.class).size() == 1, "A scroll stays a scroll of its controls, search or not");
+
+        Panel rich = new Panel().table(4, 1, 0).searchable()
+                .tableRow(1, false).check(2, "", true).label("Layer").label("2020").button(3, "x").rowEnd().tableEnd();
+        require(rejection(rich).equals("Swing table needs a header row"), "A headerless table is refused as a table, not read as a list");
+    }
+
+    // A gesture shows its result once, at once, without a queued refresh; a notification outside a gesture still reaches the view.
+    private static void swingRefreshOwner() throws Exception {
+        boolean[] value = {false};
+        Runnable[] listener = new Runnable[1];
+        int[] builds = {0};
+        Panel buffer = new Panel();
+        SwingPanel panel = new SwingPanel(new Screen() {
+            @Override
+            public Panel build() {
+                builds[0]++;
+                return buffer.reset().check(1, "On", value[0]);
+            }
+
+            @Override
+            public void listen(Runnable _listener) {
+                listener[0] = _listener;
+            }
+
+            @Override
+            public void checked(int owner, int item, boolean on) {
+                value[0] = !on; // The model decides; what the view shows comes from it.
+                listener[0].run();
+            }
+        });
+        java.util.concurrent.atomic.AtomicBoolean queued = field(panel, "refreshQueued", java.util.concurrent.atomic.AtomicBoolean.class);
+        javax.swing.JCheckBox check = all(panel, javax.swing.JCheckBox.class).getFirst();
+        builds[0] = 0;
+        check.doClick();
+        require(builds[0] == 1 && !queued.get(), "A gesture builds once and queues nothing: " + builds[0] + ", " + queued.get());
+        require(!check.isSelected(), "The gesture shows what the model left");
+        value[0] = true;
+        listener[0].run();
+        require(queued.get() && builds[0] == 1, "A notification waits for the queue");
+        panel.lazyRepaint();
+        require(builds[0] == 2 && check.isSelected(), "A notification reaches the view");
+    }
+
     private static void swingTree() throws Exception {
         List<List<BandType>> loads = new ArrayList<>();
         TimelineScreen screen = new TimelineScreen(null, (types, full) -> loads.add(types));
@@ -1237,6 +1314,8 @@ public final class DialogScreenTest {
                 swingTime();
                 swingFocusedTime();
                 swingCombo();
+                swingCollections();
+                swingRefreshOwner();
                 swingTree();
                 swingButtons();
             } catch (Exception e) {

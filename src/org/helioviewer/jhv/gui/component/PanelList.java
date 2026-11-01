@@ -14,11 +14,9 @@ import org.helioviewer.jhv.ui.Screen;
 
 import com.jidesoft.swing.SearchableUtils;
 
-// A table of one column without a header. The screen owns rows and selection.
+// A list of items. The screen owns rows and selection.
 @SuppressWarnings("serial")
 final class PanelList extends JList<String> {
-
-    private static final int CONTROLS_PER_ROW = 3;
 
     private final Screen screen;
     private final Consumer<Runnable> act;
@@ -52,19 +50,19 @@ final class PanelList extends JList<String> {
     }
 
     void update(Panel p, int control) {
-        int rows = (p.tableEnd(control) - control - 1) / CONTROLS_PER_ROW;
+        int rows = p.listEnd(control) - control - 1;
         String[] newLabels = new String[rows];
         String[] newTips = new String[rows];
         int[] newItems = new int[rows];
         BitSet newSelected = new BitSet(rows);
         for (int r = 0; r < rows; r++) {
-            int row = control + 1 + r * CONTROLS_PER_ROW;
-            if (p.kind(row) != Panel.Kind.ROW || p.kind(row + 1) != Panel.Kind.LABEL || p.kind(row + 2) != Panel.Kind.ROW_END)
-                throw new IllegalArgumentException("Swing list row needs one label");
+            int row = control + 1 + r;
+            if (p.kind(row) != Panel.Kind.ITEM)
+                throw new IllegalArgumentException("Swing list has no " + p.kind(row));
             newItems[r] = p.value(row, Panel.IntField.ID);
             newSelected.set(r, p.has(row, Panel.SELECTED));
-            newLabels[r] = p.string(row + 1, Panel.IntField.LABEL);
-            newTips[r] = p.string(row + 1, Panel.IntField.TIP);
+            newLabels[r] = p.string(row, Panel.IntField.LABEL);
+            newTips[r] = p.string(row, Panel.IntField.TIP);
         }
 
         items = newItems;
