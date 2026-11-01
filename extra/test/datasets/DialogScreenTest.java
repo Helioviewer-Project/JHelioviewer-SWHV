@@ -1277,6 +1277,10 @@ public final class DialogScreenTest {
         panel.refresh();
         TreePath selected = tree.getSelectionPath();
         require(selected != null && tree.getRowForPath(selected) == 2 && tree.getRowCount() == rows, "An arrow moves the selection");
+        tree.setSelectionRow(3);
+        tree.setSelectionInterval(2, 3);
+        button(panel, "Add").doClick();
+        require(loads.getLast().stream().map(BandType::getName).toList().equals(List.of("XRS long", "XRS short", "XRS 2")), "An upward range keeps the tree's dataset order");
     }
 
     private static void swingButtons() {

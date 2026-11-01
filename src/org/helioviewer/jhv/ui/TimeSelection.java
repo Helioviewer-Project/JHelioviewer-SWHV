@@ -21,7 +21,7 @@ public final class TimeSelection {
     public static final String[] ROTATIONS = rotations();
     public static final String[] ROTATION_SPANS = rotationSpans();
 
-    private static final Ids IDS = new Ids(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    private static final Ids DEFAULT_IDS = new Ids(1, 2, 3, 4, 5, 6, 7, 8, 9);
     // Screens keep their own ids from here.
     static final int NEXT_ID = 10;
 
@@ -51,12 +51,16 @@ public final class TimeSelection {
     // The start field beside the back split button, the end field beside the forward split button and the Carrington picker, indented.
     // The caller closes the grid and the row.
     public static Panel fields(Panel p, Ids ids, long start, long end, int backUnit, int foreUnit, boolean enabled) {
+        return fields(p, ids, start, end, backUnit, foreUnit, enabled, DATE_COLUMNS);
+    }
+
+    private static Panel fields(Panel p, Ids ids, long start, long end, int backUnit, int foreUnit, boolean enabled, int columns) {
         return p.row().enabled(enabled).space(0, 0).sizePoints(INDENT_POINTS, 0).grid(3).identity(1).stretch(0)
-                .timeField(ids.start, ids.startDate, TimeUtils.formatShort(start), DATE_COLUMNS, start,
+                .timeField(ids.start, ids.startDate, TimeUtils.formatShort(start), columns, start,
                         TimeUtils.MINIMAL_TIME.milli, TimeUtils.MAXIMAL_TIME.milli).tip("Select start date")
                 .splitButton(ids.back, ids.backUnit, ICON_SKIP_BACKWARD, SHIFT_UNITS, backUnit).flat().tip("Move time interval backward")
                 .space(0, 0).endRow()
-                .timeField(ids.end, ids.endDate, TimeUtils.formatShort(end), DATE_COLUMNS, end,
+                .timeField(ids.end, ids.endDate, TimeUtils.formatShort(end), columns, end,
                         TimeUtils.MINIMAL_TIME.milli, TimeUtils.MAXIMAL_TIME.milli).tip("Select end date")
                 .splitButton(ids.fore, ids.foreUnit, ICON_SKIP_FORWARD, SHIFT_UNITS, foreUnit).flat().tip("Move time interval forward")
                 .comboButton(ids.carrington, "CR", ROTATIONS, rotation(start)).choiceTips(ROTATION_SPANS).tip("Select Carrington rotation").endRow();
@@ -67,6 +71,7 @@ public final class TimeSelection {
         return day + Math.floorMod(current, TimeUtils.DAY_IN_MILLIS);
     }
 
+    private final Ids ids;
     private final Runnable changed;
     private long start;
     private long end;
@@ -75,6 +80,11 @@ public final class TimeSelection {
 
     // The action runs after each change of the interval, as a listener of the Swing panel.
     TimeSelection(Runnable _changed) {
+        this(DEFAULT_IDS, _changed);
+    }
+
+    TimeSelection(Ids _ids, Runnable _changed) {
+        ids = _ids;
         changed = _changed;
         long milli = TimeUtils.START.milli;
         start = TimeUtils.floorSec(milli - 2 * TimeUtils.DAY_IN_MILLIS);
@@ -111,13 +121,21 @@ public final class TimeSelection {
     }
 
     void build(Panel p, boolean enabled) {
-        fields(p, IDS, start, end, backUnit, foreUnit, enabled).gridEnd().rowEnd();
+        fields(p, ids, start, end, backUnit, foreUnit, enabled).gridEnd().rowEnd();
+    }
+
+    Panel fields(Panel p, int columns) {
+        return fields(p, ids, start, end, backUnit, foreUnit, true, columns);
+    }
+
+    void build(Panel p, boolean enabled, int columns) {
+        fields(p, ids, start, end, backUnit, foreUnit, enabled, columns).gridEnd().rowEnd();
     }
 
     boolean command(int item) {
-        if (item == IDS.back)
+        if (item == ids.back)
             set(start - SHIFTS[backUnit], end - SHIFTS[backUnit]);
-        else if (item == IDS.fore)
+        else if (item == ids.fore)
             set(start + SHIFTS[foreUnit], end + SHIFTS[foreUnit]);
         else
             return false;
@@ -125,11 +143,11 @@ public final class TimeSelection {
     }
 
     boolean choice(int item, int value) {
-        if (item == IDS.backUnit)
+        if (item == ids.backUnit)
             backUnit = Panel.choiceIndex(value, SHIFTS.length);
-        else if (item == IDS.foreUnit)
+        else if (item == ids.foreUnit)
             foreUnit = Panel.choiceIndex(value, SHIFTS.length);
-        else if (item == IDS.carrington)
+        else if (item == ids.carrington)
             set(Carrington.CR_start[Panel.choiceIndex(value, Carrington.CR_start.length)], rotationEnd(value));
         else
             return false;
@@ -138,13 +156,13 @@ public final class TimeSelection {
 
     // Swing commits a whole time, the native host a picked day.
     boolean number(int item, double value) {
-        if (item == IDS.start)
+        if (item == ids.start)
             commitStart((long) value);
-        else if (item == IDS.end)
+        else if (item == ids.end)
             commitEnd((long) value);
-        else if (item == IDS.startDate)
+        else if (item == ids.startDate)
             commitStart(withDate(start, (long) value));
-        else if (item == IDS.endDate)
+        else if (item == ids.endDate)
             commitEnd(withDate(end, (long) value));
         else
             return false;
@@ -153,9 +171,9 @@ public final class TimeSelection {
 
     // Unparsable text keeps the time.
     boolean setText(int item, String text) {
-        if (item == IDS.start)
+        if (item == ids.start)
             commitStart(TimeUtils.optParse(text, start));
-        else if (item == IDS.end)
+        else if (item == ids.end)
             commitEnd(TimeUtils.optParse(text, end));
         else
             return false;

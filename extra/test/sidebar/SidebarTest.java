@@ -427,6 +427,11 @@ public final class SidebarTest {
 
         JSpinner speed = find(movie, JSpinner.class);
         JFormattedTextField editor = ((JSpinner.DefaultEditor) speed.getEditor()).getTextField();
+        try {
+            check(((Number) editor.getFormatter().stringToValue("1,5")).intValue() == 15, "Movie speed lost its original number format");
+        } catch (java.text.ParseException e) {
+            throw new AssertionError("Movie speed rejected its original number format", e);
+        }
         int committed = ViewState.playbackData().speed();
         editor.setText("45");
         ViewState.setPlaybackAdvanceMode(Player.AdvanceMode.Stop);

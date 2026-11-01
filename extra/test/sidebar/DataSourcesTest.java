@@ -1,21 +1,10 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.ToolTipManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.gui.component.DataSourcesTree;
-import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -34,8 +23,6 @@ public final class DataSourcesTest {
         checkParser(parser);
         UiThread.postAndWait(() -> {
             checkRegistration(parser);
-            checkTree(parser);
-            checkDialog(parser);
         });
         System.out.println("DataSourcesTest passed");
     }
@@ -122,82 +109,8 @@ public final class DataSourcesTest {
                 "registration without a listener preserves last duplicate ID wins");
     }
 
-    private static void checkTree(DataSourcesParser parser) {
-        DataSourcesTree tree = new DataSourcesTree(() -> {});
-        try {
-            tree.setParsedData(parser);
-            check(tree.getSelectedItems().isEmpty(), "installing a catalog does not select its default");
-            tree.setSelectedItem("ROB", 10);
-            TreePath sourcePath = tree.getSelectionPath();
-            check(ids(tree.getSelectedItems()).equals(List.of(10)), "selection by server and source ID");
-            DefaultMutableTreeNode source = (DefaultMutableTreeNode) sourcePath.getLastPathComponent();
-            DefaultMutableTreeNode group = (DefaultMutableTreeNode) source.getParent();
-            check(!source.getAllowsChildren() && group.getAllowsChildren() && group.getChildCount() == 4,
-                    "tree has group nodes with flat source leaves");
-            tree.setSize(1000, 1000);
-            tree.expandPath(sourcePath.getParentPath());
-            Rectangle bounds = tree.getPathBounds(sourcePath);
-            check(bounds != null && tree.getToolTipText(new MouseEvent(tree, MouseEvent.MOUSE_MOVED, 0, 0,
-                    bounds.x + 1, bounds.y + 1, 0, false)).equals("Description 304"), "source tooltip");
-            check(tree.getToolTipText(null) == null, "null tooltip event");
-
-            TreePath firstPath = new TreePath(((DefaultMutableTreeNode) group.getChildAt(0)).getPath());
-            tree.setSelectionPaths(new TreePath[]{firstPath, sourcePath});
-            check(ids(tree.getSelectedItems()).equals(List.of(2, 10)), "multiple source selection");
-            tree.setSelectionPath(sourcePath.getParentPath());
-            check(tree.getSelectedItems().isEmpty(), "group selection contains no source");
-            tree.setSelectedItem("ROB", 10);
-            DataSourcesParser other = new DataSourcesParser("GSFC", catalog());
-            tree.setParsedData(other);
-            check(tree.getSelectedItems().getFirst().server.equals("ROB"), "another catalog preserves the existing selection");
-            tree.setSelectedItem("GSFC", 10);
-            check(tree.getSelectedItems().getFirst().server.equals("GSFC") && ids(tree.getSelectedItems()).equals(List.of(10)),
-                    "source IDs are selected within the requested server");
-            tree.setSelectedItem("missing", 10);
-            tree.setSelectedItem("ROB", -1);
-            check(tree.getSelectedItems().getFirst().server.equals("GSFC") && ids(tree.getSelectedItems()).equals(List.of(10)),
-                    "missing server or source preserves the existing selection");
-            tree.setSelectedItem("ROB", 10);
-            tree.setParsedData(new DataSourcesParser("ROB", new JSONObject()));
-            check(tree.getSelectedItems().isEmpty(), "catalog replacement removes stale selection");
-        } finally {
-            ToolTipManager.sharedInstance().unregisterComponent(tree);
-        }
-    }
-
     private static List<Integer> ids(List<DataSourcesParser.SourceItem> sources) {
-        List<Integer> ids = new ArrayList<>();
-        for (DataSourcesParser.SourceItem source : sources)
-            ids.add(source.sourceId);
-        return ids;
-    }
-
-    private static void checkDialog(DataSourcesParser parser) {
-        ImageDialog dialog = new ImageDialog();
-        JComponent content = dialog.createContentPanel();
-        DataSourcesTree tree = (DataSourcesTree) ((JScrollPane) content.getComponent(0)).getViewport().getView();
-        try {
-            ImageRequestSettings settings = ImageRequestSettings.instance();
-            long start = Instant.parse("2018-01-01T00:00:00Z").toEpochMilli();
-            long end = start + TimeUtils.DAY_IN_MILLIS;
-            settings.setInterval(start, end);
-            dialog.setupSources(parser);
-            long defaultEnd = Instant.parse("2021-02-03T04:05:06Z").toEpochMilli();
-            check(ids(tree.getSelectedItems()).equals(List.of(50)) && settings.end() == defaultEnd
-                    && settings.start() == defaultEnd - 2 * TimeUtils.DAY_IN_MILLIS,
-                    "dialog selects the preferred server default and its last two days");
-
-            settings.setInterval(start, end);
-            dialog.setupSources(new DataSourcesParser("GSFC", catalog()));
-            check(tree.getSelectedItems().getFirst().server.equals("ROB") && settings.start() == start && settings.end() == end,
-                    "nonpreferred catalog preserves selection and interval");
-            dialog.setupSources(new DataSourcesParser("ROB", new JSONObject()));
-            check(tree.getSelectedItems().isEmpty() && settings.start() == start && settings.end() == end,
-                    "catalog without a default preserves the interval");
-        } finally {
-            ToolTipManager.sharedInstance().unregisterComponent(tree);
-            dialog.dispose();
-        }
+        return sources.stream().map(item -> item.sourceId).toList();
     }
 
     private static void check(boolean condition, String message) {

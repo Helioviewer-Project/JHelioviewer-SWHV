@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.selector;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
@@ -14,15 +13,14 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.helioviewer.jhv.gui.component.Buttons;
-import org.helioviewer.jhv.gui.component.SamplingPanel;
+import org.helioviewer.jhv.gui.component.SwingPanel;
 import org.helioviewer.jhv.gui.dialog.ImageDialog;
-import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
-import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.ViewpointLayer;
+import org.helioviewer.jhv.ui.ImageRequestScreen;
 
 import com.jidesoft.swing.JideButton;
 
@@ -51,24 +49,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         imageActions.add(syncButton, BorderLayout.LINE_END);
         JPanel imagePanel = new JPanel(new BorderLayout());
 
-        // The selector edits the settings and shows what they accepted.
-        ImageRequestSettings settings = ImageRequestSettings.instance();
-        TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-        timeSelectorPanel.setTime(settings.start(), settings.end());
-        timeSelectorPanel.addListener(settings::setInterval);
-        settings.addListener(new ImageRequestSettings.Listener() {
-            @Override
-            public void intervalChanged(long start, long end) {
-                timeSelectorPanel.setTime(start, end);
-            }
-        });
-        GridBagConstraints samplingConstraints = new GridBagConstraints();
-        samplingConstraints.gridy = 2;
-        samplingConstraints.gridx = 0;
-        samplingConstraints.weightx = 1;
-        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
-        SamplingPanel samplingPanel = new SamplingPanel();
-        timeSelectorPanel.add(samplingPanel, samplingConstraints);
+        SwingPanel timeSelectorPanel = new SwingPanel(new ImageRequestScreen());
 
         JPanel imageHeader = new JPanel(new BorderLayout());
         imageHeader.add(timeSelectorPanel, BorderLayout.NORTH);

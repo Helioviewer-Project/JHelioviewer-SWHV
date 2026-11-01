@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -23,7 +25,7 @@ import com.jidesoft.swing.SearchableUtils;
 @SuppressWarnings("serial")
 final class PanelTree extends JTree {
 
-    private record Row(int depth, int item, String label) {
+    private record Row(int depth, int item, String label, String tip, boolean leaf) {
         @Override
         public String toString() {
             return label;
@@ -45,7 +47,8 @@ final class PanelTree extends JTree {
         setModel(model);
         setRootVisible(false);
         setShowsRootHandles(true);
-        setToggleClickCount(0);
+        setToggleClickCount(p.value(control, Panel.IntField.DOUBLE_CLICK_COLUMNS) == 0 ? 0 : 2);
+        ToolTipManager.sharedInstance().registerComponent(this);
         getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         if (getCellRenderer() instanceof DefaultTreeCellRenderer renderer) {
             renderer.setOpenIcon(null);
@@ -66,9 +69,10 @@ final class PanelTree extends JTree {
                 if (!e.isAddedPath(path))
                     screen.command(owner, item(path), Panel.Command.SELECT_REMOVE);
             }
-            for (TreePath path : changed) {
-                if (e.isAddedPath(path))
-                    screen.command(owner, item(path), Panel.Command.SELECT_ADD);
+            TreePath[] selection = getSelectionPaths();
+            if (selection != null) {
+                for (int i = 0; i < selection.length; i++)
+                    screen.command(owner, item(selection[i]), i == 0 ? Panel.Command.SELECT_ONLY : Panel.Command.SELECT_ADD);
             }
         }));
         SearchableUtils.installSearchable(this).setRecursive(true);
@@ -79,23 +83,33 @@ final class PanelTree extends JTree {
     }
 
     void update(Panel p, int control) {
+        getSelectionModel().setSelectionMode(p.has(control, Panel.MULTIPLE)
+                ? TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION : TreeSelectionModel.SINGLE_TREE_SELECTION);
         int end = p.treeViewEnd(control);
         ArrayList<Row> newRows = new ArrayList<>();
         int depth = 0;
         for (int i = control + 1; i < end; i++) {
             switch (p.kind(i)) {
-                case TREE -> newRows.add(new Row(depth++, p.value(i, Panel.IntField.ID), p.string(i, Panel.IntField.LABEL)));
-                case ITEM -> newRows.add(new Row(depth, p.value(i, Panel.IntField.ID), p.string(i, Panel.IntField.LABEL)));
+                case TREE -> newRows.add(new Row(depth++, p.value(i, Panel.IntField.ID), p.string(i, Panel.IntField.LABEL), p.string(i, Panel.IntField.TIP), false));
+                case ITEM -> newRows.add(new Row(depth, p.value(i, Panel.IntField.ID), p.string(i, Panel.IntField.LABEL), p.string(i, Panel.IntField.TIP), true));
                 case TREE_END -> depth--;
                 default -> throw new IllegalArgumentException("Swing tree has no " + p.kind(i));
             }
         }
         if (!newRows.equals(rows)) {
+            HashMap<List<String>, Boolean> expansion = new HashMap<>();
+            for (TreePath path : paths.values()) {
+                if (((DefaultMutableTreeNode) path.getLastPathComponent()).getAllowsChildren())
+                    expansion.put(labels(path), isExpanded(path));
+            }
             rows = newRows;
             rebuild();
             for (int i = control + 1; i < end; i++) {
-                if (p.kind(i) == Panel.Kind.TREE && p.has(i, Panel.OPEN))
-                    expandPath(paths.get(p.value(i, Panel.IntField.ID)));
+                if (p.kind(i) == Panel.Kind.TREE) {
+                    TreePath path = paths.get(p.value(i, Panel.IntField.ID));
+                    if (expansion.getOrDefault(labels(path), p.has(i, Panel.OPEN)))
+                        expandPath(path);
+                }
             }
         }
         for (int i = control + 1; i < end; i++) {
@@ -112,12 +126,30 @@ final class PanelTree extends JTree {
         }
     }
 
+    @Override
+    public TreePath getNextMatch(String prefix, int startingRow, Position.Bias bias) {
+        return null;
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+        TreePath path = e == null ? null : getPathForLocation(e.getX(), e.getY());
+        return path == null ? null : ((Row) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject()).tip;
+    }
+
+    private static List<String> labels(TreePath path) {
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 1; i < path.getPathCount(); i++)
+            labels.add(path.getPathComponent(i).toString());
+        return labels;
+    }
+
     private void rebuild() {
         root.removeAllChildren();
         paths.clear();
         ArrayList<DefaultMutableTreeNode> parents = new ArrayList<>(List.of(root));
         for (Row row : rows) {
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(row);
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(row, !row.leaf);
             parents.get(row.depth).add(node);
             parents.subList(row.depth + 1, parents.size()).clear();
             parents.add(node);

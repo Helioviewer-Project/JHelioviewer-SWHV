@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LayoutManager;
@@ -30,6 +31,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractButton;
+import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -112,12 +114,44 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     private volatile boolean dirty;
     private int fitted;
     private JComponent initialFocus;
+    private final int fragmentStart;
+    private final int fragmentEnd;
 
     public SwingPanel(Screen _screen) {
         screen = _screen;
+        fragmentStart = 0;
+        fragmentEnd = -1;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         screen.listen(this::changed);
         refresh();
+    }
+
+    SwingPanel(Screen _screen, Panel p, int start, int end) {
+        screen = _screen;
+        fragmentStart = start;
+        fragmentEnd = end;
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setOpaque(false);
+        updateFragment(p);
+        transparent(this);
+    }
+
+    void updateFragment(Panel p) {
+        syncing = true;
+        try {
+            reconcile(p, fragmentStart, this, nodes, null, isEnabled());
+        } finally {
+            syncing = false;
+        }
+    }
+
+    private static void transparent(Container parent) {
+        for (Component child : parent.getComponents()) {
+            if (child instanceof JPanel panel) {
+                panel.setOpaque(false);
+                transparent(panel);
+            }
+        }
     }
 
     // The control of the snapshot that takes the focus when its window opens.
@@ -161,7 +195,10 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         Panel p;
         try {
             p = screen.build();
-            reconcile(p, 0, this, nodes, null, isEnabled());
+            if (fragmentEnd >= 0)
+                updateFragment(p);
+            else
+                reconcile(p, 0, this, nodes, null, isEnabled());
         } finally {
             syncing = false;
         }
@@ -182,7 +219,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             cells.start();
         int i = start;
         int index = 0;
-        for (; i < p.size() && p.kind(i) != end; index++) {
+        for (; i < p.size() && (parent != this || fragmentEnd < 0 || i < fragmentEnd) && p.kind(i) != end; index++) {
             Panel.Kind kind = p.kind(i);
             int id = p.value(i, Panel.IntField.ID);
             Key key = new Key(kind, p.value(i, Panel.IntField.OWNER), id, p.value(i, Panel.IntField.CHOICE), id == 0 ? index : 0);
@@ -193,9 +230,19 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             if (index >= parent.getComponentCount() || parent.getComponent(index) != component)
                 parent.add(component, index);
             component.setVisible(true);
+            component.putClientProperty("panel.fill", p.has(i, Panel.FILL));
             if (parent instanceof Cells cells)
                 cells.place(component, p.value(i, Panel.IntField.CELL_SPAN), p.has(i, Panel.END_ROW), p.has(i, Panel.RIGHT));
-            else if (end == Panel.Kind.COLUMN_END || parent == this)
+            else if (parent.getLayout() instanceof GridBagLayout grid) {
+                GridBagConstraints constraints = new GridBagConstraints();
+                int columns = (Integer) parent.getClientProperty("panel.columns");
+                constraints.gridx = index % columns;
+                constraints.gridy = index / columns;
+                constraints.weightx = 0.5;
+                constraints.weighty = 1.;
+                constraints.anchor = Boolean.TRUE.equals(parent.getClientProperty("panel.center")) ? GridBagConstraints.CENTER : GridBagConstraints.LINE_START;
+                grid.setConstraints(component, constraints);
+            } else if (end == Panel.Kind.COLUMN_END || parent == this)
                 component.setAlignmentX(LEFT_ALIGNMENT);
             if (p.has(i, Panel.INITIAL_FOCUS))
                 initialFocus = node.widget.content;
@@ -236,13 +283,14 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             case GRID -> grid(p, i);
             case SPACE -> space(p, i);
             case SEPARATOR -> new Widget((JComponent) Box.createRigidArea(new Dimension()), (s, c) -> {});
-            case LABEL -> p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? label(parent instanceof RowLayout row && row.gap == 0) : reservedLabel();
+            case LABEL -> p.has(i, Panel.SELECTABLE) ? selectableLabel() : p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? label(parent instanceof RowLayout row && row.gap == 0) : reservedLabel();
             case BUTTON -> button(p, i, owner, item);
             case CHECK -> check(p.has(i, Panel.FILL), owner, item);
             case RADIO -> radio(p, i, owner, item);
             case COMBO -> p.string(i, Panel.IntField.LABEL).isEmpty() ? combo(p, i, owner, item) : picker(p, i, owner, item);
             case SPLIT_BUTTON -> splitButton(p, i, owner, item);
             case NUMBER_SPINNER -> spinner(p, i, owner, item);
+            case TEXT_SPINNER -> textSpinner(p, i, owner, item);
             case SLIDER -> slider(p, i, owner, item);
             case TEXT -> !p.string(i, Panel.IntField.WIDTH_TEXT).isEmpty() ? text(p, i)
                     : p.value(i, Panel.DoubleField.MIN) < p.value(i, Panel.DoubleField.MAX) ? numericField(p, i, owner, item) : editor(p, i, owner, item);
@@ -305,7 +353,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
 
     private static void applyMargin(Panel p, int i, JComponent component) {
         int margin = p.value(i, Panel.IntField.MARGIN);
-        if (margin != 0)
+        if (margin != 0 || p.has(i, Panel.SWING_MARGIN))
             component.setBorder(BorderFactory.createEmptyBorder(margin >>> 24, margin >> 16 & 0xFF, margin >> 8 & 0xFF, margin & 0xFF));
     }
 
@@ -318,6 +366,17 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     }
 
     private static Widget grid(Panel p, int i) {
+        if (p.swingLayout(i) == Panel.SwingLayout.EQUAL_ROWS) {
+            JPanel rows = new JPanel(new GridLayout(0, p.value(i, Panel.IntField.COLUMNS)));
+            return new Widget(rows, (snapshot, control) -> {});
+        }
+        if (p.swingLayout(i) == Panel.SwingLayout.EQUAL_CELLS || p.swingLayout(i) == Panel.SwingLayout.CENTERED_CELLS) {
+            JPanel cells = new JPanel(new GridBagLayout());
+            cells.putClientProperty("panel.columns", p.value(i, Panel.IntField.COLUMNS));
+            cells.putClientProperty("panel.center", p.swingLayout(i) == Panel.SwingLayout.CENTERED_CELLS);
+            applyMargin(p, i, cells);
+            return new Widget(cells, (snapshot, control) -> {});
+        }
         Cells cells = new Cells(p.value(i, Panel.IntField.COLUMNS), p.value(i, Panel.IntField.STRETCH) - 1, p.value(i, Panel.IntField.GAP), p.has(i, Panel.RIGHT));
         applyMargin(p, i, cells);
         return new Widget(cells, (s, c) -> {});
@@ -339,10 +398,24 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         return new Widget(label, (p, i) -> {
             applyFont(p, i, label);
             label.setText(p.string(i, Panel.IntField.LABEL));
+            label.setHorizontalAlignment(p.has(i, Panel.RIGHT) ? JLabel.RIGHT : JLabel.LEFT);
             // Separates the words from the control after them.
-            int gap = spaced && p.kind(i + 1) != Panel.Kind.ROW_END ? label.getFontMetrics(label.getFont()).charWidth(' ') : 0;
+            int gap = spaced && !p.has(i, Panel.TIGHT) && p.kind(i + 1) != Panel.Kind.ROW_END ? label.getFontMetrics(label.getFont()).charWidth(' ') : 0;
             if (label.getInsets().right != gap)
                 label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, gap));
+        });
+    }
+
+    private static Widget selectableLabel() {
+        HTMLPane label = new HTMLPane();
+        String[] previous = {null};
+        return new Widget(label, (p, i) -> {
+            String text = p.string(i, Panel.IntField.LABEL);
+            if (!text.equals(previous[0])) {
+                previous[0] = text;
+                String escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                label.setText("<div style='text-align:" + (p.has(i, Panel.CENTER) ? "center" : "left") + "'>" + escaped + "</div>");
+            }
         });
     }
 
@@ -367,7 +440,14 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         Panel.Act action = Panel.Act.values()[p.value(i, Panel.IntField.ACTION)];
         String[] directory = new String[1];
         switch (action) {
-            case COMMAND -> button.addActionListener(e -> act(() -> screen.command(owner, item, Panel.Command.CLICK)));
+            case COMMAND -> {
+                boolean commit = p.commitsEditors(i);
+                button.addActionListener(e -> {
+                    if (commit)
+                        commitEditors(this);
+                    act(() -> screen.command(owner, item, Panel.Command.CLICK));
+                });
+            }
             case FILE -> {
                 String[] extensions = p.choices(i);
                 boolean multiple = p.has(i, Panel.MULTIPLE);
@@ -380,6 +460,13 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             String icon = s.string(c, Panel.IntField.ICON);
             String label = s.string(c, Panel.IntField.LABEL);
             button.setText(icon.isEmpty() ? label : icon);
+            String sample = s.string(c, Panel.IntField.WIDTH_TEXT);
+            if (!sample.isEmpty()) {
+                Dimension preferred = button.getPreferredSize();
+                Insets insets = button.getInsets();
+                int width = button.getFontMetrics(button.getFont()).stringWidth(sample) + insets.left + insets.right;
+                button.setPreferredSize(new Dimension(Math.max(preferred.width, width), preferred.height));
+            }
             button.setSelected(s.has(c, Panel.SELECTED));
             JRootPane root = SwingUtilities.getRootPane(button);
             if (root != null && button instanceof JButton defaultButton && s.has(c, Panel.DEFAULT)) root.setDefaultButton(defaultButton);
@@ -412,6 +499,11 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             String label = p.string(i, Panel.IntField.LABEL);
             check.setText(description.isEmpty() ? label : "<html>" + label + "<br/><small>" + description);
             check.setSelected(p.has(i, Panel.SELECTED));
+            check.setHorizontalTextPosition(p.has(i, Panel.RIGHT) ? JCheckBox.LEFT : JCheckBox.RIGHT);
+            if (p.has(i, Panel.FLAT)) {
+                check.setOpaque(false);
+                check.setFocusPainted(false);
+            }
         });
     }
 
@@ -481,25 +573,101 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
         return new Widget(button, (s, c) -> menu[s.value(c, Panel.IntField.INDEX)].setSelected(true));
     }
 
+    private static void commitEditors(Container container) {
+        for (Component component : container.getComponents()) {
+            if (component instanceof JHVSpinner spinner) {
+                if (spinner.isEnabled())
+                    spinner.getValue();
+            } else if (component instanceof Container child)
+                commitEditors(child);
+        }
+    }
+
     private Widget spinner(Panel p, int i, int owner, int item) {
-        if (p.value(i, Panel.IntField.DECIMALS) != 0)
-            throw new IllegalArgumentException("Swing spinner needs whole numbers");
-        SpinnerNumberModel model = new SpinnerNumberModel((int) p.value(i, Panel.DoubleField.VALUE), (int) p.value(i, Panel.DoubleField.MIN),
-                (int) p.value(i, Panel.DoubleField.MAX), (int) p.value(i, Panel.DoubleField.STEP));
+        double minimum = p.value(i, Panel.DoubleField.MIN);
+        double maximum = p.value(i, Panel.DoubleField.MAX);
+        double step = p.value(i, Panel.DoubleField.STEP);
+        boolean decimal = !p.isIntegerSpinner(i);
+        SpinnerNumberModel model = decimal
+                ? new SpinnerNumberModel(p.value(i, Panel.DoubleField.VALUE), minimum, maximum, step)
+                : new SpinnerNumberModel((int) p.value(i, Panel.DoubleField.VALUE), (int) minimum, (int) maximum, (int) step);
         JHVSpinner spinner = new JHVSpinner(model);
+        String suffix = p.string(i, Panel.IntField.TEXT);
+        if (suffix.isEmpty() && !p.usesDefaultNumberEditor(i)) {
+            String format = "0" + (p.value(i, Panel.IntField.DECIMALS) == 0 ? "" : "." + "0".repeat(p.value(i, Panel.IntField.DECIMALS)));
+            spinner.setEditor(new JSpinner.NumberEditor(spinner, format));
+        }
         JFormattedTextField field = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+        int columns = p.value(i, Panel.IntField.WIDTH);
+        if (columns > 0)
+            field.setColumns(columns);
+        if (p.has(i, Panel.LIVE))
+            ((javax.swing.text.DefaultFormatter) field.getFormatter()).setCommitsOnValidEdit(true);
+        if (!suffix.isEmpty())
+            field.setFormatterFactory(new TerminatedFormatterFactory("%." + p.value(i, Panel.IntField.DECIMALS) + "f", suffix, minimum, maximum));
         spinner.addChangeListener(e -> act(() -> screen.number(owner, item, ((Number) spinner.getValue()).doubleValue())));
-        return new Widget(spinner, (s, c) -> {
-            model.setMinimum((int) s.value(c, Panel.DoubleField.MIN));
-            model.setMaximum((int) s.value(c, Panel.DoubleField.MAX));
-            model.setStepSize((int) s.value(c, Panel.DoubleField.STEP));
-            // The model, not getValue(): reading the spinner commits an edit in progress, which stays until the user ends it.
-            int value = (int) s.value(c, Panel.DoubleField.VALUE);
-            if (model.getNumber().intValue() != value) {
+        return new Widget(spinner, (snapshot, control) -> {
+            if (decimal) {
+                model.setMinimum(snapshot.value(control, Panel.DoubleField.MIN));
+                model.setMaximum(snapshot.value(control, Panel.DoubleField.MAX));
+                model.setStepSize(snapshot.value(control, Panel.DoubleField.STEP));
+            } else {
+                model.setMinimum((int) snapshot.value(control, Panel.DoubleField.MIN));
+                model.setMaximum((int) snapshot.value(control, Panel.DoubleField.MAX));
+                model.setStepSize((int) snapshot.value(control, Panel.DoubleField.STEP));
+            }
+            // getValue() commits the editor, so compare with the model while refreshing.
+            double value = snapshot.value(control, Panel.DoubleField.VALUE);
+            if (model.getNumber().doubleValue() != value) {
                 if (editing(field))
                     dirty = true;
-                else
+                else if (decimal)
                     spinner.setValue(value);
+                else
+                    spinner.setValue((int) value);
+            }
+        });
+    }
+
+    private Widget textSpinner(Panel p, int i, int owner, int item) {
+        String[] text = {p.string(i, Panel.IntField.TEXT)};
+        AbstractSpinnerModel model = new AbstractSpinnerModel() {
+            @Override
+            public Object getValue() {
+                return text[0];
+            }
+
+            @Override
+            public Object getNextValue() {
+                return Panel.Command.INCREASE;
+            }
+
+            @Override
+            public Object getPreviousValue() {
+                return Panel.Command.DECREASE;
+            }
+
+            @Override
+            public void setValue(Object value) {
+                if (value instanceof Panel.Command command)
+                    act(() -> screen.command(owner, item, command));
+                else {
+                    if (text[0].equals(value.toString()))
+                        return;
+                    act(() -> screen.setText(owner, item, value.toString()));
+                    if (!text[0].equals(value.toString()))
+                        throw new IllegalArgumentException("Rejected spinner value: " + value);
+                }
+                fireStateChanged();
+            }
+        };
+        JHVSpinner spinner = new JHVSpinner(model);
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
+        return new Widget(spinner, (snapshot, control) -> {
+            String value = snapshot.string(control, Panel.IntField.TEXT);
+            if (!text[0].equals(value)) {
+                text[0] = value;
+                editor.getTextField().setValue(value);
             }
         });
     }
@@ -673,6 +841,10 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
     }
 
     private Widget treeView(Panel p, int i) {
+        if (p.has(i, Panel.CELL_EDITOR)) {
+            PanelComponentTree tree = new PanelComponentTree(p, i, screen);
+            return new Widget(tree, tree::update);
+        }
         PanelTree tree = new PanelTree(p, i, screen, this::act);
         JScrollPane pane = new JScrollPane(tree);
         pane.setPreferredSize(pointSize(p, i));
@@ -725,7 +897,7 @@ public final class SwingPanel extends JPanel implements Interfaces.LazyComponent
             for (Component component : parent.getComponents()) {
                 if (component.isVisible()) {
                     Dimension preferred = component.getPreferredSize();
-                    boolean nested = component instanceof Cells || component instanceof JPanel row && row.getLayout() instanceof RowLayout;
+                    boolean nested = component instanceof JComponent jc && Boolean.TRUE.equals(jc.getClientProperty("panel.fill")) || component instanceof Cells || component instanceof JPanel row && row.getLayout() instanceof RowLayout;
                     int w = nested ? width - total + preferred.width : preferred.width;
                     int h = nested || fill ? height : preferred.height;
                     component.setBounds(x, insets.top + (height - h) / 2, w, h);

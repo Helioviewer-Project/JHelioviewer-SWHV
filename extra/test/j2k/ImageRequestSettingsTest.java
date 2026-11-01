@@ -7,8 +7,9 @@ import java.util.List;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 
-import org.helioviewer.jhv.gui.component.SamplingPanel;
+import org.helioviewer.jhv.gui.component.SwingPanel;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.ui.SamplingScreen;
 
 // The request settings' normalization, notifications and sampling rules.
 public final class ImageRequestSettingsTest {
@@ -97,8 +98,8 @@ public final class ImageRequestSettingsTest {
             ImageRequestSettings.Sampling original = shared.sampling();
             try {
                 shared.setSampling(new ImageRequestSettings.TimeStep(1800));
-                SamplingPanel panel = new SamplingPanel();
-                JSpinner cadence = (JSpinner) panel.getComponent(1);
+                SwingPanel panel = new SwingPanel(new SamplingScreen());
+                JSpinner cadence = (JSpinner) widgets(panel).get(1);
                 JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) cadence.getEditor();
                 editor.getTextField().setText("31");
                 if (shared.cadence() != 1860)
@@ -106,8 +107,8 @@ public final class ImageRequestSettingsTest {
                 editor.getTextField().setText("10001");
                 if (shared.cadence() != 1860)
                     throw new AssertionError("Out-of-range cadence changed the request");
-                ((JRadioButton) panel.getComponent(3)).doClick();
-                JSpinner count = (JSpinner) panel.getComponent(4);
+                ((JRadioButton) widgets(panel).get(3)).doClick();
+                JSpinner count = (JSpinner) widgets(panel).get(4);
                 ((JSpinner.DefaultEditor) count.getEditor()).getTextField().setText("123");
                 if (!shared.sampling().equals(new ImageRequestSettings.FrameCount(123)))
                     throw new AssertionError("Typed frame count was not applied without Enter or a focus change");
@@ -116,6 +117,17 @@ public final class ImageRequestSettingsTest {
             }
         });
         System.out.println("PASS: typed sampling edits reach the request immediately, invalid edits keep the last valid value");
+    }
+
+    private static java.util.List<java.awt.Component> widgets(java.awt.Container parent) {
+        java.util.List<java.awt.Component> result = new java.util.ArrayList<>();
+        for (java.awt.Component child : parent.getComponents()) {
+            if (child instanceof javax.swing.JSpinner || child instanceof javax.swing.JComboBox || child instanceof javax.swing.JRadioButton)
+                result.add(child);
+            else if (child instanceof java.awt.Container container)
+                result.addAll(widgets(container));
+        }
+        return result;
     }
 
     private ImageRequestSettingsTest() {}

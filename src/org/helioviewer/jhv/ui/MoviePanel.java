@@ -144,7 +144,7 @@ public final class MoviePanel implements Screen, Layers.Listener {
             p.column().enabled(!recording)
                     .row().right()
                     .label("Play")
-                    .numberSpinner(SPEED, d.speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1).format(0, 1, "").tip("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps")
+                    .numberSpinner(SPEED, d.speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1).format(0, 1, "").swingDefaultNumberEditor().tip("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps")
                     .combo(UNIT, SPEED_UNITS, d.speedUnit().ordinal())
                     .label(" and")
                     .combo(MODE, ADVANCE_MODES, d.advanceMode().ordinal())

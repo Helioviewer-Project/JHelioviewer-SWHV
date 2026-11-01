@@ -12,7 +12,7 @@ import time
 
 TESTS = Path(__file__).resolve().parent
 ROOT = TESTS.parents[1]
-DEFAULT_SUITES = ["maintenance", "commands", "model", "astronomy", "j2k", "timelines", "event", "datasets"]
+DEFAULT_SUITES = ["maintenance", "commands", "model", "astronomy", "j2k", "timelines", "event", "datasets", "thread", "ui", "options"]
 SCRIPTS = {
     "datasets": TESTS / "datasets/run_dataset_tests.py",
     "j2k": TESTS / "j2k/run_j2k_tests.py",
@@ -22,6 +22,9 @@ SCRIPTS = {
     "wcs": TESTS / "wcs/run_jhv_wcs_hpc_validation_suite.py",
 }
 JAVA_TESTS = {
+    "options": ["layers.fov.FOVOptionsTest", "plugins.pfss.PfssOptionsTest"],
+    "ui": ["plugins.swek.FilterScreenTest"],
+    "thread": ["thread.UiTimerTest"],
     "commands": ["io.samp.CommandStateTest", "layers.ViewpointStateTest", "ui.MoviePanelTest"],
     "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest", "gui.dialog.SettingsDialogTest"],
     "astronomy": ["astronomy.PositionResponseTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],

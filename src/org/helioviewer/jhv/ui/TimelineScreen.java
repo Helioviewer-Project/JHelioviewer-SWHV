@@ -118,7 +118,7 @@ public final class TimelineScreen extends DialogScreen {
 
     @Override
     public Panel build() {
-        Panel p = buffer.reset().column().margin(3, 3, 3, 3).treeView(WIDTH, HEIGHT).identity(TREE).initialFocus();
+        Panel p = buffer.reset().column().margin(3, 3, 3, 3).treeView(WIDTH, HEIGHT).multiple(true).identity(TREE).initialFocus();
         if (catalogs.isEmpty() && empty != null)
             p.item(0, empty, false).enabled(false);
         for (int i = 0; i < catalogs.size(); i++)

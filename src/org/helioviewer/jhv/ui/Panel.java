@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.ui;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 // Reusable snapshot of a screen's controls, independent of any toolkit. Its arrays stay owned by this panel and are read synchronously on the model thread.
 // Each kind is one widget with one callback; containers run from their kind to the matching end kind.
@@ -93,13 +95,13 @@ public final class Panel {
     public static final int READ_ONLY = 16384; // selectable text that cannot be edited
     public static final int ACTIVATE = 32768; // report Command.PRESS even without a value change
     public static final int REPEAT = 65536; // the button repeats while held
-    public static final int TIGHT = 131072; // a row without gaps between its controls
+    public static final int TIGHT = 131072; // a row without gaps, or a label without trailing space
     public static final int DRAGGABLE = 262144; // the table row may be dragged to another row
     public static final int CHECKABLE = 524288; // a toggle button or menu item with a check
     public static final int UNDERLINE = 1048576;
     public static final int HEADER_ROW = 2097152; // the section's first row stays beside its title
     public static final int RESET = 4194304; // the slider resets to its reset value, not the first value seen
-    public static final int FLAT = 8388608; // a button framed only while hovered
+    public static final int FLAT = 8388608; // a button framed only while hovered, or a transparent check
     public static final int SEARCHABLE = 16777216; // typing selects matching rows without filtering them
     public static final int INITIAL_FOCUS = 33554432;
     public static final int SELECTABLE = 67108864; // a tree row selected as a whole; a branch expands only by its handle
@@ -119,6 +121,51 @@ public final class Panel {
     private int[] choices = new int[96];
     // Each table column: fixed point width (0 automatic, -1 fixed sample), sample span, font flags.
     private int[] columns = new int[48];
+    // Java-only toolkit hints. Native consumes the same controls with its own layout and edit lifecycle.
+    public enum SwingLayout { DEFAULT, EQUAL_ROWS, EQUAL_CELLS, CENTERED_CELLS }
+
+    private final HashMap<Integer, SwingLayout> swingLayouts = new HashMap<>();
+    private final HashSet<Integer> editorCommits = new HashSet<>();
+    private final HashSet<Integer> defaultNumberEditors = new HashSet<>();
+    private final HashSet<Integer> integerSpinners = new HashSet<>();
+
+    public boolean isIntegerSpinner(int control) {
+        return integerSpinners.contains(control);
+    }
+
+    // Keep the toolkit's locale-aware numeric editor instead of forcing fractional digits.
+    public Panel swingDefaultNumberEditor() {
+        defaultNumberEditors.add(count - 1);
+        return this;
+    }
+
+    public boolean usesDefaultNumberEditor(int control) {
+        return defaultNumberEditors.contains(control);
+    }
+
+    public Panel equalRows() {
+        swingLayouts.put(count - 1, SwingLayout.EQUAL_ROWS);
+        return this;
+    }
+
+    public Panel equalCells(boolean centered) {
+        swingLayouts.put(count - 1, centered ? SwingLayout.CENTERED_CELLS : SwingLayout.EQUAL_CELLS);
+        return this;
+    }
+
+    public SwingLayout swingLayout(int control) {
+        return swingLayouts.getOrDefault(control, SwingLayout.DEFAULT);
+    }
+
+    public Panel commitEditors() {
+        editorCommits.add(count - 1);
+        return this;
+    }
+
+    public boolean commitsEditors(int control) {
+        return editorCommits.contains(control);
+    }
+
     private int count;
     private int charCount;
     private int spanCount;
@@ -129,6 +176,10 @@ public final class Panel {
     private int owner;
 
     public Panel reset() {
+        swingLayouts.clear();
+        editorCommits.clear();
+        defaultNumberEditors.clear();
+        integerSpinners.clear();
         count = charCount = choiceCount = byteCount = columnCount = doubleCount = owner = 0;
         spanCount = 1; // span zero is always the empty string
         return this;
@@ -343,6 +394,12 @@ public final class Panel {
 
     public Panel numberSpinner(int id, double value, double min, double max, double step) {
         return add(Kind.NUMBER_SPINNER, id, "").values(value, min, max, step);
+    }
+
+    public Panel numberSpinner(int id, int value, int min, int max, int step) {
+        numberSpinner(id, (double) value, min, max, step);
+        integerSpinners.add(count - 1);
+        return this;
     }
 
     // A spinner backed by a textual model, such as GOES class. Steps are commands to its Java owner.
@@ -628,7 +685,7 @@ public final class Panel {
         return add(Kind.TREE_END, 0, "");
     }
 
-    // A scrolling tree of tree() branches and item() rows in a point size; typing selects matching rows.
+    // A tree of branches and items in a point-sized viewport; cellEditor() uses editable section rows.
     public Panel treeView(int width, int height) {
         return add(Kind.TREE_VIEW, 0, "").sizePoints(width, height);
     }
