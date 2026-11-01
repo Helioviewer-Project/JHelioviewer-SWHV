@@ -12,8 +12,9 @@ import time
 
 TESTS = Path(__file__).resolve().parent
 ROOT = TESTS.parents[1]
-DEFAULT_SUITES = ["maintenance", "commands", "model", "astronomy", "j2k", "timelines", "event"]
+DEFAULT_SUITES = ["maintenance", "commands", "model", "astronomy", "j2k", "timelines", "event", "datasets"]
 SCRIPTS = {
+    "datasets": TESTS / "datasets/run_dataset_tests.py",
     "j2k": TESTS / "j2k/run_j2k_tests.py",
     "timelines": TESTS / "timelines/run_timelines_tests.py",
     "event": TESTS / "event/run_event_tests.py",

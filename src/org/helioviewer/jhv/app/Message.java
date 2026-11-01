@@ -7,6 +7,9 @@ public class Message {
 
         void warn(String title, Object msg);
 
+        // A warning with OK and Cancel; OK runs the action.
+        void confirm(String title, Object msg, Runnable action);
+
         void fatalErr(String msg);
     }
 
@@ -22,6 +25,10 @@ public class Message {
 
     public static void warn(String title, Object msg) {
         handler.warn(title, msg);
+    }
+
+    public static void confirm(String title, Object msg, Runnable action) {
+        handler.confirm(title, msg, action);
     }
 
     public static void fatalErr(String msg) {
@@ -41,6 +48,12 @@ public class Message {
 
         @Override
         public void warn(String title, Object msg) {
+            System.err.println(title + ": " + format(msg));
+        }
+
+        // Nobody can answer.
+        @Override
+        public void confirm(String title, Object msg, Runnable action) {
             System.err.println(title + ": " + format(msg));
         }
 

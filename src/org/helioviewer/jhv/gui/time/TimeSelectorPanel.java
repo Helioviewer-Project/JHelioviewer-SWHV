@@ -12,9 +12,10 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.component.Buttons;
-import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.gui.component.ChoicePicker;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.ui.TimeSelection;
 
 import com.jidesoft.swing.JideSplitButton;
 
@@ -47,9 +48,10 @@ public final class TimeSelectorPanel extends JPanel {
     private final ArrayList<TimeListener.Selection> listeners = new ArrayList<>();
     private final TimeField startField = new TimeField("Select start date", this::timeChanged);
     private final TimeField endField = new TimeField("Select end date", this::timeChanged);
-    private final CarringtonPicker carringtonPicker = new CarringtonPicker(this::carringtonChanged);
+    private final ChoicePicker carringtonPicker = new ChoicePicker("CR", this::carringtonChanged);
 
     public TimeSelectorPanel() {
+        carringtonPicker.setToolTipText("Select Carrington rotation");
         long milli = TimeUtils.START.milli;
         setTime(milli - 2 * TimeUtils.DAY_IN_MILLIS, milli);
 
@@ -101,18 +103,15 @@ public final class TimeSelectorPanel extends JPanel {
         setTime(getStartTime(), getEndTime());
     }
 
-    private void carringtonChanged() {
-        long time = carringtonPicker.getTime();
-        int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL) + 1;
-        long end = cr >= 0 && cr < Carrington.CR_start.length ? Carrington.CR_start[cr] : TimeUtils.MAXIMAL_TIME.milli;
-        setTime(time, end);
+    private void carringtonChanged(int rotation) {
+        setTime(Carrington.CR_start[rotation], TimeSelection.rotationEnd(rotation));
     }
 
     public void setTime(long start, long end) {
         long finalEnd = Math.max(start, end); // maybe popup error
-        carringtonPicker.setTime(start);
         startField.setTime(start);
         endField.setTime(finalEnd);
+        carringtonPicker.update(TimeSelection.ROTATIONS, TimeSelection.ROTATION_SPANS, TimeSelection.rotation(startField.getTime()));
 
         long realStart = startField.getTime();
         long realEnd = endField.getTime();

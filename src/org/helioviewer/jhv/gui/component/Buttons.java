@@ -66,7 +66,11 @@ public class Buttons {
     public static final String skipFore = button(MaterialDesign.SKIP_FORWARD);
 
     private static String button(MaterialDesign uc) {
-        return "<html><span style='font-size:12px'>&nbsp;<font face='Material Design Icons'>" + uc + "</font>&nbsp;";
+        return button(uc.toString());
+    }
+
+    static String button(String glyph) {
+        return "<html><span style='font-size:12px'>&nbsp;<font face='Material Design Icons'>" + glyph + "</font>&nbsp;";
     }
 
     // toolbar

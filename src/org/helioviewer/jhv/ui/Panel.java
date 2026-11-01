@@ -17,7 +17,7 @@ public final class Panel {
         CHOICES_START, CHOICES_COUNT, KEY, MODIFIERS, FOREGROUND,
         LABEL, TEXT, TIP, ICON, FILTER, NAME, DIRECTORY,
         ACTIVATE_COLUMNS, DOUBLE_CLICK_COLUMNS, ICON_SIZE, SECONDARY_ID, BYTES_START, BYTES_COUNT, COLUMN_START,
-        COPY_COLUMNS, SEARCH_COLUMNS, ROW_HEIGHT, WIDTH_TEXT, DESCRIPTION, ALIGN_GRID, ALIGN_COLUMN, FLEX_COLUMNS, CELL_SPAN, LARGE, DOUBLE_INDEX, FIT
+        COPY_COLUMNS, SEARCH_COLUMNS, ROW_HEIGHT, WIDTH_TEXT, DESCRIPTION, ALIGN_GRID, ALIGN_COLUMN, FLEX_COLUMNS, CELL_SPAN, LARGE, DOUBLE_INDEX, FIT, GAP, MARGIN
     }
     public enum DoubleField {
         VALUE, VALUE2, MIN, MAX, STEP, SCALE(1), REPEAT;
@@ -102,9 +102,10 @@ public final class Panel {
     public static final int FLAT = 8388608; // a button framed only while hovered
     public static final int SEARCHABLE = 16777216; // typing selects matching table rows without filtering them
     public static final int INITIAL_FOCUS = 33554432;
+    public static final int SELECTABLE = 67108864; // a tree row selected as a whole; a branch expands only by its handle
     public static final int POINT_SIZE = 268435456;
     public static final int CELL_EDITOR = 536870912;
-    public static final int FILL = 1073741824; // the viewport takes its share of a resized window's height
+    public static final int FILL = 1073741824; // the viewport takes its share of a resized window's height; a check takes clicks across its column
 
     private static final Kind[] KINDS = Kind.values();
 
@@ -682,6 +683,25 @@ public final class Panel {
         return flag(TIGHT);
     }
 
+    // Points between the controls of a row, around them too as FlowLayout with margin().
+    public Panel gap(int points) {
+        return field(IntField.GAP, points);
+    }
+
+    // Points kept clear inside a row, column or grid.
+    public Panel margin(int top, int left, int bottom, int right) {
+        return field(IntField.MARGIN, top << 24 | left << 16 | bottom << 8 | right);
+    }
+
+    // The height of a row in control rows, for a control centered against a taller neighbor.
+    public Panel height(int rows) {
+        return field(IntField.HEIGHT, rows);
+    }
+
+    public Panel selectable() {
+        return flag(SELECTABLE);
+    }
+
     public Panel center() {
         return flag(CENTER);
     }
@@ -829,12 +849,29 @@ public final class Panel {
         return end;
     }
 
+    // The control closing the scroll at this control.
+    public int scrollEnd(int control) {
+        int end = control;
+        while (kind(end) != Kind.SCROLL_END)
+            end++;
+        return end;
+    }
+
     public String[] choices(int control) {
         int start = value(control, IntField.CHOICES_START);
         String[] labels = new String[value(control, IntField.CHOICES_COUNT)];
         for (int i = 0; i < labels.length; i++)
             labels[i] = span(choices[CHOICE_STRIDE * (start + i)]);
         return labels;
+    }
+
+    // The tooltip of each choice.
+    public String[] choiceTips(int control) {
+        int start = value(control, IntField.CHOICES_START);
+        String[] tips = new String[value(control, IntField.CHOICES_COUNT)];
+        for (int i = 0; i < tips.length; i++)
+            tips[i] = span(choices[CHOICE_STRIDE * (start + i) + 2]);
+        return tips;
     }
 
     public byte[] payload(int control) {

@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-class TimeField extends JTextField {
+public final class TimeField extends JTextField {
 
     private final Runnable onChange;
     private long selectedTime = System.currentTimeMillis();
@@ -25,7 +25,7 @@ class TimeField extends JTextField {
     private final JideButton calendarButton = new JideButton(Buttons.calendar);
     private Popup calPopup = null;
 
-    TimeField(String tip, Runnable _onChange) {
+    public TimeField(String tip, Runnable _onChange) {
         onChange = _onChange;
         calendarButton.addFocusListener(new FocusAdapter() {
             @Override
@@ -108,13 +108,13 @@ class TimeField extends JTextField {
             onChange.run();
     }
 
-    void setTime(long time) {
+    public void setTime(long time) {
         if (time >= TimeUtils.MINIMAL_TIME.milli && time <= TimeUtils.MAXIMAL_TIME.milli)
             selectedTime = TimeUtils.floorSec(time);
         setText(TimeUtils.formatShort(getTime()));
     }
 
-    long getTime() {
+    public long getTime() {
         return selectedTime;
     }
 

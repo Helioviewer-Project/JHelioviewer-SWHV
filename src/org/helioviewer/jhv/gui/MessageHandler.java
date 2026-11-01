@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.KeyboardFocusManager;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -20,6 +21,13 @@ final class MessageHandler implements Message.Handler {
     @Override
     public void warn(String title, Object msg) {
         show(title, msg, JOptionPane.WARNING_MESSAGE);
+    }
+
+    @Override
+    public void confirm(String title, Object msg, Runnable action) {
+        if (JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow(), msg, title,
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION)
+            action.run();
     }
 
     @Override

@@ -1,0 +1,168 @@
+# state	kind	text	x	y	width	height	enabled
+soar-default	pane		0	0	506	511	true
+soar-default	JRadioButton	Time	3	3	57	50	true
+soar-default	JRadioButton	SOOP	3	53	57	25	true
+soar-default	TimeField		80	3	362	25	true
+soar-default	JideSplitButton		442	5	38	20	true
+soar-default	TimeField		80	28	362	25	true
+soar-default	JideSplitButton		442	30	38	20	true
+soar-default	JComboBox		60	53	443	25	false
+soar-default	JComboBox	EUI FSI 174	231	78	105	25	true
+soar-default	JComboBox	L2	341	78	76	25	true
+soar-default	JButton	Search	422	78	76	25	true
+soar-default	JLabel	0 found	455	103	43	15	true
+soar-default	JScrollPane		3	118	500	350	true
+soar-default	JLabel	0 selected	439	468	59	15	true
+soar-default	JButton	Add	430	486	76	25	true
+soar-default	JButton	Cancel	349	486	76	25	true
+soar-loaded	pane		0	0	506	511	true
+soar-loaded	JRadioButton	Time	3	3	57	50	true
+soar-loaded	JRadioButton	SOOP	3	53	57	25	true
+soar-loaded	TimeField		80	3	362	25	true
+soar-loaded	JideSplitButton		442	5	38	20	true
+soar-loaded	TimeField		80	28	362	25	true
+soar-loaded	JideSplitButton		442	30	38	20	true
+soar-loaded	JComboBox		60	53	443	25	false
+soar-loaded	JComboBox	EUI FSI 174	231	78	105	25	true
+soar-loaded	JComboBox	L2	341	78	76	25	true
+soar-loaded	JButton	Search	422	78	76	25	true
+soar-loaded	JLabel	40 found	447	103	51	15	true
+soar-loaded	JScrollPane		3	118	500	350	true
+soar-loaded	JLabel	3 selected (0.6GiB)	386	468	112	15	true
+soar-loaded	JButton	Add	430	486	76	25	true
+soar-loaded	JButton	Cancel	349	486	76	25	true
+synoptic-default	pane		0	0	506	536	true
+synoptic-default	TimeField		23	3	419	25	true
+synoptic-default	JideSplitButton		442	5	38	20	true
+synoptic-default	TimeField		23	28	419	25	true
+synoptic-default	JideSplitButton		442	30	38	20	true
+synoptic-default	JRadioButton	HMI	8	53	45	25	true
+synoptic-default	JRadioButton	AIA	8	78	45	25	true
+synoptic-default	JComboBox	Magnetogram	53	53	115	25	true
+synoptic-default	JComboBox	171	53	78	76	25	false
+synoptic-default	JRadioButton	forecast	8	106	70	19	true
+synoptic-default	JRadioButton	nowcast	78	106	70	19	true
+synoptic-default	JRadioButton	temporary	148	106	82	19	true
+synoptic-default	JRadioButton	archived	230	106	73	19	true
+synoptic-default	JButton	Search	427	103	76	25	true
+synoptic-default	JLabel	0 found	455	128	43	15	true
+synoptic-default	JScrollPane		3	143	500	350	true
+synoptic-default	JLabel	0 selected	439	493	59	15	true
+synoptic-default	JButton	Add	430	511	76	25	false
+synoptic-default	JButton	Cancel	349	511	76	25	true
+synoptic-loaded	pane		0	0	506	536	true
+synoptic-loaded	TimeField		23	3	419	25	true
+synoptic-loaded	JideSplitButton		442	5	38	20	true
+synoptic-loaded	TimeField		23	28	419	25	true
+synoptic-loaded	JideSplitButton		442	30	38	20	true
+synoptic-loaded	JRadioButton	HMI	8	53	45	25	true
+synoptic-loaded	JRadioButton	AIA	8	78	45	25	true
+synoptic-loaded	JComboBox	Magnetogram	53	53	115	25	true
+synoptic-loaded	JComboBox	171	53	78	76	25	false
+synoptic-loaded	JRadioButton	forecast	8	106	70	19	true
+synoptic-loaded	JRadioButton	nowcast	78	106	70	19	true
+synoptic-loaded	JRadioButton	temporary	148	106	82	19	true
+synoptic-loaded	JRadioButton	archived	230	106	73	19	true
+synoptic-loaded	JButton	Search	427	103	76	25	true
+synoptic-loaded	JLabel	12 found	450	128	48	15	true
+synoptic-loaded	JScrollPane		3	143	500	350	true
+synoptic-loaded	JLabel	2 selected	440	493	58	15	true
+synoptic-loaded	JButton	Add	430	511	76	25	true
+synoptic-loaded	JButton	Cancel	349	511	76	25	true
+aspiics-empty	pane		0	0	157	132	true
+aspiics-empty	JLabel	Orbits	13	8	34	15	true
+aspiics-empty	JComboBox		52	3	76	25	true
+aspiics-empty	JCheckBox	Total brightness	8	28	114	19	true
+aspiics-empty	JCheckBox	Polarized brightness	8	47	138	19	true
+aspiics-empty	JCheckBox	He I D3	8	66	65	19	true
+aspiics-empty	JCheckBox	Fe XIV	8	85	59	19	true
+aspiics-empty	JButton	Add	81	107	76	25	true
+aspiics-empty	JButton	Close	0	107	76	25	true
+aspiics-loaded	pane		0	0	157	132	true
+aspiics-loaded	JLabel	Orbits	13	8	34	15	true
+aspiics-loaded	JComboBox	120	52	3	76	25	true
+aspiics-loaded	JCheckBox	Total brightness	8	28	114	19	true
+aspiics-loaded	JCheckBox	Polarized brightness	8	47	138	19	true
+aspiics-loaded	JCheckBox	He I D3	8	66	65	19	true
+aspiics-loaded	JCheckBox	Fe XIV	8	85	59	19	true
+aspiics-loaded	JButton	Add	81	107	76	25	true
+aspiics-loaded	JButton	Close	0	107	76	25	true
+punch-default	pane		0	0	506	505	true
+punch-default	TimeField		23	3	419	25	true
+punch-default	JideSplitButton		442	5	38	20	true
+punch-default	TimeField		23	28	419	25	true
+punch-default	JideSplitButton		442	30	38	20	true
+punch-default	JLabel	Level	83	58	31	15	true
+punch-default	JComboBox	3	119	53	76	25	true
+punch-default	JComboBox		200	53	76	25	true
+punch-default	JComboBox	native cadence	281	53	136	25	true
+punch-default	JButton	Search	422	53	76	25	true
+punch-default	HTMLPane		8	78	132	19	true
+punch-default	JLabel	0 found	455	97	43	15	true
+punch-default	JScrollPane		3	112	500	350	true
+punch-default	JLabel	0 selected	439	462	59	15	true
+punch-default	JButton	Add	430	480	76	25	true
+punch-default	JButton	Cancel	349	480	76	25	true
+punch-checking	pane		0	0	506	505	true
+punch-checking	TimeField		23	3	419	25	true
+punch-checking	JideSplitButton		442	5	38	20	true
+punch-checking	TimeField		23	28	419	25	true
+punch-checking	JideSplitButton		442	30	38	20	true
+punch-checking	JLabel	Level	83	58	31	15	true
+punch-checking	JComboBox	3	119	53	76	25	true
+punch-checking	JComboBox	CAM	200	53	76	25	true
+punch-checking	JComboBox	native cadence	281	53	136	25	true
+punch-checking	JButton	Search	422	53	76	25	true
+punch-checking	HTMLPane		8	78	182	19	true
+punch-checking	JLabel	0 found	455	97	43	15	true
+punch-checking	JScrollPane		3	112	500	350	true
+punch-checking	JLabel	0 selected	439	462	59	15	true
+punch-checking	JButton	Add	430	480	76	25	true
+punch-checking	JButton	Cancel	349	480	76	25	true
+punch-loaded	pane		0	0	506	505	true
+punch-loaded	TimeField		23	3	419	25	true
+punch-loaded	JideSplitButton		442	5	38	20	true
+punch-loaded	TimeField		23	28	419	25	true
+punch-loaded	JideSplitButton		442	30	38	20	true
+punch-loaded	JLabel	Level	83	58	31	15	true
+punch-loaded	JComboBox	3	119	53	76	25	true
+punch-loaded	JComboBox	CAM	200	53	76	25	true
+punch-loaded	JComboBox	native cadence	281	53	136	25	true
+punch-loaded	JButton	Search	422	53	76	25	true
+punch-loaded	HTMLPane		8	78	256	19	true
+punch-loaded	JLabel	30 found	447	97	51	15	true
+punch-loaded	JScrollPane		3	112	500	350	true
+punch-loaded	JLabel	4 selected	439	462	59	15	true
+punch-loaded	JButton	Add	430	480	76	25	true
+punch-loaded	JButton	Cancel	349	480	76	25	true
+punch-empty	pane		0	0	506	505	true
+punch-empty	TimeField		23	3	419	25	true
+punch-empty	JideSplitButton		442	5	38	20	true
+punch-empty	TimeField		23	28	419	25	true
+punch-empty	JideSplitButton		442	30	38	20	true
+punch-empty	JLabel	Level	83	58	31	15	true
+punch-empty	JComboBox	3	119	53	76	25	true
+punch-empty	JComboBox	CAM	200	53	76	25	true
+punch-empty	JComboBox	native cadence	281	53	136	25	true
+punch-empty	JButton	Search	422	53	76	25	true
+punch-empty	HTMLPane		8	78	256	19	true
+punch-empty	JLabel	0 found — archive may not cover this period; see umbra.nascom.nasa.gov/punch	41	97	457	15	true
+punch-empty	JScrollPane		3	112	500	350	true
+punch-empty	JLabel	0 selected	439	462	59	15	true
+punch-empty	JButton	Add	430	480	76	25	true
+punch-empty	JButton	Cancel	349	480	76	25	true
+timeline-empty	pane		0	0	356	400	true
+timeline-empty	JScrollPane		3	3	350	350	true
+timeline-empty	JCheckBox	Full time resolution	3	353	350	19	true
+timeline-empty	JButton	Add	280	375	76	25	true
+timeline-empty	JButton	Cancel	199	375	76	25	true
+timeline-loaded	pane		0	0	356	400	true
+timeline-loaded	JScrollPane		3	3	350	350	true
+timeline-loaded	JCheckBox	Full time resolution	3	353	350	19	true
+timeline-loaded	JButton	Add	280	375	76	25	true
+timeline-loaded	JButton	Cancel	199	375	76	25	true
+timeline-selected	pane		0	0	356	400	true
+timeline-selected	JScrollPane		3	3	350	350	true
+timeline-selected	JCheckBox	Full time resolution	3	353	350	19	true
+timeline-selected	JButton	Add	280	375	76	25	true
+timeline-selected	JButton	Cancel	199	375	76	25	true
