@@ -7,10 +7,12 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.helioviewer.jhv.astronomy.Carrington;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -65,31 +67,42 @@ public final class TimeSelectorPanel extends JPanel {
         ButtonGroup foreGroup = createShiftMenu(foreButton);
         foreButton.addActionListener(e -> shiftSpan(ShiftUnit.valueOf(foreGroup.getSelection().getActionCommand()).shift));
 
-        setLayout(new GridBagLayout());
+        GridBagLayout layout = new GridBagLayout();
+        layout.columnWidths = new int[]{UIGlobals.sidebarLabelWidth, 0, 0, 0};
+        setLayout(layout);
         setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
 
+        c.insets = new Insets(2, 0, 2, 6);
+        c.gridx = 0;
         c.gridy = 0;
-
-        c.weightx = 1;
-        c.gridx = 0;
-        add(startField, c);
-        c.weightx = 0;
-        c.gridx = 1;
-        add(backButton, c);
-
+        c.anchor = GridBagConstraints.LINE_END;
+        c.fill = GridBagConstraints.NONE;
+        JLabel startLabel = new JLabel("Start", JLabel.RIGHT);
+        startLabel.setLabelFor(startField);
+        add(startLabel, c);
         c.gridy = 1;
+        JLabel endLabel = new JLabel("End", JLabel.RIGHT);
+        endLabel.setLabelFor(endField);
+        add(endLabel, c);
 
+        c.gridx = 1;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
-        c.gridx = 0;
+        add(startField, c);
+        c.gridy = 1;
         add(endField, c);
         c.weightx = 0;
-        c.gridx = 1;
-        add(foreButton, c);
-        c.weightx = 0;
         c.gridx = 2;
+        c.gridy = 0;
+        c.insets = new Insets(2, 0, 2, 0);
+        add(backButton, c);
+        c.gridy = 1;
+        add(foreButton, c);
+        c.gridx = 3;
         add(carringtonPicker, c);
     }
 

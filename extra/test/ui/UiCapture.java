@@ -1,5 +1,6 @@
 package org.helioviewer.jhv;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
@@ -9,6 +10,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.MainFrame;
@@ -31,7 +35,12 @@ import org.helioviewer.jhv.io.ImageRequestSettings;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 // Native window captures of the production app. Other platforms require an unobscured desktop.
 public final class UiCapture {
@@ -57,6 +66,7 @@ public final class UiCapture {
             capture("playback", MainFrame.get());
             EventQueue.invokeAndWait(() -> findTabs(MainFrame.getLayersPanel()).setSelectedIndex(1));
             capture("overlays", MainFrame.get());
+            captureTimeline();
             dialog("settings", () -> new SettingsDialog().showDialog());
             dialog("about", () -> new AboutDialog().showDialog());
             dialog("metadata", () -> {
@@ -71,6 +81,35 @@ public final class UiCapture {
             error.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static void captureTimeline() throws Exception {
+        Band band = Band.deserialize(new JSONObject().put("bandType", new JSONObject().put("name", "Capture fixture (synthetic)")
+                .put("label", "Capture fixture (synthetic)").put("unitLabel", "a.u.").put("range", new JSONArray().put(0).put(100))));
+        long start = Instant.parse("2012-08-30T00:00:00Z").toEpochMilli();
+        long[] dates = new long[2881];
+        float[] values = new float[2881];
+        for (int index = 0; index < dates.length; index++) {
+            dates[index] = start + index * 60000L;
+            double phase = (index - 1640) / 140.;
+            values[index] = (float) (18 + 4 * Math.sin(index / 100.) + 65 * Math.exp(-phase * phase));
+        }
+        Method load = Band.class.getDeclaredMethod("addToCache", float[].class, long[].class);
+        load.setAccessible(true);
+        EventQueue.invokeAndWait(() -> {
+            band.setDataColor(new Color(0x287fbd));
+            TimelineLayers.add(band);
+            try {
+                load.invoke(band, values, dates);
+            } catch (ReflectiveOperationException failure) {
+                throw new IllegalStateException(failure);
+            }
+            MoviePanel.getInstance().setAdvanced(false);
+            findTabs(MainFrame.getLayersPanel()).setSelectedIndex(2);
+        });
+        Thread.sleep(1000);
+        capture("timeline", MainFrame.get());
+        EventQueue.invokeAndWait(() -> TimelineLayers.remove(band));
     }
 
     private static JTabbedPane findTabs(Container parent) {
@@ -106,11 +145,26 @@ public final class UiCapture {
         long deadline = System.nanoTime() + 15_000_000_000L;
         do {
             captureWindow(name, window);
-            if (window != MainFrame.get() || hasRenderedScene(output.resolve(name + ".png")))
+            if (window != MainFrame.get() || (hasRenderedScene(output.resolve(name + ".png"))
+                    && (!name.equals("timeline") || hasTimelineCurve(output.resolve(name + ".png")))))
                 return;
             Thread.sleep(200);
         } while (System.nanoTime() < deadline);
         throw new IllegalStateException("Local AIA texture or coordinate grid absent from native capture: " + name);
+    }
+
+    private static boolean hasTimelineCurve(Path path) throws Exception {
+        BufferedImage capture = ImageIO.read(path.toFile());
+        int pixels = 0;
+        for (int y = capture.getHeight() * 3 / 4; y < capture.getHeight() - 60; y++) {
+            for (int x = capture.getWidth() / 2; x < capture.getWidth(); x++) {
+                int rgb = capture.getRGB(x, y);
+                int blue = rgb & 255;
+                if (blue > ((rgb >> 16) & 255) + 40 && blue > ((rgb >> 8) & 255) + 10)
+                    pixels++;
+            }
+        }
+        return pixels > 100;
     }
 
     private static boolean hasRenderedScene(Path path) throws Exception {
@@ -133,6 +187,19 @@ public final class UiCapture {
         return colors.size() > 128 && gridPixels > 50;
     }
 
+    private static void checkSidebarWidth(Container parent) {
+        JViewport viewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, parent);
+        for (Component child : parent.getComponents()) {
+            if (!child.isShowing())
+                continue;
+            Rectangle bounds = SwingUtilities.convertRectangle(parent, child.getBounds(), viewport);
+            if (bounds.x < 0 || bounds.x + bounds.width > viewport.getWidth())
+                throw new IllegalStateException("Sidebar control clipped horizontally: " + child.getClass().getName() + " " + bounds);
+            if (child instanceof Container container && !(child instanceof javax.swing.JTable))
+                checkSidebarWidth(container);
+        }
+    }
+
     private static void captureWindow(String name, Window window) throws Exception {
         EventQueue.invokeAndWait(() -> {
             if (window == MainFrame.get()) {
@@ -144,6 +211,7 @@ public final class UiCapture {
                         System.out.println(name + " grid: enabled=" + grid.isEnabled() + " lines=" + grid.getGridAlpha() + " labels=" + grid.getLabelAlpha());
                 }
                 DisplayController.display();
+                checkSidebarWidth(MainFrame.getLayersPanel());
             }
             window.toFront();
             window.requestFocus();

@@ -13,10 +13,13 @@ python3 extra/test/ui/capture.py /path/to/compact --width 1280 --height 850
 
 The main-window references cover both themes. The compact playback reference
 shows the toolbar and expanded playback controls at 1280 pixels. The dialog
-references cover Settings, image metadata, and dataset selection.
+references cover Settings, image metadata, dataset selection, and About. The
+populated timeline reference uses a clearly labeled synthetic signal.
 
-The capture runner uses disposable preferences and local image data. Catalog
-contents can vary with live service responses. Screenshots do not establish OS
+The capture runner uses disposable preferences and local image data. The additional timeline view uses an explicitly labeled synthetic signal to
+check plot composition. The runner rejects horizontally clipped sidebar controls
+and captures missing the rendered solar image, coordinate grid, or fixture curve.
+Catalog contents can vary with live service responses. Screenshots do not establish OS
 focus, pointer routing, or appearance on other platforms.
 
 | View | Capture |
@@ -27,3 +30,5 @@ focus, pointer routing, or appearance on other platforms.
 | Settings | [Settings dialog](settings.png) |
 | Image metadata | [Image information dialog](metadata.png) |
 | Dataset selection | [New image layer dialog](new-layer.png) |
+| About | [About dialog](about.png) |
+| Populated timeline | [Timeline with synthetic fixture](timeline.png) |

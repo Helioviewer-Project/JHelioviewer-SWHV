@@ -49,7 +49,6 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
         syncButton.addActionListener(e -> ImageLayers.syncLayersSpan());
         JPanel imageActions = new JPanel(new BorderLayout());
-        addLayerButton.setFont(UIGlobals.uiFontBold);
         imageActions.add(addLayerButton, BorderLayout.LINE_START);
         imageActions.add(syncButton, BorderLayout.LINE_END);
         JPanel imagePanel = new JPanel(new BorderLayout());
@@ -69,6 +68,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         GridBagConstraints samplingConstraints = new GridBagConstraints();
         samplingConstraints.gridy = 2;
         samplingConstraints.gridx = 0;
+        samplingConstraints.gridwidth = 4;
         samplingConstraints.weightx = 1;
         samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
         SamplingPanel samplingPanel = new SamplingPanel();

@@ -10,6 +10,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -42,7 +44,16 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
 
     @Override
     public JComponent createContentPanel() {
-        String text = "<b>Components and acknowledgements</b><ul>" +
+        int fontSize = UIGlobals.uiFont.getSize();
+        String graphicsInfo = HtmlEscapers.htmlEscaper().escape(GL.version) + "<br/>"
+                + HtmlEscapers.htmlEscaper().escape(GL.renderer);
+        String text = "JHelioviewer is released under the " +
+                "<a href='/licenses/JHelioviewer.txt'>Mozilla Public License Version 2.0</a><br/>" +
+                "and its use is governed by the <a href='/licenses/EULA.txt'>End-User License Agreement</a>.<br/>" +
+                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a><br/><br/>" +
+                "<b>Runtime</b><br/><span style='font-size:" + (fontSize - 1) + "pt'>" +
+                AppInfo.versionDetail + "<br/>" + graphicsInfo + "</span><br/><br/>" +
+                "<b>Components and acknowledgements</b><ul>" +
                 "<li><a href=\"https://kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, © 2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
                 "<li><a href=\"https://www.lwjgl.org\">LWJGL</a> Java 3D graphics libraries and <a href=\"https://chromium.googlesource.com/angle/angle\">ANGLE</a> cross-platform GLES translation layer.</li>" +
                 "<li><a href=\"https://github.com/JOML-CI/JOML\">JOML</a>, a Java math library for GL rendering calculations.</li>" +
@@ -64,28 +75,21 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
         HTMLPane pane = new HTMLPane();
         pane.setText(text);
         pane.addHyperlinkListener(this);
-        pane.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
-        return new JScrollPane(pane);
+        pane.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        JScrollPane scrollPane = new JScrollPane(pane);
+        scrollPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));
+        return scrollPane;
     }
 
     @Override
     public JComponent createBannerPanel() {
-        int delta = 3;
         int fontSize = UIGlobals.uiFont.getSize();
-        String graphicsInfo = HtmlEscapers.htmlEscaper().escape(GL.version) + "<br/>"
-                + HtmlEscapers.htmlEscaper().escape(GL.renderer);
-        String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
-                "<a href='https://www.jhelioviewer.org'>" + AppInfo.programName + "</a></span><br/>" +
-                "Version " + AppInfo.version + '.' + AppInfo.revision + "</b><br/>" +
-                "<span style='font-size:" + (fontSize - 1) + "pt'>" + AppInfo.versionDetail + "<br/>" + graphicsInfo + "</span><br/><br/>" +
+        String text = "<b><span style='font-size:" + (fontSize + 3) + "pt'>" +
+                "<a href='https://www.jhelioviewer.org'>" + AppInfo.programName + "</a></span></b><br/>" +
+                "Version " + AppInfo.version + '.' + AppInfo.revision + "<br/><br/>" +
                 "© 2026 <a href='https://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
-                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
-                "JHelioviewer is released under the<br/>" +
-                "<a href='/licenses/JHelioviewer.txt'>Mozilla Public License Version 2.0</a><br/>" +
-                "and its use is governed by the<br/>" +
-                "<a href='/licenses/EULA.txt'>End-User License Agreement</a><br/><br/>" +
-                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
+                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)";
 
         HTMLPane pane = new HTMLPane();
         pane.setText(text);
@@ -95,11 +99,12 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
         Image logoImage = IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage();
         JLabel logo = new JLabel(new ImageIcon(new BaseMultiResolutionImage(
                 logoImage.getScaledInstance(80, 80, Image.SCALE_SMOOTH), logoImage)));
+        logo.setVerticalAlignment(SwingConstants.TOP);
 
         JPanel banner = new JPanel(new BorderLayout(16, 0));
         banner.add(logo, BorderLayout.LINE_START);
-        banner.add(pane, BorderLayout.LINE_END);
-        banner.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        banner.add(pane, BorderLayout.CENTER);
+        banner.setBorder(BorderFactory.createEmptyBorder(16, 20, 12, 20));
         return banner;
     }
 

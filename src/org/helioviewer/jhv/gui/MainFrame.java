@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,6 +14,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.app.AppInfo;
@@ -40,6 +43,38 @@ import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
 
 public final class MainFrame {
+
+    @SuppressWarnings("serial")
+    private static final class SidebarPanel extends JPanel implements Scrollable {
+        SidebarPanel() {
+            super(new BorderLayout());
+        }
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
+            return layersPanel.getGridRowHeight();
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visible, int orientation, int direction) {
+            return orientation == SwingConstants.VERTICAL ? visible.height : visible.width;
+        }
+    }
 
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
@@ -120,7 +155,7 @@ public final class MainFrame {
         layersPanel = new LayersPanel();
         layersPanel.setTransportPanel(MoviePanel.getInstance());
 
-        leftPane = new JPanel(new BorderLayout());
+        leftPane = new SidebarPanel();
         leftPane.add(layersPanel, BorderLayout.NORTH);
 
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

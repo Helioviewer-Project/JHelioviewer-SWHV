@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 //import javax.swing.plaf.FontUIResource;
@@ -61,6 +62,13 @@ public final class UIGlobals {
                 Map.entry("Button.toolbar.pressedBackground", dark ? "#42617e" : "#c6dff1"),
                 Map.entry("Table.background", "@componentBackground"),
                 Map.entry("Table.gridColor", dark ? "#303b49" : "#e5eaf0"),
+                Map.entry("CheckBox.icon.selectedBackground", "@accentColor"),
+                Map.entry("CheckBox.icon.selectedBorderColor", "@accentColor"),
+                Map.entry("CheckBox.icon.checkmarkColor", dark ? "#152838" : "#ffffff"),
+                Map.entry("RadioButton.icon.selectedBackground", "@componentBackground"),
+                Map.entry("RadioButton.icon.selectedBorderColor", "@accentColor"),
+                Map.entry("RadioButton.icon.centerDiameter", "8"),
+                Map.entry("RadioButton.icon.checkmarkColor", "@accentColor"),
                 Map.entry("JHV.recordForeground", dark ? "#f28b91" : "#b52b40")
         ));
         try {
@@ -83,7 +91,7 @@ public final class UIGlobals {
 
         foreColor = UIManager.getColor("Label.foreground");
         backColor = UIManager.getColor("Label.background");
-        midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
+        secondaryTextColor = new Color((7 * foreColor.getRed() + 3 * backColor.getRed()) / 10, (7 * foreColor.getGreen() + 3 * backColor.getGreen()) / 10, (7 * foreColor.getBlue() + 3 * backColor.getBlue()) / 10);
 
         if (Platform.isLinux())
             UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("small.font"));
@@ -103,6 +111,7 @@ public final class UIGlobals {
         uiFont = uiFont == null ? UIManager.getFont("Label.font") : uiFont; // when not FlatLaf
         float defaultSize = uiFont.getSize();
 
+        sidebarLabelWidth = new JRadioButton("Frame count").getPreferredSize().width + 6;
         uiFontBold = uiFont.deriveFont(Font.BOLD);
         uiFontSmall = uiFont.deriveFont(defaultSize - 1);
         uiFontSmallBold = uiFontSmall.deriveFont(Font.BOLD);
@@ -138,7 +147,7 @@ public final class UIGlobals {
                 TL_INTERVAL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
                 TL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.brighter();
 
-                TL_TICK_LINE_COLOR = foreColor.darker().darker();
+                TL_TICK_LINE_COLOR = new Color(60, 72, 87);
                 TL_LABEL_TEXT_COLOR = foreColor;
                 TL_TEXT_COLOR = foreColor;
                 TL_TEXT_BACKGROUND_COLOR = backColor;
@@ -199,6 +208,8 @@ public final class UIGlobals {
 
     public static Font sansFont;
 
+    public static int sidebarLabelWidth;
+
     public static Font uiFont;
     public static Font uiFontBold;
 
@@ -215,7 +226,7 @@ public final class UIGlobals {
 
     public static Color foreColor;
     public static Color backColor;
-    public static Color midColor;
+    public static Color secondaryTextColor;
 
     // Timelines panel colors
     public static Color TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR;

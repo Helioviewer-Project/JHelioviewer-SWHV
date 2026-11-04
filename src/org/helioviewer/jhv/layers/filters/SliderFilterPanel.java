@@ -1,9 +1,11 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.util.Map;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.JHVSlider;
@@ -85,6 +87,8 @@ public final class SliderFilterPanel {
             DoubleConsumer onValueChange) {
         JLabel title = new JLabel(titleText, JLabel.RIGHT);
         JHVSlider slider = new JHVSlider(min, max, initial, scale);
+        if (min < 0 && max > 0)
+            slider.putClientProperty("FlatLaf.style", Map.of("trackValueColor", UIManager.getColor("Slider.trackColor")));
         JLabel label = new SliderValueLabel(formatter.apply(slider.getDoubleValue()), slider, step -> formatter.apply(step / (double) scale));
         slider.addChangeListener(e -> {
             double value = slider.getDoubleValue();

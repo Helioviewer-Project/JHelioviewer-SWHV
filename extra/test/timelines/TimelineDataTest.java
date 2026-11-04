@@ -24,6 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +98,7 @@ public final class TimelineDataTest {
         checkHapiRequests();
         checkChartPainting();
         checkTimeLabelSpacing();
+        checkUtcTicks();
         checkOverviewAlignment();
         checkBandEdgeClipping();
         checkBandDeviceCoordinateLimits();
@@ -282,6 +286,23 @@ public final class TimelineDataTest {
                 }
             }
         }
+        int width = Math.max(1, (int) Math.round(scale));
+        if (width > 1) {
+            int[] centerline = allowedColors.clone();
+            // A thicker stroke occupies a bounded neighborhood of the analytic centerline.
+            // The original one-device-pixel oracle remains exact at normal display scale.
+            for (int y = 0; y < 128; y++) {
+                for (int x = 0; x < 128; x++) {
+                    int colors = centerline[y * 128 + x];
+                    if (colors == 0)
+                        continue;
+                    for (int yy = Math.max(0, y - width); yy <= Math.min(127, y + width); yy++) {
+                        for (int xx = Math.max(0, x - width); xx <= Math.min(127, x + width); xx++)
+                            allowedColors[yy * 128 + xx] |= colors;
+                    }
+                }
+            }
+        }
         int[] pixels = image.getRGB(0, 0, 128, 128, null, 0, 128);
         for (int i = 0; i < pixels.length; i++) {
             int rgb = pixels[i];
@@ -292,8 +313,18 @@ public final class TimelineDataTest {
         for (int[] sample : samples) {
             boolean first = pixels[sample[0]] != Color.BLACK.getRGB();
             boolean second = pixels[sample[1]] != Color.BLACK.getRGB();
-            check(first || second, "Missing analytic line sample: " + context);
-            if (paths.length == 1 && paths[0].length == 4 && sample[0] != sample[1])
+            boolean covered = first || second;
+            if (width > 1 && !covered) {
+                int x = sample[0] % 128;
+                int y = sample[0] / 128;
+                int radius = (width + 1) / 2;
+                for (int yy = Math.max(0, y - radius); yy <= Math.min(127, y + radius); yy++) {
+                    for (int xx = Math.max(0, x - radius); xx <= Math.min(127, x + radius); xx++)
+                        covered |= pixels[yy * 128 + xx] != Color.BLACK.getRGB();
+                }
+            }
+            check(covered, "Missing analytic line sample: " + context);
+            if (width == 1 && paths.length == 1 && paths[0].length == 4 && sample[0] != sample[1])
                 check(first != second, "Two pixels at a one-pixel line's exact halfway tie: " + context);
         }
     }
@@ -328,12 +359,13 @@ public final class TimelineDataTest {
                         } finally {
                             graphics.dispose();
                         }
-                        // The far endpoint exceeds int range. Within this viewport, the nearest samples stay in one column.
-                        int first = value < 100 ? 8 * scale : 2 * scale;
-                        int last = value < 100 ? 14 * scale - 1 : 8 * scale;
+                        // The far endpoint exceeds int range. Within this viewport, the stroke stays centered on the nearest sample column.
+                        int first = value < 100 ? 8 * scale - scale / 2 : 2 * scale;
+                        int last = value < 100 ? 14 * scale - 1 : 8 * scale + (scale - 1) / 2;
                         for (int y = 0; y < 64; y++) {
                             for (int x = 0; x < 64; x++) {
-                                int expected = x == 3 * scale && y >= first && y <= last ? Color.YELLOW.getRGB() : Color.BLACK.getRGB();
+                                int left = 3 * scale - scale / 2;
+                                int expected = x >= left && x < left + scale && y >= first && y <= last ? Color.YELLOW.getRGB() : Color.BLACK.getRGB();
                                 check(image.getRGB(x, y) == expected,
                                         "Device coordinate wraps at scale " + scale + ", value=" + value + ", multicolor=" + multicolor);
                             }
@@ -343,6 +375,40 @@ public final class TimelineDataTest {
             } finally {
                 band.remove();
             }
+        }
+    }
+
+    private static void checkUtcTicks() {
+        long start = Instant.parse("2012-08-30T00:00:00Z").toEpochMilli();
+        TimeAxis twoDays = new TimeAxis(start, start + 2 * TimeUtils.DAY_IN_MILLIS);
+        List<Long> ticks = twoDays.ticks(5);
+        check(ticks.size() == 5, "Two-day plot should have five half-day ticks");
+        for (int index = 0; index < ticks.size(); index++)
+            check(ticks.get(index) == start + index * 12 * 3600000L, "Timeline tick is not aligned to a UTC half-day");
+        long[] spans = {60000L, 300000L, 10800000L, 18 * TimeUtils.DAY_IN_MILLIS,
+                28 * TimeUtils.DAY_IN_MILLIS, 100 * TimeUtils.DAY_IN_MILLIS,
+                5 * 365 * TimeUtils.DAY_IN_MILLIS, 100 * 365 * TimeUtils.DAY_IN_MILLIS};
+        for (long span : spans) {
+            for (int maximum : new int[]{2, 3, 5, 10}) {
+                TimeAxis axis = new TimeAxis(start - span + 12345, start + 12345);
+                long originalStart = axis.start();
+                long originalEnd = axis.end();
+                List<Long> values = axis.ticks(maximum);
+                check(!values.isEmpty() && values.size() <= maximum * 2, "Unusable tick density for span " + span);
+                long previous = Long.MIN_VALUE;
+                for (long value : values) {
+                    check(value >= axis.start() && value <= axis.end() && value > previous, "Ticks must be ordered inside the interval");
+                    check(value % 1000 == 0, "Ticks must align to whole UTC seconds");
+                    previous = value;
+                }
+                check(axis.start() == originalStart && axis.end() == originalEnd, "Display ticks changed the exact interval");
+            }
+        }
+        TimeAxis calendar = new TimeAxis(Instant.parse("2019-12-16T10:11:12Z").toEpochMilli(),
+                Instant.parse("2020-06-03T10:11:12Z").toEpochMilli());
+        for (long value : calendar.ticks(6)) {
+            ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+            check(date.getDayOfMonth() == 1 && date.toLocalTime().equals(LocalTime.MIDNIGHT), "Long-range ticks must align to calendar months");
         }
     }
 
@@ -458,7 +524,7 @@ public final class TimelineDataTest {
                             if (image.getRGB(x, y + dy) == Color.RED.getRGB())
                                 redPixels++;
                         }
-                        check(redPixels == 1, "Grid obscures trace or stroke width changes at scale " + scale + ", stacked=" + stacked);
+                        check(redPixels == Math.max(1, (int) Math.round(scale)), "Trace must retain its logical-pixel weight at scale " + scale + ", stacked=" + stacked);
                         int gapX = (int) (scale * xMapper.toPixel(START + 50_000));
                         for (int dy = -2; dy <= 2; dy++)
                             check(image.getRGB(gapX, y + dy) != Color.RED.getRGB(), "Painting bridges a data gap");

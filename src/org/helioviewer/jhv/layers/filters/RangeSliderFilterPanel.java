@@ -46,8 +46,7 @@ public final class RangeSliderFilterPanel {
             RangeConsumer onValueChange) {
         JLabel title = new JLabel(titleText, JLabel.RIGHT);
         JHVRangeSlider slider = new JHVRangeSlider(min, max, initialLow, initialHigh, scale);
-        // Both readout lines depend on one endpoint independently, so equal endpoints
-        // cover every displayed value without enumerating pairs.
+        // Each endpoint has the same format, so equal endpoints reserve the widest pair.
         JLabel label = new SliderValueLabel(formatter.format(slider.getLowDouble(), slider.getHighDouble()), slider,
                 step -> formatter.format(step / (double) scale, step / (double) scale));
         slider.addChangeListener(e -> {
@@ -61,7 +60,7 @@ public final class RangeSliderFilterPanel {
     }
 
     private static String formatPercent(double low, double high) {
-        return String.format("%.0f%%\n%.0f%%", low * 100, high * 100);
+        return String.format("%.0f–%.0f%%", low * 100, high * 100);
     }
 
     private static String formatMask(double low, double high, double maximum) {

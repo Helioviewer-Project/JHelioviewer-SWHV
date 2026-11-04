@@ -36,15 +36,15 @@ final class TimelineLabelPainter {
     private final Stroke boldStroke = new BasicStroke(2);
     private final Stroke thinStroke = new BasicStroke(0.5f);
 
-    void drawStaticLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
+    void drawStaticLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, boolean grid) {
         Stroke stroke = g.getStroke();
         try {
             g.setStroke(thinStroke);
             g.setFont(font);
             if (geometry.isStacked()) {
-                drawStackedLabels(g, geometry, xAxis);
+                drawStackedLabels(g, geometry, xAxis, grid);
             } else {
-                drawTimeLabels(g, geometry, xAxis);
+                drawTimeLabels(g, geometry, xAxis, grid);
                 drawYAxisLabels(g, geometry);
             }
         } finally {
@@ -85,11 +85,11 @@ final class TimelineLabelPainter {
         drawString(g, fontMetrics, ")", x + currWidth, y);
     }
 
-    private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
-        drawHorizontalLabels(g, geometry, xAxis, 0, null);
+    private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, boolean grid) {
+        drawHorizontalLabels(g, geometry, xAxis, 0, null, grid);
         List<TimelineLayer> propagatedLayers = geometry.getPropagatedLayers();
         for (int row = 0; row < propagatedLayers.size(); row++)
-            drawHorizontalLabels(g, geometry, xAxis, row + 1, propagatedLayers.get(row));
+            drawHorizontalLabels(g, geometry, xAxis, row + 1, propagatedLayers.get(row), grid);
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
@@ -97,10 +97,10 @@ final class TimelineLabelPainter {
             drawVerticalLabels(g, geometry, layout);
     }
 
-    private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
+    private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, boolean grid) {
         List<GraphGeometry.LayerLayout> layerLayouts = geometry.getLayerLayouts();
 
-        drawTimeLabels(g, geometry, xAxis);
+        drawTimeLabels(g, geometry, xAxis, grid);
 
         for (GraphGeometry.LayerLayout layout : layerLayouts)
             drawStackedVerticalLabels(g, geometry, layout);
@@ -173,21 +173,22 @@ final class TimelineLabelPainter {
         }
     }
 
-    private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl) {
+    private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl, boolean grid) {
         Rectangle graphArea = geometry.area();
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + row * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
+        List<Long> ticks = xAxis.ticks(horizontalTickCount);
+        boolean seconds = ticks.size() > 1 && ticks.get(1) - ticks.getFirst() < TimeUtils.MINUTE_IN_MILLIS;
         long start = tl == null ? xAxis.start() : tl.getObservationTime(xAxis.start());
         long end = tl == null ? xAxis.end() : tl.getObservationTime(xAxis.end());
         TimeAxis.Mapper xMapper = new TimeAxis.Mapper(start, end, graphArea.x, graphArea.width);
 
         long previousDate = Long.MIN_VALUE;
-        for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
+        for (long tick : ticks) {
+            long tickValue = tick;
             if (tl != null) {
                 tickValue = tl.getObservationTime(tickValue);
             }
@@ -195,24 +196,21 @@ final class TimelineLabelPainter {
 
             if (tl == null) {
                 g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
-                g.drawLine(x, graphArea.y, x, geometry.graphBottom() + 3);
+                g.drawLine(x, grid ? graphArea.y : geometry.graphBottom(), x, geometry.graphBottom() + 3);
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
             } else {
                 g.setColor(dataColor(tl));
             }
-            drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate), tickTextHeight);
+            drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate, seconds), tickTextHeight);
             previousDate = tickValue;
         }
     }
 
-    private static String formatTickText(long tickValue, long previousDate) {
-        if (previousDate == Long.MIN_VALUE) {
-            return TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
-        }
-
-        long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
-        long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
-        return TimeUtils.format(tickDayNumber == prevDayNumber ? DrawConstants.HOUR_TIME_FORMAT : DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
+    private static String formatTickText(long tickValue, long previousDate, boolean seconds) {
+        String time = TimeUtils.format(seconds ? DrawConstants.HOUR_TIME_FORMAT : DrawConstants.HOUR_TIME_FORMAT_NO_SEC, tickValue);
+        boolean newDate = previousDate == Long.MIN_VALUE
+                || Math.floorDiv(tickValue, TimeUtils.DAY_IN_MILLIS) != Math.floorDiv(previousDate, TimeUtils.DAY_IN_MILLIS);
+        return newDate ? time + "\n" + TimeUtils.format(DrawConstants.DAY_MONTH_YEAR_TIME_FORMAT, tickValue) : time;
     }
 
     private static void drawTimeText(Graphics2D g, GraphGeometry geometry, int x, String tickText, int tickTextHeight) {
@@ -221,7 +219,7 @@ final class TimelineLabelPainter {
         while (lines.hasNext()) {
             String line = lines.next();
             int lineWidth = (int) g.getFontMetrics().getStringBounds(line, g).getWidth();
-            int xl = Math.min(x - lineWidth / 2, geometry.rightEdge() - lineWidth);
+            int xl = Math.max(geometry.area().x, Math.min(x - lineWidth / 2, geometry.rightEdge() - lineWidth));
             g.drawString(line, xl, y);
             y += g.getFontMetrics().getHeight();
         }

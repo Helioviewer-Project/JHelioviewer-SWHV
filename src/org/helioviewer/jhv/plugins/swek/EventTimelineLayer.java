@@ -167,7 +167,7 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
 
     @Override
     public boolean hasData() {
-        return true;
+        return !visibleEvents.isEmpty();
     }
 
     @Override

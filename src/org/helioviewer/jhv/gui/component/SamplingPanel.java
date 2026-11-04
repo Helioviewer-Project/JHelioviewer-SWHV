@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.component;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -9,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.DefaultFormatter;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.ImageRequestSettings;
 
 // Edits and shows the sampling of the image request settings.
@@ -29,7 +31,9 @@ public final class SamplingPanel extends JPanel implements ImageRequestSettings.
     private boolean syncing;
 
     public SamplingPanel() {
-        setLayout(new GridBagLayout());
+        GridBagLayout layout = new GridBagLayout();
+        layout.columnWidths = new int[]{UIGlobals.sidebarLabelWidth, 0, 0};
+        setLayout(layout);
 
         ButtonGroup group = new ButtonGroup();
         group.add(timeStepButton);
@@ -48,20 +52,24 @@ public final class SamplingPanel extends JPanel implements ImageRequestSettings.
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
+        c.insets = new Insets(2, 0, 2, 6);
 
         c.gridy = 0;
         c.gridx = 0;
-        c.weightx = 1;
+        c.weightx = 0;
         add(timeStepButton, c);
         c.gridx = 1;
         c.weightx = 0;
         add(cadenceSpinner, c);
         c.gridx = 2;
+        c.weightx = 1;
+        c.anchor = GridBagConstraints.LINE_START;
         add(unitCombo, c);
 
         c.gridy = 1;
         c.gridx = 0;
-        c.weightx = 1;
+        c.weightx = 0;
+        c.anchor = GridBagConstraints.LINE_START;
         add(frameCountButton, c);
         c.gridx = 1;
         c.weightx = 0;

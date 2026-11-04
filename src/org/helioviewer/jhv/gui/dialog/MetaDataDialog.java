@@ -16,8 +16,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.app.Log;
@@ -74,6 +76,7 @@ public final class MetaDataDialog extends StandardDialog {
 
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
+        ((DefaultTableCellRenderer) fitsTable.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
         fitsTable.setIntercellSpacing(new Dimension(0, 0));
         int keywordWidth = new JLabel("MMMMMMMM").getPreferredSize().width;
         fitsTable.getColumnModel().getColumn(0).setMinWidth(keywordWidth);
@@ -84,7 +87,7 @@ public final class MetaDataDialog extends StandardDialog {
         setInitFocusedComponent(fitsTable);
         com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
         basicArea.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
-        basicArea.setPreferredSize(new Dimension(600, 100));
+        basicArea.setPreferredSize(new Dimension(600, 120));
         hvArea.setPreferredSize(new Dimension(600, 40));
         basicArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
         hvArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
@@ -157,22 +160,27 @@ public final class MetaDataDialog extends StandardDialog {
         URI sourceUri = metadata.getSourceUri();
         boolean hasSourceUri = !sourceUri.equals(MetaData.UNKNOWN_SOURCE_URI);
         String source = HtmlEscapers.htmlEscaper().escape(sourceUri.toString());
-        String sourceText = "Source URI: <a href=\"" + source + "\">" + source + "</a>";
+        String sourceText = "<a href=\"" + source + "\">" + source + "</a>";
         if (!(metadata instanceof FitsMetaData fitsMetadata)) {
-            basicArea.setText(hasSourceUri ? sourceText : "No Helioviewer metadata available");
+            basicArea.setText(hasSourceUri ? "Source URI: " + sourceText : "No Helioviewer metadata available");
             return;
         }
 
-        basicArea.setText("Observatory: " + fitsMetadata.getObservatory() + "<br/>" +
-                "Instrument: " + fitsMetadata.getInstrument() + "<br/>" +
-                "Detector: " + (fitsMetadata.getDetector().isBlank() ? "—" : fitsMetadata.getDetector()) + "<br/>" +
-                "Measurement: " + fitsMetadata.getMeasurement() + "<br/>" +
-                "Observation Date: " + fitsMetadata.getViewpoint().time +
-                (hasSourceUri ? "<br/>" + sourceText : ""));
+        basicArea.setText("<table cellspacing='0' cellpadding='1'>" +
+                summaryRow("Observatory", HtmlEscapers.htmlEscaper().escape(fitsMetadata.getObservatory())) +
+                summaryRow("Instrument", HtmlEscapers.htmlEscaper().escape(fitsMetadata.getInstrument())) +
+                summaryRow("Detector", HtmlEscapers.htmlEscaper().escape(fitsMetadata.getDetector().isBlank() ? "—" : fitsMetadata.getDetector())) +
+                summaryRow("Measurement", HtmlEscapers.htmlEscaper().escape(fitsMetadata.getMeasurement())) +
+                summaryRow("Observation date", fitsMetadata.getViewpoint().time.toString()) +
+                (hasSourceUri ? summaryRow("Source URI", sourceText) : "") + "</table>");
 
         String xml = frame.xml();
         String filename = fitsMetadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(fitsMetadata.getViewpoint().time.milli) + ".fits.xml";
         Task.submitBackground("metadata", () -> parseMetadata(xml, filename), parsed -> applyMetadata(request, parsed), Log::error);
+    }
+
+    private static String summaryRow(String label, String value) {
+        return "<tr><td align='right' style='padding-right:12px'>" + label + "</td><td>" + value + "</td></tr>";
     }
 
     private void applyMetadata(int request, ParsedMetadata parsed) {

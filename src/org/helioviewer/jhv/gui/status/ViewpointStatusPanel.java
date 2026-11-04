@@ -13,10 +13,12 @@ import org.helioviewer.jhv.time.JHVTime;
 @SuppressWarnings("serial")
 public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
 
+    private final int[] labels = new int[4];
     private double distance;
     private JHVTime time = Sun.StartEarth.time;
 
     public ViewpointStatusPanel() {
+        setLabelRanges(labels);
         lazyRepaint();
         UITimer.register(this);
     }
@@ -31,11 +33,20 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
         time = viewpoint.time;
 
         StringBuilder sb = new StringBuilder(64);
-        sb.append("CR: ");
+        labels[0] = 0;
+        sb.append("CR");
+        labels[1] = sb.length();
+        sb.append(' ');
         FastFormat.appendFixed2(sb, Carrington.time2CR(time), 0, false);
-        sb.append(" D☉: ");
+        sb.append("    ");
+        int fieldStart = sb.length();
         FastFormat.appendFixed3(sb, distance * Sun.MeanEarthDistanceInv, 7, false);
-        sb.append("au |");
+        while (sb.charAt(fieldStart) == ' ')
+            fieldStart++;
+        sb.insert(fieldStart, "D☉ ");
+        labels[2] = fieldStart;
+        labels[3] = fieldStart + 2;
+        sb.append(" au");
         setText(sb.toString());
     }
 

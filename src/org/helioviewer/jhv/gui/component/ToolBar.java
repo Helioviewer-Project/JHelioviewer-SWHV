@@ -185,9 +185,11 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
         // Zoom
         JideButton zoomIn = toolButton(ZOOMIN);
+        zoomIn.setText(ZOOMIN.icon());
         zoomIn.addActionListener(new Actions.ZoomIn());
         HoldRepeat.install(zoomIn, ZOOM_HOLD_REPEAT_MS);
         JideButton zoomOut = toolButton(ZOOMOUT);
+        zoomOut.setText(ZOOMOUT.icon());
         zoomOut.addActionListener(new Actions.ZoomOut());
         HoldRepeat.install(zoomOut, ZOOM_HOLD_REPEAT_MS);
         JideButton zoomFit = toolButton(ZOOMFIT);
@@ -317,7 +319,6 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             addButton(samp);
         }
 
-        addSeparator(dim);
 /*
         ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
         JideButton hButton = toolButton(hText);
@@ -335,6 +336,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
     private void addButton(AbstractButton b) {
         b.setFocusPainted(false);
+        b.getAccessibleContext().setAccessibleName(b.getToolTipText());
         add(b);
     }
 

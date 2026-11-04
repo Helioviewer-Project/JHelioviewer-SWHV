@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.movie.Player;
@@ -99,7 +100,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void drawIntervalBackground(Graphics2D g, IntervalGeometry geometry) {
-        g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
+        g.setColor(UIManager.getColor("Table.selectionInactiveBackground"));
         g.fillRect(geometry.selectedLeft - 1, 0, geometry.selectedRight - geometry.selectedLeft, getHeight() - 3);
     }
 
@@ -163,8 +164,16 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int tickTextWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         int maxTicks = Math.max(2, (geometry.width - tickTextWidth * 2) / tickTextWidth);
 
+        int previousRight = Integer.MIN_VALUE;
         for (LabelTick tick : labelTicks(geometry, maxTicks)) {
+            if (!geometry.contains(tick.date))
+                continue;
+            int width = g.getFontMetrics().stringWidth(tick.text);
+            int left = labelLeft(geometry.pixel(tick.date), width, geometry);
+            if (left < previousRight + 8)
+                continue;
             drawLabel(g, selectedInterval, tick.text, tick.date, geometry);
+            previousRight = left + width;
         }
     }
 
@@ -312,13 +321,15 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         }
         g.drawLine(x, 2, x, getHeight() - 1);
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        if (x + textWidth > geometry.availableRight()) {
-            if ((x - 2) < geometry.availableRight()) {
-                g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
-            }
-        } else {
-            g.drawString(tickText, x + 2, getHeight() - 5);
-        }
+        int left = labelLeft(x, textWidth, geometry);
+        g.drawString(tickText, left, getHeight() - 5);
+    }
+
+    private static int labelLeft(int x, int width, IntervalGeometry geometry) {
+        int left = x + 4;
+        if (left + width > geometry.availableRight())
+            left = x - width - 4;
+        return Math.max(DrawConstants.GRAPH_LEFT_SPACE, left);
     }
 
     private int availableIntervalWidth() {

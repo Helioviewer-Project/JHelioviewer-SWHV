@@ -3,6 +3,11 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -21,8 +26,43 @@ public final class StatusPanel extends JPanel {
 
     @SuppressWarnings("this-escape")
     public static class StatusPlugin extends JLabel {
+        private int[] labelRanges;
+
         protected StatusPlugin() {
             setFont(UIGlobals.uiFontMonoSmall);
+        }
+
+        protected void setLabelRanges(int[] ranges) {
+            labelRanges = ranges;
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            if (labelRanges == null) {
+                super.paintComponent(graphics);
+                return;
+            }
+            Graphics2D g = (Graphics2D) graphics.create();
+            try {
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g.setFont(getFont());
+                FontMetrics metrics = g.getFontMetrics();
+                Insets insets = getInsets();
+                int x = insets.left;
+                int y = insets.top + (getHeight() - insets.top - insets.bottom - metrics.getHeight()) / 2 + metrics.getAscent();
+                String text = getText();
+                int start = 0;
+                for (int index = 0; index <= labelRanges.length; index++) {
+                    int end = index == labelRanges.length ? text.length() : labelRanges[index];
+                    g.setColor(index % 2 == 0 ? getForeground() : UIGlobals.secondaryTextColor);
+                    String part = text.substring(start, end);
+                    g.drawString(part, x, y);
+                    x += metrics.stringWidth(part);
+                    start = end;
+                }
+            } finally {
+                g.dispose();
+            }
         }
     }
 

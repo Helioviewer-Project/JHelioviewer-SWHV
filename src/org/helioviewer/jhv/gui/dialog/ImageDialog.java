@@ -74,6 +74,9 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         JButton cancelButton = new JButton(close);
         cancelButton.setText("Cancel");
         getRootPane().setDefaultButton(actionButton);
+        availabilityButton.putClientProperty(ButtonPanel.KEEP_PREFERRED_WIDTH, true);
+        cancelButton.putClientProperty(ButtonPanel.KEEP_PREFERRED_WIDTH, true);
+        actionButton.putClientProperty(ButtonPanel.KEEP_PREFERRED_WIDTH, true);
 
         ButtonPanel panel = new ButtonPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));

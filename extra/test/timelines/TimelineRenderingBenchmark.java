@@ -173,8 +173,8 @@ public final class TimelineRenderingBenchmark {
                 if (frame.getRGB(gap, y + dy) == Color.RED.getRGB())
                     throw new AssertionError("Chart cache bridges a data gap");
             }
-            if (red != 1)
-                throw new AssertionError("Chart cache has " + red + " red pixels across a one-device-pixel stroke");
+            if (red != scale)
+                throw new AssertionError("Chart cache has " + red + " red pixels across a logical-pixel stroke");
             if (frame.getRGB(x, y) != Color.RED.getRGB())
                 throw new AssertionError("Three-vertex trace misses its exact device-pixel row");
             JSONArray levels = new JSONArray()
@@ -202,8 +202,8 @@ public final class TimelineRenderingBenchmark {
                     for (int dy = -3; dy <= 3; dy++)
                         if (frame.getRGB(cx, cy + dy) == expected)
                             pixels++;
-                    if (pixels != 1)
-                        throw new AssertionError("Multicolor run lost its color or one-device-pixel stroke");
+                    if (pixels != scale)
+                        throw new AssertionError("Multicolor run lost its color or logical-pixel stroke");
                     if (frame.getRGB(cx, cy) != expected)
                         throw new AssertionError("Multicolor run misses its exact device-pixel row");
                 }
@@ -218,7 +218,7 @@ public final class TimelineRenderingBenchmark {
                 field(type, "layers").set(chart, List.of(band));
                 geometry.layout(List.of(band));
             }
-            System.out.println("CHECK multicolor runs, one-pixel strokes and gaps passed");
+            System.out.println("CHECK multicolor runs, logical-pixel strokes and gaps passed");
             chart.setSize(WIDTH - 100, HEIGHT - 100);
             geometry.setSize(WIDTH - 100, HEIGHT - 100);
             geometry.layout(List.of(band));
@@ -228,7 +228,7 @@ public final class TimelineRenderingBenchmark {
             frame = ((ExportMovie.TimelineFrame) recording.invoke(chart)).image();
             if (frame.getWidth() != (WIDTH - 100) * scale || frame.getHeight() != (HEIGHT - 100) * scale)
                 throw new AssertionError("Recording dimensions did not follow resize");
-            System.out.println("CHECK cache resolution, one-pixel stroke, exact placement, gaps and resize passed");
+            System.out.println("CHECK cache resolution, logical-pixel stroke, exact placement, gaps and resize passed");
         } finally {
             graphics.dispose();
             target.flush();

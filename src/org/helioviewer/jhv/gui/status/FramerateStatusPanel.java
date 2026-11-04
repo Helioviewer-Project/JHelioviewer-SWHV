@@ -2,6 +2,7 @@ package org.helioviewer.jhv.gui.status;
 
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.component.StatusPanel;
 import org.helioviewer.jhv.math.FastFormat;
@@ -12,6 +13,7 @@ public final class FramerateStatusPanel extends StatusPanel.StatusPlugin impleme
     private int fps = -1;
 
     public FramerateStatusPanel() {
+        setForeground(UIGlobals.secondaryTextColor);
         lazyRepaint();
         UITimer.register(this);
     }

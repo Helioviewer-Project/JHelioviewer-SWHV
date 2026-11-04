@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui.status;
 
+import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.annotation.Annotations;
@@ -25,14 +27,14 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private static final int FIELD_WIDTH = 7;
     private static final String MISSING = String.format("%" + FIELD_WIDTH + "s", "--");
-    private static final String NAN_DEGREES = MISSING + "°," + MISSING + "°";
-    private static final String NAN_HPC = MISSING + "," + MISSING;
-    private static final String NAN_POLAR = MISSING + "°," + MISSING + "☉";
+    private final int[] labels = new int[12];
+    private int labelCount;
 
     private final StringBuilder textBuffer = new StringBuilder(128);
 
     public PositionStatusPanel() {
         setText(formatOrtho(Vec2.NAN, GridType.Viewpoint, 0, 0, 0, 0));
+        setLabelRanges(labels);
     }
 
     private void update(int x, int y) {
@@ -64,7 +66,12 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (DisplayController.getViewpointUpdate().dragAxis() == Vec3.ZAxis ? 0 : 90)); // w.r.t. axis
                 String ortho = formatOrtho(coord, mv.gridType(), r, pa, px, py);
-                setText(annStr.isEmpty() ? ortho : annStr + " | " + ortho);
+                if (!annStr.isEmpty()) {
+                    int offset = annStr.length() + 4;
+                    for (int index = 0; index < labels.length; index++)
+                        labels[index] += offset;
+                }
+                setText(annStr.isEmpty() ? ortho : annStr + "    " + ortho);
             }
         }
     }
@@ -79,9 +86,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private static StringBuilder appendR(StringBuilder sb, double r) {
         if (r < 32 * Sun.Radius)
-            FastFormat.appendFixed2(sb, r, FIELD_WIDTH, false).append("R☉");
+            FastFormat.appendFixed2(sb, r, FIELD_WIDTH, false).append(" R☉");
         else
-            FastFormat.appendFixed2(sb, r * Sun.MeanEarthDistanceInv, FIELD_WIDTH, false).append("au");
+            FastFormat.appendFixed2(sb, r * Sun.MeanEarthDistanceInv, FIELD_WIDTH, false).append(" au");
         return sb;
     }
 
@@ -89,61 +96,104 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return FastFormat.appendFixed2(sb, value, FIELD_WIDTH, true).append('°');
     }
 
-    private static void appendDegreePair(StringBuilder sb, Vec2 coord, GridType gridType) {
-        appendDegrees(sb, gridType.displayLongitude(coord.x)).append(',');
-        appendDegrees(sb, coord.y);
+    private void appendLabel(String text) {
+        labels[labelCount++] = textBuffer.length();
+        textBuffer.append(text);
+        labels[labelCount++] = textBuffer.length();
+        textBuffer.append(' ');
+    }
+
+    private void appendDegreePair(Vec2 coord, GridType gridType) {
+        appendLabel("φ");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING).append('°');
+        else
+            appendDegrees(textBuffer, gridType.displayLongitude(coord.x));
+        textBuffer.append("  ");
+        appendLabel("θ");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING).append('°');
+        else
+            appendDegrees(textBuffer, coord.y);
+    }
+
+    private String finishBuffer() {
+        // Keep each label next to its value; reserve stable field width before the label.
+        for (int index = 0; index < labelCount; index += 2) {
+            int start = labels[index];
+            int end = labels[index + 1];
+            int value = end + 1;
+            while (value < textBuffer.length() && textBuffer.charAt(value) == ' ')
+                value++;
+            int padding = value - end - 1;
+            for (int character = end - 1; character >= start; character--)
+                textBuffer.setCharAt(character + padding, textBuffer.charAt(character));
+            for (int character = start; character < start + padding; character++)
+                textBuffer.setCharAt(character, ' ');
+            textBuffer.setCharAt(end + padding, ' ');
+            labels[index] += padding;
+            labels[index + 1] += padding;
+        }
+        // Modes expose two or six measurements. Unused label ranges end at the text boundary.
+        Arrays.fill(labels, labelCount, labels.length, textBuffer.length());
+        return textBuffer.toString();
     }
 
     private String formatLati(@Nonnull Vec2 coord, GridType gridType) {
-        StringBuilder sb = resetBuffer();
-        sb.append("(φ,θ):(");
-        if (coord == Vec2.NAN)
-            sb.append(NAN_DEGREES);
-        else
-            appendDegreePair(sb, coord, gridType);
-        return sb.append(')').toString();
+        resetBuffer();
+        appendDegreePair(coord, gridType);
+        return finishBuffer();
     }
 
     private String formatHpc(@Nonnull Vec2 coord) {
-        StringBuilder sb = resetBuffer();
-        sb.append("(Tx,Ty):(");
-        if (coord == Vec2.NAN) {
-            sb.append(NAN_HPC);
-        } else {
-            appendXY(sb, coord.x).append(',');
-            appendXY(sb, coord.y);
-        }
-        return sb.append(')').toString();
+        resetBuffer();
+        appendLabel("Tx");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING);
+        else
+            appendXY(textBuffer, coord.x);
+        textBuffer.append("  ");
+        appendLabel("Ty");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING);
+        else
+            appendXY(textBuffer, coord.y);
+        return finishBuffer();
     }
 
     private String formatAngleRadius(@Nonnull Vec2 coord) {
-        StringBuilder sb = resetBuffer();
-        sb.append("(θ,ρ):(");
-        if (coord == Vec2.NAN) {
-            sb.append(NAN_POLAR);
-        } else {
-            appendDegrees(sb, coord.x).append(',');
-            appendR(sb, coord.y);
-        }
-        return sb.append(')').toString();
+        resetBuffer();
+        appendLabel("θ");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING).append('°');
+        else
+            appendDegrees(textBuffer, coord.x);
+        textBuffer.append("  ");
+        appendLabel("ρ");
+        if (coord == Vec2.NAN)
+            textBuffer.append(MISSING).append(" R☉");
+        else
+            appendR(textBuffer, coord.y);
+        return finishBuffer();
     }
 
     private String formatOrtho(@Nonnull Vec2 coord, GridType gridType, double r, double pa, double px, double py) {
-        StringBuilder sb = resetBuffer();
-        sb.append("(ρ,ψ):(");
-        appendR(sb, r).append(',');
-        appendDegrees(sb, pa).append(") | (φ,θ):(");
-        if (coord == Vec2.NAN)
-            sb.append(NAN_DEGREES);
-        else
-            appendDegreePair(sb, coord, gridType);
-        sb.append(") | (x,y):(");
-        appendXY(sb, px).append(',');
-        appendXY(sb, py);
-        return sb.append(')').toString();
+        resetBuffer();
+        appendLabel("ρ");
+        appendR(textBuffer, r).append("  ");
+        appendLabel("ψ");
+        appendDegrees(textBuffer, pa).append("    ");
+        appendDegreePair(coord, gridType);
+        textBuffer.append("    ");
+        appendLabel("x");
+        appendXY(textBuffer, px).append("  ");
+        appendLabel("y");
+        appendXY(textBuffer, py);
+        return finishBuffer();
     }
 
     private StringBuilder resetBuffer() {
+        labelCount = 0;
         textBuffer.setLength(0);
         return textBuffer;
     }
@@ -175,7 +225,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void maybeCopyToClipboard(PointerEvent e) {
         if (e.popupTrigger() || e.button() == 3)
-            TransferAccess.writeClipboard(GLRenderer.getDisplayedViewpoint().time.toString() + getText());
+            TransferAccess.writeClipboard(GLRenderer.getDisplayedViewpoint().time.toString() + " " + getText());
     }
 
 }

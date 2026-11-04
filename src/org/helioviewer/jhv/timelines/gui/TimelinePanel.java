@@ -44,7 +44,6 @@ public final class TimelinePanel extends JPanel {
     private static final int ICON_WIDTH = 12;
     private static final String PREDEFINED_PLACEHOLDER = "Predefined plot";
 
-    private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
     private final TimelineOptions options = new TimelineOptions();
@@ -115,6 +114,7 @@ public final class TimelinePanel extends JPanel {
     TimelinePanel(TimelineDialog dialog) {
         TimelineTableModel model = new TimelineTableModel();
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -128,7 +128,7 @@ public final class TimelinePanel extends JPanel {
         JPanel tablePanel = new JPanel(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(-1, grid.getRowHeight() * Math.max(NUMBEROFVISIBLEROWS, grid.getRowCount()) + 1);
+                return new Dimension(-1, grid.getRowHeight() * grid.getRowCount() + 1);
             }
         };
         tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));

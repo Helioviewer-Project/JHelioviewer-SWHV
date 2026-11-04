@@ -57,7 +57,7 @@ class CellRenderer {
         public void paintIcon(Component component, Graphics graphics, int x, int y) {
             Graphics g = graphics.create();
             g.translate(x, y);
-            g.setColor(component.getForeground());
+            g.setColor(downloading ? component.getForeground() : UIGlobals.secondaryTextColor);
             if (downloading) {
                 setSize(size, size);
                 setForeground(component.getForeground());
@@ -129,7 +129,7 @@ class CellRenderer {
 
     static final class Time extends DefaultTableCellRenderer {
 
-        static final Font font = UIGlobals.sansFont;
+        static final Font font = UIGlobals.uiFontMonoSmall;
 
         @Override
         public void setValue(Object value) {

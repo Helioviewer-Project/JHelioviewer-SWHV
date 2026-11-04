@@ -28,6 +28,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.plugins.Plugin;
@@ -41,13 +42,13 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public final class SettingsDialog extends StandardDialog {
 
-    private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
+    private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"));
     private final JButton clearCache = new JButton("Clear Cache");
 
     private void updateCacheSize() {
         if (!JPIPCacheManager.isAvailable()) {
             clearCache.setEnabled(false);
-            cacheSizeLabel.setText("JPIP disk cache is unavailable.");
+            cacheSizeLabel.setText("Unavailable");
             return;
         }
         Task.submitBackground("cache-size",
@@ -60,7 +61,7 @@ public final class SettingsDialog extends StandardDialog {
     }
 
     private static String cacheSizeText(String size) {
-        return "The image cache currently uses " + size + "GB on disk.";
+        return size + " GB on disk";
     }
 
     private final JTextField proxyUsername = new JTextField(Settings.getProperty("proxy.username"), 20);
@@ -124,7 +125,7 @@ public final class SettingsDialog extends StandardDialog {
 
         c.gridx = 0;
         c.gridy = 0;
-        settings.add(new JLabel("Preferred server:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Preferred server", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 0;
@@ -135,7 +136,7 @@ public final class SettingsDialog extends StandardDialog {
 
         c.gridx = 0;
         c.gridy = 1;
-        settings.add(new JLabel("At start-up:", JLabel.RIGHT), c);
+        settings.add(new JLabel("At start-up", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 1;
@@ -164,13 +165,13 @@ public final class SettingsDialog extends StandardDialog {
 
         c.gridx = 0;
         c.gridy = 3;
-        settings.add(new JLabel("Theme:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Theme", JLabel.RIGHT), c);
         c.gridx = 1;
         settings.add(themePanel, c);
 
         c.gridx = 0;
         c.gridy = 4;
-        settings.add(new JLabel("For new layers:", JLabel.RIGHT), c);
+        settings.add(new JLabel("For new layers", JLabel.RIGHT), c);
 
         c.gridx = 1;
         c.gridy = 4;
@@ -200,13 +201,13 @@ public final class SettingsDialog extends StandardDialog {
 
         c.gridx = 0;
         c.gridy = 6;
-        settings.add(new JLabel("Time reference:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Time reference", JLabel.RIGHT), c);
         c.gridx = 1;
         settings.add(timePanel, c);
 
         c.gridx = 0;
         c.gridy = 7;
-        settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Plugins", JLabel.RIGHT), c);
 
         c.gridx = 1;
         for (Plugin plugin : PluginManager.getPlugins()) {
@@ -226,15 +227,23 @@ public final class SettingsDialog extends StandardDialog {
         }
 
         c.gridx = 0;
-        c.gridwidth = 2;
         c.insets = new Insets(10, 4, 10, 4);
+        settings.add(new JLabel("Image cache", JLabel.RIGHT), c);
+        c.gridx = 1;
         settings.add(createCachePanel(), c);
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.insets = new Insets(6, 4, 4, 4);
+        JLabel proxyHeading = new JLabel("Network proxy");
+        proxyHeading.setFont(UIGlobals.uiFontBold);
+        settings.add(proxyHeading, c);
         c.gridy++;
         c.gridwidth = 1;
         c.insets = new Insets(3, 4, 3, 4);
-        settings.add(new JLabel("Proxy username:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Username", JLabel.RIGHT), c);
         c.gridy++;
-        settings.add(new JLabel("Proxy password:", JLabel.RIGHT), c);
+        settings.add(new JLabel("Password", JLabel.RIGHT), c);
         c.gridx = 1;
         c.gridy--;
         c.weightx = 1;
@@ -260,9 +269,9 @@ public final class SettingsDialog extends StandardDialog {
             });
         });
 
-        JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        cache.add(cacheSizeLabel);
-        cache.add(clearCache);
+        JPanel cache = new JPanel(new BorderLayout(8, 0));
+        cache.add(cacheSizeLabel, BorderLayout.LINE_START);
+        cache.add(clearCache, BorderLayout.LINE_END);
         return cache;
     }
 

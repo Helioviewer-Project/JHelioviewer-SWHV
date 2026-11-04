@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import org.helioviewer.jhv.gui.CompletionNotifications;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
@@ -51,7 +52,7 @@ final class ImageLayerOptions extends JPanel {
         FilterDetails sharpenPanel = SliderFilterPanel.sharpen(layer);
         FilterDetails imageFilterPanel = ImageFilterPanel.create(layer);
 
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 0;
@@ -96,7 +97,9 @@ final class ImageLayerOptions extends JPanel {
             adjustmentsPanel.setVisible(selected);
             adjButton.setText(selected ? Buttons.adjustmentsDown : Buttons.adjustmentsRight);
         });
-        c.gridx = 1;
+        adjButton.setMinimumSize(adjButton.getPreferredSize());
+        c.gridx = 0;
+        c.gridwidth = 2;
         c.weightx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         c.fill = GridBagConstraints.NONE;
@@ -140,6 +143,7 @@ final class ImageLayerOptions extends JPanel {
         buttonPanel.add(metaButton, BorderLayout.LINE_END);
 
         c.gridx = 2;
+        c.gridwidth = 1;
         c.anchor = GridBagConstraints.LINE_END;
         add(buttonPanel, c);
 
@@ -154,9 +158,10 @@ final class ImageLayerOptions extends JPanel {
             fitsButton.setText(expanded ? Buttons.fitsDown : Buttons.fitsRight);
             fitsSettings.setVisible(expanded);
         });
+        fitsButton.setMinimumSize(fitsButton.getPreferredSize());
         c.gridy++;
-        c.gridx = 1;
-        c.gridwidth = 2;
+        c.gridx = 0;
+        c.gridwidth = 3;
         c.weightx = 1;
         c.weighty = 0;
         c.anchor = GridBagConstraints.LINE_START;
@@ -173,7 +178,7 @@ final class ImageLayerOptions extends JPanel {
     }
 
     private static void alignColumns(JPanel... panels) {
-        int[] widths = new int[3];
+        int[] widths = {UIGlobals.sidebarLabelWidth, 0, 0};
         for (JPanel panel : panels) {
             GridBagLayout layout = (GridBagLayout) panel.getLayout();
             for (Component component : panel.getComponents()) {
@@ -189,21 +194,24 @@ final class ImageLayerOptions extends JPanel {
 
     private static void addFilterRow(JPanel panel, GridBagConstraints c, FilterDetails details) {
         c.gridwidth = 1;
+        c.insets = new Insets(2, 0, 2, 6);
 
         c.gridx = 0;
         c.weightx = 0;
-        c.weighty = 1;
+        c.weighty = 0;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
         panel.add(details.getFirst(), c);
 
         c.gridx = 1;
+        c.insets = new Insets(2, 0, 2, 0);
         c.weightx = 1;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
         panel.add(details.getSecond(), c);
 
         c.gridx = 2;
+        c.insets = new Insets(2, 0, 2, 0);
         c.weightx = 0;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;

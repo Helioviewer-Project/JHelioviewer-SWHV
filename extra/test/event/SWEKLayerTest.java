@@ -52,6 +52,7 @@ public final class SWEKLayerTest {
         PluginManager.setActive(plugin, true);
         SWEKLayer original = (SWEKLayer) Layers.getLayers().stream().filter(layer -> layer instanceof SWEKLayer).findFirst().orElseThrow();
         EventTimelineLayer timeline = plugin.getTimelineLayer();
+        check(!timeline.hasData(), "An empty event timeline must report no data");
         Method factory = State.class.getDeclaredMethod("readLayer", JSONObject.class);
         factory.setAccessible(true);
         JSONObject state = new JSONObject().put("className", SWEKLayer.class.getName()).put("data", new JSONObject().put("icons", false));

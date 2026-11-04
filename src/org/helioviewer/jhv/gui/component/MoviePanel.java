@@ -170,19 +170,19 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         secondLine.add(positionPanel, BorderLayout.CENTER);
 
         // Speed
-        JPanel playbackSpeed = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        JPanel playbackSpeed = new JPanel(new BorderLayout());
 
         speedSpinner = new JHVSpinner(ViewState.playbackData().speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1);
         speedSpinner.setToolTipText("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps");
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
-        playbackSpeed.add(speedSpinner);
+        playbackSpeed.add(speedSpinner, BorderLayout.LINE_START);
 
         speedUnitComboBox = new JComboBox<>(ViewState.PlaybackSpeedUnit.values());
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         advanceModeComboBox = new JComboBox<>(new Player.AdvanceMode[]{Player.AdvanceMode.Loop, Player.AdvanceMode.Stop, Player.AdvanceMode.Swing});
         advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Player.AdvanceMode) advanceModeComboBox.getSelectedItem()));
 
-        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
 
         // Record
         loopButton = new JRadioButton(ViewState.RecordingMode.LOOP.toString());
@@ -210,10 +210,12 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         formatComboBox.setSelectedItem(ExportFormat.fromSettings());
         formatComboBox.addActionListener(e -> Settings.setProperty("video.format", ((ExportFormat) Objects.requireNonNull(formatComboBox.getSelectedItem())).name()));
 
-        playbackSpeed.add(speedUnitComboBox);
-        playbackSpeed.add(advanceModeComboBox);
+        playbackSpeed.add(speedUnitComboBox, BorderLayout.CENTER);
+        playbackSpeed.add(advanceModeComboBox, BorderLayout.LINE_END);
 
-        optionsPanel.setLayout(new GridBagLayout());
+        GridBagLayout optionsLayout = new GridBagLayout();
+        optionsLayout.columnWidths = new int[]{UIGlobals.sidebarLabelWidth, 0};
+        optionsPanel.setLayout(optionsLayout);
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(3, 0, 3, 6);
         c.anchor = GridBagConstraints.LINE_END;
@@ -228,8 +230,10 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         optionsPanel.add(new JLabel("Format"), c);
         c.gridx = 1;
         c.gridy = 0;
+        c.insets = new Insets(3, 0, 3, 0);
         c.weightx = 1;
         c.anchor = GridBagConstraints.LINE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
         optionsPanel.add(playbackSpeed, c);
         c.gridy = 1;
         optionsPanel.add(recordingModes, c);

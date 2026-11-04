@@ -355,8 +355,12 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         public void paintThumb(Graphics g1) {
             Graphics2D g = (Graphics2D) g1;
             g.setStroke(thinStroke);
-            g.setColor(completeColor);
-            g.fillRoundRect(thumbRect.x + 2, thumbRect.y, thumbRect.width - 4, thumbRect.height, 6, 6);
+            int x = thumbRect.x + thumbRect.width / 2 - 2;
+            int height = Math.max(4, thumbRect.height - RANGE_MARKER_SIZE);
+            g.setColor(UIGlobals.backColor);
+            g.drawRoundRect(x - 1, thumbRect.y, 5, height, 3, 3);
+            g.setColor(UIGlobals.foreColor);
+            g.fillRoundRect(x, thumbRect.y, 4, height, 3, 3);
             if (slider.hasFocus()) {
                 g.setColor(UIGlobals.foreColor);
                 g.drawRoundRect(thumbRect.x, thumbRect.y, thumbRect.width - 1, thumbRect.height - 1, 6, 6);

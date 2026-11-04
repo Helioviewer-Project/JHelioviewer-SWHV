@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -38,6 +39,7 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
@@ -46,6 +48,7 @@ import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.ToolBar;
 import org.helioviewer.jhv.gui.dialog.SettingsDialog;
+import org.helioviewer.jhv.gui.status.PositionStatusPanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.Directories;
@@ -60,6 +63,7 @@ import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -103,6 +107,7 @@ public final class SidebarTest {
         checkPopupSliders(new ToolBar(new JPanel()));
         checkToolbarReachability();
         checkSettingsSave();
+        checkStatusReadouts();
         Layers.restore(List.of());
         LayersPanel panel = new LayersPanel();
         JPanel transport = new JPanel();
@@ -600,6 +605,42 @@ public final class SidebarTest {
             }
         }
         return null;
+    }
+
+    private static void checkStatusReadouts() {
+        PositionStatusPanel panel = new PositionStatusPanel();
+        try {
+            Method format = panel.getClass().getDeclaredMethod("formatOrtho",
+                    Vec2.class, GridType.class,
+                    double.class, double.class, double.class, double.class);
+            format.setAccessible(true);
+            String missing = (String) format.invoke(panel, Vec2.NAN,
+                    GridType.Viewpoint, 0., 0., 0., 0.);
+            check(missing.contains("--") && missing.contains("+0") && !missing.contains("|") && !missing.contains("("),
+                    "Status must distinguish unavailable coordinates from valid zero values");
+            String first = (String) format.invoke(panel, new Vec2(1, 2),
+                    GridType.Viewpoint, 1., 20., 0.1, -0.1);
+            check(!first.matches(".*[0-9] [°″].*") && first.matches(".*ψ [+-][0-9].*"),
+                    "Angular units must attach to their numbers and labels must remain next to values");
+            panel.setText(first);
+            int width = panel.getPreferredSize().width;
+            String next = (String) format.invoke(panel, new Vec2(11, 22),
+                    GridType.Viewpoint, 2., 120., 0.2, -0.2);
+            panel.setText(next);
+            check(panel.getPreferredSize().width == width, "Status readouts jitter across ordinary mouse coordinates");
+            check(next.contains("+720") && next.contains("-720") && next.contains("120.00") && next.contains("R☉"),
+                    "Status precision, signed arcseconds or units changed");
+            BufferedImage image = new BufferedImage(width, 30, BufferedImage.TYPE_INT_RGB);
+            panel.setSize(width, 30);
+            Graphics2D graphics = image.createGraphics();
+            try {
+                panel.paint(graphics);
+            } finally {
+                graphics.dispose();
+            }
+        } catch (ReflectiveOperationException failure) {
+            throw new AssertionError(failure);
+        }
     }
 
     private static void checkSettingsSave() {

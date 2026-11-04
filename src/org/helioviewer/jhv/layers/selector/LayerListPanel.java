@@ -148,7 +148,7 @@ final class LayerListPanel extends JPanel {
         JPanel tablePanel = new JPanel(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
-                int rows = Math.max(images ? 2 : 0, grid.getRowCount());
+                int rows = grid.getRowCount();
                 return new Dimension(-1, grid.getRowHeight() * rows + getInsets().top);
             }
         };

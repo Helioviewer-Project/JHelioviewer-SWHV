@@ -109,21 +109,16 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), null);
-            drawMovieLine(g);
+            drawMovieLine(g, geometry, !hasEnabledLayers());
             labelPainter.drawMouseValues(g, geometry, DrawController.selectedAxis, mousePosition, layers);
             // Guidance belongs to the UI, not the timeline frame exported to a movie.
-            if (geometry.getLayerLayouts().isEmpty()) {
+            if (!hasEnabledLayers()) {
                 g.setFont(UIGlobals.uiFont);
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
                 String message = "Add a time series from the Timelines tab.";
                 Rectangle area = geometry.area();
-                int x = area.x + Math.max(8, (area.width - g.getFontMetrics().stringWidth(message)) / 2);
-                int y = area.y + area.height / 2;
-                int textWidth = g.getFontMetrics().stringWidth(message);
-                int ascent = g.getFontMetrics().getAscent();
-                g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
-                g.fillRect(x - 10, y - ascent - 6, textWidth + 20, g.getFontMetrics().getHeight() + 12);
-                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+                int x = area.x + 12;
+                int y = area.y + g.getFontMetrics().getHeight() + 10;
                 g.drawString(message, x, y);
             }
         }
@@ -175,7 +170,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             }
         }
         g.setClip(null);
-        labelPainter.drawStaticLabels(g, geometry, timeAxis);
+        labelPainter.drawStaticLabels(g, geometry, timeAxis, hasEnabledLayers());
 
         boolean stackedMode = geometry.isStacked();
         boolean warningBandDrawn = false;
@@ -207,13 +202,28 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         g.fillRect(0, 0, width, height);
     }
 
-    private static void drawMovieLine(Graphics2D g) {
+    private boolean hasEnabledLayers() {
+        for (TimelineLayer layer : layers) {
+            if (layer.isEnabled() && (layer.getYAxis() != null || layer.hasData()))
+                return true;
+        }
+        return false;
+    }
+
+    private static void drawMovieLine(Graphics2D g, GraphGeometry geometry, boolean empty) {
         int movieLinePosition = DrawController.getMovieLinePosition();
         if (movieLinePosition < 0) {
             return;
         }
         g.setColor(UIGlobals.TL_MOVIE_FRAME_COLOR);
-        g.drawLine(movieLinePosition, 0, movieLinePosition, DrawController.getGeometry().size().height);
+        if (empty) {
+            int bottom = geometry.graphBottom();
+            g.fillPolygon(new int[]{movieLinePosition - 4, movieLinePosition + 4, movieLinePosition},
+                    new int[]{bottom - 8, bottom - 8, bottom - 2}, 3);
+            g.drawLine(movieLinePosition, bottom - 2, movieLinePosition, bottom + 3);
+        } else {
+            g.drawLine(movieLinePosition, 0, movieLinePosition, geometry.size().height);
+        }
     }
 
     @Override

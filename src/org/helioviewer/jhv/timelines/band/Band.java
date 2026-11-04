@@ -272,6 +272,9 @@ public final class Band extends TimelineLayer {
             }
             // Chart drawing uses axis-aligned device scaling.
             g.setTransform(new AffineTransform());
+            // Preserve a logical-pixel trace weight when drawing normalized device coordinates.
+            int width = Math.max(1, (int) Math.round(Math.min(Math.abs(transform.getScaleX()), Math.abs(transform.getScaleY()))));
+            g.setStroke(width == 1 ? LINE_STROKE : new BasicStroke(width, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND));
             // The existing device clip survives the transform change.
             for (Polyline line : polylines) {
                 int size = line.xPoints.length;
