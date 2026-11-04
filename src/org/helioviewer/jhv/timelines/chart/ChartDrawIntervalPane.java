@@ -154,7 +154,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     private void drawIntervalHBar(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
         g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 0, geometry.selectedLeft - DrawConstants.GRAPH_LEFT_SPACE, 2);
-        g.fillRect(geometry.selectedRight, 0, getWidth() - geometry.selectedRight - DrawConstants.GRAPH_RIGHT_SPACE, 2);
+        g.fillRect(geometry.selectedRight, 0, geometry.availableRight() - geometry.selectedRight, 2);
     }
 
     private void drawLabels(Graphics2D g, IntervalGeometry geometry, TimeAxis selectedInterval) {
@@ -322,7 +322,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private int availableIntervalWidth() {
-        return getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
+        return DrawController.getGeometry().graphWidth();
     }
 
     private IntervalGeometry intervalGeometry() {

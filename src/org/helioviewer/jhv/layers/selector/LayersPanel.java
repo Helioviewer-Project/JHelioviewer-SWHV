@@ -123,8 +123,10 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         tabs.setBackground(UIManager.getColor("Table.background"));
         tabs.setOpaque(true);
         Border contentBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, UIManager.getColor("Separator.foreground"));
-        for (int index = 0; index < tabs.getTabCount(); index++)
-            ((JComponent) tabs.getComponentAt(index)).setBorder(contentBorder);
+        for (int index = 0; index < tabs.getTabCount(); index++) {
+            JComponent tabContent = (JComponent) tabs.getComponentAt(index);
+            tabContent.setBorder(BorderFactory.createCompoundBorder(contentBorder, tabContent.getBorder()));
+        }
         add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
         Layers.addListener(this);

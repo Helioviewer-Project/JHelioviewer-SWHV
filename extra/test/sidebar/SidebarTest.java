@@ -171,6 +171,10 @@ public final class SidebarTest {
         Rectangle visible = gridOptions.getVisibleRect();
         check(visible.height == gridOptions.getPreferredSize().height && visible.width == gridOptions.getWidth(),
                 "Grid controls clipped");
+        LayerListPanel imageList = find(tabs.getComponentAt(0), LayerListPanel.class);
+        LayerListPanel overlayList = find(tabs.getComponentAt(1), LayerListPanel.class);
+        check(imageList.getInsets().left > 0 && imageList.getInsets().left == overlayList.getInsets().left
+                && imageList.getInsets().right == overlayList.getInsets().right, "Images and Overlays list padding differs after tab installation");
         checkLayerTimeRepaints(panel, tabs, images, overlays, first);
 
         JSONObject camera = DisplayController.cameraToJson();

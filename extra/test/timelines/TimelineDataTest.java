@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongUnaryOperator;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.Directories;
@@ -94,6 +95,7 @@ public final class TimelineDataTest {
         checkHapiRequests();
         checkChartPainting();
         checkTimeLabelSpacing();
+        checkOverviewAlignment();
         checkBandEdgeClipping();
         checkBandDeviceCoordinateLimits();
         System.out.println("Timeline data tests passed");
@@ -341,6 +343,36 @@ public final class TimelineDataTest {
             } finally {
                 band.remove();
             }
+        }
+    }
+
+    private static void checkOverviewAlignment() throws Exception {
+        Class<?> type = Class.forName("org.helioviewer.jhv.timelines.chart.ChartDrawIntervalPane");
+        Constructor<?> constructor = type.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        JComponent overview = (JComponent) constructor.newInstance();
+        Method interval = type.getDeclaredMethod("intervalGeometry");
+        interval.setAccessible(true);
+        GraphGeometry graph = DrawController.getGeometry();
+        Rectangle originalSize = new Rectangle(graph.size());
+        RadioData radio = new RadioData(null);
+        radio.setEnabled(true);
+        try {
+            for (int width : new int[]{400, 1000}) {
+                for (int axes : new int[]{0, 1, 3}) {
+                    graph.setSize(width, 300);
+                    graph.layout(Collections.nCopies(axes, radio));
+                    overview.setSize(width, 20);
+                    Object geometry = interval.invoke(overview);
+                    Method right = geometry.getClass().getDeclaredMethod("availableRight");
+                    right.setAccessible(true);
+                    check((int) right.invoke(geometry) == graph.graphRight(), "Overview and plot right edges differ at width " + width + " with " + axes + " axes");
+                }
+            }
+        } finally {
+            radio.remove();
+            graph.setSize(originalSize.width, originalSize.height);
+            graph.layout(TimelineLayers.get());
         }
     }
 

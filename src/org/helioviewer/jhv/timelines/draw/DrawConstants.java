@@ -15,7 +15,6 @@ public class DrawConstants {
     public static final int RIGHT_AXIS_WIDTH = 30;
 
     public static final int INTERVAL_SELECTION_HEIGHT = 20;
-    public static final int RANGE_SELECTION_WIDTH = 15;
 
     public static final DateTimeFormatter FULL_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm:ss");
     public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm");

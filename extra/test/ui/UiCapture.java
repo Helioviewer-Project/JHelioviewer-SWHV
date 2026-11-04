@@ -21,12 +21,15 @@ import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.dialog.AboutDialog;
 import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
 import org.helioviewer.jhv.gui.dialog.SettingsDialog;
 import org.helioviewer.jhv.io.ImageRequestSettings;
+import org.helioviewer.jhv.layers.GridLayer;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -103,28 +106,31 @@ public final class UiCapture {
         long deadline = System.nanoTime() + 15_000_000_000L;
         do {
             captureWindow(name, window);
-            if (window != MainFrame.get() || hasSolarTexture(output.resolve(name + ".png")))
+            if (window != MainFrame.get() || hasRenderedScene(output.resolve(name + ".png")))
                 return;
             Thread.sleep(200);
         } while (System.nanoTime() < deadline);
-        throw new IllegalStateException("Local AIA texture absent from native capture: " + name);
+        throw new IllegalStateException("Local AIA texture or coordinate grid absent from native capture: " + name);
     }
 
-    private static boolean hasSolarTexture(Path path) throws Exception {
+    private static boolean hasRenderedScene(Path path) throws Exception {
         BufferedImage capture = ImageIO.read(path.toFile());
         // The fixture's image is golden. An empty canvas, green grid, or flat thumbnail cannot pass.
         Set<Integer> colors = new HashSet<>();
-        for (int y = capture.getHeight() / 5; y < capture.getHeight() * 3 / 4; y += 4) {
-            for (int x = capture.getWidth() / 2; x < capture.getWidth(); x += 4) {
+        int gridPixels = 0;
+        for (int y = capture.getHeight() / 5; y < capture.getHeight() * 3 / 4; y += 2) {
+            for (int x = capture.getWidth() / 2; x < capture.getWidth(); x += 2) {
                 int rgb = capture.getRGB(x, y);
                 int red = (rgb >> 16) & 255;
                 int green = (rgb >> 8) & 255;
                 int blue = rgb & 255;
                 if (red > 40 && red > green && green > 2 * blue)
                     colors.add(rgb);
+                if (green > 40 && green > red + 10 && green > blue + 10)
+                    gridPixels++;
             }
         }
-        return colors.size() > 128;
+        return colors.size() > 128 && gridPixels > 50;
     }
 
     private static void captureWindow(String name, Window window) throws Exception {
@@ -133,6 +139,11 @@ public final class UiCapture {
                 long end = Instant.parse("2012-09-01T00:00:00Z").toEpochMilli();
                 ImageRequestSettings.instance().setInterval(end - 172800000L, end);
                 DrawController.setSelectedInterval(end - 172800000L, end);
+                for (Layer layer : Layers.getLayers()) {
+                    if (layer instanceof GridLayer grid)
+                        System.out.println(name + " grid: enabled=" + grid.isEnabled() + " lines=" + grid.getGridAlpha() + " labels=" + grid.getLabelAlpha());
+                }
+                DisplayController.display();
             }
             window.toFront();
             window.requestFocus();
