@@ -11,7 +11,7 @@ public class DrawConstants {
     public static final int GRAPH_RIGHT_SPACE = 10;
     public static final int GRAPH_TOP_SPACE = 20;
     public static final int GRAPH_BOTTOM_SPACE = 8;
-    public static final int GRAPH_BOTTOM_AXIS_SPACE = 18;
+    public static final int GRAPH_BOTTOM_AXIS_SPACE = 32;
     public static final int RIGHT_AXIS_WIDTH = 30;
 
     public static final int INTERVAL_SELECTION_HEIGHT = 20;

@@ -12,6 +12,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -46,7 +47,7 @@ public final class FOVTreePane extends JPanel {
         //tree.setRowHeight(0); // force calculation of nodes heights
 
         add(tree, BorderLayout.CENTER);
-        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));
     }
 
     @Override

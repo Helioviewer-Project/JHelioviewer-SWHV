@@ -223,7 +223,7 @@ final class TimelineLabelPainter {
             int lineWidth = (int) g.getFontMetrics().getStringBounds(line, g).getWidth();
             int xl = Math.min(x - lineWidth / 2, geometry.rightEdge() - lineWidth);
             g.drawString(line, xl, y);
-            y += g.getFontMetrics().getHeight() * 2 / 3;
+            y += g.getFontMetrics().getHeight();
         }
     }
 

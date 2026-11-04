@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.EnumMap;
 //import java.util.LinkedHashMap;
 //import java.util.Map;
@@ -21,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 
 import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.annotation.Annotations;
@@ -70,7 +74,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset View", "Reset view to default");
     private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Axis", "Reset view axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
-    private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate View 90°", "Rotate view 90°");
+    private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate 90°", "Rotate view 90°");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText SIDEBAR = new ButtonText(Buttons.sidebar, "Sidebar", "Hide sidebar");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
@@ -104,9 +108,15 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
     public ToolBar(JComponent _sidebar) {
         sidebar = _sidebar;
-        setLayout(new FlowLayout(FlowLayout.LEADING, 1, 3));
-        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getBackground().brighter()));
+        setLayout(new FlowLayout(FlowLayout.LEADING, 2, 6));
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UIManager.getColor("Separator.foreground")));
         setRollover(true);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent event) {
+                revalidate();
+            }
+        });
 
         try {
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
@@ -114,6 +124,35 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         setDisplayMode(displayMode);
         setVisible(Boolean.parseBoolean(Settings.getProperty("display.toolbar.visible")));
         ViewState.addModeListener(this);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension preferred = super.getPreferredSize();
+        if (getWidth() <= 0)
+            return preferred;
+        FlowLayout layout = (FlowLayout) getLayout();
+        Insets insets = getInsets();
+        int available = getWidth() - insets.left - insets.right - 2 * layout.getHgap();
+        int rowWidth = 0;
+        int rowHeight = 0;
+        int height = insets.top + insets.bottom + 2 * layout.getVgap();
+        for (Component child : getComponents()) {
+            if (!child.isVisible())
+                continue;
+            Dimension size = child.getPreferredSize();
+            int gap = rowWidth == 0 ? 0 : layout.getHgap();
+            if (rowWidth > 0 && rowWidth + gap + size.width > available) {
+                height += rowHeight + layout.getVgap();
+                rowWidth = 0;
+                rowHeight = 0;
+                gap = 0;
+            }
+            rowWidth += gap + size.width;
+            rowHeight = Math.max(rowHeight, size.height);
+        }
+        preferred.height = height + rowHeight;
+        return preferred;
     }
 
     private JideToggleButton coronaButton;
@@ -135,14 +174,14 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         sidebarButton.setToolTipText(sidebar.isVisible() ? "Hide sidebar" : "Show sidebar");
         sidebarButton.addActionListener(e -> setSidebarVisible(sidebarButton.isSelected()));
         addButton(sidebarButton);
-        add(Box.createHorizontalStrut(32));
+        add(Box.createHorizontalStrut(6));
 
         Interaction.Mode interactionMode = InputController.getMode();
         try {
             interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
         } catch (Exception ignore) {}
 
-        Dimension dim = new Dimension(32, 32);
+        Dimension dim = new Dimension(8, 28);
 
         // Zoom
         JideButton zoomIn = toolButton(ZOOMIN);

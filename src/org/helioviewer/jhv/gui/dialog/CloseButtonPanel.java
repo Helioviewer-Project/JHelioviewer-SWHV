@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.dialog;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -12,6 +13,7 @@ import com.jidesoft.dialog.StandardDialog;
 class CloseButtonPanel extends ButtonPanel {
 
     CloseButtonPanel(StandardDialog dialog) {
+        setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
         AbstractAction close = ComponentUtils.hideAction(dialog);
         dialog.setDefaultAction(close);
         dialog.setDefaultCancelAction(close);

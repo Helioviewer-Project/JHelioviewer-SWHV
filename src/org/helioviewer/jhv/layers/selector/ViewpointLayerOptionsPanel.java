@@ -45,7 +45,7 @@ final class ViewpointLayerOptionsPanel extends JPanel {
         locationPanel = new ViewpointLayerOptionsExpertPanel(layer.getOptions().getLocationOptions(), modeBox::repaint);
         equatorialPanel = new ViewpointLayerOptionsExpertPanel(layer.getOptions().getEquatorialOptions(), modeBox::repaint);
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         JPanel modePanel = new JPanel(new BorderLayout(5, 0));
         expandButton.setSelected(true);

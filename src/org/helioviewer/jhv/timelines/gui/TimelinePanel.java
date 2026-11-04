@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -130,7 +131,7 @@ public final class TimelinePanel extends JPanel {
                 return new Dimension(-1, grid.getRowHeight() * Math.max(NUMBEROFVISIBLEROWS, grid.getRowCount()) + 1);
             }
         };
-        tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
+        tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));
         tablePanel.add(grid, BorderLayout.CENTER);
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);

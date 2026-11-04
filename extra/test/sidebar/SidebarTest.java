@@ -96,6 +96,7 @@ public final class SidebarTest {
         checkSliderSizes(new MiniviewLayerOptions(new MiniviewLayer(null)), 350);
         checkSliderSizes(new TimestampLayerOptions(new TimestampLayer(null)), 350);
         checkPopupSliders(new ToolBar(new JPanel()));
+        checkToolbarReachability();
         Layers.restore(List.of());
         LayersPanel panel = new LayersPanel();
         JPanel transport = new JPanel();
@@ -589,6 +590,30 @@ public final class SidebarTest {
             }
         }
         return null;
+    }
+
+    private static void checkToolbarReachability() {
+        ToolBar toolbar = new ToolBar(new JPanel());
+        for (boolean text : new boolean[]{true, false}) {
+            toolbar.setTextVisible(text);
+            for (int width : new int[]{800, 1280, 1440}) {
+                toolbar.setSize(width, 1);
+                toolbar.setSize(width, toolbar.getPreferredSize().height);
+                toolbar.doLayout();
+                Rectangle visible = new Rectangle(0, 0, toolbar.getWidth(), toolbar.getHeight());
+                int firstCenter = -1;
+                for (Component child : toolbar.getComponents()) {
+                    if (child.isVisible() && child instanceof AbstractButton button) {
+                        check(visible.contains(child.getBounds()), "Toolbar action clipped at width " + width + ": " + button.getToolTipText());
+                        int center = child.getY() + child.getHeight() / 2;
+                        if (firstCenter < 0)
+                            firstCenter = center;
+                        if (width >= 1280)
+                            check(Math.abs(center - firstCenter) <= 1, "Toolbar unnecessarily wraps at width " + width);
+                    }
+                }
+            }
+        }
     }
 
     private static void checkPopupSliders(Component component) {

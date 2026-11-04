@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -82,11 +83,20 @@ public final class MetaDataDialog extends StandardDialog {
         com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
         basicArea.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         basicArea.setPreferredSize(new Dimension(600, 100));
-        hvArea.setPreferredSize(new Dimension(600, 100));
+        hvArea.setPreferredSize(new Dimension(600, 64));
+        basicArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+        hvArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
 
-        content.add(new JScrollPane(basicArea));
-        content.add(new JScrollPane(fitsTable));
-        content.add(new JScrollPane(hvArea));
+        JScrollPane summary = new JScrollPane(basicArea);
+        summary.setBorder(BorderFactory.createTitledBorder("Image summary"));
+        JScrollPane header = new JScrollPane(fitsTable);
+        header.setBorder(BorderFactory.createTitledBorder("FITS header"));
+        JScrollPane additional = new JScrollPane(hvArea);
+        additional.setBorder(BorderFactory.createTitledBorder("Helioviewer metadata"));
+        content.add(summary);
+        content.add(header);
+        content.add(additional);
+        content.setBorder(BorderFactory.createEmptyBorder(8, 12, 0, 12));
         exportFitsButton.addActionListener(_ -> exportFitsHeader());
     }
 
@@ -98,8 +108,11 @@ public final class MetaDataDialog extends StandardDialog {
 
         JButton button = new JButton(close);
         button.setText("Close");
+        button.putClientProperty(ButtonPanel.KEEP_PREFERRED_WIDTH, true);
+        exportFitsButton.putClientProperty(ButtonPanel.KEEP_PREFERRED_WIDTH, true);
 
         ButtonPanel panel = new ButtonPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
         panel.add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(exportFitsButton, ButtonPanel.OTHER_BUTTON);
 
@@ -162,7 +175,7 @@ public final class MetaDataDialog extends StandardDialog {
             return;
 
         fitsModel.setRows(parsed.fits);
-        hvArea.setText(parsed.helioviewer);
+        hvArea.setText(parsed.helioviewer.isBlank() ? "No additional Helioviewer metadata." : parsed.helioviewer);
 
         exportXml = parsed.exportXml;
         exportFilename = parsed.exportFilename;

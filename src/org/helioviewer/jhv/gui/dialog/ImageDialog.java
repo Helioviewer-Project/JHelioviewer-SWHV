@@ -76,6 +76,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         getRootPane().setDefaultButton(actionButton);
 
         ButtonPanel panel = new ButtonPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
         panel.add(availabilityButton, ButtonPanel.OTHER_BUTTON);
         panel.add(cancelButton, ButtonPanel.CANCEL_BUTTON);
         panel.add(actionButton, ButtonPanel.AFFIRMATIVE_BUTTON);
@@ -85,10 +86,10 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     @Override
     public JComponent createContentPanel() {
         JScrollPane scrollPane = new JScrollPane(sourcesTree);
-        scrollPane.setPreferredSize(new Dimension(250, 350));
+        scrollPane.setPreferredSize(new Dimension(340, 360));
 
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        JPanel content = new JPanel(new BorderLayout(0, 8));
+        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 8, 12));
         content.add(scrollPane, BorderLayout.CENTER);
         content.add(datasetExtent, BorderLayout.SOUTH);
         return content;
@@ -134,7 +135,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         DataSourcesParser.SourceItem item = items.size() == 1 ? items.getFirst() : null;
         load.setEnabled(!items.isEmpty());
         availabilityButton.setEnabled(getAvailabilityURL(item) != null);
-        String text = item != null ? "Extent: " + TimeUtils.formatShort(item.start) + " - " + TimeUtils.formatShort(item.end)
+        String text = item != null ? "Available time range<br/>" + TimeUtils.formatShort(item.start) + "<br/>to " + TimeUtils.formatShort(item.end)
                 : items.isEmpty() ? "" : items.size() + " datasets selected";
         datasetExtent.setText("<div style='text-align:center'>" + text + "</div>");
     }

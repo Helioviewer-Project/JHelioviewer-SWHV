@@ -86,6 +86,7 @@ public final class SettingsDialog extends StandardDialog {
         setInitFocusedComponent(closeBtn);
 
         ButtonPanel panel = new ButtonPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
         panel.add(closeBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
 
         return panel;
@@ -94,14 +95,14 @@ public final class SettingsDialog extends StandardDialog {
     @Override
     public JComponent createContentPanel() {
         proxyPanel = new ProxyPanel();
-        proxyPanel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        proxyPanel.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
         return proxyPanel;
     }
 
     @Override
     public JComponent createBannerPanel() {
         JPanel panel = createParametersPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(3, 9, 3, 9));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
         return panel;
     }
 
@@ -116,7 +117,7 @@ public final class SettingsDialog extends StandardDialog {
         JPanel settings = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(0, 2, 0, 2);
+        c.insets = new Insets(3, 4, 3, 4);
 
         c.gridx = 0;
         c.gridy = 0;
@@ -144,7 +145,7 @@ public final class SettingsDialog extends StandardDialog {
         settings.add(sampHub, c);
 
         JPanel themePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        themePanel.add(new JLabel("Use theme ", JLabel.RIGHT));
+
         ButtonGroup themeGroup = new ButtonGroup();
         DisplaySettings.UITheme currentTheme = DisplaySettings.getUITheme();
         for (DisplaySettings.UITheme theme : DisplaySettings.UITheme.values()) {
@@ -158,8 +159,10 @@ public final class SettingsDialog extends StandardDialog {
             themeGroup.add(radio);
         }
 
-        c.gridx = 1;
+        c.gridx = 0;
         c.gridy = 3;
+        settings.add(new JLabel("Theme:", JLabel.RIGHT), c);
+        c.gridx = 1;
         settings.add(themePanel, c);
 
         c.gridx = 0;
@@ -179,7 +182,7 @@ public final class SettingsDialog extends StandardDialog {
         settings.add(normalizeRadius, c);
 
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        timePanel.add(new JLabel("Use time at ", JLabel.RIGHT));
+
         ButtonGroup timeModeGroup = new ButtonGroup();
         DisplaySettings.TimeMode timeMode = DisplaySettings.getTimeMode();
         for (DisplaySettings.TimeMode mode : DisplaySettings.TimeMode.values()) {
@@ -192,8 +195,10 @@ public final class SettingsDialog extends StandardDialog {
             timeModeGroup.add(radio);
         }
 
-        c.gridx = 1;
+        c.gridx = 0;
         c.gridy = 6;
+        settings.add(new JLabel("Time reference:", JLabel.RIGHT), c);
+        c.gridx = 1;
         settings.add(timePanel, c);
 
         c.gridx = 0;
@@ -280,7 +285,7 @@ public final class SettingsDialog extends StandardDialog {
 
             GridBagConstraints c = new GridBagConstraints();
             c.anchor = GridBagConstraints.LINE_END;
-            c.insets = new Insets(0, 2, 0, 2);
+            c.insets = new Insets(3, 4, 3, 4);
             c.gridx = 0;
             c.gridy = 0;
             add(new JLabel("Proxy username:"), c);

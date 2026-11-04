@@ -21,6 +21,8 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -150,7 +152,7 @@ final class LayerListPanel extends JPanel {
             }
         };
         if (images)
-            tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
+            tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));
         tablePanel.add(grid, BorderLayout.CENTER);
         add(tablePanel, gc);
 
@@ -299,6 +301,10 @@ final class LayerListPanel extends JPanel {
         Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
         if (current != optionsPanel) {
             optionsPanelWrapper.removeAll();
+            optionsPanelWrapper.setBorder(optionsPanel == null ? null : BorderFactory.createTitledBorder(
+                    BorderFactory.createEmptyBorder(8, 8, 6, 8),
+                    layer instanceof ImageLayer ? "Image adjustments" : layer.getName() + " settings",
+                    TitledBorder.LEADING, TitledBorder.TOP, UIGlobals.uiFontBold));
             if (optionsPanel != null)
                 optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
         }

@@ -111,6 +111,15 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), null);
             drawMovieLine(g);
             labelPainter.drawMouseValues(g, geometry, DrawController.selectedAxis, mousePosition, layers);
+            // Guidance belongs to the UI, not the timeline frame exported to a movie.
+            if (geometry.getLayerLayouts().isEmpty()) {
+                g.setFont(UIGlobals.uiFont);
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+                String message = "Add a time series from the Timelines tab.";
+                Rectangle area = geometry.area();
+                int x = area.x + Math.max(8, (area.width - g.getFontMetrics().stringWidth(message)) / 2);
+                g.drawString(message, x, area.y + area.height / 2);
+            }
         }
     }
 

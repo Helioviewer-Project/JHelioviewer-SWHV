@@ -93,6 +93,7 @@ public final class TimelineDataTest {
         checkHapiTimes();
         checkHapiRequests();
         checkChartPainting();
+        checkTimeLabelSpacing();
         checkBandEdgeClipping();
         checkBandDeviceCoordinateLimits();
         System.out.println("Timeline data tests passed");
@@ -340,6 +341,42 @@ public final class TimelineDataTest {
             } finally {
                 band.remove();
             }
+        }
+    }
+
+    private static void checkTimeLabelSpacing() throws Exception {
+        Class<?> painter = Class.forName("org.helioviewer.jhv.timelines.chart.TimelineLabelPainter");
+        Method draw = painter.getDeclaredMethod("drawTimeText", Graphics2D.class, GraphGeometry.class, int.class, String.class, int.class);
+        draw.setAccessible(true);
+        for (int size : new int[]{11, 12, 13}) {
+            GraphGeometry geometry = new GraphGeometry();
+            geometry.setSize(400, 120);
+            geometry.layout(List.of());
+            BufferedImage image = new BufferedImage(400, 120, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = image.createGraphics();
+            g.setFont(new Font("SansSerif", Font.PLAIN, size));
+            g.setColor(Color.WHITE);
+            int textHeight = (int) g.getFontMetrics().getStringBounds("00:00:00", g).getHeight();
+            try {
+                draw.invoke(null, g, geometry, 150, "00:00:00\n2012-08-31", textHeight);
+            } finally {
+                g.dispose();
+            }
+            int groups = 0;
+            int blankRows = 3;
+            for (int y = geometry.graphBottom(); y < image.getHeight(); y++) {
+                boolean ink = false;
+                for (int x = 80; x < 220; x++)
+                    ink |= image.getRGB(x, y) != Color.BLACK.getRGB();
+                if (ink) {
+                    if (blankRows >= 3)
+                        groups++;
+                    blankRows = 0;
+                } else {
+                    blankRows++;
+                }
+            }
+            check(groups == 2 && blankRows >= 2, "Time/date labels overlap or clip at font size " + size);
         }
     }
 

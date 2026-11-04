@@ -40,7 +40,7 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
 
     @Override
     public JComponent createContentPanel() {
-        String text = "<center>This software was built using several components including:</center><ul>" +
+        String text = "<b>Components and acknowledgements</b><ul>" +
                 "<li><a href=\"https://kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, © 2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
                 "<li><a href=\"https://www.lwjgl.org\">LWJGL</a> Java 3D graphics libraries and <a href=\"https://chromium.googlesource.com/angle/angle\">ANGLE</a> cross-platform GLES translation layer.</li>" +
                 "<li><a href=\"https://github.com/JOML-CI/JOML\">JOML</a>, a Java math library for GL rendering calculations.</li>" +
@@ -57,12 +57,12 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
                 "<li><a href=\"https://tika.apache.org\">Apache Tika</a>, a content analysis toolkit.</li>" +
                 "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
                 "<li><a href=\"https://www.ej-technologies.com/products/install4j/overview.html\">install4j</a>, the multi-platform installer builder.</li></ul>" +
-                "<center>Third-party licenses and notices can be found inside <code>JHelioviewer.jar</code> and in the source tree.</center>";
+                "Third-party licenses and notices can be found inside <code>JHelioviewer.jar</code> and in the source tree.";
 
         HTMLPane pane = new HTMLPane();
         pane.setText(text);
         pane.addHyperlinkListener(this);
-        pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        pane.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
         return new JScrollPane(pane);
     }
 
@@ -75,7 +75,7 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
         String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
                 "<a href='https://www.jhelioviewer.org'>" + AppInfo.programName + "</a></span><br/>" +
                 "Version " + AppInfo.version + '.' + AppInfo.revision + "</b><br/>" +
-                "<span style='font-size:" + (fontSize - delta) + "pt'>" + AppInfo.versionDetail + "<br/>" + graphicsInfo + "</span><br/><br/>" +
+                "<span style='font-size:" + (fontSize - 1) + "pt'>" + AppInfo.versionDetail + "<br/>" + graphicsInfo + "</span><br/><br/>" +
                 "© 2026 <a href='https://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
@@ -96,7 +96,7 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
         JPanel banner = new JPanel(new BorderLayout());
         banner.add(logo, BorderLayout.LINE_START);
         banner.add(pane, BorderLayout.LINE_END);
-        banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
+        banner.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
         return banner;
     }
 

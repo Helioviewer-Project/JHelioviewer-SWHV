@@ -2,8 +2,12 @@ package org.helioviewer.jhv.gui.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
@@ -16,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 import javax.swing.text.DefaultCaret;
 
 import org.helioviewer.jhv.app.Settings;
@@ -99,6 +104,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
 
     private MoviePanel() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(4, 8, 8, 8));
         programTime.setFont(UIGlobals.uiFontMonoSmall);
         programTime.setEditable(false);
         programTime.setOpaque(false);
@@ -115,7 +121,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
 
         JPanel secondLine = new JPanel(new BorderLayout());
         // Control buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 0));
         int buttonSize = 18;
 
         JideButton prevFrameButton = new JideButton(Buttons.backward);
@@ -152,6 +158,8 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         advancedButton.addActionListener(e -> setAdvanced(advancedButton.isSelected()));
         buttonPanel.add(advancedButton);
 
+        for (Component button : buttonPanel.getComponents())
+            button.setPreferredSize(new Dimension(28, 30));
         secondLine.add(buttonPanel, BorderLayout.LINE_START);
 
         // Current frame number
@@ -163,7 +171,6 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
 
         // Speed
         JPanel playbackSpeed = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        playbackSpeed.add(new JLabel("Play ", JLabel.RIGHT));
 
         speedSpinner = new JHVSpinner(ViewState.playbackData().speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1);
         speedSpinner.setToolTipText("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps");
@@ -183,7 +190,6 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         freeButton = new JRadioButton(ViewState.RecordingMode.FREE.toString());
 
         JPanel recordingModes = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        recordingModes.add(new JLabel("Record ", JLabel.RIGHT));
         recordingModes.add(loopButton);
         recordingModes.add(shotButton);
         recordingModes.add(freeButton);
@@ -205,19 +211,33 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         formatComboBox.addActionListener(e -> Settings.setProperty("video.format", ((ExportFormat) Objects.requireNonNull(formatComboBox.getSelectedItem())).name()));
 
         playbackSpeed.add(speedUnitComboBox);
-        playbackSpeed.add(new JLabel(" and "));
         playbackSpeed.add(advanceModeComboBox);
 
-        JPanel output = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        output.add(new JLabel("Output size "));
-        output.add(recordSizeComboBox);
-        output.add(new JLabel("Format "));
-        output.add(formatComboBox);
-
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.add(playbackSpeed);
-        optionsPanel.add(recordingModes);
-        optionsPanel.add(output);
+        optionsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(3, 0, 3, 6);
+        c.anchor = GridBagConstraints.LINE_END;
+        c.gridx = 0;
+        c.gridy = 0;
+        optionsPanel.add(new JLabel("Playback"), c);
+        c.gridy = 1;
+        optionsPanel.add(new JLabel("Record"), c);
+        c.gridy = 2;
+        optionsPanel.add(new JLabel("Output size"), c);
+        c.gridy = 3;
+        optionsPanel.add(new JLabel("Format"), c);
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.anchor = GridBagConstraints.LINE_START;
+        optionsPanel.add(playbackSpeed, c);
+        c.gridy = 1;
+        optionsPanel.add(recordingModes, c);
+        c.gridy = 2;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        optionsPanel.add(recordSizeComboBox, c);
+        c.gridy = 3;
+        optionsPanel.add(formatComboBox, c);
 
         add(timeSlider);
         add(secondLine);
@@ -276,7 +296,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         boolean recording = ExportMovie.isRecording();
         if (recordButton.isSelected() != recording)
             recordButton.setSelected(recording);
-        recordButton.setForeground(recording ? Color.RED : new Color(0x800000));
+        recordButton.setForeground(recording ? Color.RED : UIManager.getColor("JHV.recordForeground"));
         ComponentUtils.setEnabled(optionsPanel, !recording);
         updateFormatEnabled();
     }

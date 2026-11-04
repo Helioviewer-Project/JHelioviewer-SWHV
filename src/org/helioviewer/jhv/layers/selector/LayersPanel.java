@@ -8,11 +8,13 @@ import java.awt.GridBagConstraints;
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.SamplingPanel;
 import org.helioviewer.jhv.gui.dialog.ImageDialog;
@@ -47,6 +49,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
         syncButton.addActionListener(e -> ImageLayers.syncLayersSpan());
         JPanel imageActions = new JPanel(new BorderLayout());
+        addLayerButton.setFont(UIGlobals.uiFontBold);
         imageActions.add(addLayerButton, BorderLayout.LINE_START);
         imageActions.add(syncButton, BorderLayout.LINE_END);
         JPanel imagePanel = new JPanel(new BorderLayout());
@@ -70,8 +73,14 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         SamplingPanel samplingPanel = new SamplingPanel();
         timeSelectorPanel.add(samplingPanel, samplingConstraints);
 
-        JPanel imageHeader = new JPanel(new BorderLayout());
-        imageHeader.add(timeSelectorPanel, BorderLayout.NORTH);
+        JPanel imageHeader = new JPanel(new BorderLayout(0, 6));
+        imageHeader.setBorder(BorderFactory.createEmptyBorder(8, 8, 6, 8));
+        JPanel requestPanel = new JPanel(new BorderLayout(0, 6));
+        JLabel timeHeading = new JLabel("Time range and sampling");
+        timeHeading.setFont(UIGlobals.uiFontBold);
+        requestPanel.add(timeHeading, BorderLayout.NORTH);
+        requestPanel.add(timeSelectorPanel, BorderLayout.CENTER);
+        imageHeader.add(requestPanel, BorderLayout.NORTH);
         imageHeader.add(imageActions, BorderLayout.SOUTH);
         imagePanel.add(imageHeader, BorderLayout.NORTH);
         imagePanel.add(images, BorderLayout.CENTER);

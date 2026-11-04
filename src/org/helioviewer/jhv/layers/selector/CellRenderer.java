@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.font.TextAttribute;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
@@ -77,7 +75,7 @@ class CellRenderer {
 
     static final class Name extends DefaultTableCellRenderer {
 
-        private final Font masterFont = UIGlobals.uiFont.deriveFont(Map.of(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON));
+        private final Font masterFont = UIGlobals.uiFontBold;
         private final StatusIcon status = new StatusIcon();
 
         Name() {
