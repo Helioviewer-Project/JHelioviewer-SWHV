@@ -241,13 +241,18 @@ explicit input files and remain outside the regression run.
 ### Native UI screenshot review
 
 `python3 extra/test/ui/capture.py /path/to/output --theme Dark` launches the
-production Swing application with a bundled local AIA FITS image and disposable
-preferences and a fixed plot time range, then captures the main window, expanded playback, overlays, Settings,
-About, metadata and New Layer dialogs. Repeat with `--theme Light` and with
-`--width 1280 --height 850` for the compact layout. Requires a desktop and screen-capture permission. On macOS, Xcode command-line
-tools compile a window-ID helper and captures exclude occluding applications and
-the cursor. Other platforms require an unobscured desktop. PNGs use native
-resolution. The captures show native rendered windows, not
-proof of OS focus or pointer routing. The AIA fixture captures require the rendered
-solar texture to be present. Live catalog responses can update request-time fields. The `sidebar` suite checks the underlying
-control behavior; review screenshots for contrast, hierarchy and clipping.
+production Swing application with a bundled local AIA FITS image, disposable
+preferences, and a fixed plot time range. It captures the main window, expanded
+playback, overlays, Settings, About, metadata, and New Layer dialogs. Repeat with
+`--theme Light` and `--width 1280 --height 850` for the compact layout.
+
+A desktop and screen-capture permission are required. On macOS, Xcode
+command-line tools compile a window-ID helper. Captures exclude occluding
+applications and the cursor. Other platforms require an unobscured desktop.
+PNGs use native resolution and require the rendered AIA solar texture to be
+present. Live catalog responses can update request-time fields.
+
+The [reference captures](ui/reference/README.md) show representative controls.
+Screenshots do not prove OS focus or pointer routing. The `sidebar` suite checks
+underlying control behavior. Review screenshots for contrast, hierarchy, and
+clipping.
