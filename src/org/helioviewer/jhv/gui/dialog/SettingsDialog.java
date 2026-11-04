@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -62,7 +63,8 @@ public final class SettingsDialog extends StandardDialog {
         return "The image cache currently uses " + size + "GB on disk.";
     }
 
-    private ProxyPanel proxyPanel;
+    private final JTextField proxyUsername = new JTextField(Settings.getProperty("proxy.username"), 20);
+    private final JPasswordField proxyPassword = new JPasswordField(20);
 
     public SettingsDialog() {
         super(MainFrame.get(), "Settings", true);
@@ -74,7 +76,8 @@ public final class SettingsDialog extends StandardDialog {
         AbstractAction close = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                proxyPanel.saveSettings();
+                Settings.setProperty("proxy.username", proxyUsername.getText());
+                ProxySettings.setPassword(new String(proxyPassword.getPassword()));
                 setVisible(false);
             }
         };
@@ -94,16 +97,16 @@ public final class SettingsDialog extends StandardDialog {
 
     @Override
     public JComponent createContentPanel() {
-        proxyPanel = new ProxyPanel();
-        proxyPanel.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
-        return proxyPanel;
+        proxyPassword.setText(ProxySettings.getPassword());
+        JPanel panel = createParametersPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(12, 16, 4, 16));
+        return panel;
     }
 
+    @Nullable
     @Override
     public JComponent createBannerPanel() {
-        JPanel panel = createParametersPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
-        return panel;
+        return null;
     }
 
     public void showDialog() {
@@ -222,11 +225,23 @@ public final class SettingsDialog extends StandardDialog {
             c.gridy++;
         }
 
-        JPanel paramsPanel = new JPanel(new BorderLayout());
-        paramsPanel.add(settings, BorderLayout.PAGE_START);
-        paramsPanel.add(createCachePanel(), BorderLayout.PAGE_END);
-
-        return paramsPanel;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.insets = new Insets(10, 4, 10, 4);
+        settings.add(createCachePanel(), c);
+        c.gridy++;
+        c.gridwidth = 1;
+        c.insets = new Insets(3, 4, 3, 4);
+        settings.add(new JLabel("Proxy username:", JLabel.RIGHT), c);
+        c.gridy++;
+        settings.add(new JLabel("Proxy password:", JLabel.RIGHT), c);
+        c.gridx = 1;
+        c.gridy--;
+        c.weightx = 1;
+        settings.add(proxyUsername, c);
+        c.gridy++;
+        settings.add(proxyPassword, c);
+        return settings;
     }
 
     private JPanel createCachePanel() {
@@ -272,40 +287,6 @@ public final class SettingsDialog extends StandardDialog {
         statePanel.add(defaultState, BorderLayout.LINE_START);
         statePanel.add(selectState, BorderLayout.LINE_END);
         return statePanel;
-    }
-
-    private static class ProxyPanel extends JPanel {
-
-        private final JTextField username = new JTextField(Settings.getProperty("proxy.username"), 20);
-        private final JPasswordField password = new JPasswordField(20);
-
-        ProxyPanel() {
-            super(new GridBagLayout());
-            password.setText(ProxySettings.getPassword());
-
-            GridBagConstraints c = new GridBagConstraints();
-            c.anchor = GridBagConstraints.LINE_END;
-            c.insets = new Insets(3, 4, 3, 4);
-            c.gridx = 0;
-            c.gridy = 0;
-            add(new JLabel("Proxy username:"), c);
-            c.gridy = 1;
-            add(new JLabel("Proxy password:"), c);
-
-            c.gridx = 1;
-            c.gridy = 0;
-            c.weightx = 1;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            add(username, c);
-            c.gridy = 1;
-            add(password, c);
-        }
-
-        void saveSettings() {
-            Settings.setProperty("proxy.username", username.getText());
-            ProxySettings.setPassword(new String(password.getPassword()));
-        }
-
     }
 
 }

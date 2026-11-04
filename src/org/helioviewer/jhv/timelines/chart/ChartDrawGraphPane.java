@@ -118,7 +118,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 String message = "Add a time series from the Timelines tab.";
                 Rectangle area = geometry.area();
                 int x = area.x + Math.max(8, (area.width - g.getFontMetrics().stringWidth(message)) / 2);
-                g.drawString(message, x, area.y + area.height / 2);
+                int y = area.y + area.height / 2;
+                int textWidth = g.getFontMetrics().stringWidth(message);
+                int ascent = g.getFontMetrics().getAscent();
+                g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
+                g.fillRect(x - 10, y - ascent - 6, textWidth + 20, g.getFontMetrics().getHeight() + 12);
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+                g.drawString(message, x, y);
             }
         }
     }

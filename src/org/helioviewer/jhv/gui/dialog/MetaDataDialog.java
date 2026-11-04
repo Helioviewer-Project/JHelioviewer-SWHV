@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -24,6 +25,7 @@ import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
 import org.helioviewer.jhv.io.Directories;
@@ -83,16 +85,19 @@ public final class MetaDataDialog extends StandardDialog {
         com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
         basicArea.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         basicArea.setPreferredSize(new Dimension(600, 100));
-        hvArea.setPreferredSize(new Dimension(600, 64));
+        hvArea.setPreferredSize(new Dimension(600, 40));
         basicArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
         hvArea.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
 
         JScrollPane summary = new JScrollPane(basicArea);
-        summary.setBorder(BorderFactory.createTitledBorder("Image summary"));
+        summary.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0), "Image summary",
+                TitledBorder.LEADING, TitledBorder.TOP, UIGlobals.uiFontBold));
         JScrollPane header = new JScrollPane(fitsTable);
-        header.setBorder(BorderFactory.createTitledBorder("FITS header"));
+        header.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0), "FITS header",
+                TitledBorder.LEADING, TitledBorder.TOP, UIGlobals.uiFontBold));
         JScrollPane additional = new JScrollPane(hvArea);
-        additional.setBorder(BorderFactory.createTitledBorder("Helioviewer metadata"));
+        additional.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0), "Helioviewer metadata",
+                TitledBorder.LEADING, TitledBorder.TOP, UIGlobals.uiFontBold));
         content.add(summary);
         content.add(header);
         content.add(additional);
@@ -160,7 +165,7 @@ public final class MetaDataDialog extends StandardDialog {
 
         basicArea.setText("Observatory: " + fitsMetadata.getObservatory() + "<br/>" +
                 "Instrument: " + fitsMetadata.getInstrument() + "<br/>" +
-                "Detector: " + fitsMetadata.getDetector() + "<br/>" +
+                "Detector: " + (fitsMetadata.getDetector().isBlank() ? "—" : fitsMetadata.getDetector()) + "<br/>" +
                 "Measurement: " + fitsMetadata.getMeasurement() + "<br/>" +
                 "Observation Date: " + fitsMetadata.getViewpoint().time +
                 (hasSourceUri ? "<br/>" + sourceText : ""));

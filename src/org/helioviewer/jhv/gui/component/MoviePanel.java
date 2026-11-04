@@ -189,7 +189,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         shotButton = new JRadioButton(ViewState.RecordingMode.SHOT.toString());
         freeButton = new JRadioButton(ViewState.RecordingMode.FREE.toString());
 
-        JPanel recordingModes = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        JPanel recordingModes = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         recordingModes.add(loopButton);
         recordingModes.add(shotButton);
         recordingModes.add(freeButton);

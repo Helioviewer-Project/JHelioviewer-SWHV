@@ -23,6 +23,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPasswordField;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -44,9 +45,11 @@ import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.ToolBar;
+import org.helioviewer.jhv.gui.dialog.SettingsDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
@@ -65,6 +68,8 @@ import org.helioviewer.jhv.thread.UiThread;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.jidesoft.dialog.ButtonPanel;
 
 public final class SidebarTest {
 
@@ -97,6 +102,7 @@ public final class SidebarTest {
         checkSliderSizes(new TimestampLayerOptions(new TimestampLayer(null)), 350);
         checkPopupSliders(new ToolBar(new JPanel()));
         checkToolbarReachability();
+        checkSettingsSave();
         Layers.restore(List.of());
         LayersPanel panel = new LayersPanel();
         JPanel transport = new JPanel();
@@ -590,6 +596,23 @@ public final class SidebarTest {
             }
         }
         return null;
+    }
+
+    private static void checkSettingsSave() {
+        SettingsDialog dialog = new SettingsDialog();
+        try {
+            JComponent content = dialog.createContentPanel();
+            JTextField username = find(content, JTextField.class);
+            JPasswordField password = find(content, JPasswordField.class);
+            username.setText("ui-fixture-user");
+            password.setText("ui-fixture-password");
+            ButtonPanel buttons = dialog.createButtonPanel();
+            findButton(buttons, "Close").doClick();
+            check("ui-fixture-user".equals(Settings.getProperty("proxy.username")), "Settings Close did not save the username");
+            check("ui-fixture-password".equals(ProxySettings.getPassword()), "Settings Close did not save the password");
+        } finally {
+            dialog.dispose();
+        }
     }
 
     private static void checkToolbarReachability() {

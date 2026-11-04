@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
@@ -98,6 +100,34 @@ public final class UiCapture {
     }
 
     private static void capture(String name, Window window) throws Exception {
+        long deadline = System.nanoTime() + 15_000_000_000L;
+        do {
+            captureWindow(name, window);
+            if (window != MainFrame.get() || hasSolarTexture(output.resolve(name + ".png")))
+                return;
+            Thread.sleep(200);
+        } while (System.nanoTime() < deadline);
+        throw new IllegalStateException("Local AIA texture absent from native capture: " + name);
+    }
+
+    private static boolean hasSolarTexture(Path path) throws Exception {
+        BufferedImage capture = ImageIO.read(path.toFile());
+        // The fixture's image is golden. An empty canvas, green grid, or flat thumbnail cannot pass.
+        Set<Integer> colors = new HashSet<>();
+        for (int y = capture.getHeight() / 5; y < capture.getHeight() * 3 / 4; y += 4) {
+            for (int x = capture.getWidth() / 2; x < capture.getWidth(); x += 4) {
+                int rgb = capture.getRGB(x, y);
+                int red = (rgb >> 16) & 255;
+                int green = (rgb >> 8) & 255;
+                int blue = rgb & 255;
+                if (red > 40 && red > green && green > 2 * blue)
+                    colors.add(rgb);
+            }
+        }
+        return colors.size() > 128;
+    }
+
+    private static void captureWindow(String name, Window window) throws Exception {
         EventQueue.invokeAndWait(() -> {
             if (window == MainFrame.get()) {
                 long end = Instant.parse("2012-09-01T00:00:00Z").toEpochMilli();

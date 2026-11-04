@@ -57,6 +57,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         // The selector edits the settings and shows what they accepted.
         ImageRequestSettings settings = ImageRequestSettings.instance();
         TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+        timeSelectorPanel.setBorder(null);
         timeSelectorPanel.setTime(settings.start(), settings.end());
         timeSelectorPanel.addListener(settings::setInterval);
         settings.addListener(new ImageRequestSettings.Listener() {

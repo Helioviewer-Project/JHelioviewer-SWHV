@@ -16,13 +16,13 @@ import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.UIManager;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -132,6 +132,7 @@ final class LayerListPanel extends JPanel {
 
     LayerListPanel(boolean images) {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
         LayersTableModel model = new LayersTableModel();
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -147,7 +148,7 @@ final class LayerListPanel extends JPanel {
         JPanel tablePanel = new JPanel(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
-                int rows = Math.max(images ? 4 : 0, grid.getRowCount());
+                int rows = Math.max(images ? 2 : 0, grid.getRowCount());
                 return new Dimension(-1, grid.getRowHeight() * rows + getInsets().top);
             }
         };
@@ -298,15 +299,17 @@ final class LayerListPanel extends JPanel {
         Component optionsPanel = layer == null ? null : options.getOptionsPanel(layer);
         if (optionsPanel != null)
             ComponentUtils.setEnabled(optionsPanel, !(layer instanceof ImageLayer) || layer.isEnabled());
-        Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
+        Component current = ((BorderLayout) optionsPanelWrapper.getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (current != optionsPanel) {
             optionsPanelWrapper.removeAll();
-            optionsPanelWrapper.setBorder(optionsPanel == null ? null : BorderFactory.createTitledBorder(
-                    BorderFactory.createEmptyBorder(8, 8, 6, 8),
-                    layer instanceof ImageLayer ? "Image adjustments" : layer.getName() + " settings",
-                    TitledBorder.LEADING, TitledBorder.TOP, UIGlobals.uiFontBold));
-            if (optionsPanel != null)
+            optionsPanelWrapper.setBorder(optionsPanel == null ? null : BorderFactory.createEmptyBorder(8, 0, 6, 0));
+            if (optionsPanel != null) {
+                JLabel heading = new JLabel(layer instanceof ImageLayer ? "Image adjustments" : layer.getName() + " settings");
+                heading.setFont(UIGlobals.uiFontBold);
+                heading.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+                optionsPanelWrapper.add(heading, BorderLayout.NORTH);
                 optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
+            }
         }
         revalidate();
         repaint();
