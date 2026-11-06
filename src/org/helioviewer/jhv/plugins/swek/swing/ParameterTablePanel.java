@@ -32,7 +32,7 @@ class ParameterTablePanel extends JPanel {
         table.getColumnModel().getColumn(0).setPreferredWidth(180);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(1).setCellRenderer(new WrappedTable.WrappedTextRenderer());
-        table.setPreferredScrollableViewportSize(new Dimension(table.getWidth(), 150));
+        table.setPreferredScrollableViewportSize(new Dimension(table.getPreferredSize().width, 150));
 
         TableRowSorter<ParameterTableModel> sorter = new TableRowSorter<>(parameterModel);
         sorter.toggleSortOrder(0);

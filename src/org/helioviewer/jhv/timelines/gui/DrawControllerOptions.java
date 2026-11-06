@@ -1,16 +1,16 @@
 package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.Objects;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.FormPanel;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -64,26 +64,19 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
 
         statusLabel = new JLabel("", JLabel.RIGHT);
 
-        JPanel controls = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
-        c.gridx = 0;
-        c.weightx = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        controls.add(predefinedCombo, c);
-        c.gridx = 1;
-        c.weightx = 0;
-        c.fill = GridBagConstraints.NONE;
-        controls.add(stackedButton, c);
-        c.gridx = 2;
-        c.weightx = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        controls.add(zoomCombo, c);
+        FormPanel controls = new FormPanel();
+        controls.addRow("Plot", predefinedCombo);
+        controls.addRow("Zoom", zoomCombo);
+        controls.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+
+        JPanel toggles = new JPanel(new BorderLayout());
+        toggles.add(stackedButton, BorderLayout.LINE_START);
+        toggles.add(lockButton, BorderLayout.LINE_END);
 
         JPanel actions = new JPanel(new BorderLayout());
         actions.add(addLayerButton, BorderLayout.LINE_START);
         actions.add(statusLabel, BorderLayout.CENTER);
-        actions.add(lockButton, BorderLayout.LINE_END);
+        actions.add(toggles, BorderLayout.LINE_END);
 
         add(controls, BorderLayout.NORTH);
         add(actions, BorderLayout.CENTER);
@@ -99,7 +92,7 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
         lockButton.setText((locked ? Buttons.lock : Buttons.unlock) + "Lock movie");
         boolean stacked = DrawController.getGeometry().isStacked();
         stackedButton.setSelected(stacked);
-        stackedButton.setText(stacked ? Buttons.stacked : Buttons.overlaid);
+        stackedButton.setText((stacked ? Buttons.stacked : Buttons.overlaid) + "Stack");
         statusLabel.setText(DrawController.getStatus());
     }
 

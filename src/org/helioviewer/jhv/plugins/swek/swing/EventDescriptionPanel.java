@@ -1,12 +1,10 @@
 package org.helioviewer.jhv.plugins.swek.swing;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,6 +13,8 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
+import org.helioviewer.jhv.gui.component.FormPanel;
+import org.helioviewer.jhv.gui.dialog.BaseDialog;
 import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -22,14 +22,23 @@ import org.helioviewer.jhv.time.TimeUtils;
 class EventDescriptionPanel extends JPanel {
 
     EventDescriptionPanel(SWEKSession session, RelatedEvents related, SolarEvent event) {
-        ImageIcon icon = new ImageIcon(SWEKIconImages.getImage(event.getSupplier().group().getIconKey()));
-        JLabel labelIcon = new JLabel(icon);
+        super(new BorderLayout(BaseDialog.GAP, 0));
 
-        JTextArea textStartTime = new JTextArea(TimeUtils.formatShort(event.start));
-        textStartTime.setOpaque(false);
+        FormPanel times = new FormPanel();
+        times.addRow("Start", timeText(event.start));
+        times.addRow("End", timeText(event.end));
 
-        JTextArea textEndTime = new JTextArea(TimeUtils.formatShort(event.end));
-        textEndTime.setOpaque(false);
+        JLabel colorLabel = new JLabel();
+        colorLabel.setBackground(related.getColor());
+        colorLabel.setOpaque(true);
+        colorLabel.setPreferredSize(new Dimension(0, 4));
+
+        JPanel summary = new JPanel(new BorderLayout(0, 2));
+        summary.add(times, BorderLayout.CENTER);
+        summary.add(colorLabel, BorderLayout.PAGE_END);
+
+        add(new JLabel(new ImageIcon(SWEKIconImages.getImage(event.getSupplier().group().getIconKey()))), BorderLayout.LINE_START);
+        add(summary, BorderLayout.CENTER);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -42,74 +51,13 @@ class EventDescriptionPanel extends JPanel {
                 session.highlight(null);
             }
         });
-        setLayout(new GridBagLayout());
-
-        JLabel colorLabel = new JLabel();
-        colorLabel.setBackground(related.getColor());
-        colorLabel.setOpaque(true);
-
-        GridBagConstraints iconLabelConstraint = new GridBagConstraints();
-        iconLabelConstraint.gridx = 0;
-        iconLabelConstraint.gridy = 0;
-        iconLabelConstraint.weightx = 0;
-        iconLabelConstraint.weighty = 0;
-        iconLabelConstraint.fill = GridBagConstraints.NONE;
-        iconLabelConstraint.anchor = GridBagConstraints.CENTER;
-        iconLabelConstraint.ipadx = 10;
-
-        // add the icon
-        add(labelIcon, iconLabelConstraint);
-
-        // set up the summary panel
-        JPanel summaryPanel = new JPanel(new GridBagLayout());
-        summaryPanel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 20));
-
-        addLineToSummaryPanel(summaryPanel, 0, "Start Time", textStartTime);
-        addLineToSummaryPanel(summaryPanel, 1, "End Time", textEndTime);
-
-        GridBagConstraints colorLabelConstraint = new GridBagConstraints();
-        colorLabelConstraint.gridx = 2;
-        colorLabelConstraint.gridy = 3;
-        colorLabelConstraint.weightx = 0;
-        colorLabelConstraint.weighty = 0;
-
-        colorLabelConstraint.fill = GridBagConstraints.BOTH;
-        colorLabelConstraint.anchor = GridBagConstraints.CENTER;
-        colorLabelConstraint.ipadx = 10;
-        colorLabelConstraint.ipady = 4;
-        summaryPanel.add(colorLabel, colorLabelConstraint);
-
-        // add the shortPanel
-        GridBagConstraints shortPanelConstraint = new GridBagConstraints();
-        shortPanelConstraint.fill = GridBagConstraints.BOTH;
-        shortPanelConstraint.anchor = GridBagConstraints.CENTER;
-        shortPanelConstraint.gridx = 1;
-        shortPanelConstraint.gridy = 0;
-        shortPanelConstraint.weightx = 1;
-        shortPanelConstraint.weighty = 0;
-        shortPanelConstraint.gridwidth = 1;
-        add(summaryPanel, shortPanelConstraint);
     }
 
-    private static void addLineToSummaryPanel(JPanel panel, int y, String fieldName, Component component) {
-        GridBagConstraints shortPanelLabelConstraint = new GridBagConstraints();
-        shortPanelLabelConstraint.weightx = 0;
-        shortPanelLabelConstraint.weighty = 0;
-        shortPanelLabelConstraint.anchor = GridBagConstraints.FIRST_LINE_START;
-        shortPanelLabelConstraint.gridy = y;
-
-        shortPanelLabelConstraint.gridx = 0;
-        panel.add(new JLabel(fieldName), shortPanelLabelConstraint);
-
-        shortPanelLabelConstraint.gridx = 1;
-        JLabel space = new JLabel(":");
-        space.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 7));
-        panel.add(space, shortPanelLabelConstraint);
-
-        shortPanelLabelConstraint.gridx = 2;
-        shortPanelLabelConstraint.weightx = 1;
-        shortPanelLabelConstraint.fill = GridBagConstraints.BOTH;
-        panel.add(component, shortPanelLabelConstraint);
+    private static JTextArea timeText(long time) {
+        JTextArea text = new JTextArea(TimeUtils.formatShort(time));
+        text.setEditable(false);
+        text.setOpaque(false);
+        return text;
     }
 
 }

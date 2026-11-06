@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -22,6 +23,7 @@ import org.helioviewer.jhv.event.SWEKSession;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.CollapsiblePane;
+import org.helioviewer.jhv.gui.dialog.BaseDialog;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
@@ -54,6 +56,7 @@ final class SWEKEventInformationDialog extends JDialog {
         setCollapsiblePanels();
 
         setLayout(new GridBagLayout());
+        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(BaseDialog.GAP, BaseDialog.GAP, BaseDialog.GAP, BaseDialog.GAP));
 
         GridBagConstraints eventDescriptionConstraint = new GridBagConstraints();
         eventDescriptionConstraint.gridx = 0;
@@ -72,6 +75,7 @@ final class SWEKEventInformationDialog extends JDialog {
         allTablePanelConstraint.weightx = 1;
         allTablePanelConstraint.weighty = 1;
         allTablePanelConstraint.fill = GridBagConstraints.BOTH;
+        allTablePanelConstraint.insets.top = BaseDialog.GAP;
 
         add(allTablePanel, allTablePanelConstraint);
 

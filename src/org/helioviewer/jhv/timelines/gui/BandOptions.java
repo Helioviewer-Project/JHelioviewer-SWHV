@@ -1,8 +1,7 @@
 package org.helioviewer.jhv.timelines.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +9,7 @@ import java.nio.file.Path;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.app.Log;
@@ -30,16 +30,8 @@ import com.jidesoft.swing.JideButton;
 class BandOptions extends JPanel {
 
     BandOptions(Band band) {
-        setLayout(new GridBagLayout());
+        super(new BorderLayout(6, 0));
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.fill = GridBagConstraints.NONE;
-
-        c.gridx = 0;
-        c.anchor = GridBagConstraints.LINE_START;
         JButton pickColor = new JButton("Line color");
         pickColor.setToolTipText("Change the color of the current line");
         pickColor.addActionListener(e -> {
@@ -48,10 +40,7 @@ class BandOptions extends JPanel {
                 band.setDataColor(newColor);
             }
         });
-        add(pickColor, c);
 
-        c.gridx = 1;
-        c.anchor = GridBagConstraints.LINE_START;
         JFormattedTextField propagationField = new JFormattedTextField(new TerminatedFormatterFactory("%.3f", " days", 0, 28));
         propagationField.setValue(0.);
         propagationField.setColumns(10);
@@ -59,12 +48,14 @@ class BandOptions extends JPanel {
             double value = (Double) propagationField.getValue();
             band.setPropagationDelay(value);
         });
-        add(propagationField, c);
 
-        c.gridx = 2;
-        c.anchor = GridBagConstraints.LINE_END;
-        JideButton downloadButton = getDownloadButton(band);
-        add(downloadButton, c);
+        JPanel delayPanel = new JPanel(new BorderLayout(6, 0));
+        delayPanel.add(new JLabel("Delay"), BorderLayout.LINE_START);
+        delayPanel.add(propagationField, BorderLayout.CENTER);
+
+        add(pickColor, BorderLayout.LINE_START);
+        add(delayPanel, BorderLayout.CENTER);
+        add(getDownloadButton(band), BorderLayout.LINE_END);
     }
 
     private static JideButton getDownloadButton(Band band) {

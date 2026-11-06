@@ -89,7 +89,7 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
     private final JComboBox<ViewState.RecordingSize> recordSizeComboBox;
     private final JComboBox<ExportFormat> formatComboBox;
 
-    private final JPanel optionsPanel = new JPanel();
+    private final FormPanel optionsPanel = new FormPanel();
 
     private static MoviePanel instance;
 
@@ -161,32 +161,20 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         positionPanel.add(programTime, BorderLayout.LINE_END);
         secondLine.add(positionPanel, BorderLayout.CENTER);
 
-        // Speed
-        JPanel playbackSpeed = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        playbackSpeed.add(new JLabel("Play ", JLabel.RIGHT));
-
         speedSpinner = new JHVSpinner(ViewState.playbackData().speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1);
         speedSpinner.setToolTipText("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps");
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
-        playbackSpeed.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(ViewState.PlaybackSpeedUnit.values());
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         advanceModeComboBox = new JComboBox<>(new Player.AdvanceMode[]{Player.AdvanceMode.Loop, Player.AdvanceMode.Stop, Player.AdvanceMode.Swing});
         advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Player.AdvanceMode) advanceModeComboBox.getSelectedItem()));
 
-        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 0));
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 0));
 
-        // Record
         loopButton = new JRadioButton(ViewState.RecordingMode.LOOP.toString());
         shotButton = new JRadioButton(ViewState.RecordingMode.SHOT.toString());
         freeButton = new JRadioButton(ViewState.RecordingMode.FREE.toString());
-
-        JPanel recordingModes = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        recordingModes.add(new JLabel("Record ", JLabel.RIGHT));
-        recordingModes.add(loopButton);
-        recordingModes.add(shotButton);
-        recordingModes.add(freeButton);
 
         ButtonGroup group = new ButtonGroup();
         group.add(loopButton);
@@ -204,20 +192,10 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         formatComboBox.setSelectedItem(ExportFormat.fromSettings());
         formatComboBox.addActionListener(e -> Settings.setProperty("video.format", ((ExportFormat) Objects.requireNonNull(formatComboBox.getSelectedItem())).name()));
 
-        playbackSpeed.add(speedUnitComboBox);
-        playbackSpeed.add(new JLabel(" and "));
-        playbackSpeed.add(advanceModeComboBox);
-
-        JPanel output = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-        output.add(new JLabel("Output size "));
-        output.add(recordSizeComboBox);
-        output.add(new JLabel("Format "));
-        output.add(formatComboBox);
-
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.add(playbackSpeed);
-        optionsPanel.add(recordingModes);
-        optionsPanel.add(output);
+        optionsPanel.addRow("Playback", speedSpinner, speedUnitComboBox);
+        optionsPanel.addRow("", new JLabel("At end"), advanceModeComboBox);
+        optionsPanel.addRow("Recording", loopButton, shotButton, freeButton);
+        optionsPanel.addRow("", recordSizeComboBox, new JLabel("Format"), formatComboBox);
 
         add(timeSlider);
         add(secondLine);

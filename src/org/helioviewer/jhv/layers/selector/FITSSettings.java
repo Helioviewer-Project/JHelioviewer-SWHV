@@ -3,14 +3,15 @@ package org.helioviewer.jhv.layers.selector;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 import java.util.function.DoubleConsumer;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -110,15 +111,17 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         maxClip.setColumns(5);
         maxClip.addPropertyChangeListener("value", e -> applyClipValue(maxClip, state::setClippingMax));
 
-        JPanel rangePanel = new JPanel(new BorderLayout());
-        rangePanel.add(minClip, BorderLayout.LINE_START);
-        rangePanel.add(maxClip, BorderLayout.LINE_END);
+        JPanel rangePanel = new JPanel(new GridLayout(1, 2, 6, 0));
+        rangePanel.add(minClip);
+        rangePanel.add(maxClip);
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
-        add(new JLabel("Clipping:", JLabel.RIGHT), c);
+        JLabel clippingLabel = new JLabel("Clipping", JLabel.RIGHT);
+        clippingLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 6));
+        add(clippingLabel, c);
 
         ButtonGroup clippingGroup = new ButtonGroup();
         c.gridx = 1;
@@ -137,12 +140,13 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
             });
             clippingGroup.add(radio);
 
-            JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            panel.add(radio);
             if (rangeMode) {
-                panel.add(rangePanel);
-            }
-            add(panel, c);
+                JPanel panel = new JPanel(new BorderLayout(6, 0));
+                panel.add(radio, BorderLayout.LINE_START);
+                panel.add(rangePanel, BorderLayout.CENTER);
+                add(panel, c);
+            } else
+                add(radio, c);
             c.gridy++;
         }
 

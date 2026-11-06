@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKSession;
@@ -54,7 +53,6 @@ public final class SWEKSwingUI implements SWEKLayer.CanvasUi, EventTimelineLayer
 
     private static JPanel createLayerOptions(SWEKLayer layer) {
         JCheckBox check = new JCheckBox("Icons", layer.isIcons());
-        check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> layer.setIcons(check.isSelected()));
 
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
