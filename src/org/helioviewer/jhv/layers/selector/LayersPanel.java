@@ -65,8 +65,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         GridBagConstraints samplingConstraints = new GridBagConstraints();
         samplingConstraints.gridy = 2;
         samplingConstraints.gridx = 0;
-        samplingConstraints.weightx = 1;
-        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
+        samplingConstraints.anchor = GridBagConstraints.LINE_END;
         SamplingPanel samplingPanel = new SamplingPanel();
         timeSelectorPanel.add(samplingPanel, samplingConstraints);
 

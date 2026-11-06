@@ -175,9 +175,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     public void mouseClicked(MouseEvent e) {}
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-        requestFocusInWindow();
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
     public void mouseExited(MouseEvent e) {
@@ -186,6 +184,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void mousePressed(MouseEvent e) {
+        requestFocusInWindow();
         wasPlaying = Player.isPlaying();
         if (wasPlaying)
             Commands.pause();

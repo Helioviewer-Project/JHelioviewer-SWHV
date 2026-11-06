@@ -12,7 +12,7 @@ public class Carrington {
     public static final double CR_SIDEREAL = 25.38; // days
     public static final double CR_SYNODIC_MEAN = 27.2753;
 
-    public static final int CR_MINIMAL = 1557;
+    public static final int CR_MINIMAL = 1825;
     public static final int CR_MAXIMAL = 2627;
 
     public static final long[] CR_start = CarringtonData.CR_START;

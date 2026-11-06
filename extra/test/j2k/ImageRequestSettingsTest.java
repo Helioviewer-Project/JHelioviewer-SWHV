@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JRadioButton;
+import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 
 import org.helioviewer.jhv.gui.component.SamplingPanel;
@@ -106,16 +106,34 @@ public final class ImageRequestSettingsTest {
                 editor.getTextField().setText("10001");
                 if (shared.cadence() != 1860)
                     throw new AssertionError("Out-of-range cadence changed the request");
-                ((JRadioButton) panel.getComponent(3)).doClick();
-                JSpinner count = (JSpinner) panel.getComponent(4);
-                ((JSpinner.DefaultEditor) count.getEditor()).getTextField().setText("123");
+                JComboBox<?> unit = (JComboBox<?>) panel.getComponent(2);
+                editor.getTextField().setText("5000");
+                select(unit, "frames");
+                if (!shared.sampling().equals(new ImageRequestSettings.FrameCount(1000)))
+                    throw new AssertionError("Switching to frames did not clamp the value to the frame count limit: " + shared.sampling());
+                editor.getTextField().setText("123");
                 if (!shared.sampling().equals(new ImageRequestSettings.FrameCount(123)))
                     throw new AssertionError("Typed frame count was not applied without Enter or a focus change");
+                editor.getTextField().setText("1001");
+                if (!shared.sampling().equals(new ImageRequestSettings.FrameCount(123)))
+                    throw new AssertionError("Out-of-range frame count changed the request");
+                select(unit, "all");
+                if (!(shared.sampling() instanceof ImageRequestSettings.All) || cadence.isEnabled())
+                    throw new AssertionError("All did not request every frame with the value disabled");
+                shared.setSampling(new ImageRequestSettings.TimeStep(7200));
+                if (!unit.getSelectedItem().toString().equals("hours") || !cadence.getValue().equals(2) || !cadence.isEnabled())
+                    throw new AssertionError("A settings change did not show as 2 hours");
             } finally {
                 shared.setSampling(original);
             }
         });
         System.out.println("PASS: typed sampling edits reach the request immediately, invalid edits keep the last valid value");
+    }
+
+    private static void select(JComboBox<?> combo, String label) {
+        for (int index = 0; index < combo.getItemCount(); index++)
+            if (combo.getItemAt(index).toString().equals(label))
+                combo.setSelectedIndex(index);
     }
 
     private ImageRequestSettingsTest() {}

@@ -127,6 +127,12 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
             load(request.withSpan(start, end, cadence));
     }
 
+    // Re-requests a remote layer from another dataset; a local layer has no dataset.
+    public void changeDataset(String server, int sourceId) {
+        if (request != null)
+            load(new APIRequest(server, sourceId, request.startTime(), request.endTime(), request.cadence()));
+    }
+
     public void load(List<URI> uris) {
         if (removed)
             return;
