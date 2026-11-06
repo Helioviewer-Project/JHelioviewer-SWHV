@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -29,10 +28,9 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class ImageDialog extends StandardDialog implements DataSources.Listener {
+public final class ImageDialog extends BaseDialog implements DataSources.Listener {
 
     private final ImageRequestSettings settings = ImageRequestSettings.instance();
     private ImageLayer layerToReplace;
@@ -48,7 +46,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     private final JButton actionButton = new JButton(load);
 
     public ImageDialog() {
-        super(MainFrame.get(), "New Image Layer", false);
+        super("New Image Layer", false);
         sourcesTree = new DataSourcesTree(this::loadSelectedDatasets);
         sourcesTree.addTreeSelectionListener(e -> selectionChanged());
         selectionChanged();
@@ -87,17 +85,10 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         JScrollPane scrollPane = new JScrollPane(sourcesTree);
         scrollPane.setPreferredSize(new Dimension(250, 350));
 
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        JPanel content = new JPanel(new BorderLayout(0, GAP));
         content.add(scrollPane, BorderLayout.CENTER);
         content.add(datasetExtent, BorderLayout.SOUTH);
         return content;
-    }
-
-    @Nullable
-    @Override
-    public JComponent createBannerPanel() {
-        return null;
     }
 
     public void showNewLayerSelector() {
@@ -106,14 +97,16 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     }
 
     public void changeDataset(ImageLayer layer) {
-        layerToReplace = layer;
         APIRequest req = layer.getAPIRequest();
-        if (req != null)
-            sourcesTree.setSelectedItem(req.server(), req.sourceId());
+        if (req == null)
+            return;
+        layerToReplace = layer;
+        sourcesTree.setSelectedItem(req.server(), req.sourceId());
         showDialog();
     }
 
-    private void showDialog() {
+    @Override
+    public void showDialog() {
         boolean changeMode = layerToReplace != null;
         setTitle(changeMode ? "Change Dataset" : "New Image Layer");
         actionButton.setText(changeMode ? "Change" : "Add");
@@ -166,11 +159,13 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
         if (items.isEmpty())
             return;
         setVisible(false);
-        ImageLayer target = layerToReplace;
-        layerToReplace = null;
-        for (DataSourcesParser.SourceItem item : items) {
-            ImageLayer imageLayer = target == null ? ImageLayer.create() : target;
-            imageLayer.load(settings.request(item.server, item.sourceId));
+        if (layerToReplace == null) {
+            for (DataSourcesParser.SourceItem item : items)
+                ImageLayer.create().load(settings.request(item.server, item.sourceId));
+        } else {
+            DataSourcesParser.SourceItem item = items.getFirst();
+            layerToReplace.changeDataset(item.server, item.sourceId);
+            layerToReplace = null;
         }
     }
 }

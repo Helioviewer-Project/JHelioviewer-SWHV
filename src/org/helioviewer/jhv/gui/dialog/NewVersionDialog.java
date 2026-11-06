@@ -13,6 +13,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.DesktopIntegration;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.thread.AppThread;
 
@@ -39,7 +40,7 @@ public class NewVersionDialog extends TextDialog {
                     Log.info("Found newer version " + version);
                     EventQueue.invokeLater(() -> new NewVersionDialog(updateAvailableMessage(version, runningVersion)).showDialog());
                 } else {
-                    EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, upToDateMessage(runningVersion)));
+                    EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(MainFrame.get(), upToDateMessage(runningVersion)));
                 }
             } catch (Exception e) {
                 Log.warn(e);

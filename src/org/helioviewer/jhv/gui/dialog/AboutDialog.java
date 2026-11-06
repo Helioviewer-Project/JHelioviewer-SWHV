@@ -15,7 +15,6 @@ import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.IconBank;
-import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.io.FileUtils;
@@ -23,13 +22,12 @@ import org.helioviewer.jhv.opengl.GL;
 
 import com.google.common.html.HtmlEscapers;
 import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class AboutDialog extends StandardDialog implements HyperlinkListener {
+public final class AboutDialog extends BaseDialog implements HyperlinkListener {
 
     public AboutDialog() {
-        super(MainFrame.get(), "About JHelioviewer", true);
+        super("About JHelioviewer", true);
         setResizable(false);
     }
 
@@ -96,14 +94,8 @@ public final class AboutDialog extends StandardDialog implements HyperlinkListen
         JPanel banner = new JPanel(new BorderLayout());
         banner.add(logo, BorderLayout.LINE_START);
         banner.add(pane, BorderLayout.LINE_END);
-        banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
+        banner.setBorder(BorderFactory.createEmptyBorder(0, 35, 0, 35));
         return banner;
-    }
-
-    public void showDialog() {
-        pack();
-        setLocationRelativeTo(MainFrame.get());
-        setVisible(true);
     }
 
     @Override

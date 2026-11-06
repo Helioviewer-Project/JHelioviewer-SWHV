@@ -13,9 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -30,16 +28,16 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.dialog.BaseDialog;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.band.BandDataset;
 import org.helioviewer.jhv.timelines.band.BandType;
 
 import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
-public final class TimelineDialog extends StandardDialog {
+public final class TimelineDialog extends BaseDialog {
 
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Timelines");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(root);
@@ -57,7 +55,7 @@ public final class TimelineDialog extends StandardDialog {
     };
 
     public TimelineDialog() {
-        super(MainFrame.get(), "New Timeline Layer", false);
+        super("New Timeline Layer", false);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setResizable(false);
         setType(Window.Type.UTILITY);
@@ -105,20 +103,14 @@ public final class TimelineDialog extends StandardDialog {
         JScrollPane scrollPane = new JScrollPane(tree);
         scrollPane.setPreferredSize(new Dimension(350, 350));
 
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        JPanel content = new JPanel(new BorderLayout(0, GAP));
         content.add(scrollPane);
         fullResolution.setToolTipText("Load original HAPI samples without one-minute rebinning.");
         content.add(fullResolution, BorderLayout.PAGE_END);
         return content;
     }
 
-    @Nullable
     @Override
-    public JComponent createBannerPanel() {
-        return null;
-    }
-
     public void showDialog() {
         if (!isVisible()) {
             pack();

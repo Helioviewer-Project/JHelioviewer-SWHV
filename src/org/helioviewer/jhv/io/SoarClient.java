@@ -31,16 +31,21 @@ public final class SoarClient {
         }
     }
 
-    private static void doDataSearch(@Nonnull Consumer<List<DataItem>> onResult, String adql) {
-        Task.submitBackground("soar", () -> toDataItems(query(adql)), onResult, "Error getting the data");
+    private static void doDataSearch(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull Consumer<Throwable> onFailure, String adql) {
+        Task.submitBackground("soar", () -> toDataItems(query(adql)), onResult, (logContext, t) -> {
+            Log.error(logContext, t);
+            onFailure.accept(t);
+        });
     }
 
-    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
-        doDataSearch(onResult, adqlSearchTime(descriptors, level, start, end));
+    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull Consumer<Throwable> onFailure,
+                                        @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
+        doDataSearch(onResult, onFailure, adqlSearchTime(descriptors, level, start, end));
     }
 
-    public static void submitSearchSoop(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
-        doDataSearch(onResult, adqlSearchSoop(descriptors, level, soop));
+    public static void submitSearchSoop(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull Consumer<Throwable> onFailure,
+                                        @Nonnull List<String> descriptors, @Nonnull String level, String soop) {
+        doDataSearch(onResult, onFailure, adqlSearchSoop(descriptors, level, soop));
     }
 
     public static void submitGetSoops(@Nonnull Consumer<List<String>> onResult) {

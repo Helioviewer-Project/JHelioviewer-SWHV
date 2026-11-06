@@ -1,15 +1,15 @@
 package org.helioviewer.jhv.app;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
+import org.helioviewer.jhv.gui.dialog.BaseDialog;
 import org.helioviewer.jhv.thread.UiThread;
 
 public final class JHVUncaughtExceptionHandler {
@@ -63,28 +64,25 @@ public final class JHVUncaughtExceptionHandler {
             HTMLPane report = new HTMLPane();
             report.setOpaque(false);
             report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
-            report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+            report.setBorder(BorderFactory.createEmptyBorder(0, 0, BaseDialog.GAP, 0));
             report.setText("Fatal error detected." +
                     "<p>Please email this report at <a href='mailto:" + AppInfo.emailAddress + "'>" + AppInfo.emailAddress + "</a> " +
                     "or use it to open an issue at <a href='" + AppInfo.bugURL + "'>" + AppInfo.bugURL + "</a>.<br/>");
 
-            JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
-            copyToClipboard.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent me) {
-                    TransferAccess.writeClipboard(msg);
-                    JOptionPane.showMessageDialog(null, "Error report copied to clipboard.");
-                }
-            });
+            JButton copy = new JButton("Copy Report");
+            copy.addActionListener(e -> TransferAccess.writeClipboard(msg));
+            JPanel copyPanel = new JPanel(new BorderLayout());
+            copyPanel.add(copy, BorderLayout.LINE_START);
 
             JTextArea textArea = new JTextArea();
             textArea.setText(msg);
+            textArea.setCaretPosition(0);
             textArea.setEditable(false);
             textArea.setLineWrap(true);
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(600, 400));
 
-            Object[] objects = new Object[]{report, copyToClipboard, new JSeparator(), scrollPane};
+            Object[] objects = new Object[]{report, copyPanel, new JSeparator(), scrollPane};
 
             JOptionPane optionPane = new JOptionPane();
             optionPane.setMessage(objects);

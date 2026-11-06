@@ -30,7 +30,6 @@ public final class MenuBar extends JMenuBar {
         fileMenu.add(new Actions.NewLayer());
         fileMenu.add(new Actions.NewSoarLayer());
         fileMenu.add(new Actions.NewSynopticLayer());
-        fileMenu.add(new Actions.NewAspiicsLayer());
         fileMenu.add(new Actions.NewPunchLayer());
         fileMenu.add(new Actions.OpenLocalFile());
         fileMenu.add(new Actions.OpenModel());
@@ -148,7 +147,7 @@ public final class MenuBar extends JMenuBar {
         helpMenu.add(new Actions.OpenURLinBrowser("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
         helpMenu.add(new Actions.CheckForUpdates());
         helpMenu.addSeparator();
-        helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()::showDialog));
+        helpMenu.add(new Actions.ShowDialog("Show Log...", LogDialog::open));
         helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", AppInfo.bugURL));
         if (!Platform.isMacOS()) {
             helpMenu.addSeparator();

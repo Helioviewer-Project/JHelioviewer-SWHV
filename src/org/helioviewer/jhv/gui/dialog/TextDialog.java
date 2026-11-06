@@ -1,24 +1,21 @@
 package org.helioviewer.jhv.gui.dialog;
 
-import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 
 import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings({"serial", "this-escape"})
-public class TextDialog extends StandardDialog {
+public class TextDialog extends BaseDialog {
 
     private final String text;
 
     public TextDialog(String title, String _text, boolean resizable) {
-        super(MainFrame.get(), title, true);
+        super(title, true);
         setResizable(resizable);
         text = _text;
     }
@@ -36,18 +33,6 @@ public class TextDialog extends StandardDialog {
         pane.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         return new JScrollPane(pane);
-    }
-
-    @Nullable
-    @Override
-    public JComponent createBannerPanel() {
-        return null;
-    }
-
-    public void showDialog() {
-        pack();
-        setLocationRelativeTo(MainFrame.get());
-        setVisible(true);
     }
 
 }

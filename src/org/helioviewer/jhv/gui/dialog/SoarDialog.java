@@ -1,44 +1,22 @@
 package org.helioviewer.jhv.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.MainFrame;
-import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 
 import com.google.common.collect.ImmutableSortedMap;
-import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public class SoarDialog extends StandardDialog {
+public final class SoarDialog extends CatalogDialog<SoarClient.DataItem> {
 
     private static final double MAX_SIZE = 2;
-    private static final Dimension resultSize = new Dimension(500, 350);
     private static final String[] Level = {/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(NaturalSort.comparator).
             put("EUI FSI 174", List.of("eui-fsi174-image", "eui-fsi174-image-occulter", "eui-fsi174-image-short")).
@@ -57,191 +35,94 @@ public class SoarDialog extends StandardDialog {
             // put("MAG VSO", List.of("mag-vso-normal", "mag-vso-normal-1-minute"/*, "mag-vso-burst"*/)).
                     put("SWA PAS", List.of("swa-pas-grnd-mom")).
             build();
+    private static final String BY_TIME = "Time";
+    private static final String BY_SOOP = "SOOP";
 
-    private boolean soopsDownloaded;
-    private int searchRequest;
+    private final JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
+    private final JComboBox<String> levelCombo = new JComboBox<>(Level);
+    private final JComboBox<String> searchByCombo = new JComboBox<>(new String[]{BY_TIME, BY_SOOP});
     private final JComboBox<String> soopCombo = new JComboBox<>();
-    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final JList<SoarClient.DataItem> listPane = new JList<>();
-    private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
+    private boolean soopsDownloaded;
 
     private static SoarDialog instance;
 
     public static SoarDialog getInstance() {
-        return instance == null ? instance = new SoarDialog(MainFrame.get()) : instance;
+        return instance == null ? instance = new SoarDialog() : instance;
     }
 
-    private SoarDialog(JFrame mainFrame) {
-        super(mainFrame, true);
-        setResizable(false);
-        setTitle("New SOAR Layer");
+    private SoarDialog() {
+        super("New SOAR Layer");
     }
 
     private static double getTotalSize(List<SoarClient.DataItem> items) {
         return items.stream().mapToLong(SoarClient.DataItem::size).sum() / (1024. * 1024. * 1024.);
     }
 
-    @Override
-    public ButtonPanel createButtonPanel() {
-        AbstractAction close = ComponentUtils.hideAction(this);
-        setDefaultCancelAction(close);
-
-        JButton loadButton = getLoadButton();
-        JButton cancelButton = new JButton(close);
-        cancelButton.setText("Cancel");
-
-        ButtonPanel panel = new ButtonPanel();
-        panel.add(loadButton, ButtonPanel.AFFIRMATIVE_BUTTON);
-        panel.add(cancelButton, ButtonPanel.CANCEL_BUTTON);
-
-        return panel;
-    }
-
-    private JButton getLoadButton() {
-        JButton loadButton = new JButton("Add");
-        loadButton.addActionListener(e -> {
-            List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
-            if (items.isEmpty())
-                return;
-
-            double size = getTotalSize(items);
-            if (size > MAX_SIZE) {
-                Message.err("SOAR error", String.format("Too much data selected for download: %.1fGiB.%nPlease reduce the selection to less than %.1fGiB.", size, MAX_SIZE));
-            } else {
-                SoarClient.submitLoad(items);
-                setVisible(false);
-            }
-        });
-        return loadButton;
+    private boolean bySoop() {
+        return BY_SOOP.equals(searchByCombo.getSelectedItem());
     }
 
     @Override
-    public JComponent createContentPanel() {
-        JRadioButton timeQuery = new JRadioButton("Time");
-        timeQuery.setSelected(true);
-        JRadioButton soopQuery = new JRadioButton("SOOP");
-        soopQuery.setSelected(false);
+    protected void addQueryRows() {
+        levelCombo.setSelectedItem("L2");
         soopCombo.setEnabled(false);
 
-        ButtonGroup queryGroup = new ButtonGroup();
-        queryGroup.add(timeQuery);
-        queryGroup.add(soopQuery);
-
-        soopQuery.addItemListener(e -> {
-            boolean selected = soopQuery.isSelected();
-            if (selected && !soopsDownloaded) {
+        datasetCombo.addActionListener(e -> scheduleSearch());
+        levelCombo.addActionListener(e -> scheduleSearch());
+        soopCombo.addActionListener(e -> scheduleSearch());
+        searchByCombo.addActionListener(e -> {
+            boolean bySoop = bySoop();
+            if (bySoop && !soopsDownloaded)
                 SoarClient.submitGetSoops(this::setSoops);
-            }
-            clearResults();
-            soopCombo.setEnabled(selected);
-            ComponentUtils.setEnabled(timeSelectorPanel, !selected);
+            soopCombo.setEnabled(bySoop);
+            ComponentUtils.setEnabled(timeSelectorPanel, !bySoop);
+            scheduleSearch();
         });
 
-        JPanel queryPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.weighty = 1;
-        gc.fill = GridBagConstraints.BOTH;
-
-        gc.weightx = 0;
-        gc.gridx = 0;
-        gc.gridy = 0;
-        queryPanel.add(timeQuery, gc);
-        gc.gridy = 1;
-        queryPanel.add(soopQuery, gc);
-
-        gc.weightx = 1;
-        gc.gridx = 1;
-        gc.gridy = 0;
-        queryPanel.add(timeSelectorPanel, gc);
-        gc.gridy = 1;
-        queryPanel.add(soopCombo, gc);
-
-        JPanel dataSelector = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        JComboBox<String> datasetCombo = new JComboBox<>(Dataset.keySet().toArray(String[]::new));
-        dataSelector.add(datasetCombo);
-        JComboBox<String> levelCombo = new JComboBox<>(Level);
-        levelCombo.setSelectedItem("L2");
-        dataSelector.add(levelCombo);
-        JButton searchButton = getSearchButton(datasetCombo, levelCombo, timeQuery);
-        dataSelector.add(searchButton);
-        datasetCombo.addActionListener(e -> clearResults());
-        levelCombo.addActionListener(e -> clearResults());
-        soopCombo.addActionListener(e -> clearResults());
-        timeSelectorPanel.addListener((start, end) -> clearResults());
-
-        JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        foundPanel.add(foundLabel);
-        JPanel selectedPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
-        selectedPanel.add(selectedLabel);
-
-        listPane.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                List<SoarClient.DataItem> items = listPane.getSelectedValuesList();
-                selectedLabel.setText(items.size() + " selected " + String.format("(%.1fGiB)", getTotalSize(items)));
-            }
-        });
-        com.jidesoft.swing.SearchableUtils.installSearchable(listPane);
-        JScrollPane scrollPane = new JScrollPane(listPane);
-        scrollPane.setPreferredSize(resultSize);
-
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.add(queryPanel);
-        content.add(dataSelector);
-        content.add(foundPanel);
-        content.add(scrollPane);
-        content.add(selectedPanel);
-
-        content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        return content;
+        addRow("Dataset", datasetCombo);
+        addRow("Level", levelCombo);
+        addRow("Search by", searchByCombo);
+        addRow("SOOP", soopCombo);
     }
 
-    private JButton getSearchButton(JComboBox<String> datasetCombo, JComboBox<String> levelCombo, JRadioButton timeQuery) {
-        JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> {
-            if (datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level) {
-                List<String> descriptors = Dataset.get(dataset);
-                if (descriptors != null) {
-                    clearResults();
-                    int request = searchRequest;
-                    Consumer<List<SoarClient.DataItem>> onResult = list -> setItems(request, list);
-                    if (timeQuery.isSelected()) {
-                        SoarClient.submitSearchTime(onResult, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
-                        foundLabel.setText("Searching...");
-                    } else if (soopCombo.getSelectedItem() instanceof String soop) {
-                        SoarClient.submitSearchSoop(onResult, descriptors, level, soop);
-                        foundLabel.setText("Searching...");
-                    }
-                }
-            }
-        });
-        return searchButton;
+    @Override
+    protected boolean startSearch(Consumer<List<SoarClient.DataItem>> onResult, Consumer<Throwable> onFailure) {
+        if (!(datasetCombo.getSelectedItem() instanceof String dataset && levelCombo.getSelectedItem() instanceof String level))
+            return false;
+        List<String> descriptors = Dataset.get(dataset);
+        if (!bySoop()) {
+            SoarClient.submitSearchTime(onResult, onFailure, descriptors, level, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime());
+            return true;
+        }
+        if (soopCombo.getSelectedItem() instanceof String soop) {
+            SoarClient.submitSearchSoop(onResult, onFailure, descriptors, level, soop);
+            return true;
+        }
+        return false;
     }
 
     @Nullable
     @Override
-    public JComponent createBannerPanel() {
-        return null;
+    protected String refuse(List<SoarClient.DataItem> selected) {
+        double size = getTotalSize(selected);
+        return size > MAX_SIZE ? String.format("Select at most %.1fGiB (%.1fGiB selected)", MAX_SIZE, size) : null;
     }
 
+    @Override
+    protected String describe(List<SoarClient.DataItem> selected) {
+        return String.format(" (%.1fGiB)", getTotalSize(selected));
+    }
+
+    @Override
+    protected boolean load(List<SoarClient.DataItem> items) {
+        SoarClient.submitLoad(items);
+        return true;
+    }
+
+    @Override
     public void showDialog() {
-        pack();
-        setLocationRelativeTo(MainFrame.get());
-        setVisible(true);
-    }
-
-    private void clearResults() {
-        searchRequest++;
-        listPane.setListData(new SoarClient.DataItem[0]);
-        foundLabel.setText("0 found");
-    }
-
-    private void setItems(int request, List<SoarClient.DataItem> list) {
-        if (request != searchRequest)
-            return;
-        listPane.setListData(list.toArray(SoarClient.DataItem[]::new));
-        foundLabel.setText(list.size() + " found");
+        scheduleSearch();
+        super.showDialog();
     }
 
     private void setSoops(List<String> list) {

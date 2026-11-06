@@ -37,8 +37,12 @@ public final class PunchClient {
         }
     }
 
-    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
-        Task.submitBackground("punch", new QueryItems(level, product, start, end, cadence), onResult, "Error listing the PUNCH archive");
+    public static void submitSearchTime(@Nonnull Consumer<List<DataItem>> onResult, @Nonnull Consumer<Throwable> onFailure,
+                                        @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
+        Task.submitBackground("punch", new QueryItems(level, product, start, end, cadence), onResult, (logContext, t) -> {
+            Log.error(logContext, t);
+            onFailure.accept(t);
+        });
     }
 
     public static void submitGetProducts(@Nonnull Consumer<List<String>> onResult, @Nonnull String level) {
