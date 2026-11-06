@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.draw;
 
 import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -16,17 +15,6 @@ public class DrawConstants {
 
     public static final int INTERVAL_SELECTION_HEIGHT = 20;
     public static final int RANGE_SELECTION_WIDTH = 15;
-
-    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm:ss");
-    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd\nHH:mm");
-    public static final DateTimeFormatter FULL_DATE_TIME_FORMAT_REVERSE = DateTimeFormatter.ofPattern("HH:mm:ss\nyyyy-MM-dd");
-
-    public static final DateTimeFormatter HOUR_TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
-    public static final DateTimeFormatter HOUR_TIME_FORMAT_NO_SEC = DateTimeFormatter.ofPattern("HH:mm");
-
-    public static final DateTimeFormatter DAY_MONTH_YEAR_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final DateTimeFormatter MONTH_YEAR_TIME_FORMAT = DateTimeFormatter.ofPattern("MMM yyyy");
-    public static final DateTimeFormatter YEAR_ONLY_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy");
 
     public static final int EVENT_OFFSET = 3;
 

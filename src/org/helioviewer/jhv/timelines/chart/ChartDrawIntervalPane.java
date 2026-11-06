@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -9,9 +10,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -21,16 +19,13 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.timelines.draw.TimeTicks;
 
 @SuppressWarnings("serial")
 class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMotionListener, DrawController.Listener {
 
-    private static final Calendar calendar = Calendar.getInstance();
-
     private boolean draggingInterval;
     private Point mousePressed;
-
-    private record LabelTick(long date, String text) {}
 
     private record IntervalGeometry(TimeAxis interval, int width, double ratioX, int selectedLeft, int selectedRight) {
 
@@ -40,10 +35,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
         int availableRight() {
             return DrawConstants.GRAPH_LEFT_SPACE + width;
-        }
-
-        boolean contains(long date) {
-            return interval.start() <= date && date <= interval.end();
         }
 
         boolean containsSelected(Point p) {
@@ -93,9 +84,9 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         drawIntervalBackground(g, geometry);
         drawInterval(g, geometry);
         drawMovieInterval(g, geometry);
-        drawLabels(g, geometry, selectedAxis);
         drawIntervalGraspPoints(g, geometry);
         drawIntervalHBar(g, geometry);
+        drawLabels(g, geometry, selectedAxis);
     }
 
     private void drawIntervalBackground(Graphics2D g, IntervalGeometry geometry) {
@@ -158,166 +149,26 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void drawLabels(Graphics2D g, IntervalGeometry geometry, TimeAxis selectedInterval) {
-        TimeAxis availableInterval = geometry.interval;
-        String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, availableInterval.start());
-        int tickTextWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int maxTicks = Math.max(2, (geometry.width - tickTextWidth * 2) / tickTextWidth);
+        TimeAxis available = geometry.interval;
+        FontMetrics fontMetrics = g.getFontMetrics();
+        TimeTicks.Step step = TimeTicks.step(fontMetrics, available.start(), available.end(), geometry.width);
 
-        for (LabelTick tick : labelTicks(geometry, maxTicks)) {
-            drawLabel(g, selectedInterval, tick.text, tick.date, geometry);
-        }
-    }
+        long previousDay = Long.MIN_VALUE;
+        for (long tick = step.first(available.start()); tick <= available.end(); tick = step.next(tick)) {
+            if (tick < available.start())
+                continue;
+            int x = geometry.pixel(tick);
+            boolean selected = selectedInterval.start() <= tick && tick <= selectedInterval.end();
+            g.setColor(selected ? UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR : UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
+            g.drawLine(x, 2, x, getHeight() - 1);
 
-    private static List<LabelTick> labelTicks(IntervalGeometry geometry, int maxTicks) {
-        TimeAxis availableInterval = geometry.interval;
-        long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
-        if (geometry.contains(ts)) {
-            return yearTicks(availableInterval, maxTicks);
-        }
-
-        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
-        if (geometry.contains(ts)) {
-            return monthTicks(availableInterval, maxTicks);
-        }
-
-        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
-        return geometry.contains(ts) ? dayTicks(availableInterval, maxTicks) : timeTicks(availableInterval, maxTicks);
-    }
-
-    private static List<LabelTick> timeTicks(TimeAxis availableInterval, int maxTicks) {
-        List<LabelTick> ticks = new ArrayList<>(maxTicks);
-        long timeDiff = availableInterval.end() - availableInterval.start();
-        double ratioTime = timeDiff / (double) maxTicks;
-        int day = -1;
-
-        for (int i = 0; i < maxTicks; ++i) {
-            long tickValue = availableInterval.start() + (long) (i * ratioTime);
-            calendar.setTimeInMillis(tickValue);
-            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-            String tickText;
-            if (day == currentDay) {
-                tickText = TimeUtils.format(DrawConstants.HOUR_TIME_FORMAT_NO_SEC, tickValue);
-            } else {
-                tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_NO_SEC, tickValue);
-                day = currentDay;
+            long day = Math.floorDiv(tick, TimeUtils.DAY_IN_MILLIS);
+            String text = step.label(tick, day != previousDay);
+            if (x + 2 + fontMetrics.stringWidth(text) <= geometry.availableRight()) {
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+                g.drawString(text, x + 2, getHeight() - 5);
+                previousDay = day;
             }
-            ticks.add(new LabelTick(tickValue, tickText));
-        }
-        return ticks;
-    }
-
-    private static List<LabelTick> dayTicks(TimeAxis availableInterval, int maxTicks) {
-        calendar.setTimeInMillis(availableInterval.start());
-
-        int startYear = calendar.get(Calendar.YEAR);
-        int startMonth = calendar.get(Calendar.MONTH);
-        int startDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-        calendar.set(startYear, startMonth, startDay, 0, 0, 0);
-        long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-
-        startYear = calendar.get(Calendar.YEAR);
-        startMonth = calendar.get(Calendar.MONTH);
-        startDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-        long diffMillis = availableInterval.end() - calendar.getTimeInMillis();
-        int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
-        int tickCount = Math.min(numberOfDays, maxTicks);
-        double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
-        List<LabelTick> ticks = new ArrayList<>(tickCount);
-        for (int i = 0; i < tickCount; ++i) {
-            calendar.set(startYear, startMonth, startDay, 0, 0, 0);
-            calendar.add(Calendar.DAY_OF_MONTH, (int) (i * ratioDays));
-            long time = calendar.getTimeInMillis();
-
-            String tickText = TimeUtils.format(DrawConstants.DAY_MONTH_YEAR_TIME_FORMAT, time);
-            ticks.add(new LabelTick(time, tickText));
-        }
-        return ticks;
-    }
-
-    private static List<LabelTick> monthTicks(TimeAxis availableInterval, int maxTicks) {
-        calendar.setTimeInMillis(availableInterval.start());
-
-        int startYear = calendar.get(Calendar.YEAR);
-        int startMonth = calendar.get(Calendar.MONTH);
-
-        calendar.set(startYear, startMonth, 1, 0, 0, 0);
-        long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
-            calendar.add(Calendar.MONTH, 1);
-        }
-
-        startYear = calendar.get(Calendar.YEAR);
-        startMonth = calendar.get(Calendar.MONTH);
-
-        calendar.setTimeInMillis(availableInterval.end());
-        int endYear = calendar.get(Calendar.YEAR);
-        int endMonth = calendar.get(Calendar.MONTH);
-
-        int numberOfMonths = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
-        int tickCount = Math.min(numberOfMonths, maxTicks);
-        double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
-
-        List<LabelTick> ticks = new ArrayList<>(tickCount);
-        for (int i = 0; i < tickCount; ++i) {
-            calendar.set(startYear, startMonth, 1, 0, 0, 0);
-            calendar.add(Calendar.MONTH, (int) (i * ratioMonth));
-            long time = calendar.getTimeInMillis();
-
-            String tickText = TimeUtils.format(DrawConstants.MONTH_YEAR_TIME_FORMAT, time);
-            ticks.add(new LabelTick(time, tickText));
-        }
-        return ticks;
-    }
-
-    private static List<LabelTick> yearTicks(TimeAxis availableInterval, int maxTicks) {
-        calendar.setTimeInMillis(availableInterval.start());
-
-        int startYear = calendar.get(Calendar.YEAR);
-
-        calendar.set(startYear, Calendar.JANUARY, 1, 0, 0, 0);
-        long ts = calendar.getTimeInMillis();
-        if (!(availableInterval.start() <= ts && ts <= availableInterval.end())) {
-            startYear++;
-        }
-
-        calendar.setTimeInMillis(availableInterval.end());
-        int endYear = calendar.get(Calendar.YEAR);
-
-        int hTicks = Math.clamp(endYear - startYear + 1, 2, maxTicks);
-        int yearDifference = (endYear - startYear) / (hTicks - 1);
-        List<LabelTick> ticks = new ArrayList<>(hTicks);
-        for (int i = 0; i < hTicks; ++i) {
-            calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1, 0, 0, 0);
-            long time = calendar.getTimeInMillis();
-
-            String tickText = TimeUtils.format(DrawConstants.YEAR_ONLY_TIME_FORMAT, time);
-            ticks.add(new LabelTick(time, tickText));
-        }
-        return ticks;
-    }
-
-    private void drawLabel(Graphics2D g, TimeAxis selectedInterval, String tickText, long date, IntervalGeometry geometry) {
-        int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int x = geometry.pixel(date);
-        if (selectedInterval.start() <= date && date <= selectedInterval.end()) {
-            g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
-        } else {
-            g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
-        }
-        g.drawLine(x, 2, x, getHeight() - 1);
-        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        if (x + textWidth > geometry.availableRight()) {
-            if ((x - 2) < geometry.availableRight()) {
-                g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
-            }
-        } else {
-            g.drawString(tickText, x + 2, getHeight() - 5);
         }
     }
 

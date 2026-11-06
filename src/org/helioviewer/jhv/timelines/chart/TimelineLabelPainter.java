@@ -11,7 +11,6 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -20,6 +19,7 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.timelines.draw.TimeTicks;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
 final class TimelineLabelPainter {
@@ -175,55 +175,38 @@ final class TimelineLabelPainter {
 
     private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl) {
         Rectangle graphArea = geometry.area();
-        String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
-        int tickTextWidth = (int) tickTextBounds.getWidth();
-        int tickTextHeight = (int) tickTextBounds.getHeight() + row * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
-        int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
         long start = tl == null ? xAxis.start() : tl.getObservationTime(xAxis.start());
         long end = tl == null ? xAxis.end() : tl.getObservationTime(xAxis.end());
+        if (graphArea.width <= 0 || end <= start)
+            return;
+
         TimeAxis.Mapper xMapper = new TimeAxis.Mapper(start, end, graphArea.x, graphArea.width);
+        FontMetrics fontMetrics = g.getFontMetrics();
+        TimeTicks.Step step = TimeTicks.step(fontMetrics, start, end, graphArea.width);
+        Color textColor = tl == null ? UIGlobals.TL_LABEL_TEXT_COLOR : dataColor(tl);
+        int y = geometry.graphBottom() + 2 + fontMetrics.getHeight() + row * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
 
-        long previousDate = Long.MIN_VALUE;
-        for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
-            if (tl != null) {
-                tickValue = tl.getObservationTime(tickValue);
-            }
-            int x = xMapper.toPixel(tickValue);
-
+        long previousDay = Long.MIN_VALUE;
+        int previousRight = Integer.MIN_VALUE;
+        for (long tick = step.first(start); tick <= end; tick = step.next(tick)) {
+            if (tick < start)
+                continue;
+            int x = xMapper.toPixel(tick);
             if (tl == null) {
                 g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
                 g.drawLine(x, graphArea.y, x, geometry.graphBottom() + 3);
-                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-            } else {
-                g.setColor(dataColor(tl));
             }
-            drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate), tickTextHeight);
-            previousDate = tickValue;
-        }
-    }
 
-    private static String formatTickText(long tickValue, long previousDate) {
-        if (previousDate == Long.MIN_VALUE) {
-            return TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
-        }
-
-        long tickDayNumber = tickValue / TimeUtils.DAY_IN_MILLIS;
-        long prevDayNumber = previousDate / TimeUtils.DAY_IN_MILLIS;
-        return TimeUtils.format(tickDayNumber == prevDayNumber ? DrawConstants.HOUR_TIME_FORMAT : DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
-    }
-
-    private static void drawTimeText(Graphics2D g, GraphGeometry geometry, int x, String tickText, int tickTextHeight) {
-        int y = geometry.graphBottom() + 2 + tickTextHeight;
-        Iterator<String> lines = tickText.lines().iterator();
-        while (lines.hasNext()) {
-            String line = lines.next();
-            int lineWidth = (int) g.getFontMetrics().getStringBounds(line, g).getWidth();
-            int xl = Math.min(x - lineWidth / 2, geometry.rightEdge() - lineWidth);
-            g.drawString(line, xl, y);
-            y += g.getFontMetrics().getHeight() * 2 / 3;
+            long day = Math.floorDiv(tick, TimeUtils.DAY_IN_MILLIS);
+            String text = step.label(tick, day != previousDay);
+            int textWidth = fontMetrics.stringWidth(text);
+            int xText = Math.max(0, Math.min(x - textWidth / 2, geometry.rightEdge() - textWidth));
+            if (xText >= previousRight + TimeTicks.LABEL_GAP) {
+                g.setColor(textColor);
+                g.drawString(text, xText, y);
+                previousRight = xText + textWidth;
+                previousDay = day;
+            }
         }
     }
 
