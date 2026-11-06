@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -146,11 +147,11 @@ final class LayerListPanel extends JPanel {
             @Override
             public Dimension getPreferredSize() {
                 int rows = Math.max(images ? 4 : 0, grid.getRowCount());
-                return new Dimension(-1, grid.getRowHeight() * rows + getInsets().top);
+                Insets insets = getInsets();
+                return new Dimension(-1, grid.getRowHeight() * rows + insets.top + insets.bottom);
             }
         };
-        if (images)
-            tablePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
+        tablePanel.setBorder(BorderFactory.createMatteBorder(images ? 1 : 0, 0, 1, 0, getBackground().brighter()));
         tablePanel.add(grid, BorderLayout.CENTER);
         add(tablePanel, gc);
 
@@ -295,7 +296,7 @@ final class LayerListPanel extends JPanel {
     void setOptionsPanel(@Nullable Layer layer) {
         Component optionsPanel = layer == null ? null : options.getOptionsPanel(layer);
         if (optionsPanel != null)
-            ComponentUtils.setEnabled(optionsPanel, !(layer instanceof ImageLayer) || layer.isEnabled());
+            ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
         Component current = optionsPanelWrapper.getComponentCount() == 0 ? null : optionsPanelWrapper.getComponent(0);
         if (current != optionsPanel) {
             optionsPanelWrapper.removeAll();

@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.font.TextAttribute;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
@@ -77,7 +75,6 @@ class CellRenderer {
 
     static final class Name extends DefaultTableCellRenderer {
 
-        private final Font masterFont = UIGlobals.uiFont.deriveFont(Map.of(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON));
         private final StatusIcon status = new StatusIcon();
 
         Name() {
@@ -98,16 +95,12 @@ class CellRenderer {
         public void setValue(Object value) {
             if (value instanceof Layer layer) {
                 String layerName = layer.getName();
+                boolean master = layer == Layers.getActiveImageLayer();
                 setText(layerName);
+                setFont(master ? UIGlobals.uiFontBold : UIGlobals.uiFont);
                 status.downloading = layer.isDownloading();
                 setIcon(status.downloading || layer.isLocal() ? status : null);
-                if (layer == Layers.getActiveImageLayer()) {
-                    setToolTipText(layerName + " (master)");
-                    setFont(masterFont);
-                } else {
-                    setToolTipText(null);
-                    setFont(UIGlobals.uiFont);
-                }
+                setToolTipText(master ? layerName + " (master)" : null);
             }
         }
 

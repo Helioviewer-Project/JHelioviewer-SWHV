@@ -135,14 +135,14 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         sidebarButton.setToolTipText(sidebar.isVisible() ? "Hide sidebar" : "Show sidebar");
         sidebarButton.addActionListener(e -> setSidebarVisible(sidebarButton.isSelected()));
         addButton(sidebarButton);
-        add(Box.createHorizontalStrut(32));
+        add(Box.createHorizontalStrut(8));
 
         Interaction.Mode interactionMode = InputController.getMode();
         try {
             interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
         } catch (Exception ignore) {}
 
-        Dimension dim = new Dimension(32, 32);
+        Dimension dim = new Dimension(8, 32);
 
         // Zoom
         JideButton zoomIn = toolButton(ZOOMIN);
@@ -278,7 +278,6 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             addButton(samp);
         }
 
-        addSeparator(dim);
 /*
         ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
         JideButton hButton = toolButton(hText);
@@ -339,11 +338,17 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         slider.setSnapToTicks(true);
         slider.setToolTipText("Annotation thickness");
         slider.setPreferredSize(new Dimension(POPUP_SLIDER_WIDTH, slider.getPreferredSize().height));
-        slider.addChangeListener(e -> Annotations.setThicknessValue(slider.getValue()));
+        SliderValueLabel value = new SliderValueLabel(Integer.toString(thickness), slider, Integer::toString);
+        slider.addChangeListener(e -> {
+            Annotations.setThicknessValue(slider.getValue());
+            value.setText(Integer.toString(slider.getValue()));
+        });
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        panel.add(new JLabel("Width"), BorderLayout.LINE_START);
         panel.add(slider, BorderLayout.CENTER);
+        panel.add(value, BorderLayout.LINE_END);
         return panel;
     }
 

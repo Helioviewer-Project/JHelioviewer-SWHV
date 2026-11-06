@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -109,7 +110,7 @@ public final class SidebarTest {
         overlays.setSize(500, 200);
         check(images.getRowCount() == 0 && overlays.getRowCount() == 5, "Default category filtering");
         check(find(viewpoint, JComboBox.class).getSelectedItem() == ViewpointLayerOptions.CameraMode.Observer, "Default mode control");
-        check(!findButton(viewpoint, Buttons.chevronRight + "Viewpoint").isEnabled(), "Default Observer disclosure enabled");
+        check(!findButton(viewpoint, Buttons.chevronDown + "Viewpoint").isEnabled(), "Default Observer disclosure enabled");
         check(!tabs.isEnabledAt(2) && !tabs.isEnabledAt(3), "Uninstalled sidebar tabs enabled");
         JPanel timelineContents = new JPanel();
         JPanel eventContents = new JPanel();
@@ -150,15 +151,28 @@ public final class SidebarTest {
         check(Layers.getActiveImageLayer() == first, "Image activation");
         ImageLayerOptions firstOptions = find(tabs.getComponentAt(0), ImageLayerOptions.class);
         check(firstOptions != secondOptions, "Image options shared between layers");
+        GridLayerOptions gridOptions = find(tabs.getComponentAt(1), GridLayerOptions.class);
         grid.setEnabled(false);
         Layers.fireLayerUpdated(grid);
-        check(find(tabs.getComponentAt(1), GridLayerOptions.class).isEnabled(), "Hidden overlay settings disabled");
+        check(!gridOptions.isEnabled(), "Hidden overlay settings enabled");
+        check(!find(gridOptions, JSlider.class).isEnabled(), "Hidden overlay slider enabled");
         click(overlays, rowNamed(overlays, "Grid"), LayersTableModel.ENABLED_COL);
         check(grid.isEnabled(), "Filtered visibility checkbox targeted the wrong layer");
+        check(gridOptions.isEnabled(), "Visible overlay settings disabled");
+        check(find(gridOptions, JSlider.class).isEnabled(), "Visible overlay slider disabled");
         check(Layers.getActiveImageLayer() == first, "Overlay checkbox changed active image");
         checkAdjustments(panel, tabs, 0, firstOptions, imageSize.width);
+        panel.setSize(imageSize.width, panel.getPreferredSize().height - tabs.getPreferredSize().height + 150);
+        layoutTree(panel);
+        Rectangle tabBounds = tabs.getBounds();
+        JScrollPane imageScroll = (JScrollPane) tabs.getComponentAt(0);
+        imageScroll.getVerticalScrollBar().setValue(imageScroll.getVerticalScrollBar().getMaximum());
+        layoutTree(panel);
+        check(imageScroll.getViewport().getViewPosition().y > 0, "Image tab did not scroll");
+        check(tabs.getBounds().equals(tabBounds), "Scrolling moved the tab strip");
+        check(transport.getVisibleRect().height == transport.getHeight(), "Scrolling clipped transport controls");
+        imageScroll.getVerticalScrollBar().setValue(0);
         tabs.setSelectedIndex(1);
-        GridLayerOptions gridOptions = find(tabs.getComponentAt(1), GridLayerOptions.class);
         panel.setSize(imageSize.width, panel.getPreferredSize().height);
         layoutTree(panel);
         Rectangle visible = gridOptions.getVisibleRect();
@@ -197,7 +211,7 @@ public final class SidebarTest {
         int headerHeight = viewpoint.getPreferredSize().height;
         JComboBox<?> modeBox = find(viewpoint, JComboBox.class);
         check(modeBox.getSelectedItem() == ViewpointLayerOptions.CameraMode.ObserverAt1au, "Restored viewpoint editor is stale");
-        check(!findButton(viewpoint, Buttons.chevronRight + "Viewpoint").isEnabled(), "Observer at 1au disclosure enabled");
+        check(!findButton(viewpoint, Buttons.chevronDown + "Viewpoint").isEnabled(), "Observer at 1au disclosure enabled");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Observer);
         check(!restored.isEnabled() && DisplayController.getViewpointUpdate() == UpdateViewpoint.observer, "Observer selection did not turn off custom viewpoint");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Location);
@@ -221,11 +235,18 @@ public final class SidebarTest {
         check(modeText(modeBox, -1).equals("Location: Venus"), "Collapsed viewpoint lost target label");
         check(camera.similar(DisplayController.cameraToJson()) && update == DisplayController.getViewpointUpdate(), "Collapsing viewpoint changed camera");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Location);
-        check(visibleViewpointOptions(viewpoint) == locationEditor && expand.isSelected()
+        check(visibleViewpointOptions(viewpoint) == null && !expand.isSelected()
                 && camera.similar(DisplayController.cameraToJson()) && update == DisplayController.getViewpointUpdate(),
-                "Reselecting Location did not expand retained controls without changing the camera");
-        expand.doClick();
+                "Reselecting Location changed disclosure or camera state");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Heliosphere);
+        check(!expand.isSelected(), "Changing viewpoint mode reopened collapsed options");
+        check(visibleViewpointOptions(viewpoint) == null, "Collapsed mode change exposed options");
+        modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Observer);
+        check(!expand.isSelected() && !expand.isVisible(), "Observer changed collapsed preference");
+        modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Location);
+        check(!expand.isSelected() && visibleViewpointOptions(viewpoint) == null, "Observer round trip reopened options");
+        modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Heliosphere);
+        expand.doClick();
         ViewpointLayerOptionsExpertPanel equatorialEditor = visibleViewpointOptions(viewpoint);
         check(equatorialEditor != null && equatorialEditor != locationEditor, "Mode selection did not expand its own controls");
         ViewpointLayerOptionsExpert equatorial = restored.getOptions().getEquatorialOptions();
@@ -253,7 +274,7 @@ public final class SidebarTest {
         check(modeText(modeBox, -1).equals("Heliosphere"), "Heliosphere mode label");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Observer);
         check(visibleViewpointOptions(viewpoint) == null && viewpoint.getPreferredSize().height == headerHeight, "Observer reserves options height");
-        check(!expand.isEnabled() && !expand.isSelected(), "Observer disclosure enabled or expanded");
+        check(!expand.isEnabled() && !expand.isVisible() && expand.isSelected(), "Observer changed expanded preference");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Location);
         check(visibleViewpointOptions(viewpoint) == locationEditor && modeText(modeBox, -1).equals("Location: Venus"), "Mode switch rebuilt Location options or lost its target");
         modeBox.setSelectedItem(ViewpointLayerOptions.CameraMode.Heliosphere);
@@ -277,15 +298,27 @@ public final class SidebarTest {
             Layers.restore(List.of(restored));
             ViewpointLayerOptionsPanel viewpoint = find(panel, ViewpointLayerOptionsPanel.class);
             boolean hasOptions = mode == ViewpointLayerOptions.CameraMode.Location || mode == ViewpointLayerOptions.CameraMode.Heliosphere;
-            AbstractButton expand = findButton(viewpoint, (hasOptions ? Buttons.chevronDown : Buttons.chevronRight) + "Viewpoint");
-            check(expand != null && expand.isEnabled() == hasOptions && expand.isSelected() == hasOptions,
+            AbstractButton expand = findButton(viewpoint, Buttons.chevronDown + "Viewpoint");
+            check(expand != null && expand.isEnabled() == hasOptions && expand.isSelected(),
                     "Restored disclosure state: " + mode);
+            JLabel caption = find(expand.getParent(), JLabel.class);
+            check(expand.isVisible() == hasOptions && caption.isVisible() != hasOptions && caption.isEnabled(),
+                    "Viewpoint label/disclosure visibility: " + mode);
             check((visibleViewpointOptions(viewpoint) != null) == hasOptions, "Restored options visibility: " + mode);
             if (hasOptions) {
+                viewpoint.setSize(500, viewpoint.getPreferredSize().height);
+                layoutTree(viewpoint);
+                JComboBox<?> modeBox = find(viewpoint, JComboBox.class);
+                int modeX = modeBox.getX();
                 expand.doClick();
                 restored.setCameraMode(mode == ViewpointLayerOptions.CameraMode.Location
                         ? ViewpointLayerOptions.CameraMode.Heliosphere : ViewpointLayerOptions.CameraMode.Location);
-                check(expand.isSelected() && visibleViewpointOptions(viewpoint) != null, "Model mode change did not expand options");
+                check(!expand.isSelected() && visibleViewpointOptions(viewpoint) == null, "Model mode change reopened collapsed options");
+                restored.setCameraMode(ViewpointLayerOptions.CameraMode.Observer);
+                viewpoint.setSize(500, viewpoint.getPreferredSize().height);
+                layoutTree(viewpoint);
+                check(modeBox.getX() == modeX, "Viewpoint mode selector moved when disclosure became a label");
+                check(caption.isVisible() && !expand.isVisible(), "Observer retained its disclosure");
             }
         }
         Layers.getViewpointLayer().setCameraMode(ViewpointLayerOptions.CameraMode.Observer);

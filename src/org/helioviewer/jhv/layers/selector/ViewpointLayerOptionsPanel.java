@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -38,7 +39,7 @@ final class ViewpointLayerOptionsPanel extends JPanel {
     private final ViewpointLayerOptionsExpertPanel equatorialPanel;
     private final JComboBox<ViewpointLayerOptions.CameraMode> modeBox = new JComboBox<>(ViewpointLayerOptions.CameraMode.values());
     private final JideToggleButton expandButton = new JideToggleButton(Buttons.chevronDown + "Viewpoint");
-    private boolean syncing;
+    private final JPanel viewpointControl = new JPanel(new CardLayout());
 
     ViewpointLayerOptionsPanel(ViewpointLayer _layer) {
         layer = _layer;
@@ -50,7 +51,9 @@ final class ViewpointLayerOptionsPanel extends JPanel {
         JPanel modePanel = new JPanel(new BorderLayout(5, 0));
         expandButton.setSelected(true);
         expandButton.addActionListener(e -> refreshMode());
-        modePanel.add(expandButton, BorderLayout.LINE_START);
+        viewpointControl.add(new JLabel("Viewpoint", JLabel.CENTER), "label");
+        viewpointControl.add(expandButton, "disclosure");
+        modePanel.add(viewpointControl, BorderLayout.LINE_START);
         modeBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focused) {
@@ -68,13 +71,8 @@ final class ViewpointLayerOptionsPanel extends JPanel {
         });
         modeBox.setSelectedItem(layer.getCameraMode());
         modeBox.addActionListener(e -> {
-            if (!syncing && modeBox.getSelectedItem() instanceof ViewpointLayerOptions.CameraMode mode) {
-                expandButton.setSelected(true);
-                if (layer.getCameraMode() == mode)
-                    refreshMode();
-                else
-                    layer.setCameraMode(mode);
-            }
+            if (modeBox.getSelectedItem() instanceof ViewpointLayerOptions.CameraMode mode)
+                layer.setCameraMode(mode);
         });
         modePanel.add(modeBox, BorderLayout.CENTER);
 
@@ -98,15 +96,9 @@ final class ViewpointLayerOptionsPanel extends JPanel {
     void refreshMode() {
         ViewpointLayerOptions.CameraMode mode = layer.getCameraMode();
         boolean hasOptions = mode == ViewpointLayerOptions.CameraMode.Location || mode == ViewpointLayerOptions.CameraMode.Heliosphere;
-        if (!hasOptions || modeBox.getSelectedItem() != mode)
-            expandButton.setSelected(hasOptions);
         expandButton.setEnabled(hasOptions);
-        syncing = true;
-        try {
-            modeBox.setSelectedItem(mode);
-        } finally {
-            syncing = false;
-        }
+        ((CardLayout) viewpointControl.getLayout()).show(viewpointControl, hasOptions ? "disclosure" : "label");
+        modeBox.setSelectedItem(mode);
         expandButton.setText((expandButton.isSelected() ? Buttons.chevronDown : Buttons.chevronRight) + "Viewpoint");
         boolean expanded = expandButton.isSelected();
         locationPanel.setVisible(expanded && mode == ViewpointLayerOptions.CameraMode.Location);

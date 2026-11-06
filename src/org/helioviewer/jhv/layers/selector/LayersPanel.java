@@ -9,7 +9,9 @@ import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
@@ -103,10 +105,10 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
                 return size;
             }
         };
-        tabs.addTab("Images", imagePanel);
-        tabs.addTab("Overlays", overlays);
-        tabs.addTab("Timelines", timelines);
-        tabs.addTab("Events", events);
+        tabs.addTab("Images", scrollTab(imagePanel));
+        tabs.addTab("Overlays", scrollTab(overlays));
+        tabs.addTab("Timelines", scrollTab(timelines));
+        tabs.addTab("Events", scrollTab(events));
         tabs.setEnabledAt(2, false);
         tabs.setEnabledAt(3, false);
         tabs.setBackground(UIManager.getColor("Table.background"));
@@ -117,6 +119,16 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
         Layers.addListener(this);
+    }
+
+    private JScrollPane scrollTab(JComponent content) {
+        JPanel topAligned = new JPanel(new BorderLayout());
+        topAligned.add(content, BorderLayout.NORTH);
+        JScrollPane scrollPane = new JScrollPane(topAligned, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setFocusable(false);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(getGridRowHeight());
+        return scrollPane;
     }
 
     private void refreshViewpoint() {
@@ -163,7 +175,7 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
         target.removeAll();
         if (panel != null)
             target.add(panel, BorderLayout.CENTER);
-        int index = tabs.indexOfComponent(target);
+        int index = tabs.indexOfComponent(SwingUtilities.getAncestorOfClass(JScrollPane.class, target));
         if (panel == null && tabs.getSelectedIndex() == index)
             tabs.setSelectedIndex(0);
         tabs.setEnabledAt(index, panel != null);

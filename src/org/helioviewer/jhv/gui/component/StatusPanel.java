@@ -61,23 +61,9 @@ public final class StatusPanel extends JPanel {
     public void addPlugin(StatusPlugin newPlugin, Alignment alignment) {
         if (alignment == Alignment.LEFT) {
             leftPanel.add(newPlugin);
-            addLeftSpacer(10);
         } else {
             rightPanel.add(newPlugin, 0);
-            addRightSpacer(10);
         }
-    }
-
-    private void addLeftSpacer(int width) {
-        JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(width, -1));
-        leftPanel.add(spacer);
-    }
-
-    private void addRightSpacer(int width) {
-        JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(width, -1));
-        rightPanel.add(spacer, 0);
     }
 
 }

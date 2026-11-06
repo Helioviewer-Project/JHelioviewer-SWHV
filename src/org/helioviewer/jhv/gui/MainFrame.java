@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.app.AppInfo;
@@ -99,10 +98,7 @@ public final class MainFrame {
     }
 
     private static JFrame mainFrame;
-    private static JScrollPane leftScrollPane;
     private static FixedWidthPanel leftPaneHost;
-
-    private static JPanel leftPane;
 
     private static final RenderStartupHost renderHost = new RenderStartupHost();
     private static AwtInputAdapter awtInputAdapter;
@@ -120,15 +116,8 @@ public final class MainFrame {
         layersPanel = new LayersPanel();
         layersPanel.setTransportPanel(MoviePanel.getInstance());
 
-        leftPane = new JPanel(new BorderLayout());
-        leftPane.add(layersPanel, BorderLayout.NORTH);
-
-        leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        leftScrollPane.setFocusable(false);
-        leftScrollPane.setBorder(null);
-        leftScrollPane.getVerticalScrollBar().setUnitIncrement(layersPanel.getGridRowHeight());
         leftPaneHost = new FixedWidthPanel();
-        leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
+        leftPaneHost.add(layersPanel, BorderLayout.CENTER);
 
         awtInputAdapter = new AwtInputAdapter();
 
@@ -263,10 +252,8 @@ public final class MainFrame {
 
         layersPanel.setOptionsPanel(null);
         moviePanel.setAdvanced(false);
-        leftPane.revalidate();
-
-        int scrollbarWidth = leftScrollPane.getVerticalScrollBar().getPreferredSize().width;
-        leftPaneHost.setFixedWidth(Math.max(contentWidth, leftPane.getPreferredSize().width) + scrollbarWidth);
+        layersPanel.revalidate();
+        leftPaneHost.setFixedWidth(contentWidth);
         leftPaneHost.revalidate();
     }
 
