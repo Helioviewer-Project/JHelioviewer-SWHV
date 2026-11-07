@@ -36,8 +36,10 @@ public class PositionResponse {
     private final Position.Cartesian[] velocity; // units of c
     private final long positionStart;
     private final long positionEnd;
+    private final long requestStart;
+    private final long requestEnd;
 
-    PositionResponse(Position.Cartesian[] _position, @Nullable Position.Cartesian[] _velocity) throws Exception {
+    PositionResponse(Position.Cartesian[] _position, @Nullable Position.Cartesian[] _velocity, long _requestStart, long _requestEnd) throws Exception {
         int len = _position.length;
         if (len == 0)
             throw new Exception("Empty response");
@@ -45,9 +47,12 @@ public class PositionResponse {
         velocity = _velocity;
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
+        requestStart = _requestStart;
+        requestEnd = _requestEnd;
+        checkCoverage();
     }
 
-    PositionResponse(JSONObject jo, boolean state) throws Exception {
+    PositionResponse(JSONObject jo, boolean state, long _requestStart, long _requestEnd) throws Exception {
         JSONArray res = jo.getJSONArray("result");
         int len = res.length();
         if (len == 0)
@@ -80,16 +85,21 @@ public class PositionResponse {
         }
         positionStart = position[0].milli();
         positionEnd = position[len - 1].milli();
+        requestStart = _requestStart;
+        requestEnd = _requestEnd;
+        checkCoverage();
+    }
+
+    private void checkCoverage() throws Exception {
+        if (positionStart > requestStart || positionEnd < requestEnd)
+            throw new Exception("Position response does not cover requested interval " + TimeUtils.format(requestStart) + " to " + TimeUtils.format(requestEnd));
     }
 
     long interpolateTime(long t, long start, long end) {
         if (start >= end)
-            return positionEnd;
-        else {
-            double f = (t - start) / (double) (end - start); //!
-            long time = (long) (positionStart + f * (positionEnd - positionStart) + .5);
-            return Math.clamp(time, positionStart, positionEnd);
-        }
+            return requestEnd;
+        double f = (Math.clamp(t, start, end) - start) / (double) (end - start);
+        return requestStart + Math.round(f * (requestEnd - requestStart));
     }
 
     private void interpolate(long t, long start, long end, Interpolated out, @Nullable double[] vel) {

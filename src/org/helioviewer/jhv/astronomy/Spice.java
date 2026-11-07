@@ -51,13 +51,13 @@ public class Spice {
         // Stopwatch sw = Stopwatch.createStarted();
         try {
             long dt = deltat * 1000;
-            int len = (int) ((end - start) / dt) + 1;
+            int len = (int) Math.ceilDiv(end - start, dt) + 1;
             Position.Cartesian[] position = new Position.Cartesian[len];
             Position.Cartesian[] velocity = state ? new Position.Cartesian[len] : null;
-            int i = 0;
             double[] v = new double[3];
             double[] sv = new double[6];
-            for (long milli = start; milli <= end; milli += dt) {
+            for (int i = 0; i < len; i++) {
+                long milli = start + i * dt;
                 if (state) {
                     CSPICE.spkezr(target, milli2et(milli), frame, abcorr, observer, sv, lightTimeUnused);
                     v[0] = sv[0] * Sun.RadiusKMeterInv;
@@ -66,10 +66,10 @@ public class Spice {
                     velocity[i] = new Position.Cartesian(milli, sv[3] * VelocityFactor, sv[4] * VelocityFactor, sv[5] * VelocityFactor);
                 } else
                     position(observer, target, frame, abcorr, milli, v);
-                position[i++] = new Position.Cartesian(milli, v[0], v[1], v[2]);
+                position[i] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
             //System.out.println((sw.elapsed().toNanos() / 1e9));
-            return new PositionResponse(position, velocity);
+            return new PositionResponse(position, velocity, start, end);
         } catch (Exception e) {
             Log.error(e);
         }

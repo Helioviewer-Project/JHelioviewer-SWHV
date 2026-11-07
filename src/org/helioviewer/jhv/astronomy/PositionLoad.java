@@ -35,16 +35,32 @@ public final class PositionLoad {
         future = _future;
     }
 
-    private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, String abcorr, boolean state, long start,
-                                long end) implements Callable<PositionResponse> {
+    record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, String abcorr, boolean state, long start,
+                        long end) implements Callable<PositionResponse> {
+        long stepSeconds() {
+            return Math.max(60, Math.ceilDiv(end - start, 1000L * (MAX_POINTS - 1)));
+        }
+
+        URI uri() throws Exception {
+            long deltat = stepSeconds();
+            long dt = deltat * 1000;
+            long sampleEnd = start + Math.ceilDiv(end - start, dt) * dt;
+            return new URI((state ? stateTemplate : positionTemplate).expand(UriTemplate.vars()
+                    .set("ref", frame)
+                    .set("observer", observer.getSpiceName())
+                    .set("target", target.getSpiceName())
+                    .set("abcorr", abcorr)
+                    .set("utc", TimeUtils.format(start))
+                    .set("utc_end", TimeUtils.format(sampleEnd))
+                    .set("deltat", deltat)));
+        }
+
         @Override
         public PositionResponse call() throws Exception {
             if (start > end)
                 throw new Exception("End before start");
 
-            long deltat = 60, span = (end - start) / 1000;
-            if (span / deltat > MAX_POINTS)
-                deltat = span / MAX_POINTS;
+            long deltat = stepSeconds();
 
             if (observer.isInternal() && target.isInternal()) {
                 PositionResponse response = Spice.getRange(observer.getSpiceName(), target.getSpiceName(), frame.toString(), abcorr, state, start, end, deltat);
@@ -52,19 +68,10 @@ public final class PositionLoad {
                     return response;
             }
 
-            URI uri = new URI((state ? stateTemplate : positionTemplate).expand(UriTemplate.vars()
-                    .set("ref", frame)
-                    .set("observer", observer.getSpiceName())
-                    .set("target", target.getSpiceName())
-                    .set("abcorr", abcorr)
-                    .set("utc", TimeUtils.format(start))
-                    .set("utc_end", TimeUtils.format(end))
-                    .set("deltat", deltat)));
-
-            try (NetClient nc = NetClient.of(uri, true)) {
+            try (NetClient nc = NetClient.of(uri(), true)) {
                 JSONObject result = JSONUtils.get(nc.getReader());
                 if (nc.isSuccessful()) {
-                    return new PositionResponse(result, state);
+                    return new PositionResponse(result, state, start, end);
                 } else {
                     throw new Exception(result.optString("faultstring", "Invalid network response"));
                 }
