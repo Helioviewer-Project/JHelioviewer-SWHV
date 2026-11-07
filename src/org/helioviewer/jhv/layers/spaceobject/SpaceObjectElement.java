@@ -1,14 +1,20 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
+import org.helioviewer.jhv.astronomy.SpaceObject;
+
 public final class SpaceObjectElement {
 
-    private final String name;
+    private final SpaceObject target;
 
     private boolean selected;
     private String status;
 
-    public SpaceObjectElement(String _name) {
-        name = _name;
+    public SpaceObjectElement(SpaceObject _target) {
+        target = _target;
+    }
+
+    public SpaceObject getTarget() {
+        return target;
     }
 
     void select() {
@@ -35,7 +41,7 @@ public final class SpaceObjectElement {
 
     @Override
     public String toString() {
-        return name;
+        return target.toString();
     }
 
 }

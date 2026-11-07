@@ -84,7 +84,7 @@ public final class ViewpointLayerOptionsExpert {
             ja = new JSONArray(new String[]{"Earth"});
 
         ArrayList<SpaceObjectElement> elements = new ArrayList<>();
-        SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target.toString())));
+        SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target)));
 
         container = new SpaceObjectContainer(elements, exclusive);
         selectTargets(ja);
@@ -323,14 +323,10 @@ public final class ViewpointLayerOptionsExpert {
     private void load(SpaceObjectElement element) {
         unload(element);
 
-        SpaceObject target = SpaceObject.get(element.toString());
-        if (target == null)
-            return;
-
         loads.put(element, PositionLoad.submit(status -> {
             container.setStatus(element, status);
             DisplayController.refreshCamera();
-        }, observer, target, frame, "NONE", startTime, endTime));
+        }, observer, element.getTarget(), frame, "NONE", startTime, endTime));
         reloadSky();
     }
 
@@ -341,9 +337,7 @@ public final class ViewpointLayerOptionsExpert {
         List<SpaceObjectElement> selected = container.getSelectedElements();
         if (!exclusive || !skyActive || !(planets || stars) || selected.isEmpty())
             return;
-        SpaceObject location = SpaceObject.get(selected.getFirst().toString());
-        if (location == null)
-            return;
+        SpaceObject location = selected.getFirst().getTarget();
 
         PositionLoad.StatusReceiver receiver = status -> DisplayController.display();
         apparentSun = PositionLoad.submit(receiver, location, SpaceObject.SUN, Frame.J2000, "LT+S", startTime, endTime);

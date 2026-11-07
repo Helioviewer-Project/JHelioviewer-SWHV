@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.Colors;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 public class SpaceObject {
 
@@ -23,31 +24,31 @@ public class SpaceObject {
     public static final SpaceObject STA = new SpaceObject(true, "STEREO AHEAD", "STEREO Ahead", 2 / Sun.RadiusMeter, Colors.bytes(32, 32, 128));
     static final SpaceObject SSB = new SpaceObject(true, "SSB", "Solar System Barycenter", 0, Colors.White.bytes());
 
-    private static final ImmutableMap<String, SpaceObject> objectMap = new ImmutableMap.Builder<String, SpaceObject>()
-            .put("Sun", SUN)
-            .put("Mercury", new SpaceObject(true, "MERCURY", "Mercury", 2439700 / Sun.RadiusMeter, Colors.Gray.bytes()))
-            .put("Venus", new SpaceObject(true, "VENUS", "Venus", 6051800 / Sun.RadiusMeter, Colors.bytes(181, 110, 26)))
-            .put("Earth", new SpaceObject(true, "EARTH", "Earth", 6371000 / Sun.RadiusMeter, Colors.Blue.bytes()))
+    private static final ImmutableMap<String, SpaceObject> objectMap = Maps.uniqueIndex(List.of(
+            SUN,
+            new SpaceObject(true, "MERCURY", "Mercury", 2439700 / Sun.RadiusMeter, Colors.Gray.bytes()),
+            new SpaceObject(true, "VENUS", "Venus", 6051800 / Sun.RadiusMeter, Colors.bytes(181, 110, 26)),
+            new SpaceObject(true, "EARTH", "Earth", 6371000 / Sun.RadiusMeter, Colors.Blue.bytes()),
             //
-            .put("Parker Solar Probe", new SpaceObject(false, "PSP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.bytes(235, 199, 31)))
-            .put("Solar Orbiter", SOLO)
-            .put("BepiColombo", new SpaceObject(false, "BEPICOLOMBO MPO", "BepiColombo", 2 / Sun.RadiusMeter, Colors.White.bytes()))
-            .put("STEREO Ahead", STA)
-            .put("STEREO Behind", new SpaceObject(false, "STEREO BEHIND", "STEREO Behind", 2 / Sun.RadiusMeter, Colors.White.bytes()))
-            .put("SOHO", new SpaceObject(false, "SOHO", "SOHO", 2 / Sun.RadiusMeter, Colors.White.bytes()))
-            .put("SDO", new SpaceObject(false, "SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White.bytes()))
-            .put("PROBA-2", new SpaceObject(false, "PROBA2", "PROBA-2", 2 / Sun.RadiusMeter, Colors.White.bytes()))
+            new SpaceObject(false, "PSP", "Parker Solar Probe", 2 / Sun.RadiusMeter, Colors.bytes(235, 199, 31)),
+            SOLO,
+            new SpaceObject(false, "BEPICOLOMBO MPO", "BepiColombo", 2 / Sun.RadiusMeter, Colors.White.bytes()),
+            STA,
+            new SpaceObject(false, "STEREO BEHIND", "STEREO Behind", 2 / Sun.RadiusMeter, Colors.White.bytes()),
+            new SpaceObject(false, "SOHO", "SOHO", 2 / Sun.RadiusMeter, Colors.White.bytes()),
+            new SpaceObject(false, "SDO", "SDO", 2 / Sun.RadiusMeter, Colors.White.bytes()),
+            new SpaceObject(false, "PROBA2", "PROBA-2", 2 / Sun.RadiusMeter, Colors.White.bytes()),
+            new SpaceObject(false, "Proba-3", "Proba-3 CSC", 2 / Sun.RadiusMeter, Colors.White.bytes()),
             //
-            .put("Moon", new SpaceObject(true, "MOON", "Moon", 1737400 / Sun.RadiusMeter, Colors.LightGray.bytes()))
-            .put("Mars", new SpaceObject(true, "MARS BARYCENTER", "Mars", 3389500 / Sun.RadiusMeter, Colors.bytes(135, 37, 18)))
-            .put("Jupiter", new SpaceObject(true, "JUPITER BARYCENTER", "Jupiter", 69911000 / Sun.RadiusMeter, Colors.bytes(168, 172, 180)))
-            .put("Saturn", new SpaceObject(true, "SATURN BARYCENTER", "Saturn", 58232000 / Sun.RadiusMeter, Colors.bytes(208, 198, 173)))
-            .put("Uranus", new SpaceObject(true, "URANUS BARYCENTER", "Uranus", 25362000 / Sun.RadiusMeter, Colors.bytes(201, 239, 242)))
-            .put("Neptune", new SpaceObject(true, "NEPTUNE BARYCENTER", "Neptune", 24622000 / Sun.RadiusMeter, Colors.bytes(124, 157, 226)))
-            .put("Pluto", new SpaceObject(true, "PLUTO BARYCENTER", "Pluto", 1195000 / Sun.RadiusMeter, Colors.bytes(205, 169, 140)))
-            //.put("Comet 67P", new SpaceObject(false, "CHURYUMOV-GERASIMENKO", "Comet 67P", 2200 / Sun.RadiusMeter, Colors.White.bytes()))
-            //.put("PROBA-3", new SpaceObject(false, "PROBA3", "PROBA-3", 2 / Sun.RadiusMeter, Colors.White.bytes()))
-            .build();
+            new SpaceObject(true, "MOON", "Moon", 1737400 / Sun.RadiusMeter, Colors.LightGray.bytes()),
+            new SpaceObject(true, "MARS BARYCENTER", "Mars", 3389500 / Sun.RadiusMeter, Colors.bytes(135, 37, 18)),
+            new SpaceObject(true, "JUPITER BARYCENTER", "Jupiter", 69911000 / Sun.RadiusMeter, Colors.bytes(168, 172, 180)),
+            new SpaceObject(true, "SATURN BARYCENTER", "Saturn", 58232000 / Sun.RadiusMeter, Colors.bytes(208, 198, 173)),
+            new SpaceObject(true, "URANUS BARYCENTER", "Uranus", 25362000 / Sun.RadiusMeter, Colors.bytes(201, 239, 242)),
+            new SpaceObject(true, "NEPTUNE BARYCENTER", "Neptune", 24622000 / Sun.RadiusMeter, Colors.bytes(124, 157, 226)),
+            new SpaceObject(true, "PLUTO BARYCENTER", "Pluto", 1195000 / Sun.RadiusMeter, Colors.bytes(205, 169, 140))
+            //new SpaceObject(false, "CHURYUMOV-GERASIMENKO", "Comet 67P", 2200 / Sun.RadiusMeter, Colors.White.bytes()),
+    ), SpaceObject::toString);
 
     public static List<SpaceObject> getTargets(SpaceObject observer) {
         List<SpaceObject> list = new ArrayList<>(objectMap.values());
