@@ -307,7 +307,7 @@ public final class Band extends TimelineLayer {
     }
 
     private static void drawDevicePolyline(Graphics2D g, Polyline line, int start, int end,
-                                          AffineTransform transform) {
+                                           AffineTransform transform) {
         int count = end - start;
         int[] xp = new int[count];
         int[] yp = new int[count];

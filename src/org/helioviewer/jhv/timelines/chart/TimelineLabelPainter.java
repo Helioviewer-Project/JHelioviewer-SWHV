@@ -200,6 +200,7 @@ final class TimelineLabelPainter {
             long day = Math.floorDiv(tick, TimeUtils.DAY_IN_MILLIS);
             String text = step.label(tick, day != previousDay);
             int textWidth = fontMetrics.stringWidth(text);
+            //noinspection MathClampMigration
             int xText = Math.max(0, Math.min(x - textWidth / 2, geometry.rightEdge() - textWidth));
             if (xText >= previousRight + TimeTicks.LABEL_GAP) {
                 g.setColor(textColor);
