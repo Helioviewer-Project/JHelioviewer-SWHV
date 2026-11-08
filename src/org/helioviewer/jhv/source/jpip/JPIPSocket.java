@@ -59,13 +59,9 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     private static String createQuery(int len, String... values) {
-        boolean isKey = true;
         StringBuilder buf = new StringBuilder();
-        for (String val : values) {
-            buf.append(val);
-            buf.append(isKey ? '=' : '&');
-            isKey = !isKey;
-        }
+        for (int i = 0; i < values.length; i += 2)
+            buf.append(values[i]).append('=').append(values[i + 1]).append('&');
         return buf + "len=" + len;
     }
 
