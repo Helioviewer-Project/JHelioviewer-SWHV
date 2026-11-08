@@ -21,6 +21,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.display.DisplayLayout;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapScale;
@@ -28,8 +29,13 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.InputMouseListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.AbstractLayer;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
@@ -78,12 +84,15 @@ public final class EclipseRenderingTest {
                 starsFirst();
                 planetLoads();
                 clearing();
+                hpcDisks();
+                hpcMarkersAndHover();
+                capturePreservesHover();
                 check(!GLException.checkErrors("EclipseRenderingTest"), "Moon rendering GL errors");
             } finally {
                 renderer.destroy();
             }
         }
-        System.out.println("PASS: foreground eclipses, background markers, stars first, back-to-front planets, limb crossing, rotation, planet loading, clearing, colors and context recreation");
+        System.out.println("PASS: Orthographic and HPC eclipses, wide-field Moon/Earth limbs, stars and planets, per-viewport projection and hover, ordering, clearing and context recreation");
     }
 
     private static void cap() throws Exception {
@@ -190,37 +199,47 @@ public final class EclipseRenderingTest {
             Position source = new Position(TIME, 215, 0, 0);
             for (Quat drag : new Quat[]{Quat.createAxisY(-Math.PI / 3), Quat.createAxisY(-Math.PI / 6), Quat.ZERO,
                     Quat.createAxisY(Math.PI / 6), Quat.createAxisY(Math.PI / 3), Quat.createXY(.4, .7)}) {
-                ByteBuffer overlay = fixture.draw(drag, 6, 0, 0, false);
-                GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-                GLSLSphereShader.render();
-                mask.bind();
-                difference.bind();
-                texture.bind();
-                lut.bind();
-                GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, 0, 0, 1, 1, 1,
-                        0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, 0, 100, 0, 1, 0);
-                GLSLImageShader.render(MapMode.Orthographic, Quat.rotate(drag, source.toQuat()), source,
-                        geometry, source, geometry, source, Mat2.IDENTITY, 0, 0, false);
-                ByteBuffer rendered = BufferUtils.newByteBuffer(4 * SIZE * SIZE);
-                GL.glReadPixels(0, 0, SIZE, SIZE, GL.RGBA, GL.UNSIGNED_BYTE, rendered);
-                int moonPixels = 0;
-                for (int row = 2; row < SIZE - 2; row++) {
-                    for (int col = 2; col < SIZE - 2; col++) {
-                        int expected = rendered.get(4 * (row * SIZE + col)) & 255;
-                        boolean edge = false;
-                        for (int dy = -2; dy <= 2; dy++)
-                            for (int dx = -2; dx <= 2; dx++)
-                                edge |= (rendered.get(4 * ((row + dy) * SIZE + col + dx)) & 255) != expected;
-                        if (edge || expected != 0 && expected < 250)
-                            continue;
-                        boolean onMoon = expected >= 250;
-                        if (onMoon)
-                            moonPixels++;
-                        check(((overlay.get(4 * (row * SIZE + col)) & 255) != 0) == onMoon,
-                                "eclipse fill differs from image silhouette at " + col + "," + row + " drag " + drag.toJson());
+                for (MapMode mode : new MapMode[]{MapMode.Orthographic, MapMode.HPC}) {
+                    ByteBuffer overlay;
+                    if (mode == MapMode.Orthographic)
+                        overlay = fixture.draw(drag, 6, 0, 0, false);
+                    else {
+                        double angleBound = Math.toDegrees(Math.atan(3 / 215.));
+                        MapView view = fixture.hpcView(new MapScale[]{MapScale.hpc(angleBound, angleBound)}, 1, 0, 0, drag);
+                        overlay = fixture.drawHpc(view, Display.getViewport(0));
                     }
+                    GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                    if (mode == MapMode.Orthographic)
+                        GLSLSphereShader.render();
+                    mask.bind();
+                    difference.bind();
+                    texture.bind();
+                    lut.bind();
+                    GLSLImageShader.bindDisplay(new float[]{1, 1, 1, 1}, 0, 0, 0, 0, 0, 1, 1, 1,
+                            0, 0, 0, 0, 0, 0, Float.POSITIVE_INFINITY, 0, 0, 100, 0, 1, 0);
+                    GLSLImageShader.render(mode, mode == MapMode.Orthographic ? Quat.rotate(drag, source.toQuat()) : source.toQuat(), source,
+                            geometry, source, geometry, source, Mat2.IDENTITY, 0, 0, false);
+                    ByteBuffer rendered = BufferUtils.newByteBuffer(4 * SIZE * SIZE);
+                    GL.glReadPixels(0, 0, SIZE, SIZE, GL.RGBA, GL.UNSIGNED_BYTE, rendered);
+                    int moonPixels = 0;
+                    for (int row = 2; row < SIZE - 2; row++) {
+                        for (int col = 2; col < SIZE - 2; col++) {
+                            int expected = rendered.get(4 * (row * SIZE + col)) & 255;
+                            boolean edge = false;
+                            for (int dy = -2; dy <= 2; dy++)
+                                for (int dx = -2; dx <= 2; dx++)
+                                    edge |= (rendered.get(4 * ((row + dy) * SIZE + col + dx)) & 255) != expected;
+                            if (edge || expected != 0 && expected < 250)
+                                continue;
+                            boolean onMoon = expected >= 250;
+                            if (onMoon)
+                                moonPixels++;
+                            check(((overlay.get(4 * (row * SIZE + col)) & 255) != 0) == onMoon,
+                                    mode + " eclipse fill differs from image silhouette at " + col + "," + row + " drag " + drag.toJson());
+                        }
+                    }
+                    check(moonPixels > 10, "image mapping fixture lost the Moon silhouette");
                 }
-                check(moonPixels > 10, "image mapping fixture lost the Moon silhouette");
             }
         } finally {
             mask.delete();
@@ -432,6 +451,237 @@ public final class EclipseRenderingTest {
         }
     }
 
+    private static void hpcDisks() throws Exception {
+        double[] sun = {0, 0, 215};
+        try (Fixture fixture = new Fixture(sun, new double[]{0, 0, .55}, "Earth")) {
+            SpaceObject earth = SpaceObject.get("Earth");
+            for (SpaceObject target : new SpaceObject[]{MOON, earth}) {
+                for (double longitude : new double[]{0, 89, 110, -170}) {
+                    double latitude = longitude == 0 ? -.35 : 20;
+                    double angularRadius = longitude == 0 ? .3 : 18;
+                    double distance = target.getRadius() / Math.sin(Math.toRadians(angularRadius));
+                    double[] body = fixture.angularVector(longitude, latitude, distance);
+                    fixture.apparentPlanets.clear();
+                    fixture.apparentPlanets.add(load(target, body, TIME));
+                    MapScale scale = longitude == 0 ? MapScale.hpc(2, 1.5) : MapScale.hpc(180, 70);
+                    for (Quat drag : new Quat[]{Quat.ZERO, Quat.createXY(.6, .9)}) {
+                        MapView view = fixture.hpcView(new MapScale[]{scale}, 1.2, .02, -.03, drag);
+                        ByteBuffer pixels = fixture.drawHpc(view, Display.getViewport(0));
+                        int checked = compareHpc(fixture, pixels, view, Display.getViewport(0), body, target, longitude, latitude);
+                        check(checked > 20, "HPC " + target + " disk missing at " + longitude);
+                    }
+                }
+            }
+            fixture.apparentPlanets.clear();
+            fixture.apparentPlanets.add(load(MOON, new double[]{0, 0, .55}, TIME));
+            fixture.apparentPlanets.add(load(earth, new double[]{0, 0, .3}, TIME));
+            MapView overlap = fixture.hpcView(new MapScale[]{MapScale.hpc(2, 2)}, 1, 0, 0, Quat.ZERO);
+            ByteBuffer ordered = fixture.drawHpc(overlap, Display.getViewport(0));
+            for (int channel = 0; channel < 3; channel++) {
+                double expected = .5 * (earth.getTrajectoryColor(false)[channel] & 255) + .25 * (MOON.getTrajectoryColor(false)[channel] & 255);
+                check(Math.abs((ordered.get(4 * (160 * SIZE + 172) + channel) & 255) - expected) <= 1, "HPC near Earth did not cover far Moon");
+            }
+            Collections.reverse(fixture.apparentPlanets);
+            check(ordered.equals(fixture.drawHpc(overlap, Display.getViewport(0))), "HPC planet input order changed rendered pixels");
+            fixture.apparentPlanets.clear();
+            fixture.apparentPlanets.add(load(MOON, new double[]{0, 0, 430}, TIME));
+            MapView view = fixture.hpcView(new MapScale[]{MapScale.hpc(2, 2)}, 1, 0, 0, Quat.ZERO);
+            ByteBuffer hidden = fixture.drawHpc(view, Display.getViewport(0));
+            for (int i = 0; i < SIZE * SIZE; i++)
+                check(hidden.get(4 * i) == 0, "HPC background Moon visible through the Sun");
+            fixture.install();
+            field(AbstractLayer.class, "enabled").setBoolean(fixture.layer, false);
+            ByteBuffer disabled = fixture.drawHpc(view, Display.getViewport(0));
+            for (int i = 0; i < SIZE * SIZE; i++)
+                check(disabled.get(4 * i) == 0, "HPC disabled sky retained pixels");
+        }
+    }
+
+    private static int compareHpc(Fixture fixture, ByteBuffer pixels, MapView view, Viewport vp,
+                                  double[] body, SpaceObject target, double longitude, double latitude) {
+        MapScale scale = view.scale(vp);
+        double width = view.cameraWidth(vp);
+        double dx = width / vp.width, dy = width / vp.height;
+        byte[] color = target.getTrajectoryColor(false);
+        int checked = 0;
+        for (int row = 1; row < vp.height - 1; row++) {
+            for (int col = 1; col < vp.width - 1; col++) {
+                double ux = width * ((col + .5) / vp.width - .5) - view.cameraTranslationX() / vp.aspect + .5;
+                double uy = width * ((row + .5) / vp.height - .5) - view.cameraTranslationY() + .5;
+                if (Math.abs(ux - scale.toUnitX(longitude)) < 6 * dx && Math.abs(uy - scale.toUnitY(latitude)) < 6 * dy)
+                    continue;
+                boolean inside = hpcBody(fixture, scale, ux, uy, body, target.getRadius());
+                boolean edge = false;
+                for (int ix = -1; ix <= 1; ix++)
+                    for (int iy = -1; iy <= 1; iy++)
+                        edge |= hpcBody(fixture, scale, ux + ix * dx, uy + iy * dy, body, target.getRadius()) != inside;
+                if (edge)
+                    continue;
+                for (int channel = 0; channel < 3; channel++) {
+                    int value = pixels.get(4 * (row * vp.width + col) + channel) & 255;
+                    check(Math.abs(value - (inside ? .5 * (color[channel] & 255) : 0)) <= 1,
+                            "HPC " + target + " at " + col + "," + row + " expected disk=" + inside + " got=" + value);
+                }
+                if (inside)
+                    checked++;
+            }
+        }
+        return checked;
+    }
+
+    private static boolean hpcBody(Fixture fixture, MapScale scale, double ux, double uy, double[] body, double radius) {
+        if (ux < 0 || ux > 1 || uy < 0 || uy > 1)
+            return false;
+        double[] ray = fixture.angularVector(scale.toMapX(ux), scale.toMapY(uy), 1);
+        double along = dot(body, ray);
+        double miss = 0;
+        for (int i = 0; i < 3; i++)
+            miss += (body[i] - along * ray[i]) * (body[i] - along * ray[i]);
+        return along > 0 && miss <= radius * radius;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void hpcMarkersAndHover() throws Exception {
+        Viewport[] originalViewports = Display.getViewports();
+        boolean originalMultiview = Display.multiview;
+        MapView originalView = GLRenderer.getMapView();
+        try (Fixture fixture = new Fixture(new double[]{0, 0, 215}, new double[]{0, 0, .55}, "Earth")) {
+            double[] direction = fixture.angularVector(10, 5, 1);
+            Stars.Star star = new Stars.Star(Math.atan2(direction[1], direction[0]), Math.asin(direction[2]),
+                    0, 0, 0, 0, 0, 123, direction[0], direction[1], direction[2]);
+            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+                    CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{star})));
+            field(ViewpointLayerOptionsExpert.class, "locationHeliocentric").set(fixture.options,
+                    load(SpaceObject.get("Earth"), new double[]{0, 0, -215}, TIME));
+            field(ViewpointLayerOptionsExpert.class, "locationState").set(fixture.options,
+                    load(SpaceObject.get("Earth"), new double[]{0, 0, 0}, TIME, true));
+            fixture.apparentPlanets.clear();
+            Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 160, SIZE, SIZE), DisplayLayout.viewport(1, 160, 0, 160, SIZE, SIZE)};
+            field(Display.class, "viewports").set(null, viewports);
+            Display.multiview = true;
+            MapScale[] scales = {MapScale.hpc(20, 10), MapScale.hpc(40, 20)};
+            MapView view = fixture.hpcView(scales, 1, 0, 0, Quat.createXY(.6, .9));
+            field(GLRenderer.class, "screenView").set(null, view);
+            for (Viewport vp : viewports) {
+                ByteBuffer pixels = fixture.drawHpc(view, vp);
+                int col = (int) Math.round(scales[vp.idx].toUnitX(10) * vp.width - .5);
+                int row = (int) Math.round(scales[vp.idx].toUnitY(5) * vp.height - .5);
+                check((pixels.get(4 * (row * vp.width + col)) & 255) == 255, "HPC star projection in viewport " + vp.idx);
+            }
+            InputMouseListener listener = (InputMouseListener) field(ViewpointLayer.class, "hoverListener").get(fixture.layer);
+            InputController.addListener(listener);
+            try {
+                for (Viewport vp : viewports) {
+                    int x = vp.x + (int) Math.round(scales[vp.idx].toUnitX(10) * vp.width);
+                    int y = vp.yAWT + (int) Math.round((1 - scales[vp.idx].toUnitY(5)) * vp.height);
+                    InputController.mouseMoved(new PointerEvent(x, y, 0, 0, false, false, false, false, false));
+                    List<String> text = (List<String>) field(ViewpointLayer.class, "hoverText").get(fixture.layer);
+                    check(text.size() == 1 && text.getFirst().startsWith("HIP123,"), "HPC star hover in viewport " + vp.idx);
+                }
+            } finally {
+                InputController.removeListener(listener);
+            }
+            fixture.apparentPlanets.add(load(MOON, fixture.angularVector(10, 5, 430), TIME));
+            for (Viewport vp : viewports) {
+                ByteBuffer pixels = fixture.drawHpc(view, vp);
+                int col = (int) Math.round(scales[vp.idx].toUnitX(10) * vp.width - .5);
+                int row = (int) Math.round(scales[vp.idx].toUnitY(5) * vp.height - .5);
+                byte[] color = MOON.getTrajectoryColor(false);
+                for (int channel = 0; channel < 3; channel++)
+                    check((pixels.get(4 * (row * vp.width + col) + channel) & 255) == (color[channel] & 255), "HPC planet did not cover star");
+            }
+            fixture.apparentPlanets.clear();
+            double[] rearDirection = fixture.angularVector(120, 35, 1);
+            Stars.Star rearStar = new Stars.Star(Math.atan2(rearDirection[1], rearDirection[0]), Math.asin(rearDirection[2]),
+                    0, 0, 0, 0, 0, 456, rearDirection[0], rearDirection[1], rearDirection[2]);
+            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+                    CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{rearStar})));
+            MapScale wide = MapScale.hpc(180, 90);
+            MapView panned = fixture.hpcView(new MapScale[]{wide, wide}, .2, (wide.toUnitX(120) - .5) * viewports[0].aspect,
+                    wide.toUnitY(35) - .5, Quat.createXY(.6, .9));
+            for (Viewport vp : viewports) {
+                ByteBuffer pixels = fixture.drawHpc(panned, vp);
+                check((pixels.get(4 * (vp.height / 2 * vp.width + vp.width / 2)) & 255) == 255,
+                        "HPC panned star beyond 90 degrees was culled");
+            }
+            MapView clipped = fixture.hpcView(scales, 1, 0, 0, Quat.ZERO);
+            for (Viewport vp : viewports) {
+                ByteBuffer pixels = fixture.drawHpc(clipped, vp);
+                for (int i = 0; i < vp.width * vp.height; i++)
+                    check(pixels.get(4 * i) == 0, "HPC star outside map bounds was drawn");
+            }
+            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+                    CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{star})));
+            MapView zoomedOut = fixture.hpcView(scales, 4, 0, 0, Quat.ZERO);
+            for (Viewport vp : viewports) {
+                ByteBuffer pixels = fixture.drawHpc(zoomedOut, vp);
+                int col = (int) Math.round((.5 + (scales[vp.idx].toUnitX(10) - .5) / 4) * vp.width - .5);
+                int row = (int) Math.round((.5 + (scales[vp.idx].toUnitY(5) - .5) / 4) * vp.height - .5);
+                check((pixels.get(4 * (row * vp.width + col)) & 255) == 255, "HPC star missing after zooming beyond the map");
+            }
+        } finally {
+            field(Display.class, "viewports").set(null, originalViewports);
+            Display.multiview = originalMultiview;
+            Display.setActiveViewport(0, 0);
+            field(GLRenderer.class, "screenView").set(null, originalView);
+            GL.glViewport(0, 0, SIZE, SIZE);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void capturePreservesHover() throws Exception {
+        List<Layer> layers = (List<Layer>) field(Layers.class, "layers").get(null);
+        List<Layer> originalLayers = List.copyOf(layers);
+        MapView originalView = GLRenderer.getMapView();
+        MapMode originalMode = Display.mode;
+        try (Fixture fixture = new Fixture(new double[]{0, 0, 215}, new double[]{0, 0, .55}, "Earth")) {
+            layers.clear();
+            layers.add(fixture.layer);
+            Display.mode = MapMode.HPC;
+            GLRenderer.reshape(160, SIZE);
+            fixture.apparentPlanets.clear();
+            fixture.apparentPlanets.add(load(MOON, fixture.angularVector(2, 1, 430), TIME));
+            MapView screen = fixture.hpcView(new MapScale[]{MapScale.hpc(5, 10)}, 1, 0, 0, Quat.ZERO);
+            field(GLRenderer.class, "screenView").set(null, screen);
+            GLRenderer.renderScene(screen);
+            InputMouseListener listener = (InputMouseListener) field(ViewpointLayer.class, "hoverListener").get(fixture.layer);
+            InputController.addListener(listener);
+            try {
+                PointerEvent atMoon = new PointerEvent(112, 144, 0, 0, false, false, false, false, false);
+                InputController.mouseMoved(atMoon);
+                List<String> hover = (List<String>) field(ViewpointLayer.class, "hoverText").get(fixture.layer);
+                check(hover.equals(List.of("Moon")), "Moon hover missing before capture");
+                GLGrab capture = new GLGrab(1024, 1024);
+                try {
+                    ByteBuffer frame = ByteBuffer.allocate(3 * 1024 * 1024);
+                    capture.renderFrame(frame);
+                    boolean moonDrawn = false;
+                    for (int i = 0; i < frame.capacity(); i++) {
+                        if (frame.get(i) != 0) {
+                            moonDrawn = true;
+                            break;
+                        }
+                    }
+                    check(moonDrawn, "Capture lost its Moon marker");
+                } finally {
+                    capture.dispose();
+                }
+                check(GLRenderer.getMapView() == screen && Display.fullViewport.width == 160 && Display.fullViewport.height == SIZE,
+                        "Capture did not restore the interactive view");
+                InputController.mouseMoved(atMoon);
+                check(hover.equals(List.of("Moon")), "Capture replaced screen hover coordinates");
+            } finally {
+                InputController.removeListener(listener);
+            }
+        } finally {
+            layers.clear();
+            layers.addAll(originalLayers);
+            Display.mode = originalMode;
+            GLRenderer.reshape(SIZE, SIZE);
+            field(GLRenderer.class, "screenView").set(null, originalView);
+        }
+    }
+
     private static final class Fixture implements AutoCloseable {
         private final ViewpointLayer layer;
         private final ViewpointLayerOptionsExpert options;
@@ -494,6 +744,36 @@ public final class EclipseRenderingTest {
             ByteBuffer pixels = BufferUtils.newByteBuffer(4 * SIZE * SIZE);
             GL.glReadPixels(0, 0, SIZE, SIZE, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
             return pixels;
+        }
+
+        private MapView hpcView(MapScale[] scales, double width, double x, double y, Quat drag) {
+            Display.whiteBackground = false;
+            Position viewpoint = new Position(time, distance, 0, 0);
+            DisplayController.setViewpointUpdate(_ -> viewpoint, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+            DisplayController.cameraFromJson(new JSONObject().put("fov", 2 * Math.atan(width / (2 * distance))).put("dragRotation", drag.toJson()));
+            Display.getCamera().setTranslation(-x, -y);
+            return MapView.create(Display.getCamera(), viewpoint, MapMode.HPC, GridType.Viewpoint, scales);
+        }
+
+        private ByteBuffer drawHpc(MapView view, Viewport vp) {
+            GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            GL.glClearColor(0, 0, 0, 0);
+            GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+            Transform.ortho2D(vp.aspect, view.cameraWidth(vp), view.cameraTranslationX(), view.cameraTranslationY());
+            GLSLScreenShader.setView(view, vp);
+            layer.renderScale(view, vp);
+            ByteBuffer pixels = BufferUtils.newByteBuffer(4 * vp.width * vp.height);
+            GL.glReadPixels(vp.x, vp.yGL, vp.width, vp.height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+            return pixels;
+        }
+
+        private double[] angularVector(double longitude, double latitude, double length) {
+            double lon = Math.toRadians(longitude), lat = Math.toRadians(latitude);
+            double[] vector = new double[3];
+            for (int i = 0; i < 3; i++)
+                vector[i] = length * (Math.cos(lon) * Math.cos(lat) * axes[0][i]
+                        + Math.sin(lat) * axes[1][i] + Math.sin(lon) * Math.cos(lat) * axes[2][i]);
+            return vector;
         }
 
         private double[] vector(double x, double y, double length) {

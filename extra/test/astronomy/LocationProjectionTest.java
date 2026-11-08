@@ -9,6 +9,7 @@ import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;
 import org.helioviewer.jhv.astronomy.Stars;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
@@ -38,12 +39,30 @@ public class LocationProjectionTest {
             check(Math.abs(ViewpointLayer.SOLAR_POLE[i] - pole[2][i]) < 1e-12, "solar pole differs from the SOLO_IAU_SUN_2009 frame");
         placement(pole, Stars.load());
         occultation();
+        hpcProjection();
         System.out.println("PASS: Location planets and stars against the Carrington reference, occultation by the solar disk, solar pole");
     }
 
     private static void check(boolean condition, String message) {
         if (!condition)
             throw new AssertionError(message);
+    }
+
+    private static void hpcProjection() {
+        double[] sun = {0, 0, 1}, north = {0, 1, 0}, west = {1, 0, 0};
+        for (double longitude : new double[]{-179, -100, -90, -45, 0, 45, 90, 100, 179}) {
+            for (double latitude : new double[]{-80, -10, 0, 10, 80}) {
+                double lon = Math.toRadians(longitude), lat = Math.toRadians(latitude);
+                double[] v = {Math.sin(lon) * Math.cos(lat), Math.sin(lat), Math.cos(lon) * Math.cos(lat)};
+                Vec2 projected = ViewpointLayer.projectLocation(v, false, sun, north, west, 215, 215, MapMode.HPC);
+                check(projected != null && Math.abs(projected.x - longitude) < 1e-10 && Math.abs(projected.y - latitude) < 1e-10,
+                        "HPC apparent direction " + longitude + "," + latitude);
+            }
+        }
+        check(ViewpointLayer.projectLocation(new double[]{0, 0, 430}, false, sun, north, west, 215, 215, MapMode.HPC) == null,
+                "HPC background planet visible through the Sun");
+        check(ViewpointLayer.projectLocation(new double[]{0, 0, 1}, true, sun, north, west, 215, 215, MapMode.HPC) == null,
+                "HPC star visible through the Sun");
     }
 
     private static double[] rotate(double[][] m, double[] v) {
@@ -73,7 +92,7 @@ public class LocationProjectionTest {
         double sunDistance = Math.sqrt(dot(sun, sun));
         double[] z = sun.clone(), north = new double[3], west = new double[3];
         ViewpointLayer.helioprojectiveAxes(z, sunDistance, pole, north, west);
-        return ViewpointLayer.projectLocation(v, beyondSun, z, north, west, sunDistance, distance);
+        return ViewpointLayer.projectLocation(v, beyondSun, z, north, west, sunDistance, distance, MapMode.Orthographic);
     }
 
     // helioprojective from spherical coordinates, https://celestialscenes.com/alma/convert/coordconvert.pdf eqs. (3), (6)

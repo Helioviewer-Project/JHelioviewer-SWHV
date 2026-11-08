@@ -15,6 +15,8 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
@@ -55,13 +57,13 @@ public class ViewpointLayer extends AbstractLayer {
 
     private record LocationPlanet(Vec3 direction, double distance, double sinRadiusSquared, float[] color, int pointIndex, int pointCount) {}
 
-    private record LocationHover(double x, double y, Object object) {}
+    private record LocationHover(double x, double y, Object object, int viewportIndex) {}
 
     private final GLSLShape locationPoints = new GLSLShape(true);
     private final BufVertex locationPointsBuf = new BufVertex();
     private int locationStarCount;
     private final List<LocationPlanet> locationPlanets = new ArrayList<>();
-    private final List<LocationHover> locationHover = new ArrayList<>(); // after the drag rotation
+    private final List<LocationHover> locationHover = new ArrayList<>();
     private final double[] locationVector = new double[3];
     private final double[] locationPoint = new double[3];
     private final double[] locationSun = new double[3];
@@ -117,7 +119,7 @@ public class ViewpointLayer extends AbstractLayer {
     @Override
     public void render(MapView mv, Viewport vp) {
         if (vp.idx == 0 && options.isLocation())
-            computeLocation(mv);
+            computeLocation(mv, vp);
 
         if (!enabled)
             return;
@@ -162,6 +164,15 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         Transform.popView();
+    }
+
+    @Override
+    public void renderScale(MapView mv, Viewport vp) {
+        if (!mv.isHpc() || !options.isLocation())
+            return;
+        computeLocation(mv, vp);
+        if (enabled)
+            renderLocation(mv);
     }
 
     private static final int MOUSE_OFFSET_X = 25;
@@ -259,7 +270,7 @@ public class ViewpointLayer extends AbstractLayer {
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        if (!enabled || !mv.isOrthographic()) { // the sky is drawn only in orthographic mode
+        if (!enabled || !(mv.isOrthographic() || mv.isHpc())) {
             clearHoverTextIfNeeded();
             return;
         }
@@ -273,6 +284,8 @@ public class ViewpointLayer extends AbstractLayer {
 
         Object nearest = null;
         for (LocationHover point : locationHover) {
+            if (mv.isHpc() && point.viewportIndex != vp.idx)
+                continue;
             double deltaX = point.x - mousePlaneX;
             double deltaY = point.y - mousePlaneY;
             double dist2 = deltaX * deltaX + deltaY * deltaY;
@@ -394,26 +407,20 @@ public class ViewpointLayer extends AbstractLayer {
         }
     }
 
-    // the same points in every viewport, computed once per frame for the widest visible viewport
-    private void computeLocation(MapView mv) {
-        locationHover.clear();
+    // Orthographic points are shared; HPC points use each viewport's angular scale.
+    private void computeLocation(MapView mv, Viewport vp) {
+        // Preserve screen hover positions while rendering captures.
+        if (mv == GLRenderer.getMapView() && vp.idx == 0)
+            locationHover.clear();
         locationStarCount = 0;
         locationPlanets.clear();
-        putLocationSky(mv);
+        putLocationSky(mv, vp);
         locationPoints.upload(locationPointsBuf);
         locationPointsBuf.clear();
     }
 
-    private void putLocationSky(MapView mv) {
+    private void putLocationSky(MapView mv, Viewport vp) {
         if (!enabled)
-            return;
-
-        double extent = 0;
-        for (Viewport vp : Display.getViewports()) {
-            double width = mv.cameraWidth(vp);
-            extent = Math.max(extent, Math.hypot(width * vp.aspect / 2, width / 2));
-        }
-        if (extent == 0)
             return;
 
         ViewpointLayerOptionsExpert location = options.getLocationOptions();
@@ -422,7 +429,6 @@ public class ViewpointLayer extends AbstractLayer {
             return;
 
         Position viewpoint = mv.viewpoint();
-        Quat drag = mv.dragRotation();
         long time = Player.getTime().milli, start = Player.getStartTime(), end = Player.getEndTime();
         double sunDistance = sunResponse.interpolateRectangular(time, start, end, locationSun, locationInterpolated);
         helioprojectiveAxes(locationSun, sunDistance, SOLAR_POLE, locationNorth, locationWest);
@@ -440,10 +446,28 @@ public class ViewpointLayer extends AbstractLayer {
                 locationHelio[i] /= helioDistance;
             helioDistance *= Sun.MeanEarthDistanceInv; // [au]
 
-            // cone around the Sun covering the view, the tilted plane is foreshortened by cos(tilt)
-            extent += Math.hypot(mv.cameraTranslationX(), mv.cameraTranslationY());
-            double cosTilt = Math.abs(drag.rotateVector(Vec3.ZAxis).z);
-            double cosCone = Math.cos(Math.min(Math.PI / 2, Math.atan2(extent, cosTilt * viewpoint.distance) + STAR_OFFSET));
+            double cosCone;
+            if (mv.isHpc()) {
+                MapScale scale = mv.scale(vp);
+                double halfWidth = mv.cameraWidth(vp) / 2;
+                double cx = .5 - mv.cameraTranslationX() / vp.aspect;
+                double cy = .5 - mv.cameraTranslationY();
+                double lon = Math.max(Math.abs(scale.toMapX(Math.clamp(cx - halfWidth, 0, 1))),
+                        Math.abs(scale.toMapX(Math.clamp(cx + halfWidth, 0, 1))));
+                double lat = Math.max(Math.abs(scale.toMapY(Math.clamp(cy - halfWidth, 0, 1))),
+                        Math.abs(scale.toMapY(Math.clamp(cy + halfWidth, 0, 1))));
+                cosCone = Math.cos(Math.min(Math.PI, Math.toRadians(Math.hypot(lon, lat)) + STAR_OFFSET));
+            } else {
+                // The tilted plane is foreshortened by cos(tilt).
+                double extent = 0;
+                for (Viewport viewport : Display.getViewports()) {
+                    double width = mv.cameraWidth(viewport);
+                    extent = Math.max(extent, Math.hypot(width * viewport.aspect / 2, width / 2));
+                }
+                extent += Math.hypot(mv.cameraTranslationX(), mv.cameraTranslationY());
+                double cosTilt = Math.abs(mv.dragRotation().rotateVector(Vec3.ZAxis).z);
+                cosCone = Math.cos(Math.min(Math.PI / 2, Math.atan2(extent, cosTilt * viewpoint.distance) + STAR_OFFSET));
+            }
 
             byte[] color = Display.whiteBackground ? Colors.Black.bytes() : Colors.White.bytes();
             for (Stars.Star star : catalog.stars()) {
@@ -451,7 +475,7 @@ public class ViewpointLayer extends AbstractLayer {
                     continue;
                 double[] apparent = Stars.apparent(star, years, locationSsb, locationHelio, helioDistance, locationVelocity);
                 float size = (float) Math.clamp(5 - 0.28 * star.mag(), 2.5, 5.5);
-                putLocation(star, projectLocation(apparent, true, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance), drag, size, color);
+                putLocation(star, projectLocation(apparent, true, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance, mv.mode()), mv, vp, size, color);
             }
         }
         locationStarCount = locationPointsBuf.getCount();
@@ -461,12 +485,12 @@ public class ViewpointLayer extends AbstractLayer {
             if (response == null)
                 continue;
             double objectDistance = response.interpolateRectangular(time, start, end, locationVector, locationInterpolated);
-            Vec2 center = projectLocation(locationVector, false, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance);
+            Vec2 center = projectLocation(locationVector, false, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance, mv.mode());
             if (center == null && objectDistance >= sunDistance)
                 continue;
             SpaceObject target = load.target();
             int pointIndex = locationPointsBuf.getCount();
-            putLocation(load, center, drag, SIZE_LOCATION_PLANET, target.getTrajectoryColor(Display.whiteBackground));
+            putLocation(load, center, mv, vp, SIZE_LOCATION_PLANET, target.getTrajectoryColor(Display.whiteBackground));
             double sinRadius = objectDistance < sunDistance ? target.getRadius() / objectDistance : 0;
             double x = 0, y = 0, z = 0;
             for (int i = 0; i < 3; i++) {
@@ -483,32 +507,46 @@ public class ViewpointLayer extends AbstractLayer {
 
     private void renderLocation(MapView mv) {
         Transform.pushView();
-        Transform.rotateViewInverse(mv.viewRotation()); // points are in screen coordinates
+        if (mv.isOrthographic())
+            Transform.rotateViewInverse(mv.viewRotation()); // points are in screen coordinates
         GL.glDisable(GL.DEPTH_TEST);
         locationPoints.renderPoints(Display.pixelScale[1], 0, locationStarCount);
         for (LocationPlanet planet : locationPlanets) {
             locationPoints.renderPoints(Display.pixelScale[1], planet.pointIndex(), planet.pointCount());
             if (planet.sinRadiusSquared() > 0)
-                GLSLEclipseShader.render(planet.direction(), mv.viewpoint().distance, planet.sinRadiusSquared(), mv.dragRotation(), planet.color());
+                GLSLEclipseShader.render(mv, planet.direction(), planet.sinRadiusSquared(), planet.color());
         }
         GL.glEnable(GL.DEPTH_TEST);
         Transform.popView();
     }
 
-    // inside the disk only transiting planets, on the solar surface; nothing else covers the disk after the drag rotation
-    private void putLocation(Object object, @Nullable Vec2 xy, Quat drag, float size, byte[] color) {
+    private void putLocation(Object object, @Nullable Vec2 xy, MapView mv, Viewport vp, float size, byte[] color) {
         if (xy == null)
             return;
-        double r2 = xy.x * xy.x + xy.y * xy.y;
-        boolean transit = r2 < 1;
-        locationPoint[0] = xy.x;
-        locationPoint[1] = xy.y;
-        locationPoint[2] = transit ? Math.sqrt(1 - r2) : 0;
-        drag.qxv(locationPoint, locationPoint);
-        if (transit ? locationPoint[2] <= 0 : locationPoint[0] * locationPoint[0] + locationPoint[1] * locationPoint[1] < 1)
-            return;
-        locationPointsBuf.putVertex((float) locationPoint[0], (float) locationPoint[1], 0, size, color); // depth always within the clip planes
-        locationHover.add(new LocationHover(locationPoint[0], locationPoint[1], object));
+        double x, y;
+        if (mv.isHpc()) {
+            MapScale scale = mv.scale(vp);
+            double unitX = scale.toUnitX(xy.x), unitY = scale.toUnitY(xy.y);
+            if (unitX < 0 || unitX > 1 || unitY < 0 || unitY > 1)
+                return;
+            x = (unitX - .5) * vp.aspect;
+            y = unitY - .5;
+        } else {
+            // Transiting markers follow the solar surface; other markers stay on the image plane.
+            double r2 = xy.x * xy.x + xy.y * xy.y;
+            boolean transit = r2 < 1;
+            locationPoint[0] = xy.x;
+            locationPoint[1] = xy.y;
+            locationPoint[2] = transit ? Math.sqrt(1 - r2) : 0;
+            mv.dragRotation().qxv(locationPoint, locationPoint);
+            if (transit ? locationPoint[2] <= 0 : locationPoint[0] * locationPoint[0] + locationPoint[1] * locationPoint[1] < 1)
+                return;
+            x = locationPoint[0];
+            y = locationPoint[1];
+        }
+        locationPointsBuf.putVertex((float) x, (float) y, 0, size, color);
+        if (mv == GLRenderer.getMapView())
+            locationHover.add(new LocationHover(x, y, object, vp.idx));
     }
 
     private static double[] solarPole(double ra, double dec) {
@@ -530,17 +568,19 @@ public class ViewpointLayer extends AbstractLayer {
         west[2] = sun[0] * north[1] - sun[1] * north[0];
     }
 
-    // apparent position on the plane through the Sun, null if behind the observer or the solar disk
+    // Apparent angular position in HPC, or position on the Sun plane in Orthographic mode.
     @Nullable
-    static Vec2 projectLocation(double[] v, boolean beyondSun, double[] sun, double[] north, double[] west, double sunDistance, double distance) {
+    static Vec2 projectLocation(double[] v, boolean beyondSun, double[] sun, double[] north, double[] west, double sunDistance, double distance, MapMode mode) {
         double z = v[0] * sun[0] + v[1] * sun[1] + v[2] * sun[2];
-        if (z <= 0)
+        if (mode == MapMode.Orthographic && z <= 0)
             return null;
         double r = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
         if ((beyondSun || r > sunDistance) && z * sunDistance > r * Math.sqrt(sunDistance * sunDistance - Sun.Radius * Sun.Radius)) // cos(sep) > cos(solar angular radius)
             return null;
         double x = v[0] * west[0] + v[1] * west[1] + v[2] * west[2];
         double y = v[0] * north[0] + v[1] * north[1] + v[2] * north[2];
+        if (mode == MapMode.HPC)
+            return new Vec2(Math.toDegrees(Math.atan2(x, z)), Math.toDegrees(Math.atan2(y, Math.hypot(x, z))));
         return new Vec2(distance * x / z, distance * y / z);
     }
 
