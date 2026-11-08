@@ -51,26 +51,18 @@ public class Player {
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
                 case Loop -> {
-                    if (next.milli == playbackLastTime.milli) {
-                        return playbackFirstTime;
-                    }
+                    return playbackFirstTime;
                 }
                 case Stop -> {
-                    if (next.milli == playbackLastTime.milli) {
-                        return null;
-                    }
+                    return null;
                 }
                 case Swing -> {
-                    if (next.milli == playbackLastTime.milli) {
-                        advanceMode = AdvanceMode.SwingDown;
-                        return lowerTime.apply(next);
-                    }
+                    advanceMode = AdvanceMode.SwingDown;
+                    return lowerTime.apply(next);
                 }
                 case SwingDown -> {
-                    if (next.milli == playbackFirstTime.milli) {
-                        advanceMode = AdvanceMode.Swing;
-                        return higherTime.apply(next);
-                    }
+                    advanceMode = AdvanceMode.Swing;
+                    return higherTime.apply(next);
                 }
             }
         }
