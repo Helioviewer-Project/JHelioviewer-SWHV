@@ -96,8 +96,13 @@ public final class PositionLoad {
         return null;
     }
 
-    public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, String abcorr, long start, long end) {
-        return submit(receiver, observer, target, frame, abcorr, false, start, end);
+    public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+        return submit(receiver, observer, target, frame, "NONE", false, start, end);
+    }
+
+    // Corrected relative velocities are tangents for apparent-position interpolation.
+    public static PositionLoad submitApparent(StatusReceiver receiver, SpaceObject observer, SpaceObject target, long start, long end) {
+        return submit(receiver, observer, target, Frame.J2000, "LT+S", true, start, end);
     }
 
     // geometric state of target relative to the solar system barycentre in J2000

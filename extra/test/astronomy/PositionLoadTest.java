@@ -27,6 +27,9 @@ public class PositionLoadTest {
 
         URI state = load(start, start + 1, true).uri();
         check(state.getPath().equals("/state"), "state request used the position endpoint");
+        check(position.uri().getPath().equals("/position"), "position request used the state endpoint");
+        check(parameters(state).get("ref").equals("J2000") && parameters(state).get("abcorr").equals("LT+S"),
+                "apparent state request changed its frame or aberration correction");
         check(parameters(state).get("utc_end").equals(TimeUtils.format(start + 60000)), "state request lacks endpoint coverage");
 
         System.out.println("PASS: position/state request coverage, fractional intervals, default cadence and strict point cap");

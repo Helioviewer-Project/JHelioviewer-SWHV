@@ -20,6 +20,7 @@ public class SpiceTest {
         Directories.createCacheDirs();
         AppInit.loadSpice();
         ranges();
+        apparentVelocity();
 
         double worst = 0;
         long start = TimeUtils.parse("1960-01-01T00:00:00"), end = TimeUtils.parse("2060-01-01T00:00:00");
@@ -61,6 +62,19 @@ public class SpiceTest {
                 }
             }
         }
+    }
+
+    private static void apparentVelocity() throws Exception {
+        long time = TimeUtils.parse("2026-08-12T19:12:35.554");
+        double[] before = new double[3], after = new double[3], state = new double[6], lt = new double[1];
+        // A longer difference suppresses numerical noise from light-time-corrected positions.
+        double start = Spice.milli2et(time - 10000), end = Spice.milli2et(time + 10000);
+        CSPICE.spkpos("MOON", start, "J2000", "LT+S", "EARTH", before, lt);
+        CSPICE.spkpos("MOON", end, "J2000", "LT+S", "EARTH", after, lt);
+        CSPICE.spkezr("MOON", Spice.milli2et(time), "J2000", "LT+S", "EARTH", state, lt);
+        for (int i = 0; i < 3; i++)
+            if (Math.abs((after[i] - before[i]) / (end - start) - state[i + 3]) > 1e-6)
+                throw new AssertionError("Corrected velocity is not the derivative of corrected position");
     }
 
     private static double difference(long milli) throws Exception {

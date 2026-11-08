@@ -368,7 +368,7 @@ public final class EclipseRenderingTest {
         for (String observer : new String[]{"Earth", "Moon"}) {
             try (Fixture fixture = new Fixture(new double[]{0, 0, 215}, new double[]{0, 0, .55}, observer)) {
                 field(ViewpointLayerOptionsExpert.class, "skyActive").setBoolean(fixture.options, true);
-                fixture.options.setTimeSelection(TIME.milli, TIME.milli);
+                fixture.options.setTimeSelection(TIME.milli, TIME.milli + 60000);
                 fixture.options.setPlanets(true);
                 check(fixture.apparentPlanets.size() == 8, "Planets must include Moon and exclude the observer");
                 PositionLoad moon = null;
@@ -376,12 +376,11 @@ public final class EclipseRenderingTest {
                     check(load.target() != SpaceObject.get(observer), "Observer loaded as its own apparent planet");
                     if (load.target() == MOON)
                         moon = load;
+                    apparentLoad(load);
                 }
-                if (observer.equals("Earth")) {
+                if (observer.equals("Earth"))
                     check(moon != null, "Planets did not include Moon");
-                    Future<?> future = (Future<?>) field(PositionLoad.class, "future").get(moon);
-                    check(future.get(10, TimeUnit.SECONDS) instanceof PositionResponse, "Local Moon position load failed");
-                }
+                apparentLoad((PositionLoad) field(ViewpointLayerOptionsExpert.class, "apparentSun").get(fixture.options));
                 @SuppressWarnings("unchecked")
                 List<PositionLoad> owned = (List<PositionLoad>) field(ViewpointLayerOptionsExpert.class, "locationLoads").get(fixture.options);
                 check(owned.size() == 9 && owned.containsAll(fixture.apparentPlanets), "Planet loads did not enter the normal cancellation list");
@@ -389,6 +388,17 @@ public final class EclipseRenderingTest {
                 check(fixture.apparentPlanets.isEmpty() && owned.isEmpty(), "Disabled Planets retained position loads");
             }
         }
+    }
+
+    private static void apparentLoad(PositionLoad load) throws Exception {
+        Future<?> future = (Future<?>) field(PositionLoad.class, "future").get(load);
+        PositionResponse response = (PositionResponse) future.get(10, TimeUnit.SECONDS);
+        Position.Cartesian[] positions = (Position.Cartesian[]) field(PositionResponse.class, "position").get(response);
+        Position.Cartesian[] velocities = (Position.Cartesian[]) field(PositionResponse.class, "velocity").get(response);
+        check(positions.length == 2 && positions[1].milli() - positions[0].milli() == 60000,
+                "Apparent position cadence changed for " + load.target());
+        check(velocities != null && velocities.length == positions.length,
+                "Apparent position load omitted interpolation tangents for " + load.target());
     }
 
     private static void clearing() throws Exception {

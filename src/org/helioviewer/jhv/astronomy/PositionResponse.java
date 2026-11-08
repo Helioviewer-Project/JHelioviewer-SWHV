@@ -126,7 +126,23 @@ public class PositionResponse {
             vel[1] = out.y;
             vel[2] = out.z;
         }
-        interpolate(position, i, inext, alpha, out);
+        if (velocity == null || i == inext)
+            interpolate(position, i, inext, alpha, out);
+        else
+            interpolatePosition(i, inext, alpha, out);
+    }
+
+    private void interpolatePosition(int i, int inext, double alpha, Interpolated out) {
+        Position.Cartesian p0 = position[i], p1 = position[inext];
+        Position.Cartesian v0 = velocity[i], v1 = velocity[inext];
+        double a2 = alpha * alpha, a3 = a2 * alpha;
+        double h00 = 2 * a3 - 3 * a2 + 1, h01 = -2 * a3 + 3 * a2;
+        // Cubic Hermite tangents: velocity in c, duration in solar-radius light times.
+        double duration = (p1.milli() - p0.milli()) / Sun.RadiusMilli;
+        double h10 = (a3 - 2 * a2 + alpha) * duration, h11 = (a3 - a2) * duration;
+        out.x = h00 * p0.x() + h01 * p1.x() + (h10 * v0.x() + h11 * v1.x());
+        out.y = h00 * p0.y() + h01 * p1.y() + (h10 * v0.y() + h11 * v1.y());
+        out.z = h00 * p0.z() + h01 * p1.z() + (h10 * v0.z() + h11 * v1.z());
     }
 
     private void interpolate(Position.Cartesian[] samples, int i, int inext, double alpha, Interpolated out) {

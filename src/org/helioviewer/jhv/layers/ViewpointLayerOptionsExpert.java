@@ -326,7 +326,7 @@ public final class ViewpointLayerOptionsExpert {
         loads.put(element, PositionLoad.submit(status -> {
             container.setStatus(element, status);
             DisplayController.refreshCamera();
-        }, observer, element.getTarget(), frame, "NONE", startTime, endTime));
+        }, observer, element.getTarget(), frame, startTime, endTime));
         reloadSky();
     }
 
@@ -340,19 +340,19 @@ public final class ViewpointLayerOptionsExpert {
         SpaceObject location = selected.getFirst().getTarget();
 
         PositionLoad.StatusReceiver receiver = status -> DisplayController.display();
-        apparentSun = PositionLoad.submit(receiver, location, SpaceObject.SUN, Frame.J2000, "LT+S", startTime, endTime);
+        apparentSun = PositionLoad.submitApparent(receiver, location, SpaceObject.SUN, startTime, endTime);
         locationLoads.add(apparentSun);
         if (planets) {
             for (String name : APPARENT_PLANETS) {
                 SpaceObject planet = SpaceObject.get(name);
                 if (planet != null && planet != location)
-                    apparentPlanets.add(PositionLoad.submit(receiver, location, planet, Frame.J2000, "LT+S", startTime, endTime));
+                    apparentPlanets.add(PositionLoad.submitApparent(receiver, location, planet, startTime, endTime));
             }
             locationLoads.addAll(apparentPlanets);
         }
         if (stars) {
             locationState = PositionLoad.submitBarycentricState(receiver, location, startTime, endTime);
-            locationHeliocentric = PositionLoad.submit(receiver, SpaceObject.SUN, location, Frame.J2000, "NONE", startTime, endTime);
+            locationHeliocentric = PositionLoad.submit(receiver, SpaceObject.SUN, location, Frame.J2000, startTime, endTime);
             locationLoads.add(locationState);
             locationLoads.add(locationHeliocentric);
         }
