@@ -86,6 +86,8 @@ public final class TimelineDataTest {
         checkOrderingAndGaps();
         checkUnsortedAndEqualTimestamps();
         checkGraphSnapshot();
+        checkMinuteCache();
+        checkMinuteGraphClearing();
         checkFullSampleCount();
         checkLayerCreation();
         checkSavedState();
@@ -1036,6 +1038,79 @@ public final class TimelineDataTest {
         check(updated.size() == 2, "Updated view loses a gap");
         checkSamples(updated.get(0), new long[]{START + 250}, new float[]{15});
         checkSamples(updated.get(1), new long[]{START + 400}, new float[]{20});
+    }
+
+    private static void checkMinuteCache() {
+        long minute = TimeUtils.MINUTE_IN_MILLIS;
+        long chunk = 8 * TimeUtils.DAY_IN_MILLIS;
+        long start = START / chunk * chunk;
+        BandCacheMinute cache = new BandCacheMinute();
+        check(cache.getValues(100, start, start + minute).isEmpty(), "Empty minute cache produces a graph");
+        cache.addToCache(AXIS, new float[]{YAxis.BLANK}, new long[]{start});
+        check(cache.getValues(100, start, start + minute).isEmpty(), "Blank-only minute cache produces a graph");
+
+        cache.addToCache(AXIS, new float[]{10, 20, YAxis.BLANK, 30, 40, YAxis.BLANK},
+                new long[]{start, start + minute, start + 2 * minute, start + 3 * minute, start + 4 * minute, start + 5 * minute});
+        List<List<BandCache.DateValue>> runs = cache.getValues(100, start, start + 6 * minute);
+        check(runs.size() == 2, "Minute gaps create empty runs or join separate runs");
+        checkSamples(runs.get(0), new long[]{start, start + minute}, new float[]{10, 20});
+        checkSamples(runs.get(1), new long[]{start + 3 * minute, start + 4 * minute}, new float[]{30, 40});
+        check(cache.getValues(100, start + 10 * minute, start + 20 * minute).isEmpty(), "Empty minute view produces a graph");
+
+        BandCacheMinute missingChunk = new BandCacheMinute();
+        long beforeGap = start + chunk - minute;
+        long afterGap = start + 2 * chunk;
+        missingChunk.addToCache(AXIS, new float[]{41, 42}, new long[]{beforeGap, afterGap});
+        runs = missingChunk.getValues(100_000, beforeGap, afterGap + minute);
+        check(runs.size() == 2, "Missing minute chunk joins runs or leaves an empty run");
+        checkSamples(runs.get(0), new long[]{beforeGap}, new float[]{41});
+        checkSamples(runs.get(1), new long[]{afterGap}, new float[]{42});
+        check(missingChunk.getValues(100_000, start + chunk, afterGap - minute).isEmpty(), "Missing chunk produces a graph");
+
+        BandCacheMinute coarse = new BandCacheMinute();
+        coarse.addToCache(AXIS, new float[]{50}, new long[]{start});
+        coarse.addToCache(AXIS, new float[]{YAxis.BLANK}, new long[]{start + minute});
+        runs = coarse.getValues(1, start, start + 8 * minute);
+        check(runs.size() == 1, "Blank minute sample erased a coarse value or added an empty run");
+        checkSamples(runs.getFirst(), new long[]{start}, new float[]{50});
+    }
+
+    private static void checkMinuteGraphClearing() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            Band band = new Band(new BandType(new JSONObject().put("name", "empty minute view")
+                    .put("range", new JSONArray(List.of(0, 100)))));
+            BufferedImage image = new BufferedImage(101, 101, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = image.createGraphics();
+            Rectangle area = new Rectangle(0, 0, 100, 100);
+            try {
+                band.setDataColor(Color.RED);
+                Method build = Band.class.getDeclaredMethod("buildPolylines", List.class, TimeAxis.Mapper.class,
+                        YAxis.Mapper.class, LongUnaryOperator.class, boolean.class);
+                build.setAccessible(true);
+                Field graph = Band.class.getDeclaredField("graphData");
+                graph.setAccessible(true);
+                List<List<BandCache.DateValue>> samples = List.of(List.of(
+                        new BandCache.DateValue(START, 50), new BandCache.DateValue(START + 60_000, 50)));
+                graph.set(band, build.invoke(null, samples, new TimeAxis.Mapper(START, START + 60_000, 0, 100),
+                        band.getYAxis().mapper(0, 100), LongUnaryOperator.identity(), false));
+                band.draw(g, area, false);
+                check(image.getRGB(50, 50) == Color.RED.getRGB(), "Empty-view fixture did not draw its initial graph");
+
+                DrawController.getGeometry().layout(List.of(band));
+                band.graphGeometryChanged();
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, image.getWidth(), image.getHeight());
+                band.draw(g, area, false);
+                for (int pixel : image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth()))
+                    check(pixel == Color.BLACK.getRGB(), "Empty minute view retained the previous graph");
+            } catch (ReflectiveOperationException e) {
+                throw new AssertionError(e);
+            } finally {
+                g.dispose();
+                band.remove();
+                DrawController.getGeometry().layout(TimelineLayers.get());
+            }
+        });
     }
 
     private static void checkFullSampleCount() {

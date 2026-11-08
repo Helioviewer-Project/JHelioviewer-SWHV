@@ -17,6 +17,7 @@ interface BandCache {
 
     float[] getBounds(long start, long end);
 
+    // Each run is nonempty and separated from adjacent runs by missing data.
     List<List<DateValue>> getValues(double graphWidth, long start, long end);
 
     float getValue(long ts);

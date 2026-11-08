@@ -352,7 +352,7 @@ public final class Band extends TimelineLayer {
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(
                 Display.pixelScale[0] * drawArea.width,
                 start - barWidthMillis, end + barWidthMillis);
-        if (rawData.stream().allMatch(List::isEmpty)) {
+        if (rawData.isEmpty()) {
             graphWorker.invalidate();
             graphData = EMPTY_GRAPH_DATA;
             DrawController.drawRequest();
@@ -400,9 +400,6 @@ public final class Band extends TimelineLayer {
                 throw new InterruptedException();
 
             int size = list.size();
-            if (size == 0)
-                continue;
-
             int[] dates = new int[size];
             int[] yPixels = new int[size];
             float[] values = useMulticolor ? new float[size] : null;

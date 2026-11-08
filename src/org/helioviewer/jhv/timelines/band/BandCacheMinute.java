@@ -115,7 +115,8 @@ class BandCacheMinute implements BandCache {
                 i++;
             }
         }
-        ret.add(list);
+        if (!list.isEmpty())
+            ret.add(list);
         return ret;
     }
 
