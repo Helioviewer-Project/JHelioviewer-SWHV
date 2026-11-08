@@ -107,38 +107,38 @@ public final class CommandStateTest {
     }
 
     private static void checkPlayback(List<String> warnings) {
-        Commands.setPlayback(new JSONObject().put("advanceMode", "Swing").put("speed", "35").put("firstFrame", "2").put("lastFrame", "7"));
+        ViewState.applyPlayback(new JSONObject().put("advanceMode", "Swing").put("speed", "35").put("firstFrame", "2").put("lastFrame", "7"));
         ViewState.PlaybackData before = ViewState.playbackData();
         check(before.advanceMode() == Player.AdvanceMode.Swing && before.speed() == 35 && before.firstFrame() == 2 && before.lastFrame() == 7, "Playback settings");
-        Commands.setPlayback(new JSONObject());
+        ViewState.applyPlayback(new JSONObject());
         check(ViewState.playbackData().equals(before), "Empty playback update");
         for (String invalid : List.of("1.5", "2147483648", " 12 ", "invalid")) {
-            Commands.setPlayback(new JSONObject().put("speed", invalid).put("firstFrame", invalid).put("lastFrame", invalid));
+            ViewState.applyPlayback(new JSONObject().put("speed", invalid).put("firstFrame", invalid).put("lastFrame", invalid));
             check(ViewState.playbackData().equals(before), "Invalid integer accepted: " + invalid);
             checkWarning(warnings, "playback speed");
             checkWarning(warnings, "playback first frame");
             checkWarning(warnings, "playback last frame");
         }
-        Commands.setPlayback(new JSONObject().put("advanceMode", "SwingDown").put("speedUnit", "invalid"));
+        ViewState.applyPlayback(new JSONObject().put("advanceMode", "SwingDown").put("speedUnit", "invalid"));
         check(ViewState.playbackData().equals(before), "Internal or invalid playback enum accepted");
         checkWarning(warnings, "internal playback advance mode");
         checkWarning(warnings, "speedUnit");
-        Commands.setPlayback(new JSONObject().put("speedUnit", "HOURS_PER_SECOND").put("firstFrame", "3"));
+        ViewState.applyPlayback(new JSONObject().put("speedUnit", "HOURS_PER_SECOND").put("firstFrame", "3"));
         check(ViewState.playbackData().speedUnit() == ViewState.PlaybackSpeedUnit.HOURS_PER_SECOND
                 && ViewState.playbackData().speed() == 35 && Player.getPlaybackFirstFrame() == 3 && Player.getPlaybackLastFrame() == 7, "Partial playback update");
-        Commands.setPlayback(new JSONObject().put("speed", "0"));
+        ViewState.applyPlayback(new JSONObject().put("speed", "0"));
         check(ViewState.playbackData().speed() == 1, "Speed minimum");
-        Commands.setPlayback(new JSONObject().put("speed", "121"));
+        ViewState.applyPlayback(new JSONObject().put("speed", "121"));
         check(ViewState.playbackData().speed() == 120, "Speed maximum");
         System.out.println("PASS: strict integers, internal mode rejection, speed clamping and partial playback updates");
     }
 
     private static void checkRecording(List<String> warnings) {
-        Commands.setRecording(new JSONObject().put("mode", "FREE").put("size", "H1024"));
-        Commands.setRecording(new JSONObject().put("mode", "invalid").put("size", "H2048"));
+        ViewState.applyRecording(new JSONObject().put("mode", "FREE").put("size", "H1024"));
+        ViewState.applyRecording(new JSONObject().put("mode", "invalid").put("size", "H2048"));
         check(ViewState.recordingData().mode() == ViewState.RecordingMode.FREE && ViewState.recordingData().size() == ViewState.RecordingSize.H2048, "Partial recording update");
         checkWarning(warnings, "mode");
-        Commands.setRecording(new JSONObject().put("size", "invalid"));
+        ViewState.applyRecording(new JSONObject().put("size", "invalid"));
         check(ViewState.recordingData().size() == ViewState.RecordingSize.H2048, "Invalid recording size accepted");
         checkWarning(warnings, "size");
 
@@ -150,7 +150,7 @@ public final class CommandStateTest {
             check(output == null, "Failed recording reported an output file");
         };
         ExportMovie.setMainCanvasVisible(false);
-        Commands.recordStart(completion, new JSONObject().put("mode", "FREE").put("size", "H1024").put("speed", "37"));
+        ExportMovie.start(completion, new JSONObject().put("mode", "FREE").put("size", "H1024").put("speed", "37"));
         check(!ExportMovie.isRecording() && outcomes.equals(List.of(false)), "Failed recording start did not report failure");
         check(messages.equals(List.of("The timeline is not available.")), "Failed recording start changed its completion message");
         check(ViewState.recordingData().size() == ViewState.RecordingSize.H1024 && ViewState.playbackData().speed() == 37, "Failed start discarded applied settings");
@@ -158,20 +158,20 @@ public final class CommandStateTest {
 
         Message message = new Message("jhv.record.start").addParam("mode", "FREE").addParam("size", "H2048")
                 .addParam("advanceMode", "Stop").addParam("speed", "32").addParam("speedUnit", "FRAMES_PER_SECOND").addParam("firstFrame", "0");
-        Commands.recordStart(completion, SampHandlers.parameters(message, "mode", "size", "advanceMode", "speed", "speedUnit"));
+        ExportMovie.start(completion, SampHandlers.parameters(message, "mode", "size", "advanceMode", "speed", "speedUnit"));
         check(ExportMovie.isRecording() && outcomes.size() == 1, "Recording did not start or completed prematurely");
         ViewState.PlaybackData playback = ViewState.playbackData();
         ViewState.RecordingData recording = ViewState.recordingData();
         check(playback.speed() == 32 && playback.advanceMode() == Player.AdvanceMode.Stop && playback.firstFrame() == 3
                 && recording.size() == ViewState.RecordingSize.H2048, "Recording parameters or unsupported frame parameter");
         int count = warnings.size();
-        Commands.recordStart(completion, new JSONObject().put("mode", "invalid").put("size", "H4096").put("speed", "120"));
+        ExportMovie.start(completion, new JSONObject().put("mode", "invalid").put("size", "H4096").put("speed", "120"));
         check(outcomes.equals(List.of(false, false)) && warnings.size() == count, "Already-recording request was parsed or not refused");
         check(ViewState.playbackData().equals(playback) && ViewState.recordingData().equals(recording), "Already-recording request changed settings");
-        Commands.recordStart(completion, null);
+        ExportMovie.start(completion, null);
         check(outcomes.equals(List.of(false, false, false)) && ExportMovie.isRecording(), "GUI start bypassed the recording guard");
         check(messages.equals(List.of("The timeline is not available.", "Recording already in progress.", "Recording already in progress.")), "Recording refusal changed its completion message");
-        Commands.recordStart(Commands.Completion.NONE, null);
+        ExportMovie.start(Commands.Completion.NONE, null);
         check(ExportMovie.isRecording() && outcomes.size() == 3, "Unobserved recording refusal changed the active operation");
         System.out.println("PASS: recording partial updates, combined start settings, failure completion and already-recording guard");
     }

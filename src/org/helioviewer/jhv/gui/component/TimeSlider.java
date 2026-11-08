@@ -25,7 +25,6 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
@@ -107,7 +106,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     private void setRange(int min, int max) {
-        Commands.setPlaybackRange(
+        Player.setPlaybackRange(
                 Math.clamp(Math.min(min, max), getMinimum(), getMaximum()),
                 Math.clamp(Math.max(min, max), getMinimum(), getMaximum()));
     }
@@ -138,7 +137,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setValue(int n) {
         super.setValue(n);
-        Commands.seekFrame(n);
+        Player.setFrame(n);
     }
 
     @Override
@@ -149,9 +148,9 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0)
-            Commands.nextFrame();
+            Player.nextFrame();
         else if (e.getWheelRotation() > 0)
-            Commands.previousFrame();
+            Player.previousFrame();
     }
 
     @Override
@@ -187,7 +186,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         requestFocusInWindow();
         wasPlaying = Player.isPlaying();
         if (wasPlaying)
-            Commands.pause();
+            Player.pause();
         dragMode = dragModeFor(e);
         dragAnchorValue = sliderUI.valueForXPosition(e.getX());
         dragRangeMin = Player.getPlaybackFirstFrame();
@@ -200,7 +199,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         dragMode = DragMode.Frame;
         setCursor(cursorFor(e));
         if (wasPlaying)
-            Commands.play();
+            Player.play();
     }
 
     private void dragRange(int value) {

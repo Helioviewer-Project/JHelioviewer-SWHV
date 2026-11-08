@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -279,7 +279,7 @@ public final class DrawController {
     public static void setMovieFrame(Point point) {
         if (!geometry.inGraph(point))
             return;
-        Commands.seekTime(new JHVTime(geometry.xMapper(selectedAxis).toValue(point.x)));
+        Player.setTime(new JHVTime(geometry.xMapper(selectedAxis).toValue(point.x)));
     }
 
     public static void highlightChanged() {

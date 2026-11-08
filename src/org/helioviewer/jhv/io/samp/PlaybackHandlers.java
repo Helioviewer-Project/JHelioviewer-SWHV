@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.io.samp;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -13,11 +14,11 @@ final class PlaybackHandlers {
 
     static void register(SampClient client) {
         client.addMessageHandler(playbackSetHandler());
-        client.addMessageHandler(SampHandlers.command("jhv.playback.play", Commands::play));
-        client.addMessageHandler(SampHandlers.command("jhv.playback.pause", Commands::pause));
-        client.addMessageHandler(SampHandlers.command("jhv.playback.toggle", Commands::togglePlayback));
-        client.addMessageHandler(SampHandlers.command("jhv.playback.next-frame", Commands::nextFrame));
-        client.addMessageHandler(SampHandlers.command("jhv.playback.previous-frame", Commands::previousFrame));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.play", Player::play));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.pause", Player::pause));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.toggle", Player::toggle));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.next-frame", Player::nextFrame));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.previous-frame", Player::previousFrame));
         client.addMessageHandler(SampHandlers.create("jhv.playback.seek-frame",
                 (senderId, sender, msg) -> playbackSeekFrame(msg)));
         client.addMessageHandler(SampHandlers.create("jhv.playback.seek-time",
@@ -27,7 +28,7 @@ final class PlaybackHandlers {
     private static AbstractMessageHandler playbackSetHandler() {
         return SampHandlers.create("jhv.playback.set", (senderId, sender, msg) -> {
             JSONObject parameters = SampHandlers.parameters(msg, "advanceMode", "speed", "speedUnit", "firstFrame", "lastFrame");
-            UiThread.post(() -> Commands.setPlayback(parameters));
+            UiThread.post(() -> ViewState.applyPlayback(parameters));
         });
     }
 
@@ -37,7 +38,7 @@ final class PlaybackHandlers {
             return;
         try {
             int value = Integer.parseInt(frame);
-            UiThread.post(() -> Commands.seekFrame(value));
+            UiThread.post(() -> Player.setFrame(value));
         } catch (NumberFormatException e) {
             Log.warn("Ignoring invalid seek frame value: " + frame, e);
         }
@@ -49,7 +50,7 @@ final class PlaybackHandlers {
             return;
         try {
             JHVTime value = new JHVTime(time);
-            UiThread.post(() -> Commands.seekTime(value));
+            UiThread.post(() -> Player.setTime(value));
         } catch (RuntimeException e) {
             Log.warn("Ignoring invalid seek time value: " + time, e);
         }

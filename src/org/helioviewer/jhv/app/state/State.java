@@ -268,7 +268,7 @@ public final class State {
 
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData); // this applies projection again
-            Commands.seekTime(time);
+            Player.setTime(time);
             DisplayController.refreshCamera();
         }
 

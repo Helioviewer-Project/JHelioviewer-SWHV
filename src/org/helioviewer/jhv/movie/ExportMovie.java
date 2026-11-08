@@ -185,8 +185,8 @@ public final class ExportMovie {
                     captureFrame();
                 }
             } else if (mode == ViewState.RecordingMode.LOOP) {
-                Commands.seekFrame(0);
-                Commands.play();
+                Player.setFrame(0);
+                Player.play();
             }
         }
 

@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.annotation.Annotations;
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
@@ -214,7 +213,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.resetView();
+            DisplayController.resetView();
         }
     }
 
@@ -238,7 +237,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.resetViewAxis();
+            DisplayController.resetViewAxis();
         }
     }
 
@@ -265,7 +264,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.rotateView90(axis);
+            DisplayController.rotateView90(axis);
         }
     }
 
@@ -276,7 +275,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.togglePlayback();
+            Player.toggle();
         }
     }
 
@@ -288,8 +287,8 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (Player.isPlaying())
-                Commands.pause();
-            Commands.previousFrame();
+                Player.pause();
+            Player.previousFrame();
         }
     }
 
@@ -301,8 +300,8 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (Player.isPlaying())
-                Commands.pause();
-            Commands.nextFrame();
+                Player.pause();
+            Player.nextFrame();
         }
     }
 
@@ -314,9 +313,9 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (ExportMovie.isRecording())
-                Commands.recordStop();
+                ExportMovie.shallStop();
             else
-                Commands.recordStart(CompletionNotifications::recordingFinished, null);
+                ExportMovie.start(CompletionNotifications::recordingFinished, null);
         }
     }
 
@@ -426,7 +425,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.zoomFit();
+            DisplayController.zoomFit();
         }
     }
 
@@ -449,7 +448,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.zoomIn();
+            DisplayController.zoomIn();
         }
     }
 
@@ -460,7 +459,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.zoomOneToOne();
+            DisplayController.zoomOneToOne();
         }
     }
 
@@ -471,7 +470,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.zoomOut();
+            DisplayController.zoomOut();
         }
     }
 
