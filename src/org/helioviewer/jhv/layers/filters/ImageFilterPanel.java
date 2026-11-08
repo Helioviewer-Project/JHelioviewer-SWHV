@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers.filters;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.function.DoubleConsumer;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -29,7 +30,15 @@ public final class ImageFilterPanel {
         return String.format("%.2f", value);
     }
 
-    private static JPanel createUpsilonRow(String title, JHVSlider slider, JLabel label) {
+    private static JPanel createUpsilonRow(String title, double initial, DoubleConsumer setter) {
+        JHVSlider slider = new JHVSlider(0.05, 1, initial, 100);
+        JLabel label = new SliderValueLabel(formatUpsilon(slider.getDoubleValue()), slider, step -> formatUpsilon(step / 100.));
+        slider.addChangeListener(e -> {
+            double value = slider.getDoubleValue();
+            setter.accept(value);
+            label.setText(formatUpsilon(value));
+            DisplayController.display();
+        });
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JLabel(title), BorderLayout.LINE_START);
         panel.add(slider, BorderLayout.CENTER);
@@ -68,25 +77,9 @@ public final class ImageFilterPanel {
         enhanceButton.setAlwaysDropdown(true);
         enhanceButton.add(enhancePanel);
 
-        JHVSlider upsilonLowSlider = new JHVSlider(0.05, 1, settings.getUpsilonLow(), 100);
-        JLabel upsilonLowLabel = new SliderValueLabel(formatUpsilon(upsilonLowSlider.getDoubleValue()), upsilonLowSlider, step -> formatUpsilon(step / 100.));
-        upsilonLowSlider.addChangeListener(e -> {
-            double value = upsilonLowSlider.getDoubleValue();
-            settings.setUpsilon(value, settings.getUpsilonHigh());
-            upsilonLowLabel.setText(formatUpsilon(value));
-            DisplayController.display();
-        });
-        JHVSlider upsilonHighSlider = new JHVSlider(0.05, 1, settings.getUpsilonHigh(), 100);
-        JLabel upsilonHighLabel = new SliderValueLabel(formatUpsilon(upsilonHighSlider.getDoubleValue()), upsilonHighSlider, step -> formatUpsilon(step / 100.));
-        upsilonHighSlider.addChangeListener(e -> {
-            double value = upsilonHighSlider.getDoubleValue();
-            settings.setUpsilon(settings.getUpsilonLow(), value);
-            upsilonHighLabel.setText(formatUpsilon(value));
-            DisplayController.display();
-        });
         JPanel upsilonPanel = new JPanel(new GridLayout(2, 1));
-        upsilonPanel.add(createUpsilonRow("ΥL ", upsilonLowSlider, upsilonLowLabel));
-        upsilonPanel.add(createUpsilonRow("ΥH ", upsilonHighSlider, upsilonHighLabel));
+        upsilonPanel.add(createUpsilonRow("ΥL ", settings.getUpsilonLow(), value -> settings.setUpsilon(value, settings.getUpsilonHigh())));
+        upsilonPanel.add(createUpsilonRow("ΥH ", settings.getUpsilonHigh(), value -> settings.setUpsilon(settings.getUpsilonLow(), value)));
 
         JideSplitButton upsilonButton = new JideSplitButton("Υ");
         upsilonButton.setToolTipText("Soften shadows (ΥL, below median) and highlights (ΥH, above median) of RHEF output independently");
