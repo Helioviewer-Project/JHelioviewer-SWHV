@@ -49,7 +49,6 @@ public final class UIGlobals {
 
         foreColor = UIManager.getColor("Label.foreground");
         backColor = UIManager.getColor("Label.background");
-        midColor = new Color((foreColor.getRed() + backColor.getRed()) / 2, (foreColor.getGreen() + backColor.getGreen()) / 2, (foreColor.getBlue() + backColor.getBlue()) / 2);
 
         if (Platform.isLinux())
             UIManager.getLookAndFeelDefaults().put("defaultFont", UIManager.getFont("small.font"));
@@ -181,7 +180,6 @@ public final class UIGlobals {
 
     public static Color foreColor;
     public static Color backColor;
-    public static Color midColor;
 
     // Timelines panel colors
     public static Color TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR;

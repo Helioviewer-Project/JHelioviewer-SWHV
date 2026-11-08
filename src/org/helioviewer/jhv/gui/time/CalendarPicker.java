@@ -13,7 +13,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.gui.component.TableValue;
@@ -53,7 +52,6 @@ class CalendarPicker extends JPanel {
     void resizeSelectionPanel() {
         selectionPanel.resizeTableSpace();
         selectionPanel.resizeTableRowHeight();
-        selectionPanel.resizeTableColumnWidth();
     }
 
     // Changes the view and the corresponding controller
@@ -240,9 +238,7 @@ class CalendarPicker extends JPanel {
                 table.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
             }
 
-            // set the size of rows and columns
             resizeTableRowHeight();
-            resizeTableColumnWidth();
 
             // select cell
             if (selectedCell != null)
@@ -265,16 +261,6 @@ class CalendarPicker extends JPanel {
             int rowHeight;
             if (rowCount > 0 && (rowHeight = (table.getHeight() - headerHeight) / rowCount) > 0)
                 table.setRowHeight(rowHeight);
-        }
-
-        // Sets the size of the columns so all columns will have the same size
-        // and all columns will fit into the space of the table component.
-        void resizeTableColumnWidth() {
-            JTableHeader tableHeader = table.getTableHeader();
-            int columnCount = tableHeader.getColumnModel().getColumnCount();
-            for (int i = 0; i < columnCount; i++) {
-                tableHeader.getColumnModel().getColumn(i).setWidth(table.getColumnModel().getColumn(i).getWidth());
-            }
         }
 
     }

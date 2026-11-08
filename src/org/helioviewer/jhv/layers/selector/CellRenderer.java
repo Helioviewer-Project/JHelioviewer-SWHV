@@ -124,7 +124,7 @@ class CellRenderer {
 
     static final class Time extends DefaultTableCellRenderer {
 
-        static final Font font = UIGlobals.sansFont;
+        static final Font font = UIGlobals.uiFontMono;
 
         @Override
         public void setValue(Object value) {
