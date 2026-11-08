@@ -1,12 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Frame;
-import org.helioviewer.jhv.astronomy.PositionLoad;
-import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.movie.Player;
@@ -34,6 +28,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         }
     }
 
+    final ViewpointSky sky;
+
     private final ViewpointLayerOptionsExpert locationOptions;
     private final ViewpointLayerOptionsExpert equatorialOptions;
 
@@ -47,8 +43,10 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             joLocation = jo.optJSONObject("location");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        locationOptions = new ViewpointLayerOptionsExpert(joLocation, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, SpaceObject.SUN, Frame.SOLO_HEEQ, false);
+        locationOptions = new ViewpointLayerOptionsExpert(joLocation, Frame.SOLO_IAU_SUN_2009, true);
+        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, Frame.SOLO_HEEQ, false);
+        sky = new ViewpointSky(locationOptions);
+        locationOptions.setSkyChangeListener(sky::reload);
         locationOptions.setChangeListener(() -> optionStateChanged(CameraMode.Location));
         equatorialOptions.setChangeListener(() -> optionStateChanged(CameraMode.Heliosphere));
 
@@ -126,7 +124,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     private void updateSky() {
-        locationOptions.setSkyActive(active && cameraMode == CameraMode.Location);
+        sky.setActive(active && cameraMode == CameraMode.Location);
     }
 
     @Override
@@ -142,23 +140,6 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
 
     boolean isHeliospheric() {
         return cameraMode == CameraMode.Heliosphere;
-    }
-
-    @Nullable
-    PositionLoad getHighlightedLoad() {
-        return isHeliospheric() ? equatorialOptions.getHighlightedLoad() : null;
-    }
-
-    List<PositionLoad> getVisibleLoads() {
-        return isHeliospheric() ? equatorialOptions.getSelectedLoads() : List.of();
-    }
-
-    int getSpiralSpeed() {
-        return isHeliospheric() ? equatorialOptions.getSpiralSpeed() : 0;
-    }
-
-    boolean isRelative() {
-        return isHeliospheric() && equatorialOptions.isRelative();
     }
 
 }

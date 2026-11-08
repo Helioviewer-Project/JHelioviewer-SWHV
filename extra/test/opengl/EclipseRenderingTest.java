@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -358,11 +359,11 @@ public final class EclipseRenderingTest {
             double ra = Math.atan2(direction[1], direction[0]);
             double dec = Math.asin(direction[2]);
             Stars.Star star = new Stars.Star(ra, dec, 0, 0, 0, 0, 0, 1, direction[0], direction[1], direction[2]);
-            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+            field(fixture.sky.getClass(), "starCatalog").set(fixture.sky,
                     CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{star})));
-            field(ViewpointLayerOptionsExpert.class, "locationHeliocentric").set(fixture.options,
+            field(fixture.sky.getClass(), "heliocentric").set(fixture.sky,
                     load(SpaceObject.get("Earth"), new double[]{0, 0, -215}, TIME));
-            field(ViewpointLayerOptionsExpert.class, "locationState").set(fixture.options,
+            field(fixture.sky.getClass(), "observerState").set(fixture.sky,
                     load(SpaceObject.get("Earth"), new double[]{0, 0, 0}, TIME, true));
             fixture.apparentPlanets.clear();
             ByteBuffer stars = fixture.draw(Quat.ZERO, 8, 0, 0, false);
@@ -386,7 +387,7 @@ public final class EclipseRenderingTest {
     private static void planetLoads() throws Exception {
         for (String observer : new String[]{"Earth", "Moon"}) {
             try (Fixture fixture = new Fixture(new double[]{0, 0, 215}, new double[]{0, 0, .55}, observer)) {
-                field(ViewpointLayerOptionsExpert.class, "skyActive").setBoolean(fixture.options, true);
+                field(fixture.sky.getClass(), "active").setBoolean(fixture.sky, true);
                 fixture.options.setTimeSelection(TIME.milli, TIME.milli + 60000);
                 fixture.options.setPlanets(true);
                 check(fixture.apparentPlanets.size() == 8, "Planets must include Moon and exclude the observer");
@@ -399,12 +400,42 @@ public final class EclipseRenderingTest {
                 }
                 if (observer.equals("Earth"))
                     check(moon != null, "Planets did not include Moon");
-                apparentLoad((PositionLoad) field(ViewpointLayerOptionsExpert.class, "apparentSun").get(fixture.options));
-                @SuppressWarnings("unchecked")
-                List<PositionLoad> owned = (List<PositionLoad>) field(ViewpointLayerOptionsExpert.class, "locationLoads").get(fixture.options);
-                check(owned.size() == 9 && owned.containsAll(fixture.apparentPlanets), "Planet loads did not enter the normal cancellation list");
+                apparentLoad((PositionLoad) field(fixture.sky.getClass(), "apparentSun").get(fixture.sky));
+                List<CompletableFuture<PositionResponse>> pending = new ArrayList<>();
+                for (int i = 0; i < fixture.apparentPlanets.size(); i++) {
+                    CompletableFuture<PositionResponse> future = new CompletableFuture<>();
+                    SpaceObject target = fixture.apparentPlanets.get(i).target();
+                    fixture.apparentPlanets.set(i, load(target, future));
+                    pending.add(future);
+                }
+                CompletableFuture<PositionResponse> sunFuture = new CompletableFuture<>();
+                field(fixture.sky.getClass(), "apparentSun").set(fixture.sky, load(SpaceObject.SUN, sunFuture));
+                pending.add(sunFuture);
                 fixture.options.setPlanets(false);
-                check(fixture.apparentPlanets.isEmpty() && owned.isEmpty(), "Disabled Planets retained position loads");
+                check(fixture.apparentPlanets.isEmpty() && field(fixture.sky.getClass(), "apparentSun").get(fixture.sky) == null,
+                        "Disabled Planets retained position loads");
+                for (Future<PositionResponse> future : pending)
+                    check(future.isCancelled(), "Disabled Planets did not cancel a pending sky request");
+
+                fixture.options.setStars(true);
+                pending.clear();
+                for (String name : new String[]{"apparentSun", "observerState", "heliocentric"}) {
+                    PositionLoad load = (PositionLoad) field(fixture.sky.getClass(), name).get(fixture.sky);
+                    ((Future<?>) field(PositionLoad.class, "future").get(load)).get(10, TimeUnit.SECONDS);
+                    CompletableFuture<PositionResponse> future = new CompletableFuture<>();
+                    field(fixture.sky.getClass(), name).set(fixture.sky, load(load.target(), future));
+                    pending.add(future);
+                }
+                Future<?> catalogLoad = (Future<?>) field(fixture.sky.getClass(), "starCatalog").get(fixture.sky);
+                catalogLoad.get(10, TimeUnit.SECONDS);
+                CompletableFuture<Stars.Catalog> catalog = new CompletableFuture<>();
+                field(fixture.sky.getClass(), "starCatalog").set(fixture.sky, catalog);
+                fixture.options.setStars(false);
+                for (Future<PositionResponse> future : pending)
+                    check(future.isCancelled(), "Disabled Stars did not cancel a pending sky request");
+                check(catalog.isCancelled(), "Disabled Stars did not cancel the catalogue load");
+                for (String name : new String[]{"apparentSun", "observerState", "heliocentric", "starCatalog"})
+                    check(field(fixture.sky.getClass(), name).get(fixture.sky) == null, "Disabled Stars retained " + name);
             }
         }
     }
@@ -431,11 +462,11 @@ public final class EclipseRenderingTest {
             fixture.apparentPlanets.clear();
             fixture.empty("missing Moon response");
             fixture.install();
-            field(ViewpointLayerOptionsExpert.class, "apparentSun").set(fixture.options, null);
+            field(fixture.sky.getClass(), "apparentSun").set(fixture.sky, null);
             fixture.empty("missing Sun response");
             fixture.install();
             fixture.options.setPlanets(false);
-            field(ViewpointLayerOptionsExpert.class, "apparentSun").set(fixture.options, load(SpaceObject.SUN, fixture.sun, fixture.time));
+            field(fixture.sky.getClass(), "apparentSun").set(fixture.sky, load(SpaceObject.SUN, fixture.sun, fixture.time));
             fixture.empty("Planets disabled");
             fixture.options.setPlanets(true);
             fixture.install();
@@ -549,11 +580,11 @@ public final class EclipseRenderingTest {
             double[] direction = fixture.angularVector(10, 5, 1);
             Stars.Star star = new Stars.Star(Math.atan2(direction[1], direction[0]), Math.asin(direction[2]),
                     0, 0, 0, 0, 0, 123, direction[0], direction[1], direction[2]);
-            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+            field(fixture.sky.getClass(), "starCatalog").set(fixture.sky,
                     CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{star})));
-            field(ViewpointLayerOptionsExpert.class, "locationHeliocentric").set(fixture.options,
+            field(fixture.sky.getClass(), "heliocentric").set(fixture.sky,
                     load(SpaceObject.get("Earth"), new double[]{0, 0, -215}, TIME));
-            field(ViewpointLayerOptionsExpert.class, "locationState").set(fixture.options,
+            field(fixture.sky.getClass(), "observerState").set(fixture.sky,
                     load(SpaceObject.get("Earth"), new double[]{0, 0, 0}, TIME, true));
             fixture.apparentPlanets.clear();
             Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 160, SIZE, SIZE), DisplayLayout.viewport(1, 160, 0, 160, SIZE, SIZE)};
@@ -594,7 +625,7 @@ public final class EclipseRenderingTest {
             double[] rearDirection = fixture.angularVector(120, 35, 1);
             Stars.Star rearStar = new Stars.Star(Math.atan2(rearDirection[1], rearDirection[0]), Math.asin(rearDirection[2]),
                     0, 0, 0, 0, 0, 456, rearDirection[0], rearDirection[1], rearDirection[2]);
-            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+            field(fixture.sky.getClass(), "starCatalog").set(fixture.sky,
                     CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{rearStar})));
             MapScale wide = MapScale.hpc(180, 90);
             MapView panned = fixture.hpcView(new MapScale[]{wide, wide}, .2, (wide.toUnitX(120) - .5) * viewports[0].aspect,
@@ -610,7 +641,7 @@ public final class EclipseRenderingTest {
                 for (int i = 0; i < vp.width * vp.height; i++)
                     check(pixels.get(4 * i) == 0, "HPC star outside map bounds was drawn");
             }
-            field(ViewpointLayerOptionsExpert.class, "starCatalog").set(fixture.options,
+            field(fixture.sky.getClass(), "starCatalog").set(fixture.sky,
                     CompletableFuture.completedFuture(new Stars.Catalog(Stars.julianYear(TIME.milli), new Stars.Star[]{star})));
             MapView zoomedOut = fixture.hpcView(scales, 4, 0, 0, Quat.ZERO);
             for (Viewport vp : viewports) {
@@ -690,6 +721,7 @@ public final class EclipseRenderingTest {
         private final double[][] axes;
         private final double distance;
         private final JHVTime time;
+        private final Object sky;
         private final List<PositionLoad> apparentPlanets;
 
         Fixture(double[] _sun, double[] _moon, String observer) throws Exception {
@@ -706,7 +738,8 @@ public final class EclipseRenderingTest {
             JSONObject empty = new JSONObject().put("objects", new JSONArray()).put("stars", false).put("planets", true);
             layer = new ViewpointLayer(new JSONObject().put("mode", "Location").put("location", empty).put("equatorial", empty));
             options = layer.getOptions().getLocationOptions();
-            apparentPlanets = (List<PositionLoad>) field(ViewpointLayerOptionsExpert.class, "apparentPlanets").get(options);
+            sky = field(ViewpointLayerOptions.class, "sky").get(layer.getOptions());
+            apparentPlanets = (List<PositionLoad>) field(sky.getClass(), "apparentPlanets").get(sky);
             for (SpaceObjectElement element : options.getContainer().getElements()) {
                 if (element.getTarget() == SpaceObject.get(observer)) {
                     options.getContainer().selectElement(element);
@@ -721,7 +754,7 @@ public final class EclipseRenderingTest {
         }
 
         private void install() throws Exception {
-            field(ViewpointLayerOptionsExpert.class, "apparentSun").set(options, load(SpaceObject.SUN, sun, time));
+            field(sky.getClass(), "apparentSun").set(sky, load(SpaceObject.SUN, sun, time));
             apparentPlanets.clear();
             apparentPlanets.add(load(MOON, moon, time));
         }
@@ -871,9 +904,13 @@ public final class EclipseRenderingTest {
         response.setAccessible(true);
         PositionResponse positions = response.newInstance(new Position.Cartesian[]{new Position.Cartesian(time.milli, vector[0], vector[1], vector[2])},
                 state ? new Position.Cartesian[]{new Position.Cartesian(time.milli, 0, 0, 0)} : null, time.milli, time.milli);
+        return load(target, CompletableFuture.completedFuture(positions));
+    }
+
+    private static PositionLoad load(SpaceObject target, Future<PositionResponse> future) throws Exception {
         Constructor<PositionLoad> load = PositionLoad.class.getDeclaredConstructor(PositionLoad.StatusReceiver.class, SpaceObject.class, Future.class);
         load.setAccessible(true);
-        return load.newInstance((PositionLoad.StatusReceiver) status -> {}, target, CompletableFuture.completedFuture(positions));
+        return load.newInstance((PositionLoad.StatusReceiver) status -> {}, target, future);
     }
 
     private static Field field(Class<?> type, String name) throws Exception {
