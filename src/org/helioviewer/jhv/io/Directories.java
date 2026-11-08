@@ -8,66 +8,23 @@ import org.helioviewer.jhv.app.Platform;
 // An enum containing all the directories mapped in a system independent way. If
 // a new directory is required, just add it here, and it will be created at startup.
 public enum Directories {
-    // The home directory
-    HOME {
-        private final String path = System.getProperty("user.home");
+    HOME, CACHE, STATES, EXPORTS, LOGS, SETTINGS, KERNELS, DOWNLOADS;
 
-        @Override
-        public String getPath() {
-            return path + File.separator + "JHelioviewer-SWHV" + File.separator;
-        }
-    },
-    CACHE {
-        @Override
-        public String getPath() {
-            return transientRoot() + "Cache" + File.separator;
-        }
-    },
-    // The JHV state directory
-    STATES {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "States" + File.separator;
-        }
-    },
-    // The exports directory (movies, screenshots, metadata)
-    EXPORTS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Exports" + File.separator;
-        }
-    },
-    // The log directory
-    LOGS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Logs" + File.separator;
-        }
-    },
-    // The settings directory
-    SETTINGS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "Settings" + File.separator;
-        }
-    },
-    // The SPICE kernels directory
-    KERNELS {
-        @Override
-        public String getPath() {
-            return HOME.getPath() + "kernels" + File.separator;
-        }
-    },
-    // The downloads directory
-    DOWNLOADS {
-        @Override
-        public String getPath() {
-            return transientRoot() + "Downloads" + File.separator;
-        }
-    };
+    private static final String home = System.getProperty("user.home") + File.separator + "JHelioviewer-SWHV" + File.separator;
 
     // A String representation of the path of the directory
-    public abstract String getPath();
+    public String getPath() {
+        return switch (this) {
+            case HOME -> home;
+            case CACHE -> transientRoot() + "Cache" + File.separator;
+            case STATES -> home + "States" + File.separator;
+            case EXPORTS -> home + "Exports" + File.separator;
+            case LOGS -> home + "Logs" + File.separator;
+            case SETTINGS -> home + "Settings" + File.separator;
+            case KERNELS -> home + "kernels" + File.separator;
+            case DOWNLOADS -> transientRoot() + "Downloads" + File.separator;
+        };
+    }
 
     // A File representation of the path of the directory
     public File getFile() {
@@ -113,7 +70,7 @@ public enum Directories {
 
     private static String transientRoot() {
         if (!Platform.isWindows())
-            return HOME.getPath();
+            return home;
 
         String tmp = System.getProperty("java.io.tmpdir");
         String root = appendJHV(tmp);
