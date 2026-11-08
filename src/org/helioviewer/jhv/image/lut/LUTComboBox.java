@@ -28,11 +28,6 @@ public final class LUTComboBox extends JComboBox<String> {
         return lut == null ? LUT.gray() : lut;
     }
 
-    public String getColormap() {
-        Object selected = getSelectedItem();
-        return selected == null ? LUT.gray().name() : selected.toString();
-    }
-
     public void selectLUT(LUT lut) {
         String name;
         if (lut == null) // e.g. RGB
