@@ -28,12 +28,6 @@ public class BufferUtils {
         return destination.put(position, source, sourcePosition, count).position(position + count);
     }
 
-    public static IntBuffer putRemaining(IntBuffer destination, IntBuffer source) {
-        int position = destination.position();
-        return destination.put(position, source, source.position(), source.remaining())
-                .position(position + source.remaining());
-    }
-
     public static FloatBuffer putRemaining(FloatBuffer destination, FloatBuffer source) {
         int position = destination.position();
         return destination.put(position, source, source.position(), source.remaining())
