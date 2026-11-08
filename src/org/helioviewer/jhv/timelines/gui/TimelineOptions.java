@@ -21,13 +21,7 @@ final class TimelineOptions implements TimelineLayers.Listener {
 
     @Nullable
     JPanel getOptionsPanel(TimelineLayer layer) {
-        JPanel panel = panels.get(layer);
-        if (panel == null) {
-            panel = createOptionsPanel(layer);
-            if (panel != null)
-                panels.put(layer, panel);
-        }
-        return panel;
+        return panels.computeIfAbsent(layer, TimelineOptions::createOptionsPanel);
     }
 
     @Nullable

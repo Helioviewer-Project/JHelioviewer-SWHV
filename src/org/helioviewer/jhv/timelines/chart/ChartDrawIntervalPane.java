@@ -209,9 +209,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         IntervalGeometry geometry = intervalGeometry();
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= geometry.availableRight()) {
-                mousePressed = new Point(geometry.selectedMiddle(), 0);
-                moveSelectedInterval(p, geometry);
-                mousePressed = null;
+                DrawController.moveSelectedInterval(geometry.timeAt(p.x) - geometry.timeAt(geometry.selectedMiddle()));
             }
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             jumpSelectedInterval(p, geometry);
