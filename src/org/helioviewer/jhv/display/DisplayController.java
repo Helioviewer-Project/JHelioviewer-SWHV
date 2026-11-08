@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.layers.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -28,8 +29,10 @@ public final class DisplayController {
         KEEP_TRANSFORM
     }
 
-    private static final ViewpointState viewpointModel = new ViewpointState(UpdateViewpoint.observer);
-    private static final ViewpointState miniViewpointState = new ViewpointState(UpdateViewpoint.earthAt1au);
+    private static UpdateViewpoint viewpointUpdate = UpdateViewpoint.observer;
+    private static Position mainViewpoint = Sun.StartEarth;
+    private static boolean tracking;
+    private static Position miniViewpoint = Sun.StartEarth;
 
     @Nullable
     private static Consumer<Position> renderRequestHandler;
@@ -38,7 +41,7 @@ public final class DisplayController {
     private static Position pendingViewpoint;
 
     public static void render() {
-        Position viewpoint = viewpointModel.getViewpoint();
+        Position viewpoint = mainViewpoint;
         if (!ImageLayers.decode(viewpoint)) // just display() if none enabled
             display(viewpoint);
     }
@@ -48,7 +51,7 @@ public final class DisplayController {
     }
 
     public static void display() {
-        display(viewpointModel.getViewpoint());
+        display(mainViewpoint);
     }
 
     public static void display(Position viewpoint) {
@@ -68,28 +71,30 @@ public final class DisplayController {
     }
 
     public static UpdateViewpoint getViewpointUpdate() {
-        return viewpointModel.getUpdateViewpoint();
+        return viewpointUpdate;
     }
 
     public static boolean getTrackingMode() {
-        return viewpointModel.getTrackingMode();
+        return tracking;
     }
 
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
-        viewpointModel.setUpdateViewpoint(updateViewpoint);
+        viewpointUpdate = updateViewpoint;
         switch (mode) {
             case RESET -> resetCamera();
             case KEEP_TRANSFORM -> updateViewpoint(Player.getTime());
         }
     }
 
-    public static void setTrackingMode(boolean tracking) {
-        if (viewpointModel.setTrackingMode(tracking))
-            refreshCamera();
+    public static void setTrackingMode(boolean _tracking) {
+        if (tracking == _tracking)
+            return;
+        tracking = _tracking;
+        refreshCamera();
     }
 
     public static void timeChanged(JHVTime time) {
-        if (!viewpointModel.getTrackingMode())
+        if (!tracking)
             updateViewpoint(time);
     }
 
@@ -99,22 +104,23 @@ public final class DisplayController {
     }
 
     private static void updateViewpoint(JHVTime time) {
-        Display.getCamera().updateViewpoint(viewpointModel.update(time));
+        mainViewpoint = viewpointUpdate.update(time);
+        Display.getCamera().updateViewpoint(mainViewpoint);
     }
 
     public static void resetCamera() {
-        resetCamera(Display.getCamera(), viewpointModel);
+        mainViewpoint = viewpointUpdate.update(Player.getTime());
+        resetCamera(Display.getCamera(), mainViewpoint);
         render();
     }
 
     static void resetCameras() {
-        resetCamera(Display.getMiniCamera(), miniViewpointState);
-        resetCamera(Display.getCamera(), viewpointModel);
-        render();
+        miniViewpoint = UpdateViewpoint.earthAt1au.update(Player.getTime());
+        resetCamera(Display.getMiniCamera(), miniViewpoint);
+        resetCamera();
     }
 
-    private static void resetCamera(Camera camera, ViewpointState model) {
-        Position viewpoint = model.update(Player.getTime());
+    private static void resetCamera(Camera camera, Position viewpoint) {
         camera.reset(viewpoint);
         fitCameraToImageLayers(camera, viewpoint);
     }
@@ -126,7 +132,7 @@ public final class DisplayController {
     }
 
     public static void zoomMiniToFit() {
-        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointState.getViewpoint());
+        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpoint);
     }
 
     public static void zoomToFovAnnotation(double centerX, double centerY, double halfSize) {
@@ -223,7 +229,7 @@ public final class DisplayController {
     }
 
     public static void cameraFromJson(JSONObject json) {
-        Display.getCamera().fromJson(json, viewpointModel.getViewpoint());
+        Display.getCamera().fromJson(json, mainViewpoint);
     }
 
     private DisplayController() {}
