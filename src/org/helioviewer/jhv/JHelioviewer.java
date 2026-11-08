@@ -142,17 +142,12 @@ public class JHelioviewer {
         Task.submitBackground("init", () -> {
             AppInit.init(webProfilePopup);
             return null;
-        }, JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+        }, JHelioviewer::onSuccessInit, "An error occurred during initialization");
     }
 
     private static void onSuccessInit(Void ignoredResult) {
         DataSources.loadSources(true);
         CommandLine.load();
-    }
-
-    private static void onFailureInit(String ignoredLogContext, Throwable t) {
-        Log.error(t);
-        Message.err("An error occurred during initialization", t.getMessage());
     }
 
     private static boolean isHeadless() {
