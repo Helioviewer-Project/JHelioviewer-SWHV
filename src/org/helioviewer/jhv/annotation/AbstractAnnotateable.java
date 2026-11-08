@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    static final byte[] dragColor = Colors.Green.bytes();
+    private static final byte[] dragColor = Colors.Green.bytes();
     private static final double ACTIVE_THICKNESS_FACTOR = 1.5;
     protected static final double ANNOTATION_RADIUS = Sun.Radius * 1.01;
 
@@ -86,9 +86,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    protected Vec3 computeDragPoint(Viewport vp, int x, int y) {
-        return null;
-    }
+    protected abstract Vec3 computeDragPoint(Viewport vp, int x, int y);
 
     @Override
     public void draw(MapView mv, Viewport vp, boolean pending, BufVertex vexBuf) {}
@@ -98,9 +96,6 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Override
     public void mousePressed(Viewport vp, int x, int y) {
-        if (!isDraggable())
-            return;
-
         Vec3 pt = computeDragPoint(vp, x, y);
         if (pt != null)
             startPoint = pt;

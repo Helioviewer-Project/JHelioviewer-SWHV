@@ -40,14 +40,9 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void mousePressed(Viewport vp, int x, int y) {
-        Vec3 pt = mouseToSurface(vp, x, y);
-        if (pt != null)
-            startPoint = pt;
+    protected Vec3 computeDragPoint(Viewport vp, int x, int y) {
+        return mouseToSurface(vp, x, y);
     }
-
-    @Override
-    public void mouseDragged(Viewport vp, int x, int y) {}
 
     @Override
     public boolean isComplete() {
