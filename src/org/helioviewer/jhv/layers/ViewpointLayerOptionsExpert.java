@@ -40,7 +40,7 @@ public final class ViewpointLayerOptionsExpert {
     private PositionLoad apparentSun;
     private PositionLoad locationState;
     private PositionLoad locationHeliocentric;
-    private final List<PositionLoad> locationLoads = new ArrayList<>(); // all of the above
+    private final List<PositionLoad> locationLoads = new ArrayList<>();
     private Future<Stars.Catalog> starCatalog;
     private Runnable changeListener = () -> {};
 
@@ -94,10 +94,6 @@ public final class ViewpointLayerOptionsExpert {
         changeListener = listener;
     }
 
-    private void fireChanged() {
-        changeListener.run();
-    }
-
     public void setTimespan(long start, long end) {
         if (!syncInterval)
             return;
@@ -111,7 +107,7 @@ public final class ViewpointLayerOptionsExpert {
         startTime = start;
         endTime = end;
         reloadSelected();
-        fireChanged();
+        changeListener.run();
     }
 
     public boolean hasFrameOptions() {
@@ -136,12 +132,12 @@ public final class ViewpointLayerOptionsExpert {
                 selected.forEach(this::unload);
             load(element);
         }
-        fireChanged();
+        changeListener.run();
     }
 
     public void setHighlightedElement(SpaceObjectElement element) {
         container.setHighlightedElement(element);
-        fireChanged();
+        changeListener.run();
     }
 
     public boolean isSyncInterval() {
@@ -172,7 +168,7 @@ public final class ViewpointLayerOptionsExpert {
 
         frame = _frame;
         reloadSelected();
-        fireChanged();
+        changeListener.run();
     }
 
     public void setRelative(boolean _relative) {
@@ -180,7 +176,7 @@ public final class ViewpointLayerOptionsExpert {
             return;
 
         relative = _relative;
-        fireChanged();
+        changeListener.run();
     }
 
     public int getSpiralSpeedValue() {
@@ -231,14 +227,14 @@ public final class ViewpointLayerOptionsExpert {
     }
 
     List<PositionLoad> getSelectedLoads() {
-        ArrayList<PositionLoad> loads = new ArrayList<>();
+        ArrayList<PositionLoad> selectedLoads = new ArrayList<>();
         for (SpaceObjectElement element : container.getSelectedElements()) {
-            PositionLoad load = this.loads.get(element);
+            PositionLoad load = loads.get(element);
             if (load != null)
-                loads.add(load);
+                selectedLoads.add(load);
         }
-        loads.removeIf(PositionLoad::hasFailed);
-        return loads;
+        selectedLoads.removeIf(PositionLoad::hasFailed);
+        return selectedLoads;
     }
 
     // only once the location itself, the viewpoint, is loaded

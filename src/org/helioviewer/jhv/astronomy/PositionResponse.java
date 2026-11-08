@@ -121,18 +121,18 @@ public class PositionResponse {
 
         // Position and velocity samples share timestamps.
         if (vel != null) {
-            interpolate(velocity, i, inext, alpha, out);
+            interpolateLinear(velocity, i, inext, alpha, out);
             vel[0] = out.x;
             vel[1] = out.y;
             vel[2] = out.z;
         }
         if (velocity == null || i == inext)
-            interpolate(position, i, inext, alpha, out);
+            interpolateLinear(position, i, inext, alpha, out);
         else
-            interpolatePosition(i, inext, alpha, out);
+            interpolateHermite(i, inext, alpha, out);
     }
 
-    private void interpolatePosition(int i, int inext, double alpha, Interpolated out) {
+    private void interpolateHermite(int i, int inext, double alpha, Interpolated out) {
         Position.Cartesian p0 = position[i], p1 = position[inext];
         Position.Cartesian v0 = velocity[i], v1 = velocity[inext];
         double a2 = alpha * alpha, a3 = a2 * alpha;
@@ -145,7 +145,7 @@ public class PositionResponse {
         out.z = h00 * p0.z() + h01 * p1.z() + (h10 * v0.z() + h11 * v1.z());
     }
 
-    private void interpolate(Position.Cartesian[] samples, int i, int inext, double alpha, Interpolated out) {
+    private void interpolateLinear(Position.Cartesian[] samples, int i, int inext, double alpha, Interpolated out) {
         if (positionStart == positionEnd) {
             Position.Cartesian p = samples[0];
             out.x = p.x();

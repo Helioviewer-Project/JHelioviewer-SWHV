@@ -125,7 +125,6 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         updateSky();
     }
 
-    // the sky loads run only while it is drawn
     private void updateSky() {
         locationOptions.setSkyActive(active && cameraMode == CameraMode.Location);
     }

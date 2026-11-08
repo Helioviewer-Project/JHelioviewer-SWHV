@@ -64,7 +64,6 @@ public class ViewpointLayer extends AbstractLayer {
     private final List<LocationHover> locationHover = new ArrayList<>(); // after the drag rotation
     private final double[] locationVector = new double[3];
     private final double[] locationPoint = new double[3];
-    private final double[] locationScreen = new double[3];
     private final double[] locationSun = new double[3];
     private final double[] locationNorth = new double[3];
     private final double[] locationWest = new double[3];
@@ -79,7 +78,6 @@ public class ViewpointLayer extends AbstractLayer {
 
     private final double[] lati = new double[3];
     private final double[] hoverPoint = new double[3];
-    private final double[] rotatedHoverPoint = new double[3];
     private final PositionResponse.Interpolated latiInterpolated = new PositionResponse.Interpolated();
     private final PositionResponse.Interpolated hoverInterpolated = new PositionResponse.Interpolated();
 
@@ -102,7 +100,7 @@ public class ViewpointLayer extends AbstractLayer {
         options = new ViewpointLayerOptions(jo);
     }
 
-    public double getRelativeLongitude(long time, long start, long end) {
+    private double getRelativeLongitude(long time, long start, long end) {
         double relativeLon = 0;
 
         PositionLoad control = options.getHighlightedLoad();
@@ -138,7 +136,6 @@ public class ViewpointLayer extends AbstractLayer {
         double relativeLon = 0;
         int spiralSpeed = 0;
 
-        lati[0] = lati[1] = lati[2] = 0; // reset
         if (control != null) {
             PositionResponse response = control.getResponse();
             if (response != null) {
@@ -232,17 +229,17 @@ public class ViewpointLayer extends AbstractLayer {
             if (response == null)
                 continue;
 
-            response.interpolateRectangular(time, start, end, hoverPoint, hoverInterpolated); // should be shared with the one in renderPlanets
+            response.interpolateRectangular(time, start, end, hoverPoint, hoverInterpolated);
             if (relativeLon != 0) {
                 double x = hoverPoint[0];
                 double y = hoverPoint[1];
                 hoverPoint[0] = x * cosRelativeLon - y * sinRelativeLon;
                 hoverPoint[1] = x * sinRelativeLon + y * cosRelativeLon;
             }
-            dragRotation.qxv(hoverPoint, rotatedHoverPoint);
+            dragRotation.qxv(hoverPoint, hoverPoint);
 
-            double deltaX = rotatedHoverPoint[0] - mousePlaneX;
-            double deltaY = rotatedHoverPoint[1] - mousePlaneY;
+            double deltaX = hoverPoint[0] - mousePlaneX;
+            double deltaY = hoverPoint[1] - mousePlaneY;
             double dist2 = deltaX * deltaX + deltaY * deltaY;
             if (dist2 < minDist2) {
                 minDist2 = dist2;
@@ -408,12 +405,13 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     private void putLocationSky(MapView mv) {
+        if (!enabled)
+            return;
+
         double extent = 0;
         for (Viewport vp : Display.getViewports()) {
-            if (enabled) {
-                double width = mv.cameraWidth(vp);
-                extent = Math.max(extent, Math.hypot(width * vp.aspect / 2, width / 2));
-            }
+            double width = mv.cameraWidth(vp);
+            extent = Math.max(extent, Math.hypot(width * vp.aspect / 2, width / 2));
         }
         if (extent == 0)
             return;
@@ -506,11 +504,11 @@ public class ViewpointLayer extends AbstractLayer {
         locationPoint[0] = xy.x;
         locationPoint[1] = xy.y;
         locationPoint[2] = transit ? Math.sqrt(1 - r2) : 0;
-        drag.qxv(locationPoint, locationScreen);
-        if (transit ? locationScreen[2] <= 0 : locationScreen[0] * locationScreen[0] + locationScreen[1] * locationScreen[1] < 1)
+        drag.qxv(locationPoint, locationPoint);
+        if (transit ? locationPoint[2] <= 0 : locationPoint[0] * locationPoint[0] + locationPoint[1] * locationPoint[1] < 1)
             return;
-        locationPointsBuf.putVertex((float) locationScreen[0], (float) locationScreen[1], 0, size, color); // depth always within the clip planes
-        locationHover.add(new LocationHover(locationScreen[0], locationScreen[1], object));
+        locationPointsBuf.putVertex((float) locationPoint[0], (float) locationPoint[1], 0, size, color); // depth always within the clip planes
+        locationHover.add(new LocationHover(locationPoint[0], locationPoint[1], object));
     }
 
     private static double[] solarPole(double ra, double dec) {

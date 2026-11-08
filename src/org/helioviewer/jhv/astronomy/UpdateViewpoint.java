@@ -30,12 +30,8 @@ public interface UpdateViewpoint {
 
         @Override
         public Position update(JHVTime time) {
-            if (positionLoad != null) {
-                PositionResponse response = positionLoad.getResponse();
-                if (response != null)
-                    return response.interpolateCarrington(time.milli, start, end, interpolated);
-            }
-            return Sun.getEarth(time);
+            PositionResponse response = positionLoad == null ? null : positionLoad.getResponse();
+            return response == null ? Sun.getEarth(time) : response.interpolateCarrington(time.milli, start, end, interpolated);
         }
     }
 

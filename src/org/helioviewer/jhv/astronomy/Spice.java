@@ -8,8 +8,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
-//import com.google.common.base.Stopwatch;
-
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
 import spice.basic.SpiceException;
@@ -48,7 +46,6 @@ public class Spice {
 
     @Nullable
     static PositionResponse getRange(String observer, String target, String frame, String abcorr, boolean state, long start, long end, long deltat) {
-        // Stopwatch sw = Stopwatch.createStarted();
         try {
             long dt = deltat * 1000;
             int len = (int) Math.ceilDiv(end - start, dt) + 1;
@@ -68,7 +65,6 @@ public class Spice {
                     position(observer, target, frame, abcorr, milli, v);
                 position[i] = new Position.Cartesian(milli, v[0], v[1], v[2]);
             }
-            //System.out.println((sw.elapsed().toNanos() / 1e9));
             return new PositionResponse(position, velocity, start, end);
         } catch (Exception e) {
             Log.error(e);

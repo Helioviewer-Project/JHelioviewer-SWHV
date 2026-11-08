@@ -70,11 +70,9 @@ public final class PositionLoad {
 
             try (NetClient nc = NetClient.of(uri(), true)) {
                 JSONObject result = JSONUtils.get(nc.getReader());
-                if (nc.isSuccessful()) {
-                    return new PositionResponse(result, state, start, end);
-                } else {
+                if (!nc.isSuccessful())
                     throw new Exception(result.optString("faultstring", "Invalid network response"));
-                }
+                return new PositionResponse(result, state, start, end);
             }
         }
     }
@@ -89,11 +87,7 @@ public final class PositionLoad {
 
     @Nullable
     public PositionResponse getResponse() {
-        try {
-            return future.isDone() ? future.get() : null;
-        } catch (Exception ignore) { // logged to UI by onFailure
-        }
-        return null;
+        return future.state() == Future.State.SUCCESS ? future.resultNow() : null;
     }
 
     public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
@@ -114,12 +108,8 @@ public final class PositionLoad {
         receiver.setStatus("Loading...");
 
         Future<PositionResponse> future = Task.submitBackground(target.getSpiceName(), new LoadPosition(observer, target, frame, abcorr, state, start, end),
-                result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
+                result -> receiver.setStatus("Loaded"), (logContext, t) -> onFailure(receiver, t));
         return new PositionLoad(receiver, target, future);
-    }
-
-    private static void onSuccess(StatusReceiver receiver) {
-        receiver.setStatus("Loaded");
     }
 
     private static void onFailure(StatusReceiver receiver, Throwable t) {
