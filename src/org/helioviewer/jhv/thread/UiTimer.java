@@ -22,7 +22,7 @@ public final class UiTimer {
     private boolean repeats = true;
     private ScheduledFuture<?> scheduled;
     private volatile boolean running;
-    private volatile int generation;
+    private int generation;
     private final AtomicBoolean pending = new AtomicBoolean();
 
     public UiTimer(int _delay, @Nonnull Runnable _task) {
@@ -73,14 +73,15 @@ public final class UiTimer {
     private void schedule() {
         if (scheduled != null)
             scheduled.cancel(false);
-        scheduled = scheduler.scheduleWithFixedDelay(this::tick, delay, delay, TimeUnit.MILLISECONDS);
+        // A canceled tick may still run, so keep the generation of its schedule.
+        int gen = generation;
+        scheduled = scheduler.scheduleWithFixedDelay(() -> tick(gen), delay, delay, TimeUnit.MILLISECONDS);
     }
 
     // Scheduler thread: coalesce into one queued tick.
-    private void tick() {
+    private void tick(int gen) {
         if (!running || !pending.compareAndSet(false, true))
             return;
-        int gen = generation;
         UiThread.post(() -> fire(gen));
     }
 
