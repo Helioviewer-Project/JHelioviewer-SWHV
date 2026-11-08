@@ -104,19 +104,12 @@ public final class ImageLayers {
     }
 
     public static void arrangeMultiView() {
-        if (Display.multiview) {
-            int ct = 0;
-            for (ImageLayer layer : Layers.getImageLayers()) {
-                if (layer.isEnabled()) {
-                    layer.setVisible(ct);
-                    ct++;
-                }
-            }
-        } else {
-            for (ImageLayer layer : Layers.getImageLayers()) {
-                if (layer.isEnabled())
-                    layer.setVisible(0);
-            }
+        int viewport = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (layer.isEnabled())
+                layer.setVisible(Display.multiview ? viewport++ : 0);
+            else
+                layer.setVisible(-1);
         }
         Display.reshapeAll();
         DisplayController.render();

@@ -21,7 +21,7 @@ SCRIPTS = {
     "wcs": TESTS / "wcs/run_jhv_wcs_hpc_validation_suite.py",
 }
 JAVA_TESTS = {
-    "commands": ["io.samp.CommandStateTest", "layers.ViewpointStateTest"],
+    "commands": ["io.samp.CommandStateTest", "layers.ViewpointStateTest", "display.DisplayLayoutTest"],
     "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest"],
     "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],

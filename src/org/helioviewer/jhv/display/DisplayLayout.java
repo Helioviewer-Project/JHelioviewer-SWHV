@@ -20,6 +20,8 @@ public final class DisplayLayout {
             {3, 3}  // 6
     };
 
+    public static final int MAX_VIEWPORTS = ROW_LAYOUTS.length - 1;
+
     static Viewport[] viewports(int width, int height, int count) {
         if (count < 1 || count >= ROW_LAYOUTS.length) {
             return new Viewport[]{viewport(0, 0, 0, width, height, height)};

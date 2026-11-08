@@ -98,7 +98,7 @@ public final class Display {
             for (ImageLayer layer : Layers.getImageLayers()) {
                 if (layer.isEnabled()) {
                     ct++;
-                    if (ct == 6)
+                    if (ct == DisplayLayout.MAX_VIEWPORTS)
                         break;
                 }
             }

@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
@@ -70,6 +71,7 @@ public final class FramesTest {
         delivery(true);
         sampling();
         arrivals();
+        EventQueue.invokeAndWait(FramesTest::visibility);
         System.out.println("PASS: nearest selectable frame by time, equal synthetic endpoints give one frame");
     }
 
@@ -285,6 +287,90 @@ public final class FramesTest {
             EventQueue.invokeAndWait(layer::detach);
         }
         System.out.println("PASS: arrivals publish catch-up before notification; hidden layers settle without decoding and resume when shown");
+    }
+
+    private static void visibility() {
+        boolean multiview = Display.multiview;
+        List<ImageLayer> images = new ArrayList<>();
+        try {
+            Display.multiview = false;
+            for (int i = 0; i < 8; i++)
+                images.add(ImageLayer.create());
+            ImageLayers.arrangeMultiView();
+            checkVisibility(images, 1, -1, -1, -1, -1, -1, -1, -1, -1);
+            for (ImageLayer layer : images)
+                layer.setEnabled(true);
+            checkVisibility(images, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+            if (ImageLayers.getImageLayerInViewport(0) != images.getFirst())
+                throw new AssertionError("Single-view lookup did not use the first image");
+
+            Display.multiview = true;
+            ImageLayers.arrangeMultiView();
+            checkVisibility(images, 6, 0, 1, 2, 3, 4, 5, -1, -1);
+            if (!images.get(6).isEnabled() || !images.get(7).isEnabled())
+                throw new AssertionError("Overflow images must stay enabled");
+            images.get(1).setEnabled(false);
+            checkVisibility(images, 6, 0, -1, 1, 2, 3, 4, 5, -1);
+            images.get(3).setEnabled(false);
+            checkVisibility(images, 6, 0, -1, 1, -1, 2, 3, 4, 5);
+            images.get(1).setEnabled(true);
+            checkVisibility(images, 6, 0, 1, 2, -1, 3, 4, 5, -1);
+
+            Layers.reorderImageLayer(7, 0);
+            checkVisibility(images, 6, 1, 2, 3, -1, 4, 5, -1, 0);
+            if (ImageLayers.getImageLayerInViewport(0) != images.getLast())
+                throw new AssertionError("Viewport lookup did not follow reordered images");
+            Layers.remove(images.removeFirst());
+            checkVisibility(images, 6, 1, 2, -1, 3, 4, 5, 0);
+
+            Display.multiview = false;
+            ImageLayers.arrangeMultiView();
+            checkVisibility(images, 1, 0, 0, -1, 0, 0, 0, 0);
+            for (ImageLayer layer : images)
+                layer.setEnabled(false);
+            checkVisibility(images, 1, -1, -1, -1, -1, -1, -1, -1);
+            Display.multiview = true;
+            ImageLayers.arrangeMultiView();
+            checkVisibility(images, 1, -1, -1, -1, -1, -1, -1, -1);
+        } finally {
+            for (ImageLayer layer : images)
+                Layers.remove(layer);
+            Display.multiview = multiview;
+            ImageLayers.arrangeMultiView();
+        }
+        ImageLayer detached = new ImageLayer(Frames.placeholder());
+        try {
+            detached.setVisible(0);
+            detached.setEnabled(false);
+            if (detached.isVisibleIdx() != -1)
+                throw new AssertionError("Disabling an unregistered image retained its viewport");
+            detached.setEnabled(true);
+            if (detached.isVisibleIdx() != -1 || detached.isVisible(-1))
+                throw new AssertionError("An unregistered image gained a viewport without assignment");
+            detached.setVisible(5);
+            if (detached.isVisibleIdx() != 5 || !detached.isVisible(5))
+                throw new AssertionError("Explicit viewport assignment was lost");
+            detached.setVisible(6);
+            if (detached.isVisibleIdx() != -1 || detached.isVisible(-1))
+                throw new AssertionError("Viewport assignment exceeded the six-view limit");
+        } finally {
+            detached.detach();
+        }
+        System.out.println("PASS: image viewport assignment across enablement, six-view overflow, mode changes, reorder and removal");
+    }
+
+    private static void checkVisibility(List<ImageLayer> images, int viewportCount, int... expected) {
+        if (Display.getViewports().length != viewportCount || images.size() != expected.length)
+            throw new AssertionError("Unexpected image or viewport count");
+        for (int i = 0; i < images.size(); i++) {
+            ImageLayer layer = images.get(i);
+            if (layer.isVisibleIdx() != expected[i])
+                throw new AssertionError("Image " + i + " has viewport " + layer.isVisibleIdx() + ", expected " + expected[i]);
+            for (int viewport = 0; viewport < 6; viewport++) {
+                if (layer.isVisible(viewport) != (expected[i] == viewport))
+                    throw new AssertionError("Image " + i + " visibility differs at viewport " + viewport);
+            }
+        }
     }
 
     private static void sampling() throws Exception {
