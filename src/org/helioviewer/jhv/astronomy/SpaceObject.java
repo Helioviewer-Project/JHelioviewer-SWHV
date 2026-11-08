@@ -18,6 +18,8 @@ public class SpaceObject {
     private final double radius;
     private final byte[] color;
     private final byte[] whiteBackgroundColor;
+    private final float[] eclipseColor;
+    private final float[] whiteBackgroundEclipseColor;
 
     public static final SpaceObject SUN = new SpaceObject(true, "SUN", "Sun", 1, Colors.Yellow.bytes());
     public static final SpaceObject SOLO = new SpaceObject(true, "SOLO", "Solar Orbiter", 2 / Sun.RadiusMeter, Colors.bytes(226, 0, 79));
@@ -68,6 +70,12 @@ public class SpaceObject {
         radius = _radius;
         color = _color;
         whiteBackgroundColor = readableOnWhite(_color);
+        eclipseColor = eclipseColor(color);
+        whiteBackgroundEclipseColor = eclipseColor(whiteBackgroundColor);
+    }
+
+    private static float[] eclipseColor(byte[] color) {
+        return new float[]{(color[0] & 255) * 0.5f / 255, (color[1] & 255) * 0.5f / 255, (color[2] & 255) * 0.5f / 255, 0.5f};
     }
 
     private static final double WHITE_TRAJECTORY_MAX_LIGHTNESS = 0.70;
@@ -141,6 +149,10 @@ public class SpaceObject {
 
     public byte[] getTrajectoryColor(boolean whiteBackground) {
         return whiteBackground ? whiteBackgroundColor : color;
+    }
+
+    public float[] getEclipseColor(boolean whiteBackground) {
+        return whiteBackground ? whiteBackgroundEclipseColor : eclipseColor;
     }
 
     @Override

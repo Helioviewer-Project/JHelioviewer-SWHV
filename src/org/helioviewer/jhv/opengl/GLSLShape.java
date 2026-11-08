@@ -35,8 +35,16 @@ public class GLSLShape extends VertexArrayObject implements GLSLVertexReceiver {
         renderPoints(factor, Transform.get());
     }
 
+    public void renderPoints(double factor, int first, int toDraw) {
+        renderPoints(factor, first, toDraw, Transform.get());
+    }
+
     void renderPoints(double factor, FloatBuffer mvp) {
-        if (count == 0)
+        renderPoints(factor, 0, count, mvp);
+    }
+
+    private void renderPoints(double factor, int first, int toDraw, FloatBuffer mvp) {
+        if (toDraw == 0)
             return;
 
         GLSLShapeShader.point.use();
@@ -46,11 +54,11 @@ public class GLSLShape extends VertexArrayObject implements GLSLVertexReceiver {
         bind();
 
         GLSLShapeShader.point.bindOpaquePass(true);
-        GL.glDrawArrays(GL.POINTS, 0, count);
+        GL.glDrawArrays(GL.POINTS, first, toDraw);
 
         GLSLShapeShader.point.bindOpaquePass(false);
         GL.glDepthMask(false);
-        GL.glDrawArrays(GL.POINTS, 0, count);
+        GL.glDrawArrays(GL.POINTS, first, toDraw);
         GL.glDepthMask(true);
     }
 

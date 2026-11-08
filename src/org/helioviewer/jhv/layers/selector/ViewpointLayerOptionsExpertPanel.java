@@ -67,14 +67,14 @@ final class ViewpointLayerOptionsExpertPanel extends JPanel {
     }
 
     private JPanel createSkyPanel() {
-        JCheckBox planetsCheckBox = new JCheckBox("Planets", options.isPlanets());
-        planetsCheckBox.addActionListener(e -> options.setPlanets(planetsCheckBox.isSelected()));
         JCheckBox starsCheckBox = new JCheckBox("Stars", options.isStars());
         starsCheckBox.addActionListener(e -> options.setStars(starsCheckBox.isSelected()));
+        JCheckBox planetsCheckBox = new JCheckBox("Planets", options.isPlanets());
+        planetsCheckBox.addActionListener(e -> options.setPlanets(planetsCheckBox.isSelected()));
 
         JPanel skyPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        skyPanel.add(planetsCheckBox);
         skyPanel.add(starsCheckBox);
+        skyPanel.add(planetsCheckBox);
         return skyPanel;
     }
 

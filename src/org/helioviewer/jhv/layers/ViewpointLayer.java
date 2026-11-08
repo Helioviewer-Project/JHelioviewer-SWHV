@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.PositionResponse;
+import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Stars;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -27,6 +28,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
+import org.helioviewer.jhv.opengl.GLSLEclipseShader;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
@@ -51,10 +53,14 @@ public class ViewpointLayer extends AbstractLayer {
     private ViewpointOrbitWorker.Parameters uploadedParameters;
     private ViewpointOrbitWorker.Prepared readyOrbits;
 
+    private record LocationPlanet(Vec3 direction, double distance, double sinRadiusSquared, float[] color, int pointIndex, int pointCount) {}
+
     private record LocationHover(double x, double y, Object object) {}
 
     private final GLSLShape locationPoints = new GLSLShape(true);
     private final BufVertex locationPointsBuf = new BufVertex();
+    private int locationStarCount;
+    private final List<LocationPlanet> locationPlanets = new ArrayList<>();
     private final List<LocationHover> locationHover = new ArrayList<>(); // after the drag rotation
     private final double[] locationVector = new double[3];
     private final double[] locationPoint = new double[3];
@@ -394,6 +400,8 @@ public class ViewpointLayer extends AbstractLayer {
     // the same points in every viewport, computed once per frame for the widest visible viewport
     private void computeLocation(MapView mv) {
         locationHover.clear();
+        locationStarCount = 0;
+        locationPlanets.clear();
         putLocationSky(mv);
         locationPoints.upload(locationPointsBuf);
         locationPointsBuf.clear();
@@ -420,15 +428,6 @@ public class ViewpointLayer extends AbstractLayer {
         long time = Player.getTime().milli, start = Player.getStartTime(), end = Player.getEndTime();
         double sunDistance = sunResponse.interpolateRectangular(time, start, end, locationSun, locationInterpolated);
         helioprojectiveAxes(locationSun, sunDistance, SOLAR_POLE, locationNorth, locationWest);
-
-        for (PositionLoad load : location.getApparentPlanets()) {
-            PositionResponse response = load.getResponse();
-            if (response == null)
-                continue;
-            response.interpolateRectangular(time, start, end, locationVector, locationInterpolated);
-            putLocation(load, projectLocation(locationVector, false, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance), drag, SIZE_LOCATION_PLANET,
-                    load.target().getTrajectoryColor(Display.whiteBackground));
-        }
 
         PositionResponse state = location.getLocationState();
         PositionResponse heliocentric = location.getLocationHeliocentric();
@@ -457,13 +456,43 @@ public class ViewpointLayer extends AbstractLayer {
                 putLocation(star, projectLocation(apparent, true, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance), drag, size, color);
             }
         }
+        locationStarCount = locationPointsBuf.getCount();
+
+        for (PositionLoad load : location.getApparentPlanets()) {
+            PositionResponse response = load.getResponse();
+            if (response == null)
+                continue;
+            double objectDistance = response.interpolateRectangular(time, start, end, locationVector, locationInterpolated);
+            Vec2 center = projectLocation(locationVector, false, locationSun, locationNorth, locationWest, sunDistance, viewpoint.distance);
+            if (center == null && objectDistance >= sunDistance)
+                continue;
+            SpaceObject target = load.target();
+            int pointIndex = locationPointsBuf.getCount();
+            putLocation(load, center, drag, SIZE_LOCATION_PLANET, target.getTrajectoryColor(Display.whiteBackground));
+            double sinRadius = objectDistance < sunDistance ? target.getRadius() / objectDistance : 0;
+            double x = 0, y = 0, z = 0;
+            for (int i = 0; i < 3; i++) {
+                x += locationVector[i] * locationWest[i];
+                y += locationVector[i] * locationNorth[i];
+                z += locationVector[i] * locationSun[i];
+            }
+            Vec3 direction = new Vec3(x / objectDistance, y / objectDistance, z / objectDistance);
+            locationPlanets.add(new LocationPlanet(direction, objectDistance, sinRadius * sinRadius,
+                    target.getEclipseColor(Display.whiteBackground), pointIndex, locationPointsBuf.getCount() - pointIndex));
+        }
+        locationPlanets.sort((a, b) -> Double.compare(b.distance(), a.distance()));
     }
 
     private void renderLocation(MapView mv) {
         Transform.pushView();
         Transform.rotateViewInverse(mv.viewRotation()); // points are in screen coordinates
         GL.glDisable(GL.DEPTH_TEST);
-        locationPoints.renderPoints(Display.pixelScale[1]);
+        locationPoints.renderPoints(Display.pixelScale[1], 0, locationStarCount);
+        for (LocationPlanet planet : locationPlanets) {
+            locationPoints.renderPoints(Display.pixelScale[1], planet.pointIndex(), planet.pointCount());
+            if (planet.sinRadiusSquared() > 0)
+                GLSLEclipseShader.render(planet.direction(), mv.viewpoint().distance, planet.sinRadiusSquared(), mv.dragRotation(), planet.color());
+        }
         GL.glEnable(GL.DEPTH_TEST);
         Transform.popView();
     }

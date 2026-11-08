@@ -30,7 +30,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public static final int MIN_SPEED_SPIRAL = 200;
     public static final int MAX_SPEED_SPIRAL = 2000;
-    private static final String[] APPARENT_PLANETS = {"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
+    private static final String[] APPARENT_PLANETS = {"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Moon"};
 
     private final boolean exclusive;
     private final SpaceObject observer;

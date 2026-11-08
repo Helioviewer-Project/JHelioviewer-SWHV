@@ -79,6 +79,7 @@ public final class GLRenderer {
         try {
             GLSLScreenShader.init();
             GLSLSphereShader.init();
+            GLSLEclipseShader.init();
             GLSLImageShader.init();
             GLSLLineShader.init();
             GLSLMeshShader.init();
@@ -136,6 +137,7 @@ public final class GLRenderer {
         GLSLMeshShader.dispose();
         GLSLLineShader.dispose();
         GLSLImageShader.dispose();
+        GLSLEclipseShader.dispose();
         GLSLSphereShader.dispose();
         GLSLScreenShader.dispose();
     }

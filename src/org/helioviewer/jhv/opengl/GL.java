@@ -416,6 +416,10 @@ public final class GL {
         GLES30.glUniform4fv(location, values);
     }
 
+    public static void glUniform4fv(int location, FloatBuffer values) {
+        GLES30.glUniform4fv(location, values);
+    }
+
     public static void glUniformBlockBinding(int program, int blockIndex, int binding) {
         GLES30.glUniformBlockBinding(program, blockIndex, binding);
     }
