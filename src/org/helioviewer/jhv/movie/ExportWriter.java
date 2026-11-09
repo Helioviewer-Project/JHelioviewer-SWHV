@@ -110,16 +110,10 @@ class ExportWriter {
 
     private static final List<String> formatVideo = List.of(
             "-pix_fmt", "yuv420p",
-            "-color_primaries", "bt709",
-            "-color_trc", "bt709",
-            "-colorspace", "bt709",
-            "-color_range", "2",
             "-tune", "psnr",
-            "-movflags", "+faststart",
-            "-movflags", "+write_colr" // may be useless
-    );
-    private static final List<String> formatImage = List.of(
-            "-vf", "scale=in_range=pc:out_range=pc"
+            // Scale converts matrix and range; setparams only tags primaries and transfer.
+            "-vf", "scale=out_range=full:out_color_matrix=bt709,setparams=color_primaries=bt709:color_trc=bt709",
+            "-movflags", "+faststart"
     );
 
     String close() throws Exception {
@@ -147,7 +141,7 @@ class ExportWriter {
                 "-hide_banner",
                 "-f", "rawvideo",
                 "-pix_fmt", "rgb24",
-                "-r", format == ExportFormat.PNG ? "1" : String.valueOf(fps),
+                "-framerate", String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
         );
@@ -155,7 +149,8 @@ class ExportWriter {
         List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
         command.addAll(format.settings);
-        command.addAll(format == ExportFormat.PNG ? formatImage : formatVideo);
+        if (format != ExportFormat.PNG)
+            command.addAll(formatVideo);
         command.add("-y");
         command.add(outPath);
         return command;
