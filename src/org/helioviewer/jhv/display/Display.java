@@ -11,7 +11,6 @@ public final class Display {
 
     public static void setMapMode(MapMode _mode) {
         mode = _mode;
-        resetViewportZoom();
         DisplayController.resetCameras();
     }
 

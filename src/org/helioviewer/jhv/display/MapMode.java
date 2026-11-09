@@ -17,6 +17,13 @@ public enum MapMode {
         };
     }
 
+    public double clampZoom(Camera camera, double zoom) {
+        return switch (this) {
+            case RadialWarp, RectWarp -> zoom;
+            case Orthographic, HPC, Latitudinal -> camera.clampZoom(zoom);
+        };
+    }
+
     public boolean usesWarpLambda() {
         return this == RadialWarp || this == RectWarp;
     }

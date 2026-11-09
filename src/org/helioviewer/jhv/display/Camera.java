@@ -76,6 +76,12 @@ public final class Camera {
         return cameraWidth;
     }
 
+    // viewport zoom keeping the effective field of view within the camera limits
+    double clampZoom(double zoom) {
+        double t = Math.tan(0.5 * fov);
+        return Math.clamp(zoom, Math.tan(0.5 * MIN_FOV) / t, Math.tan(0.5 * MAX_FOV) / t);
+    }
+
     public static double zoomFactor(double wr) {
         return Math.exp(ZOOM_STEP * wr); // smoother, direction-symmetric zooming via exponential scaling
     }

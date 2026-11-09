@@ -109,6 +109,7 @@ public final class DisplayController {
     }
 
     public static void resetCamera() {
+        Display.resetViewportZoom();
         mainViewpoint = viewpointUpdate.update(Player.getTime());
         resetCamera(Display.getCamera(), mainViewpoint);
         render();
@@ -162,10 +163,13 @@ public final class DisplayController {
         display();
     }
 
-    private static void zoomViewports(double wr) {
-        double factor = Camera.zoomFactor(wr);
+    public static void zoomViewports(double wr) {
         for (Viewport viewport : Display.getViewports())
-            viewport.zoom *= factor;
+            zoomViewport(viewport, wr);
+    }
+
+    public static void zoomViewport(Viewport vp, double wr) {
+        vp.zoom = Display.mode.clampZoom(Display.getCamera(), vp.zoom * Camera.zoomFactor(wr));
     }
 
     public static void zoomOneToOne() {
@@ -198,7 +202,6 @@ public final class DisplayController {
     }
 
     public static void resetView() {
-        Display.resetViewportZoom();
         resetCamera();
     }
 
@@ -229,6 +232,7 @@ public final class DisplayController {
     }
 
     public static void cameraFromJson(JSONObject json) {
+        Display.resetViewportZoom();
         Display.getCamera().fromJson(json, mainViewpoint);
     }
 
