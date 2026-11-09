@@ -112,7 +112,7 @@ class ExportWriter {
             "-pix_fmt", "yuv420p",
             "-tune", "psnr",
             // Scale converts matrix and range; setparams only tags primaries and transfer.
-            "-vf", "scale=out_range=full:out_color_matrix=bt709,setparams=color_primaries=bt709:color_trc=bt709",
+            "-vf", "scale=out_range=full:out_color_matrix=bt709,setparams=color_primaries=bt709:color_trc=iec61966-2-1",
             "-movflags", "+faststart"
     );
 
