@@ -1,0 +1,102 @@
+name: Build FITS and WCS native libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      library:
+        description: Library to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - cfitsio
+          - wcs
+      target:
+        description: Platform to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - macos-arm64
+          - macos-x64
+          - linux-x64
+          - windows-x64
+      jhv_commit:
+        description: Full source commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        library: ${{ fromJSON(inputs.library == 'all' && '["cfitsio","wcs"]' || format('["{0}"]', inputs.library)) }}
+        target: ${{ fromJSON(inputs.target == 'all' && '["macos-arm64","macos-x64","linux-x64","windows-x64"]' || format('["{0}"]', inputs.target)) }}
+    runs-on: ${{ fromJSON('{"macos-arm64":"macos-15","macos-x64":"macos-15-intel","linux-x64":"ubuntu-24.04","windows-x64":"windows-2022"}')[matrix.target] }}
+    timeout-minutes: 45
+    env:
+      OUTPUT_DIR: ${{ github.workspace }}/build/native-libraries/${{ matrix.library }}
+      LIBRARY: ${{ matrix.library }}
+      TARGET: ${{ matrix.target }}
+      JHV_COMMIT: ${{ inputs.jhv_commit }}
+      WORKFLOW_COMMIT: ${{ github.workflow_sha }}
+      WORKFLOW_REF: ${{ github.workflow_ref }}
+      PYTHONUTF8: '1'
+    steps:
+      - name: Require an immutable source revision
+        shell: bash
+        run: '[[ "$JHV_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]'
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.jhv_commit }}
+          path: jhv
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-java@v6
+        if: matrix.library == 'wcs'
+        with:
+          distribution: temurin
+          java-version: '25'
+          architecture: ${{ matrix.target == 'macos-arm64' && 'aarch64' || 'x64' }}
+      - name: Verify source and candidate-record checks
+        shell: bash
+        run: python -m unittest discover -s "jhv/extra/$LIBRARY" -v
+      - name: Build macOS or Windows library
+        if: matrix.target != 'linux-x64'
+        shell: bash
+        run: python "jhv/extra/$LIBRARY/build.py" "$TARGET" --output "$OUTPUT_DIR"
+      - name: Build Linux library with glibc 2.17
+        if: matrix.target == 'linux-x64'
+        shell: bash
+        run: |
+          mkdir -p "$OUTPUT_DIR"
+          docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" \
+            -v "$GITHUB_WORKSPACE/jhv:/jhv:ro" \
+            -v "$OUTPUT_DIR:/output" \
+            quay.io/pypa/manylinux2014_x86_64@sha256:296069bc05d85275248f168f6e3b34ba8aa06181b67e40cd7447c64d56d3a851 \
+            /opt/python/cp313-cp313/bin/python3 "/jhv/extra/$LIBRARY/build.py" "$TARGET" --output /output
+      - name: Validate the candidate library
+        shell: bash
+        run: python "jhv/extra/$LIBRARY/check_build.py" "$OUTPUT_DIR" --platform "$TARGET"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: jhv-${{ matrix.library }}-${{ matrix.target }}
+          path: build/native-libraries/${{ matrix.library }}/artifacts/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preserve failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: jhv-${{ matrix.library }}-${{ matrix.target }}-diagnostics
+          path: build/native-libraries/${{ matrix.library }}/validation/${{ matrix.target }}/
+          if-no-files-found: ignore
+          retention-days: 7
