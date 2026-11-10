@@ -48,6 +48,7 @@ import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.ToolBar;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.GridLayer;
@@ -64,6 +65,7 @@ import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
+import org.helioviewer.jhv.source.FITSSource;
 import org.helioviewer.jhv.thread.UiThread;
 
 import org.json.JSONArray;
@@ -714,8 +716,25 @@ public final class SidebarTest {
                     check(hdu.isVisible() && hdu.getWidth() > 80, "HDU dropdown disappeared after selection");
                     check(hdu.getSelectedIndex() == 1 && plane.getValue().equals(choice == 0 ? 1 : 2),
                             "HDU or plane selection was not retained after reload");
+                    FITSSource source = (FITSSource) layer.frames().valueAt(0).source();
+                    check(source.selection().equals(new ImageProcessingSettings.FITSSelection(2, choice)),
+                            "Selectors did not reload the selected HDU and plane");
                 });
             }
+            CompletableFuture<Boolean> failedSelection = UiThread.postAndWait(() -> {
+                layer.selectFITS(new ImageProcessingSettings.FITSSelection(2, 99));
+                return layer.whenLoadFinished();
+            });
+            check(failedSelection.get(30, TimeUnit.SECONDS), "Failed selection removed the loaded layer");
+            UiThread.postAndWait(() -> {
+                FITSSettings fits = find(editor, FITSSettings.class);
+                check(find(fits, JComboBox.class).getSelectedIndex() == 1
+                                && find(fits, JSpinner.class).getValue().equals(2),
+                        "Failed selection did not restore the displayed selection");
+                FITSSource source = (FITSSource) layer.frames().valueAt(0).source();
+                check(source.selection().equals(new ImageProcessingSettings.FITSSelection(2, 1)),
+                        "Failed selection replaced the installed source");
+            });
         } finally {
             UiThread.postAndWait(() -> Layers.remove(layer));
             Files.deleteIfExists(cube);

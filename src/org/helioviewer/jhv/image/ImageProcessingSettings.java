@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.image;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -71,8 +70,6 @@ public final class ImageProcessingSettings {
 
     }
 
-    private @Nullable FITSSelection fitsSelection;
-
     private ImageFilter.Type filter = ImageFilter.Type.None;
 
     private double clippingMin = -500;
@@ -96,19 +93,6 @@ public final class ImageProcessingSettings {
             return;
         filter = type;
         onChange.run();
-    }
-
-    @Nullable
-    public FITSSelection fitsSelection() {
-        return fitsSelection;
-    }
-
-    public void setFITSSelection(@Nullable FITSSelection selection) {
-        if (Objects.equals(fitsSelection, selection))
-            return;
-        fitsSelection = selection;
-        // Selection reloads the source through the loader, rather than reprocessing its old pixels.
-        listeners.forEach(FITSListener::fitsParametersChanged);
     }
 
     public FITSParameters fitsParameters() {

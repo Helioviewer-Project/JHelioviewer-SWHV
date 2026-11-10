@@ -63,7 +63,7 @@ public final class FITSSeriesTest {
                     frames.close();
                 }
             }
-            checkSettingsReload(first, second);
+            checkSelectionReload(first, second);
             UiThread.postAndWait(FITSSeriesTest::checkPlayerReload);
         } finally {
             Files.deleteIfExists(first);
@@ -73,13 +73,10 @@ public final class FITSSeriesTest {
         System.out.println("PASS FITS series selection, pixels, chronological order and timestamps");
     }
 
-    private static void checkSettingsReload(Path first, Path second) throws Exception {
+    private static void checkSelectionReload(Path first, Path second) throws Exception {
         LinkedBlockingQueue<ImageLayerLoader.Result> results = new LinkedBlockingQueue<>();
         LinkedBlockingQueue<Boolean> failures = new LinkedBlockingQueue<>();
-        ImageProcessingSettings settings = new ImageProcessingSettings(() -> {
-            throw new AssertionError("Selection reprocessed the previous source");
-        });
-        ImageLayerLoader loader = UiThread.postAndWait(() -> new ImageLayerLoader(settings, results::add, () -> failures.add(true)));
+        ImageLayerLoader loader = UiThread.postAndWait(() -> new ImageLayerLoader(results::add, () -> failures.add(true)));
         Frames previous = null;
         try {
             UiThread.postAndWait(() -> loader.load(List.of(first.toUri(), second.toUri())));
@@ -87,14 +84,17 @@ public final class FITSSeriesTest {
             if (initial == null || initial.preserveSettings())
                 throw new AssertionError("Initial series did not load normally");
             previous = initial.frames();
-            if (!UiThread.postAndWait(settings::fitsSelection).equals(new ImageProcessingSettings.FITSSelection(1, 0)))
-                throw new AssertionError("Initial source selection was not published to settings");
+            if (!initial.selection().equals(new ImageProcessingSettings.FITSSelection(1, 0)))
+                throw new AssertionError("Initial source selection was not reported");
 
             ImageProcessingSettings.FITSSelection selected = new ImageProcessingSettings.FITSSelection(1, 1);
-            UiThread.postAndWait(() -> settings.setFITSSelection(selected));
+            UiThread.postAndWait(() -> {
+                loader.select(selected);
+                loader.select(new ImageProcessingSettings.FITSSelection(1, 99));
+            });
             ImageLayerLoader.Result replacement = results.poll(10, TimeUnit.SECONDS);
             if (replacement == null || !replacement.preserveSettings() || replacement.frames().size() != 2)
-                throw new AssertionError("Settings did not reload the retained series");
+                throw new AssertionError("Selection did not reload the retained series");
             previous.close();
             previous = replacement.frames();
             for (int i = 0; i < previous.size(); i++) {
@@ -102,28 +102,32 @@ public final class FITSSeriesTest {
                     throw new AssertionError("Reload did not apply settings to every source");
             }
             UiThread.postAndWait(() -> {
-                settings.setFITSSelection(selected);
-                settings.setClippingMin(1);
+                loader.select(selected);
                 if (loader.isLoading())
-                    throw new AssertionError("Unchanged selection or clipping edit reloaded the source");
-                settings.setFITSSelection(new ImageProcessingSettings.FITSSelection(1, 99));
+                    throw new AssertionError("Unchanged selection reloaded the source");
+                loader.select(new ImageProcessingSettings.FITSSelection(1, 99));
             });
-            if (failures.poll(10, TimeUnit.SECONDS) == null || !UiThread.postAndWait(settings::fitsSelection).equals(selected))
-                throw new AssertionError("Failed selection did not retain the previous series and restore settings");
+            if (failures.poll(10, TimeUnit.SECONDS) == null)
+                throw new AssertionError("Invalid selection did not fail");
+            UiThread.postAndWait(() -> {
+                loader.select(selected);
+                if (loader.isLoading())
+                    throw new AssertionError("Failed selection did not retain the current selection");
+            });
             UiThread.postAndWait(() -> loader.load(List.of(first.toUri())));
             ImageLayerLoader.Result next = results.poll(10, TimeUnit.SECONDS);
             if (next == null || next.preserveSettings() || next.frames().size() != 1)
                 throw new AssertionError("A new file inherited selection reload behavior");
             previous.close();
             previous = next.frames();
-            if (!UiThread.postAndWait(settings::fitsSelection).equals(new ImageProcessingSettings.FITSSelection(1, 0)))
-                throw new AssertionError("New source did not reset selection settings");
+            if (!next.selection().equals(new ImageProcessingSettings.FITSSelection(1, 0)))
+                throw new AssertionError("New source did not reset selection");
         } finally {
             UiThread.postAndWait(loader::abolish);
             if (previous != null)
                 previous.close();
         }
-        System.out.println("PASS settings-driven series reload, unchanged-selection no-op, failure rollback and new-source reset");
+        System.out.println("PASS direct series reload, busy/unchanged-selection no-op, failure retention and new-source reset");
     }
 
     private static void checkPlayerReload() {

@@ -14,8 +14,8 @@ and the packaged detector mask. Source checks cover image-HDU and cube-plane
 selection, selected metadata, default selection, bounds and displayed row order.
 `FITSSeriesTest` loads a two-file cube series through the production layer loader
 and checks selection across files, decoded pixels, ordering and timestamps. It
-also checks settings-driven reloads, unchanged-selection no-ops, failed-selection
-rollback and selection reset when loading a new file.
+also checks direct selection reloads, busy/unchanged-selection no-ops, retention
+after failed selections and selection reset when loading a new file.
 
 To check fresh Java classes with only a candidate native library available:
 

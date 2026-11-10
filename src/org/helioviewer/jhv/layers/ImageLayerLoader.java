@@ -39,7 +39,6 @@ final class ImageLayerLoader {
     // baseName names the single source of a request load; warnings are for the user.
     record Result(Frames frames, @Nullable APIRequest request, @Nullable String baseName, List<String> warnings, List<URI> uris, @Nullable ImageProcessingSettings.FITSSelection selection, boolean preserveSettings) {}
 
-    private final ImageProcessingSettings settings;
     private @Nullable Result current;
     private final Consumer<Result> onLoaded;
     private final Runnable onLoadFailed;
@@ -48,9 +47,7 @@ final class ImageLayerLoader {
     private Thread loadThread;
     private DownloadLayer download;
 
-    ImageLayerLoader(ImageProcessingSettings _settings, @Nonnull Consumer<Result> _onLoaded, @Nonnull Runnable _onLoadFailed) {
-        settings = _settings;
-        settings.addFITSListener(this::selectionChanged);
+    ImageLayerLoader(@Nonnull Consumer<Result> _onLoaded, @Nonnull Runnable _onLoadFailed) {
         onLoaded = _onLoaded;
         onLoadFailed = _onLoadFailed;
     }
@@ -70,10 +67,9 @@ final class ImageLayerLoader {
         load(() -> open(null, FileUtils.resolveURIList(uriList)));
     }
 
-    private void selectionChanged() {
+    void select(ImageProcessingSettings.FITSSelection selection) {
         Result previous = current;
-        ImageProcessingSettings.FITSSelection selection = settings.fitsSelection();
-        if (previous == null || isLoading() || selection == null || selection.equals(previous.selection()))
+        if (previous == null || isLoading() || selection.equals(previous.selection()))
             return;
         load(() -> open(previous.request(), previous.uris(), selection));
     }
@@ -139,10 +135,8 @@ final class ImageLayerLoader {
             return;
         }
         loadThread = null;
-        if (error == null)
-            current = result;
-        settings.setFITSSelection(current == null ? null : current.selection());
         if (error == null) {
+            current = result;
             onLoaded.accept(result);
             if (!result.warnings().isEmpty())
                 Message.warn("Warning", String.join("\n", result.warnings()));
