@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 
 public class ExtensionFileFilter {
 
-    public static final FilenameFilter Image = new Filter(new String[]{"jpg", "jpeg", "png", "fts", "fits", "fits.gz", "jp2", "jpx", "zip"});
+    public static final FilenameFilter Image = new Filter(new String[]{"jpg", "jpeg", "png", "fit", "fts", "fits", "fit.gz", "fts.gz", "fits.gz", "jp2", "jpx", "zip"});
     public static final FilenameFilter Model = new Filter(new String[]{"gltf", "glb", "gltf.gz", "glb.gz"});
     public static final FilenameFilter Timeline = new Filter(new String[]{"json", "cdf"});
     public static final FilenameFilter JHV = new Filter(new String[]{"jhv"});

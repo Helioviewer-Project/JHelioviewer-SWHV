@@ -19,7 +19,7 @@ public class DataUri {
             boolean gzip = sourcePath.endsWith(".gz");
             if (gzip)
                 sourcePath = sourcePath.substring(0, sourcePath.length() - 3);
-            if (gzip && sourcePath.endsWith(".fits"))
+            if (gzip && (sourcePath.endsWith(".fits") || sourcePath.endsWith(".fit") || sourcePath.endsWith(".fts")))
                 return Format.FITS;
             if (sourcePath.endsWith(".gltf") || sourcePath.endsWith(".glb"))
                 return Format.GLTF;
