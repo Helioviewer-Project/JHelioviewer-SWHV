@@ -41,11 +41,20 @@ public final class Annotations {
 
     private static Annotateable pending;
     private static int activeIndex = -1;
+    private static boolean visible = true;
     private static double thickness = DEFAULT_THICKNESS * LINEWIDTH;
     private static Colors baseColor = Colors.Blue;
 
     public static void start(Annotateable annotateable) {
         pending = annotateable;
+    }
+
+    public static boolean isVisible() {
+        return visible;
+    }
+
+    public static void setVisible(boolean value) {
+        visible = value;
     }
 
     public static int getThicknessValue() {
@@ -116,7 +125,7 @@ public final class Annotations {
     }
 
     public static void render(MapView mv, Viewport vp) {
-        if (pending == null && annotations.isEmpty())
+        if (!visible || (pending == null && annotations.isEmpty()))
             return;
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;

@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DownloadLayer;
@@ -36,8 +37,9 @@ import org.helioviewer.jhv.wcs.ImageGrid;
 final class ImageLayerLoader {
 
     // baseName names the single source of a request load; warnings are for the user.
-    record Result(Frames frames, @Nullable APIRequest request, @Nullable String baseName, List<String> warnings) {}
+    record Result(Frames frames, @Nullable APIRequest request, @Nullable String baseName, List<String> warnings, List<URI> uris, @Nullable ImageProcessingSettings.FITSSelection selection, boolean preserveSettings) {}
 
+    private @Nullable Result current;
     private final Consumer<Result> onLoaded;
     private final Runnable onLoadFailed;
 
@@ -63,6 +65,13 @@ final class ImageLayerLoader {
     // Directories are expanded on the load thread, so cancelling covers the enumeration.
     void load(List<URI> uriList) {
         load(() -> open(null, FileUtils.resolveURIList(uriList)));
+    }
+
+    void select(ImageProcessingSettings.FITSSelection selection) {
+        Result previous = current;
+        if (previous == null || isLoading() || selection.equals(previous.selection()))
+            return;
+        load(() -> open(previous.request(), previous.uris(), selection));
     }
 
     private void load(Callable<Result> task) {
@@ -114,6 +123,7 @@ final class ImageLayerLoader {
     }
 
     void abolish() {
+        current = null;
         cancelLoad();
         detachDownload();
     }
@@ -126,6 +136,7 @@ final class ImageLayerLoader {
         }
         loadThread = null;
         if (error == null) {
+            current = result;
             onLoaded.accept(result);
             if (!result.warnings().isEmpty())
                 Message.warn("Warning", String.join("\n", result.warnings()));
@@ -141,10 +152,14 @@ final class ImageLayerLoader {
 
     // The loader owns every source it opens until the timeline does. Warnings are reported together after the load.
     static Result open(@Nullable APIRequest request, List<URI> uris) throws Exception {
+        return open(request, uris, null);
+    }
+
+    static Result open(@Nullable APIRequest request, List<URI> uris, @Nullable ImageProcessingSettings.FITSSelection selection) throws Exception {
         List<String> warnings = new ArrayList<>();
         List<Opened> opened = new ArrayList<>();
         try {
-            opened.addAll(openMany(request, uris, warnings));
+            opened.addAll(openMany(request, uris, warnings, selection));
             if (opened.isEmpty())
                 throw new Exception(warnings.isEmpty() ? "No image files found." : String.join("\n", warnings));
 
@@ -172,8 +187,16 @@ final class ImageLayerLoader {
                         o.source.close();
                 }
             }
+            ImageProcessingSettings.FITSSelection applied = null;
+            for (Frames.Frame frame : kept) {
+                if (frame.source() instanceof FITSSource fits) {
+                    applied = fits.selection();
+                    break;
+                }
+            }
             String baseName = opened.size() == 1 ? opened.getFirst().dataUri.baseName() : null;
-            return new Result(new Frames(kept), request, baseName, warnings);
+            return new Result(new Frames(kept), request, baseName, warnings,
+                    selection == null ? opened.stream().map(o -> o.dataUri.sourceUri()).toList() : List.copyOf(uris), applied, selection != null);
         } catch (Throwable t) {
             for (Opened o : opened) {
                 try {
@@ -187,9 +210,9 @@ final class ImageLayerLoader {
     }
 
     // Several URIs tolerate failures of some; one URI fails the load.
-    private static List<Opened> openMany(@Nullable APIRequest request, List<URI> uris, List<String> warnings) throws Exception {
+    private static List<Opened> openMany(@Nullable APIRequest request, List<URI> uris, List<String> warnings, @Nullable ImageProcessingSettings.FITSSelection selection) throws Exception {
         if (uris.size() == 1)
-            return openUri(request, uris.getFirst(), warnings);
+            return openUri(request, uris.getFirst(), warnings, selection);
         Thread worker = Thread.currentThread();
         // Keep JPIP initialization on the interruptible loader thread.
         boolean jpip = uris.stream().anyMatch(uri -> "jpip".equalsIgnoreCase(uri.getScheme()) || "jpips".equalsIgnoreCase(uri.getScheme()));
@@ -197,7 +220,7 @@ final class ImageLayerLoader {
             if (worker.isInterrupted())
                 return Stream.empty();
             try {
-                return openUri(request, uri, warnings).stream();
+                return openUri(request, uri, warnings, selection).stream();
             } catch (Exception e) {
                 Log.warn(uri.toString(), e);
                 synchronized (warnings) {
@@ -208,17 +231,17 @@ final class ImageLayerLoader {
         }).toList();
     }
 
-    private static List<Opened> openUri(@Nullable APIRequest request, URI uri, List<String> warnings) throws Exception {
+    private static List<Opened> openUri(@Nullable APIRequest request, URI uri, List<String> warnings, @Nullable ImageProcessingSettings.FITSSelection selection) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         if (dataUri.format() == DataUri.Format.ZIP)
-            return openMany(null, FileUtils.unZip(dataUri.uri()), warnings);
+            return openMany(null, FileUtils.unZip(dataUri.uri()), warnings, selection);
 
         Source source = null;
         try {
             source = switch (dataUri.format()) {
                 case JPIP -> J2KSource.open(dataUri.uri());
                 case JP2, JPX -> new J2KSource(dataUri.file().toPath());
-                case FITS -> new FITSSource(dataUri.file());
+                case FITS -> new FITSSource(dataUri.file(), selection);
                 case PNG, JPEG -> new RasterSource(dataUri.file());
                 default -> throw new Exception("Unknown image type");
             };

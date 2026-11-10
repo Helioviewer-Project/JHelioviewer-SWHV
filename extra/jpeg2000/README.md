@@ -30,8 +30,8 @@ macOS 13.0. Each artifact records source revisions, local changes, CMake/compile
 versions and a SHA-256 checksum. Local builds do not trigger validation automatically.
 KDU builds remain in the separate native-build repository's existing workflow.
 
-JHV loads only the selected bridge: KDU by default, or OpenJPEG with the JVM option
-`-Djhv.j2k.decoder=openjpeg`. The accepted values are `kdu` and `openjpeg`.
+JHV loads only the selected bridge: OpenJPEG by default, or Kakadu with the JVM
+option `-Djhv.j2k.decoder=kdu`. The accepted values are `kdu` and `openjpeg`.
 Kakadu's support libraries are loaded only when KDU is selected. There is no
 automatic fallback if the selected bridge is missing.
 Rebuild and package the named bridges before running this version of JHV;

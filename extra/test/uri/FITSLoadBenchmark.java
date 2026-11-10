@@ -14,10 +14,12 @@ import java.util.Locale;
 import java.util.stream.Stream;
 import java.util.zip.CRC32;
 
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.wcs.ImageGrid;
 
 import nom.tam.fits.FitsFactory;
@@ -46,6 +48,8 @@ public final class FITSLoadBenchmark {
 
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
+        Platform.init();
+        Directories.createCacheDirs();
 
         List<Path> files = collectFiles(options.inputs(), options.recursive());
         if (files.isEmpty()) {
@@ -63,8 +67,15 @@ public final class FITSLoadBenchmark {
 
         try {
             ImageProcessingSettings.FITSParameters state = new ImageProcessingSettings(() -> {}).fitsParameters();
-            ClipSet.Range clipRange = options.mode() == Mode.Buffer
-                    ? state.clipRange(new FITSSource(file).clipSet()) : null;
+            ClipSet.Range clipRange = null;
+            if (options.mode() == Mode.Buffer) {
+                FITSSource initial = new FITSSource(file);
+                try {
+                    clipRange = state.clipRange(initial.clipSet());
+                } finally {
+                    initial.close();
+                }
+            }
             for (int i = 0; i < options.warmup(); i++)
                 free(load(file, options, state, clipRange));
 
@@ -94,12 +105,17 @@ public final class FITSLoadBenchmark {
     }
 
     private static Result load(File file, Options options, ImageProcessingSettings.FITSParameters state, ClipSet.Range clipRange) throws Exception {
-        if (options.mode() == Mode.Info) {
-            ImageGrid size = new FITSSource(file).levels(0).getLevel(0);
-            return new Result(size.width(), size.height(), null, "");
+        FITSSource source = new FITSSource(file);
+        try {
+            if (options.mode() == Mode.Info) {
+                ImageGrid size = source.levels(0).getLevel(0);
+                return new Result(size.width(), size.height(), null, "");
+            }
+            ImageBuffer buffer = source.decode(0, 0, ImageFilter.of(options.filter(), null), state, clipRange);
+            return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
+        } finally {
+            source.close();
         }
-        ImageBuffer buffer = new FITSSource(file).decode(0, 0, ImageFilter.of(options.filter(), null), state, clipRange);
-        return new Result(buffer.width, buffer.height, buffer, options.checksum() ? String.format("%08x", checksum(buffer)) : "");
     }
 
     private static long checksum(ImageBuffer imageBuffer) {

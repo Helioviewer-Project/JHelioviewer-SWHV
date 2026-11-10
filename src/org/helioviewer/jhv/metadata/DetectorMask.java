@@ -1,16 +1,16 @@
 package org.helioviewer.jhv.metadata;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.source.FITSReader;
 
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.ImageHDU;
-import nom.tam.fits.header.Bitpix;
+import nom.tam.fits.Header;
+import nom.tam.util.FitsInputStream;
 
 public final class DetectorMask {
 
@@ -35,19 +35,23 @@ public final class DetectorMask {
     }
 
     private static ImageBuffer loadImageBuffer(String resourcePath) {
-        try (InputStream in = FileUtils.getResource(resourcePath); Fits fits = new Fits(in)) {
-            BasicHDU<?> hdu = fits.readHDU();
-            if (!(hdu instanceof ImageHDU imageHDU) || hdu.getBitpix() != Bitpix.BYTE)
+        try (InputStream in = FileUtils.getResource(resourcePath)) {
+            byte[] bytes = in.readAllBytes();
+            Header header;
+            try (FitsInputStream input = new FitsInputStream(new ByteArrayInputStream(bytes))) {
+                header = Header.readHeader(input);
+            }
+            if (header == null || header.getIntValue("BITPIX") != 8 || header.getIntValue("NAXIS") != 2)
                 throw new Exception("Detector mask must be an 8-bit FITS image");
-            if (!(imageHDU.getKernel() instanceof byte[][] pixels) || pixels.length == 0 || pixels[0].length == 0)
+            int height = header.getIntValue("NAXIS2");
+            int width = header.getIntValue("NAXIS1");
+            if (width <= 0 || height <= 0)
                 throw new Exception("Detector mask must be a non-empty 2D FITS image");
-
-            int height = pixels.length;
-            int width = pixels[0].length;
+            byte[] pixels = FITSReader.readMask(bytes, width, height);
             try (ImageBuffer.WriteBuffer output = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8)) {
                 ByteBuffer outputPixels = output.byteBuffer();
                 for (int y = 0; y < height; y++)
-                    outputPixels.put(width * (height - 1 - y), pixels[y], 0, width);
+                    outputPixels.put(width * (height - 1 - y), pixels, width * y, width);
                 return output.finish();
             }
         } catch (Exception e) {

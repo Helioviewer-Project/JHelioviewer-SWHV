@@ -231,14 +231,14 @@
       "native_members": []
     },
     {
-      "path": "lib/formats/nom-tam-fits-master-bbebf33.jar",
-      "sha256": "86e88460b6fef9b2c281b12f86e96dace814b8b97fc159338a300bc9fb1c53e5",
+      "path": "lib/formats/nom-tam-fits-1.23.1.jar",
+      "sha256": "81caa1dae491e61c2a5c36d9da12db7ddeb6ac07da50fa351a85b679008305b1",
       "embedded_notices": [
-        "lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt"
+        "lib/formats/nom-tam-fits-1.23.1.jar!LICENSE.txt"
       ],
       "declarations": [
         {
-          "source": "lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
+          "source": "lib/formats/nom-tam-fits-1.23.1.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
           "name": "Public Domain",
           "url": "file://${project.basedir}/src/license/publicdomain/license.txt"
         }
@@ -427,6 +427,19 @@
       ]
     },
     {
+      "path": "lib/jhv/linux-amd64/libjhvfits.so",
+      "sha256": "92d187c0ec23e7d1b3d404128dd0fc2dbd744324de3c790edf3fb035c279cb81",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/CFITSIO.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/linux-amd64/libjhvfits.so"
+      ]
+    },
+    {
       "path": "lib/jhv/linux-amd64/libjhvj2k_kdu.so",
       "sha256": "f092e0d928948e2a8a04874b8e0d6df129f16a1851b6638711cb1985c1870a0e",
       "embedded_notices": [],
@@ -455,7 +468,7 @@
     },
     {
       "path": "lib/jhv/linux-amd64/libjhvwcs.so",
-      "sha256": "9edbdf0af36b460c1aa80e577453cd83914dce4c4fe80f5090e3f911b9f87a39",
+      "sha256": "ed7c4e9f77f3d1e3500f6aebcaf02f97028b2bde734b02d11a0f2adde3d12dc9",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -532,6 +545,19 @@
       ]
     },
     {
+      "path": "lib/jhv/macos-amd64/libjhvfits.dylib",
+      "sha256": "4eca7372420fde87217eaa459633d1b66b5cc72f437239d6c12ad15a129d282a",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/CFITSIO.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-amd64/libjhvfits.dylib"
+      ]
+    },
+    {
       "path": "lib/jhv/macos-amd64/libjhvj2k_kdu.dylib",
       "sha256": "ad0d0fe0adea5ede94eb69792979269a8668f6c6a6dec8b6d4e4895ec3e71335",
       "embedded_notices": [],
@@ -560,7 +586,7 @@
     },
     {
       "path": "lib/jhv/macos-amd64/libjhvwcs.dylib",
-      "sha256": "7b7043a4a37586f44e8bac498ff1c1b2add54d27532506a8cca9e28832bf108d",
+      "sha256": "0d54ed536a731d1eb1b9edddcadc455ec42b9f67f39ee547260279a2a5446ee3",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -637,6 +663,19 @@
       ]
     },
     {
+      "path": "lib/jhv/macos-arm64/libjhvfits.dylib",
+      "sha256": "89dd40a2f2da558a0ac6e193b4134ad958b7dca8d6d4a4a42ce93bcb93a942e8",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/CFITSIO.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/macos-arm64/libjhvfits.dylib"
+      ]
+    },
+    {
       "path": "lib/jhv/macos-arm64/libjhvj2k_kdu.dylib",
       "sha256": "579728df23e21450bd494ac7b5ee28ac4ab9a6c312cf3674511b830d2a037814",
       "embedded_notices": [],
@@ -665,7 +704,7 @@
     },
     {
       "path": "lib/jhv/macos-arm64/libjhvwcs.dylib",
-      "sha256": "ac85d352af08c9e970bbafaeeb6c77cc11936cf2470e5fc0784761311f511d50",
+      "sha256": "d26969cedd74143c354dd6a5c8976f34e8f283412e89767e38683a9bdfcb6c71",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -716,6 +755,19 @@
       ]
     },
     {
+      "path": "lib/jhv/windows-amd64/jhvfits.dll",
+      "sha256": "2bd2d1f5201e11b7c6bce216a232c3054d3ec7843af85032f7b37a55bfd7c3ee",
+      "embedded_notices": [],
+      "declarations": [],
+      "supplemental_notices": [
+        "extra/licenses/CFITSIO.txt"
+      ],
+      "external_notices": [],
+      "native_members": [
+        "lib/jhv/windows-amd64/jhvfits.dll"
+      ]
+    },
+    {
       "path": "lib/jhv/windows-amd64/jhvj2k_kdu.dll",
       "sha256": "131ced35c30c35e985b1cf5b7aea35df9d057223332fdd0be6e7d1cf67d8d0aa",
       "embedded_notices": [],
@@ -744,7 +796,7 @@
     },
     {
       "path": "lib/jhv/windows-amd64/jhvwcs.dll",
-      "sha256": "41ede22b97031da330c3e80d496c0b81d6df815dbfc2e34026228fe6cb3fcc36",
+      "sha256": "dd4ccc989a96c57fe2d135d02df51d471af819a1f78e75f5216c75774c265867",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [

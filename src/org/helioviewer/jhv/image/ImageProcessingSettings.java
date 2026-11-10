@@ -12,6 +12,9 @@ public final class ImageProcessingSettings {
         void fitsParametersChanged();
     }
 
+    // HDU and plane indices are zero-based, including the primary HDU.
+    public record FITSSelection(int hdu, int plane) {}
+
     public enum ClippingMode {
         Percentile001("Percentile 0.001%", 0.00001),
         Percentile05("Percentile 0.5%", 0.005),

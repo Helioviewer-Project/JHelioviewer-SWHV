@@ -141,6 +141,13 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 
+    public void selectFITS(ImageProcessingSettings.FITSSelection selection) {
+        if (removed)
+            return;
+        loader.select(selection);
+        Layers.fireLayerUpdated(this);
+    }
+
     private void loadFailed() {
         if (loaded)
             Layers.fireLayerUpdated(this);
@@ -179,8 +186,9 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         request = result.request();
         baseName = result.baseName();
         setFrames(result.frames());
-        displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
-        Layers.imageLayerLoaded(this, firstLoad);
+        if (!result.preserveSettings())
+            displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
+        Layers.imageLayerLoaded(this, firstLoad, result.preserveSettings());
         settleLoad();
     }
 

@@ -76,6 +76,14 @@ public class Player {
         timeRangeChanged();
     }
 
+    public static void refreshMaster() {
+        int maximum = getMaximumFrameNumber();
+        setPlaybackRange(Math.min(playbackFirstFrame, maximum), Math.min(playbackLastFrame, maximum));
+        setTime(lastTimestamp);
+        notifyStatusChanged();
+        timeRangeChanged();
+    }
+
     public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
         int lastFrame = Math.max(0, newPlaybackLastFrame);
         int firstFrame = Math.clamp(newPlaybackFirstFrame, 0, lastFrame);

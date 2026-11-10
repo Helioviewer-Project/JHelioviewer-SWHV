@@ -1,15 +1,23 @@
 package org.helioviewer.jhv.source;
 
 import java.io.File;
-import java.nio.Buffer;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.wcs.ImageGrid;
 
 import com.google.common.escape.Escaper;
@@ -24,20 +32,131 @@ import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-// One FITS image; the file is read again for each decode.
+// NTF reads headers once; CFITSIO reads pixels from Java-owned input storage.
 public final class FITSSource implements Source {
 
-    private final File file;
+    public record Image(int hdu, String name, int planes) {
+        @Override
+        public String toString() {
+            return hdu + " · " + name;
+        }
+    }
+
+    private final List<Image> images;
+    private final ImageProcessingSettings.FITSSelection selection;
+    private final Path path;
+    private final boolean temporary;
+    private final int bitpix;
+    private final int tileRows;
+    private final FITSData data;
     private final String xml;
     private final ResolutionSet levels;
     private final @Nullable ClipSet clipSet;
+    private boolean closed;
 
-    public FITSSource(File _file) throws Exception {
-        file = _file;
-        FITSData data = readData(file);
-        xml = getHeaderAsXML(data.header());
-        levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, data.width(), data.height())}, 1);
-        clipSet = data.calculateClipSet();
+    public FITSSource(File file) throws Exception {
+        this(file, null);
+    }
+
+    public FITSSource(File file, @Nullable ImageProcessingSettings.FITSSelection requested) throws Exception {
+        try (InputStream input = Files.newInputStream(file.toPath())) {
+            temporary = input.read() == 0x1f && input.read() == 0x8b;
+        }
+        path = temporary ? inflate(file.toPath()) : file.toPath();
+        try {
+            Header header;
+            int selectedTileRows;
+            try (Fits fits = new Fits(path.toFile())) {
+                BasicHDU<?>[] hdus = fits.read(); // File-backed payloads stay deferred.
+                List<Image> available = new ArrayList<>();
+                for (int i = 0; i < hdus.length; i++) {
+                    if (!(hdus[i] instanceof ImageHDU) && !(hdus[i] instanceof CompressedImageHDU))
+                        continue;
+                    Header image = hdus[i] instanceof CompressedImageHDU compressed
+                            ? compressed.getImageHeader() : hdus[i].getHeader();
+                    int axes = image.getIntValue("NAXIS");
+                    if ((axes == 2 || axes == 3) && image.getIntValue("NAXIS1") > 0 && image.getIntValue("NAXIS2") > 0
+                            && (axes == 2 || image.getIntValue("NAXIS3") > 0)) {
+                        String name = hdus[i].getHeader().getStringValue("EXTNAME");
+                        available.add(new Image(i, name == null ? "Image" : name.trim(), axes == 3 ? image.getIntValue("NAXIS3") : 1));
+                    }
+                }
+                images = List.copyOf(available);
+                int selected = requested == null ? findHDU(hdus, images) : requested.hdu();
+                Image image = images.stream().filter(candidate -> candidate.hdu() == selected).findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("No supported image at FITS HDU " + selected));
+                int plane = requested == null ? 0 : requested.plane();
+                if (plane < 0 || plane >= image.planes())
+                    throw new IllegalArgumentException("Invalid plane " + (plane + 1) + " for FITS HDU " + selected);
+                selection = new ImageProcessingSettings.FITSSelection(selected, plane);
+                if (hdus[selected] instanceof CompressedImageHDU compressed) {
+                    header = compressed.getImageHeader();
+                    selectedTileRows = compressed.getHeader().getIntValue("ZTILE2", 1);
+                } else {
+                    header = hdus[selected].getHeader();
+                    selectedTileRows = header.getIntValue("NAXIS2");
+                }
+            }
+            if (header.getIntValue("NAXIS") == 3) {
+                for (String key : new String[]{"PC1_3", "PC2_3", "CD1_3", "CD2_3"}) {
+                    if (header.getDoubleValue(key, 0) != 0)
+                        throw new IllegalArgumentException("Spatially coupled FITS cubes are unsupported: " + key);
+                }
+            }
+            int width = header.getIntValue("NAXIS1", 0);
+            int height = header.getIntValue("NAXIS2", 0);
+            Math.multiplyExact(width, height); // Java primitive-array limit.
+            bitpix = header.getIntValue("BITPIX");
+            if (bitpix != 8 && bitpix != 16 && bitpix != 32 && bitpix != 64 && bitpix != -32 && bitpix != -64)
+                throw new IllegalArgumentException("Unsupported FITS BITPIX: " + bitpix);
+            tileRows = Math.clamp(selectedTileRows, 1, height);
+            boolean hasBlank = header.containsKey(Standard.BLANK);
+            long blank = hasBlank ? header.getLongValue(Standard.BLANK) : 0;
+            double bzero = header.getDoubleValue(Standard.BZERO, 0);
+            double bscale = header.getDoubleValue(Standard.BSCALE, 1);
+            if (bitpix != 8 && (!Double.isFinite(bzero) || !Double.isFinite(bscale)))
+                throw new IllegalArgumentException("Invalid FITS BZERO/BSCALE");
+            float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
+            float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
+            ClipSet.Range headerRange = min == Float.MAX_VALUE || max == Float.MAX_VALUE ? null : new ClipSet.Range(min, max);
+            data = new FITSData(width, height, hasBlank, blank, bzero, bscale, headerRange);
+            xml = getHeaderAsXML(header);
+            levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, width, height)}, 1);
+            clipSet = bitpix == 8 || headerRange != null ? null : data.calculateSampledClipSet(
+                    readPixels(Math.max((int) (4L * width / 1024), 1), Math.max((int) (4L * height / 1024), 1)));
+        } catch (Throwable error) {
+            if (temporary) {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (Exception cleanup) {
+                    error.addSuppressed(cleanup);
+                }
+            }
+            throw error;
+        }
+    }
+
+    public List<Image> images() {
+        return images;
+    }
+
+    public ImageProcessingSettings.FITSSelection selection() {
+        return selection;
+    }
+
+    private static Path inflate(Path compressed) throws Exception {
+        Path result = Files.createTempFile(Directories.fileCacheDir.toPath(), "fits-", ".fits");
+        try (InputStream raw = Files.newInputStream(compressed); InputStream input = new GZIPInputStream(raw)) {
+            Files.copy(input, result, StandardCopyOption.REPLACE_EXISTING);
+            return result;
+        } catch (Throwable error) {
+            try {
+                Files.deleteIfExists(result);
+            } catch (Exception cleanup) {
+                error.addSuppressed(cleanup);
+            }
+            throw error;
+        }
     }
 
     @Override
@@ -75,81 +194,41 @@ public final class FITSSource implements Source {
     @Override
     public ImageBuffer decode(int frame, int level, ImageFilter filter,
                               @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws Exception {
-        return readData(file).decode(filter, fits, clip);
+        Object pixels;
+        synchronized (this) {
+            if (closed)
+                throw new IllegalStateException("FITS source is closed");
+            pixels = readPixels(1, 1);
+        }
+        return data.decode(pixels, filter, fits, clip);
     }
 
     @Override
-    public void close() {}
-
-    private static FITSData readData(File file) throws Exception {
-        try (Fits f = new Fits(file)) {
-            BasicHDU<?> hdu = findHDU(f);
-            Header header = imageHeader(hdu);
-            int[] axes = imageAxes(header);
-            Object pixels = readFlatPixels(hdu, axes);
-            boolean hasBlank = header.containsKey(Standard.BLANK);
-            long blank = hasBlank ? header.getLongValue(Standard.BLANK) : 0;
-            double bzero = header.getDoubleValue(Standard.BZERO, 0);
-            double bscale = header.getDoubleValue(Standard.BSCALE, 1);
-            if (!(pixels instanceof byte[]) && (!Double.isFinite(bzero) || !Double.isFinite(bscale)))
-                throw new Exception("Invalid FITS BZERO/BSCALE");
-            float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
-            float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
-            ClipSet.Range headerRange = min == Float.MAX_VALUE || max == Float.MAX_VALUE ? null : new ClipSet.Range(min, max);
-            return new FITSData(header, pixels, axes[1], axes[0], hasBlank, blank, bzero, bscale, headerRange);
-        }
-    }
-
-    private static BasicHDU<?> findHDU(Fits fits) throws Exception {
-        BasicHDU<?>[] hdus = fits.read();
-        // this is cumbersome
-        for (BasicHDU<?> hdu : hdus) {
-            if (hdu instanceof CompressedImageHDU) {
-                return hdu;
+    public synchronized void close() {
+        if (closed)
+            return;
+        closed = true;
+        if (temporary) {
+            try {
+                Files.deleteIfExists(path);
+            } catch (Exception e) {
+                Log.error("Cannot remove staged FITS " + path, e);
             }
         }
-        for (BasicHDU<?> hdu : hdus) {
-            if (hdu instanceof ImageHDU ihdu && ihdu.getAxes() != null /* might be an extension */) {
-                return ihdu;
-            }
-        }
-        throw new Exception("No image found");
     }
 
-    private static Header imageHeader(BasicHDU<?> hdu) throws Exception {
-        if (hdu instanceof CompressedImageHDU chdu) {
-            return chdu.getImageHeader();
-        } else {
-            return hdu.getHeader();
-        }
+    private Object readPixels(int stepX, int stepY) throws Exception {
+        return FITSReader.read(path, selection.hdu() + 1, bitpix, data.width(), data.height(), selection.plane(), tileRows, stepX, stepY);
     }
 
-    private static int[] imageAxes(Header header) throws Exception {
-        int nAxis = header.getIntValue("NAXIS", 0);
-        if (nAxis != 2)
-            throw new Exception("Only 2D FITS files supported");
-        int[] axes = {header.getIntValue("NAXIS2", 0), header.getIntValue("NAXIS1", 0)};
-        if (axes[0] <= 0 || axes[1] <= 0)
-            throw new Exception("Only 2D FITS files supported");
-        return axes;
-    }
-
-    @SuppressWarnings("deprecation")
-    private static Object readFlatPixels(BasicHDU<?> hdu, int[] axes) throws Exception {
-        if (hdu instanceof CompressedImageHDU chdu) {
-            return unwrapPixelBuffer(chdu.getUncompressedData(), axes[0] * axes[1]);
-        } else if (hdu instanceof ImageHDU ihdu) {
-            return ihdu.getData().getTiler().getTile(new int[]{0, 0}, axes);
-        } else {
-            throw new Exception("Unsupported FITS HDU: " + hdu.getClass().getSimpleName());
+    private static int findHDU(BasicHDU<?>[] hdus, List<Image> images) throws Exception {
+        for (Image image : images) {
+            if (hdus[image.hdu()] instanceof CompressedImageHDU)
+                return image.hdu();
         }
-    }
-
-    private static Object unwrapPixelBuffer(Buffer buffer, int expectedPixels) throws Exception {
-        if (!buffer.hasArray() || buffer.arrayOffset() != 0 || buffer.position() != 0 || buffer.remaining() < expectedPixels) {
-            throw new Exception("Unsupported compressed FITS pixel buffer: " + buffer.getClass().getSimpleName());
-        }
-        return buffer.array();
+        if (images.isEmpty())
+            throw new Exception("No supported 2D image or 3D cube found");
+        return images.getFirst().hdu();
     }
 
     private static final String nl = System.lineSeparator();

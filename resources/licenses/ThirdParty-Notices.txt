@@ -169,10 +169,10 @@ https://github.com/stleary/JSON-java/blob/master/LICENSE
 
 Supplemental notices: JSON.txt.
 
-lib/formats/nom-tam-fits-master-bbebf33.jar
--------------------------------------------
+lib/formats/nom-tam-fits-1.23.1.jar
+-----------------------------------
 
-Source: lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt
+Source: lib/formats/nom-tam-fits-1.23.1.jar!LICENSE.txt
 
 The Unlicense
 
@@ -201,7 +201,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 
-Declared in lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
+Declared in lib/formats/nom-tam-fits-1.23.1.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
 Public Domain
 file://${project.basedir}/src/license/publicdomain/license.txt
 
@@ -394,6 +394,11 @@ lib/jhv/linux-amd64/libJNISpice.so
 
 Supplemental notices: SPICE.txt.
 
+lib/jhv/linux-amd64/libjhvfits.so
+---------------------------------
+
+Supplemental notices: CFITSIO.txt.
+
 lib/jhv/linux-amd64/libjhvj2k_kdu.so
 ------------------------------------
 
@@ -433,6 +438,11 @@ lib/jhv/macos-amd64/libJNISpice.dylib
 -------------------------------------
 
 Supplemental notices: SPICE.txt.
+
+lib/jhv/macos-amd64/libjhvfits.dylib
+------------------------------------
+
+Supplemental notices: CFITSIO.txt.
 
 lib/jhv/macos-amd64/libjhvj2k_kdu.dylib
 ---------------------------------------
@@ -474,6 +484,11 @@ lib/jhv/macos-arm64/libJNISpice.dylib
 
 Supplemental notices: SPICE.txt.
 
+lib/jhv/macos-arm64/libjhvfits.dylib
+------------------------------------
+
+Supplemental notices: CFITSIO.txt.
+
 lib/jhv/macos-arm64/libjhvj2k_kdu.dylib
 ---------------------------------------
 
@@ -503,6 +518,11 @@ lib/jhv/windows-amd64/ffmpeg
 ----------------------------
 
 Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/windows-amd64/jhvfits.dll
+---------------------------------
+
+Supplemental notices: CFITSIO.txt.
 
 lib/jhv/windows-amd64/jhvj2k_kdu.dll
 ------------------------------------
