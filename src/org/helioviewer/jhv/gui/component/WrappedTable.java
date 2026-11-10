@@ -3,15 +3,20 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 
 @SuppressWarnings("serial")
-public class WrappedTable extends JTable {
+public final class WrappedTable extends JTable {
 
     private Timer updateTimer;
+
+    public WrappedTable() {
+        ((JLabel) getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.LEFT);
+    }
 
     @Override
     public void columnMarginChanged(ChangeEvent e) {
