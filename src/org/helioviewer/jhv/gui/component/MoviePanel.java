@@ -148,7 +148,6 @@ public class MoviePanel extends JPanel implements Player.StatusListener, ExportM
         advancedButton = new JideToggleButton(Buttons.settings);
         advancedButton.setFont(Buttons.getMaterialFont(buttonSize));
         advancedButton.setToolTipText("Playback and recording options");
-        advancedButton.getAccessibleContext().setAccessibleName("Playback and recording options");
         advancedButton.addActionListener(e -> setAdvanced(advancedButton.isSelected()));
         buttonPanel.add(advancedButton);
 

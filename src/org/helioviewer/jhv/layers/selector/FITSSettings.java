@@ -149,7 +149,6 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         hduLabel.setLabelFor(hduChoice);
         hduChoice.setPrototypeDisplayValue(new FITSSource.Image(0, "Image HDU", 1));
         hduChoice.setToolTipText("Applies to every file in this series");
-        planeChoice.getAccessibleContext().setAccessibleName("FITS plane");
         ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(3);
         hduChoice.addActionListener(e -> {
             if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image
