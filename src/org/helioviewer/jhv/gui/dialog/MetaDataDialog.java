@@ -1,9 +1,7 @@
 package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.Dimension;
-import java.io.BufferedWriter;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +22,7 @@ import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.XMLUtils;
 import org.helioviewer.jhv.layers.Frames;
 import org.helioviewer.jhv.layers.ImageData;
@@ -187,9 +186,7 @@ public final class MetaDataDialog extends BaseDialog {
 
         Task.submitBackground("metadata-export", () -> {
             Path path = Path.of(Directories.EXPORTS.getPath(), filename);
-            try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-                writer.write(xml, 0, xml.length());
-            }
+            FileUtils.writeAtomically(path, writer -> writer.write(xml));
             return path.toString();
         }, CompletionNotifications::fileReady, (logContext, t) -> Log.error("Failed to write metadata", t));
     }

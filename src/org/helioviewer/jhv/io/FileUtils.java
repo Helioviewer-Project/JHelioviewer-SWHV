@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -24,6 +26,8 @@ import java.util.stream.Stream;
 
 import org.helioviewer.jhv.app.Log;
 
+import org.apache.commons.io.function.IOConsumer;
+
 public final class FileUtils {
 
     public static InputStream getResource(String path) throws IOException {
@@ -36,6 +40,22 @@ public final class FileUtils {
     public static String readResourceString(String path) throws IOException {
         try (InputStream is = getResource(path)) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    public static void writeAtomically(Path target, IOConsumer<BufferedWriter> write) throws IOException {
+        Path temp = Files.createTempFile(target.toAbsolutePath().getParent(), ".jhv-", ".tmp");
+        try {
+            try (BufferedWriter writer = Files.newBufferedWriter(temp)) {
+                write.accept(writer);
+            }
+            try {
+                Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temp);
         }
     }
 

@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.app.state;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.layers.ConnectionLayer;
 import org.helioviewer.jhv.layers.FOVLayer;
 import org.helioviewer.jhv.layers.GridLayer;
@@ -55,8 +54,8 @@ public final class State {
 
         AppThread.create(() -> {
             Path path = Path.of(dir, file);
-            try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-                json.write(writer);
+            try {
+                FileUtils.writeAtomically(path, writer -> json.write(writer));
             } catch (IOException e) {
                 Log.error(e);
             }

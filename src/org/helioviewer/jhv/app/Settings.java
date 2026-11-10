@@ -1,13 +1,13 @@
 package org.helioviewer.jhv.app;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.FileUtils;
 
 @SuppressWarnings("serial")
 public class Settings {
@@ -49,8 +49,8 @@ public class Settings {
     public static void setProperty(String key, String val) {
         if (!val.equals(getProperty(key))) {
             settings.setProperty(key, val);
-            try (BufferedWriter writer = Files.newBufferedWriter(userPath)) {
-                settings.store(writer, null);
+            try {
+                FileUtils.writeAtomically(userPath, writer -> settings.store(writer, null));
             } catch (Exception e) {
                 Log.warn(e);
             }
