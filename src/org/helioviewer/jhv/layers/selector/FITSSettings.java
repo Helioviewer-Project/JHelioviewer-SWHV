@@ -162,7 +162,8 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         });
         hduChoice.setPrototypeDisplayValue(new FITSSource.Image(0, "Image HDU", 1));
         hduChoice.setToolTipText("Image HDU");
-        ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(3);
+        planeChoice.putClientProperty("JComponent.minimumWidth", 0);
+        ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(2);
         hduChoice.addActionListener(e -> {
             if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image
                     && selection != null && image.hdu() != selection.hdu()) {
