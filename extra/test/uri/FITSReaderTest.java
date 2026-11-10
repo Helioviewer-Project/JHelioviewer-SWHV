@@ -3,9 +3,11 @@ package org.helioviewer.jhv.source;
 import java.io.IOException;
 import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -67,6 +69,7 @@ public final class FITSReaderTest {
                 throw new AssertionError("Mapping leaked after " + path);
             System.out.println("PASS raw/subset planes: " + path.getFileName());
         }
+        checkInfinities();
         checkSelection();
         checkCoupledCube();
         FITSSource ccor = new FITSSource(data.getParent().resolve("CCOR2_1A_20260902T211514_V00_NC.fits").toFile());
@@ -155,6 +158,43 @@ public final class FITSReaderTest {
         if (mapped.getCount() != maps)
             throw new AssertionError("Mapping leak");
         System.out.println("PASS paths, gzip/error cleanup, CCOR2 clipping, and detector mask");
+    }
+
+    private static void checkInfinities() throws Exception {
+        for (boolean wide : new boolean[]{false, true}) {
+            Path path = Files.createTempFile("jhv-infinite-pixels-", ".fits");
+            try {
+                try (Fits fits = new Fits()) {
+                    Object values = wide ? new double[][]{{Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, .5}}
+                            : new float[][]{{Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, .5f}};
+                    BasicHDU<?> image = Fits.makeHDU(values);
+                    image.getHeader().addValue("HV_DMIN", 0.0, null);
+                    image.getHeader().addValue("HV_DMAX", 1.0, null);
+                    fits.addHDU(image);
+                    fits.write(path.toFile());
+                }
+                Object actual = FITSReader.read(path, 1, wide ? -64 : -32, 4, 1, 0, 1, 1, 1);
+                if (!Double.isNaN(((Number) Array.get(actual, 0)).doubleValue())
+                        || ((Number) Array.get(actual, 1)).doubleValue() != Double.POSITIVE_INFINITY
+                        || ((Number) Array.get(actual, 2)).doubleValue() != Double.NEGATIVE_INFINITY)
+                    throw new AssertionError("Reader must preserve NaN and both infinity signs");
+                FITSSource source = new FITSSource(path.toFile());
+                try {
+                    ImageProcessingSettings.FITSParameters settings = new ImageProcessingSettings(() -> {}).fitsParameters();
+                    try (ImageBufferOwner owner = new ImageBufferOwner(source.decode(0, 0, ImageFilter.NONE, settings, null))) {
+                        ShortBuffer pixels = (ShortBuffer) owner.buffer.buffer;
+                        if (Float.float16ToFloat(pixels.get(0)) != 0 || Float.float16ToFloat(pixels.get(1)) != 1
+                                || Float.float16ToFloat(pixels.get(2)) != 1)
+                            throw new AssertionError("NaN must display low; both infinities must display high");
+                    }
+                } finally {
+                    source.close();
+                }
+            } finally {
+                Files.deleteIfExists(path);
+            }
+        }
+        System.out.println("PASS float/double infinity preservation and full-white display");
     }
 
     private static void checkSelection() throws Exception {

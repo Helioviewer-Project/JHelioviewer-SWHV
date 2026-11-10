@@ -97,8 +97,9 @@ Each read opens CFITSIO's read-only memory-file driver and closes its handle bef
 returning. No filesystem path or persistent native handle crosses the interface.
 Integer BLANK and BZERO/BSCALE conversion remains the caller's responsibility.
 CFITSIO reconstructs quantized floating-point pixels and substitutes NaN for
-floating nulls. The adapter reports status text without consuming CFITSIO's shared
-error-message stack.
+quantized nulls. Non-quantized images preserve IEEE values, including both signs
+of infinity, for Java to interpret. The adapter reports status text without
+consuming CFITSIO's shared error-message stack.
 
 ## Application input ownership
 

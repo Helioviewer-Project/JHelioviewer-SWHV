@@ -4,6 +4,7 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import ctypes
+import gzip
 import hashlib
 import json
 import math
@@ -31,6 +32,31 @@ def canonical_bytes(output, bitpix):
         if normalized is not None:
             return bytes(normalized)
     return data
+
+
+def ieee_fixture(bitpix, compressed):
+    def header(cards):
+        return "".join(card.ljust(80) for card in [*cards, "END"]).encode().ljust(2880, b" ")
+
+    code = "f" if bitpix == -32 else "d"
+    tiny = 2.0 ** (-140 if bitpix == -32 else -1070)
+    values = [math.inf, -math.inf, math.nan, 0.0, -0.0, tiny]
+    pixels = struct.pack(">" + code * len(values), *values)
+    expected = canonical_bytes(struct.pack("<" + code * len(values), *values), bitpix)
+    if not compressed:
+        cards = ["SIMPLE  =                    T", f"BITPIX  = {bitpix:20d}",
+                 "NAXIS   =                    2", "NAXIS1  =                    3", "NAXIS2  =                    2"]
+        return header(cards) + pixels.ljust(2880, b"\0"), expected, 1
+    primary = header(["SIMPLE  =                    T", "BITPIX  =                    8",
+                      "NAXIS   =                    0", "EXTEND  =                    T"])
+    heap = gzip.compress(pixels, mtime=0)
+    extension = header(["XTENSION= 'BINTABLE'", "BITPIX  =                    8", "NAXIS   =                    2",
+                        "NAXIS1  =                    8", "NAXIS2  =                    1", f"PCOUNT  = {len(heap):20d}",
+                        "GCOUNT  =                    1", "TFIELDS =                    1", "TTYPE1  = 'COMPRESSED_DATA'",
+                        "TFORM1  = '1PB'", "ZIMAGE  =                    T", f"ZBITPIX = {bitpix:20d}",
+                        "ZNAXIS  =                    2", "ZNAXIS1 =                    3", "ZNAXIS2 =                    2",
+                        "ZTILE1  =                    3", "ZTILE2  =                    2", "ZCMPTYPE= 'GZIP_1'"])
+    return primary + extension + (struct.pack(">ii", len(heap), 0) + heap).ljust(2880, b"\0"), expected, 2
 
 
 def main():
@@ -111,6 +137,20 @@ def main():
         if bytes(decode(input_bytes, 2, -32, 11, 9, plane)) != expected:
             raise AssertionError("Selected extension HDU/plane pixels differ")
     print("PASS selected HDUs with different dimensions and planes", flush=True)
+
+    for bitpix in (-32, -64):
+        for compressed in (False, True):
+            data, expected, hdu = ieee_fixture(bitpix, compressed)
+            input_bytes = ctypes.create_string_buffer(data)
+            actual = decode(input_bytes, hdu, bitpix, 3, 2, 0)
+            if canonical_bytes(actual, bitpix) != expected:
+                raise AssertionError(f"IEEE values changed: BITPIX {bitpix}, compressed={compressed}")
+            size = abs(bitpix) // 8
+            subset = decode(input_bytes, hdu, bitpix, 3, 2, 0, step_x=2)
+            expected_subset = b"".join(expected[i * size:(i + 1) * size] for i in (0, 2, 3, 5))
+            if canonical_bytes(subset, bitpix) != expected_subset:
+                raise AssertionError(f"IEEE subset values changed: BITPIX {bitpix}, compressed={compressed}")
+    print("PASS infinities, NaN, signed zero and subnormal values in plain/lossless float images", flush=True)
 
     error = ctypes.create_string_buffer(128)
     output = ctypes.create_string_buffer(4)

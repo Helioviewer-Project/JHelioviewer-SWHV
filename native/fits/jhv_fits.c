@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "fitsio2.h"
 
 #ifdef _WIN32
@@ -65,7 +66,18 @@ JHV_EXPORT int jhv_fits_read(const void *input, int64_t input_length,
     if (!status) fits_set_bscale(file, 1.0, 0.0, &status);
     float fnan = NAN;
     double dnan = NAN;
-    void *nulval = bitpix == -32 ? (void *)&fnan : bitpix == -64 ? (void *)&dnan : NULL;
+    void *nulval = NULL;
+    if (!status && bitpix < 0 && fits_is_compressed_image(file, &status)) {
+        int column, scale_status = 0, zero_status = 0, quantize_status = 0;
+        char quantize[FLEN_VALUE];
+        fits_get_colnum(file, CASEINSEN, "ZSCALE", &column, &scale_status);
+        fits_get_colnum(file, CASEINSEN, "ZZERO", &column, &zero_status);
+        fits_read_key(file, TSTRING, "ZQUANTIZ", quantize, NULL, &quantize_status);
+        // Quantized pixels need null substitution; IEEE pixels must retain infinities.
+        if ((scale_status == 0 || zero_status == 0) &&
+                (quantize_status != 0 || strcmp(quantize, "NONE") != 0))
+            nulval = bitpix == -32 ? (void *)&fnan : (void *)&dnan;
+    }
     long first[3] = {1, (long)firstrow + 1, (long)plane + 1};
     if (!status) {
         if (stepx == 1 && stepy == 1) {
