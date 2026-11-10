@@ -9,25 +9,38 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.function.DoubleConsumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
+import org.helioviewer.jhv.layers.Frames;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.source.FITSSource;
 
 @SuppressWarnings("serial")
 public final class FITSSettings extends JPanel implements ImageProcessingSettings.FITSListener {
 
+    private final ImageLayer layer;
     private final ImageProcessingSettings state;
     private boolean syncing;
+    private final JLabel hduLabel = new JLabel("HDU", JLabel.RIGHT);
+    private final JComboBox<FITSSource.Image> hduChoice = new JComboBox<>();
+    private final JSpinner planeChoice = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
+    private List<FITSSource.Image> images = List.of();
     private final JRadioButton gammaButton = new JRadioButton("γ");
     private final JRadioButton betaButton = new JRadioButton("β");
     private final JRadioButton alphaButton = new JRadioButton("α");
@@ -62,9 +75,10 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         });
     }
 
-    public FITSSettings(ImageProcessingSettings _state) {
+    public FITSSettings(ImageLayer _layer) {
         super(new GridBagLayout());
-        state = _state;
+        layer = _layer;
+        state = layer.getProcessingSettings();
         ImageProcessingSettings.FITSParameters initialState = state.fitsParameters();
         gammaSlider = createSlider(gammaIndex(ImageProcessingSettings.GAMMA_MAX),
                 gammaIndex(ImageProcessingSettings.GAMMA_MIN), gammaIndex(initialState.gamma()));
@@ -119,6 +133,36 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
+        add(hduLabel, c);
+        c.gridx = 1;
+        c.weightx = 1;
+        add(hduChoice, c);
+        c.gridx = 2;
+        c.weightx = 0;
+        add(planeChoice, c);
+        c.gridy++;
+        c.gridx = 0;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        hduLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 6));
+        hduLabel.setLabelFor(hduChoice);
+        hduChoice.setPrototypeDisplayValue(new FITSSource.Image(0, "Image HDU", 1));
+        hduChoice.setToolTipText("Applies to every file in this series");
+        planeChoice.getAccessibleContext().setAccessibleName("FITS plane");
+        ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(3);
+        hduChoice.addActionListener(e -> {
+            if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image
+                    && state.fitsSelection() != null && image.hdu() != state.fitsSelection().hdu()) {
+                state.setFITSSelection(new ImageProcessingSettings.FITSSelection(image.hdu(), 0));
+                Layers.fireLayerUpdated(layer);
+            }
+        });
+        planeChoice.addChangeListener(e -> {
+            if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image) {
+                state.setFITSSelection(new ImageProcessingSettings.FITSSelection(image.hdu(), ((Number) planeChoice.getValue()).intValue() - 1));
+                Layers.fireLayerUpdated(layer);
+            }
+        });
         JLabel clippingLabel = new JLabel("Clipping", JLabel.RIGHT);
         clippingLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 6));
         add(clippingLabel, c);
@@ -177,6 +221,40 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     public void fitsParametersChanged() {
         syncing = true;
         try {
+            FITSSource source = null;
+            Frames frames = layer.frames();
+            for (int i = 0; i < frames.size(); i++) {
+                if (frames.valueAt(i).source() instanceof FITSSource fits) {
+                    source = fits;
+                    break;
+                }
+            }
+            List<FITSSource.Image> available = source == null ? List.of() : source.images();
+            if (!images.equals(available)) {
+                images = available;
+                hduChoice.removeAllItems();
+                for (FITSSource.Image image : images)
+                    hduChoice.addItem(image);
+            }
+            int planes = 1;
+            if (source != null) {
+                for (FITSSource.Image image : images) {
+                    if (image.hdu() == source.selection().hdu()) {
+                        hduChoice.setSelectedItem(image);
+                        planes = image.planes();
+                        break;
+                    }
+                }
+                SpinnerNumberModel planeModel = (SpinnerNumberModel) planeChoice.getModel();
+                planeModel.setMaximum(planes);
+                planeModel.setValue(source.selection().plane() + 1);
+            }
+            hduLabel.setVisible(images.size() > 1);
+            hduChoice.setVisible(images.size() > 1);
+            planeChoice.setToolTipText("Plane " + planeChoice.getValue() + " of " + planes + "; applies to every file in this series");
+            planeChoice.setVisible(planes > 1);
+            hduChoice.setEnabled(!layer.isDownloading());
+            planeChoice.setEnabled(!layer.isDownloading());
             ImageProcessingSettings.FITSParameters data = state.fitsParameters();
 
             gammaButton.setSelected(data.scalingMode() == ImageProcessingSettings.ScalingMode.Gamma);

@@ -72,13 +72,16 @@ public final class Layers {
         Player.resetToMaster();
     }
 
-    // A layer's frames arrived: a first load enables and activates it, a reload of the active layer resyncs the player.
-    static void imageLayerLoaded(ImageLayer layer, boolean firstLoad) {
+    // A source replacement can preserve the current view and playback time.
+    static void imageLayerLoaded(ImageLayer layer, boolean firstLoad, boolean preserveSettings) {
         if (firstLoad)
             layer.setEnabled(true);
-        DisplayController.zoomMiniToFit();
-        if (firstLoad || activeLayer == layer) {
+        if (!preserveSettings)
+            DisplayController.zoomMiniToFit();
+        if (!preserveSettings && (firstLoad || activeLayer == layer)) {
             setActiveImageLayer(layer);
+        } else if (activeLayer == layer) {
+            Player.refreshMaster();
         } else {
             layer.frames().select(Player.getTime());
             DisplayController.render();

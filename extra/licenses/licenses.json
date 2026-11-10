@@ -231,14 +231,14 @@
       "native_members": []
     },
     {
-      "path": "lib/formats/nom-tam-fits-master-bbebf33.jar",
-      "sha256": "86e88460b6fef9b2c281b12f86e96dace814b8b97fc159338a300bc9fb1c53e5",
+      "path": "lib/formats/nom-tam-fits-1.23.1.jar",
+      "sha256": "81caa1dae491e61c2a5c36d9da12db7ddeb6ac07da50fa351a85b679008305b1",
       "embedded_notices": [
-        "lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt"
+        "lib/formats/nom-tam-fits-1.23.1.jar!LICENSE.txt"
       ],
       "declarations": [
         {
-          "source": "lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
+          "source": "lib/formats/nom-tam-fits-1.23.1.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml",
           "name": "Public Domain",
           "url": "file://${project.basedir}/src/license/publicdomain/license.txt"
         }

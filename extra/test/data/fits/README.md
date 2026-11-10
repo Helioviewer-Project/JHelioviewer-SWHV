@@ -9,12 +9,10 @@ NTF is not a pixel reference. Expected arrays are little-endian and NaNs are
 canonicalized. CFITSIO is compiled with `-ffp-contract=off`, matching the production
 build's explicit cross-platform arithmetic policy.
 
-Astropy's reconstructed pixels match exactly except for the quantized-double cases.
-That build fuses multiplication/addition in dequantization. Its exact output is
-retained in `dither2-double.astropy.raw` and `mixed-double.astropy.raw`; separate and fused reconstruction differ
-by at most 7.26e-12 in this fixture. The separate-operation values agree bit-for-bit
-with the released CFITSIO C API. This is floating arithmetic rounding after
-quantization, not a different scale, dither sequence, zero sentinel or plane.
+Quantized-double reconstruction can differ slightly between separate and fused
+multiply/add operations. The `.raw` files use the pinned CFITSIO build's separate
+operations. The generator also compares its output with Astropy and reports any
+floating-point rounding differences.
 
 The corpus covers Rice row/block/whole-plane tiles, partial edges, 64-bit integers
 above 2^53, unsigned bytes, quantized float/double DITHER2 cubes with zeros and NaNs,
@@ -29,9 +27,6 @@ python3 extra/test/uri/generate_fits_fixtures.py --cfitsio-library /path/to/libc
 
 Use the pinned released CFITSIO 4.7.0 library built with contraction disabled.
 
-`wcs-pixels.tsv` records full-pixel SHA-256 values from the same released CFITSIO
-C API for all 14 image HDUs in the existing WCS FITS/FTS corpus in the parent
-directory. The URI suite checks those 75,870,624 pixels on every run. Regenerate
-that manifest with `extra/test/uri/reference_wcs_pixels.py --cfitsio-library ...`.
-The WCS suite separately validates their geometry and captured instrument XML
-against Astropy; these pixel checks do not replace coordinate validation.
+The existing WCS corpus remains covered by its separate geometry and metadata
+validation. The Java FITS checks retain the real CCOR2 missing-pixel regression
+and packaged detector-mask reference.

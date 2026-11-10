@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -27,6 +28,7 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -67,6 +69,8 @@ import org.helioviewer.jhv.thread.UiThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import nom.tam.fits.Fits;
+
 public final class SidebarTest {
 
     public static void main(String[] args) throws Exception {
@@ -79,6 +83,7 @@ public final class SidebarTest {
         try {
             UiThread.postAndWait(SidebarTest::checkSidebar);
             checkFitsOptions();
+            checkFitsSelectionLayout();
         } finally {
             UiThread.postAndWait(() -> {
                 Layers.getViewpointLayer().setCameraMode(ViewpointLayerOptions.CameraMode.Observer);
@@ -605,6 +610,115 @@ public final class SidebarTest {
             check(options.getStartTime() == movieStart && options.getEndTime() == movieEnd, "Time sync lost fractional movie timestamps");
             selector.setTime(movieStart + 30000, movieEnd + 40000);
             check(options.getStartTime() == movieStart && options.getEndTime() == movieEnd, "Hidden selector changed synchronized interval");
+        }
+    }
+
+    private static void checkFitsSelectionLayout() throws Exception {
+        Path cube = Files.createTempFile("jhv-fits-selector-", ".fits");
+        try (Fits fixture = new Fits("extra/test/data/fits/rice-row.fits")) {
+            // Two image HDUs expose both selectors without depending on external PUNCH files.
+            fixture.addHDU(fixture.read()[1]);
+            fixture.write(cube.toFile());
+        }
+        LayersPanel sidebar = UiThread.postAndWait(LayersPanel::new);
+        ImageLayer layer = UiThread.postAndWait(ImageLayer::create);
+        ImageLayerOptions editor = UiThread.postAndWait(() -> {
+            sidebar.setOptionsPanel(layer);
+            return find(sidebar, ImageLayerOptions.class);
+        });
+        Dimension disclosureSize = UiThread.postAndWait(() -> findButton(editor, Buttons.fitsRight).getPreferredSize());
+        Dimension adjustmentsSize = UiThread.postAndWait(() -> findButton(editor, Buttons.adjustmentsRight).getPreferredSize());
+        try {
+            CompletableFuture<Boolean> finished = UiThread.postAndWait(() -> {
+                layer.load(List.of(Path.of(System.getProperty("jhv.test.fits", cube.toString())).toUri()));
+                return layer.whenLoadFinished();
+            });
+            check(finished.get(30, TimeUnit.SECONDS), "Cube fixture failed to load");
+            UiThread.postAndWait(() -> {
+                editor.refresh(layer);
+                findButton(editor, Buttons.fitsRight).doClick();
+                FITSSettings fits = find(editor, FITSSettings.class);
+                JSpinner plane = find(fits, JSpinner.class);
+                check(plane.getToolTipText().contains("of 3"), "Plane count missing from tooltip");
+                for (int width : new int[]{350, 500}) {
+                    sidebar.setSize(width, 1000);
+                    layoutTree(sidebar);
+                    JScrollPane scroll = (JScrollPane) javax.swing.SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
+                    check(scroll.getViewport().getView().getWidth() == scroll.getViewport().getExtentSize().width,
+                            "Sidebar content exceeds its viewport: " + scroll.getViewport().getView().getWidth() + " / " + scroll.getViewport().getExtentSize().width);
+                    AbstractButton disclosure = findButton(editor, Buttons.fitsDown);
+                    AbstractButton adjustments = findButton(editor, Buttons.adjustmentsRight);
+                    check(disclosure.getWidth() >= disclosureSize.width && disclosure.getHeight() == disclosureSize.height,
+                            "FITS disclosure wraps or clips: " + disclosure.getSize() + " / " + disclosureSize);
+                    check(adjustments.getWidth() >= adjustmentsSize.width && adjustments.getHeight() == adjustmentsSize.height,
+                            "Adjustments disclosure wraps or clips: " + adjustments.getSize() + " / " + adjustmentsSize);
+                    Rectangle number = javax.swing.SwingUtilities.convertRectangle(plane.getParent(), plane.getBounds(), editor);
+                    Component hdu = find(fits, JComboBox.class);
+                    check(hdu.isVisible(), "HDU dropdown hidden after placeholder-to-cube load");
+                    {
+                        Component color = controlNamed(editor, "Color");
+                        Rectangle expected = javax.swing.SwingUtilities.convertRectangle(color.getParent(), color.getBounds(), editor);
+                        Rectangle actual = javax.swing.SwingUtilities.convertRectangle(hdu.getParent(), hdu.getBounds(), editor);
+                        check(actual.x == expected.x && actual.width == expected.width && actual.width > 80,
+                                "HDU dropdown does not align with main controls: " + actual + " / " + expected);
+                        Component opacity = controlNamed(editor, "Opacity");
+                        Component value = editor.getComponent(editor.getComponentZOrder(opacity) + 1);
+                        Rectangle valueBounds = value.getBounds();
+                        check(number.x + number.width == valueBounds.x + valueBounds.width,
+                                "Plane spinner does not align with main values: " + number + " / " + valueBounds);
+                        check(Math.abs(actual.y + actual.height / 2 - number.y - number.height / 2) <= 2,
+                                "HDU and plane controls occupy separate rows: " + actual + " / " + number);
+                        check(number.x >= actual.x + actual.width && number.x + number.width <= editor.getWidth(),
+                                "FITS selectors overlap or exceed the sidebar");
+                        check(plane.getVisibleRect().width == plane.getWidth(), "Plane spinner clipped by sidebar viewport");
+                        for (Component component : editor.getComponents()) {
+                            if (component.isVisible())
+                                check(component.getX() >= 0 && component.getX() + component.getWidth() <= editor.getWidth(),
+                                        "Image option clipped at viewport edge: " + component.getBounds());
+                        }
+                    }
+                }
+                String screenshot = System.getProperty("jhv.test.fitsScreenshot");
+                if (screenshot != null) {
+                    sidebar.setSize(350, 1000);
+                    layoutTree(sidebar);
+                    BufferedImage image = new BufferedImage(editor.getWidth() * 2, editor.getHeight() * 2, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D graphics = image.createGraphics();
+                    graphics.scale(2, 2);
+                    editor.printAll(graphics);
+                    graphics.dispose();
+                    try {
+                        javax.imageio.ImageIO.write(image, "png", Path.of(screenshot).toFile());
+                    } catch (java.io.IOException e) {
+                        throw new java.io.UncheckedIOException(e);
+                    }
+                }
+            });
+            for (int step = 0; step < 2; step++) {
+                int choice = step;
+                CompletableFuture<Boolean> reloaded = UiThread.postAndWait(() -> {
+                    FITSSettings fits = find(editor, FITSSettings.class);
+                    if (choice == 0)
+                        find(fits, JComboBox.class).setSelectedIndex(1);
+                    else
+                        find(fits, JSpinner.class).setValue(2);
+                    return layer.whenLoadFinished();
+                });
+                check(reloaded.get(30, TimeUnit.SECONDS), "FITS selection reload failed");
+                UiThread.postAndWait(() -> {
+                    editor.refresh(layer);
+                    layoutTree(editor);
+                    FITSSettings fits = find(editor, FITSSettings.class);
+                    JComboBox<?> hdu = find(fits, JComboBox.class);
+                    JSpinner plane = find(fits, JSpinner.class);
+                    check(hdu.isVisible() && hdu.getWidth() > 80, "HDU dropdown disappeared after selection");
+                    check(hdu.getSelectedIndex() == 1 && plane.getValue().equals(choice == 0 ? 1 : 2),
+                            "HDU or plane selection was not retained after reload");
+                });
+            }
+        } finally {
+            UiThread.postAndWait(() -> Layers.remove(layer));
+            Files.deleteIfExists(cube);
         }
     }
 

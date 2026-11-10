@@ -41,7 +41,7 @@ final class ImageLayerOptions extends JPanel {
 
     ImageLayerOptions(ImageLayer layer) {
         super(new GridBagLayout());
-        fitsSettings = new FITSSettings(layer.getProcessingSettings());
+        fitsSettings = new FITSSettings(layer);
         FilterDetails differencePanel = DifferencePanel.create(layer);
         FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
         FilterDetails blendPanel = SliderFilterPanel.blend(layer);
@@ -215,6 +215,7 @@ final class ImageLayerOptions extends JPanel {
         boolean hasFITS = imageLayer.frames().hasFITS();
         fitsButton.setVisible(hasFITS);
         fitsSettings.setVisible(hasFITS && fitsButton.isSelected());
+        fitsSettings.fitsParametersChanged();
         lutPanel.refresh();
     }
 

@@ -30,7 +30,6 @@ copies the result into `lib/jhv`; validate the candidate before installing it.
 ## Independent validation
 
 ```sh
-python3 -m unittest discover -s extra/cfitsio -v
 python3 extra/cfitsio/check_build.py /path/to/output --platform macos-arm64
 ```
 
@@ -40,8 +39,7 @@ JAR, WCS library or SPICE library. A missing entrypoint or broken candidate fail
 no bundled reader substitutes for it.
 
 The checks compare all planes, subsets and row bands against 13 committed
-CFITSIO/Astropy fixtures, plus full-image hashes for 14 image HDUs in the existing
-FITS corpus. They cover integer types, Rice, gzip, HCOMPRESS, PLIO, quantized float
+CFITSIO/Astropy fixtures. They cover integer types, Rice, gzip, HCOMPRESS, PLIO, quantized float
 and double cubes, zero/null markers, tile edges, concurrent first-use quantized
 reads, malformed input, invalid HDUs and insufficient output capacity. Reference
 pixels come from the released CFITSIO C API, independently of this adapter.
@@ -61,8 +59,10 @@ gh workflow run build-native-libraries.yml -f library=cfitsio -f target=all -f j
 ```
 
 Each job builds with the same script, then runs the independent validation on
-macOS ARM64, macOS Intel, Linux x64 or Windows x64. Python 3.13 is the only test
-runtime. CI requires a clean checkout matching the requested source SHA.
+macOS ARM64, macOS Intel, Linux x64 or Windows x64. A separate step compiles fresh
+Java classes and checks the application's FITS reader against only that candidate
+library. The workflow requires Python 3.13 and JDK 25. CI requires a clean checkout
+matching the requested source SHA.
 
 Successful checks produce `jhv-cfitsio-TARGET` artifacts containing the library,
 `builds.json`, `validation.json`, notices, test logs and `SHA256SUMS`. Validation
@@ -71,6 +71,13 @@ run URL. Failed checks upload diagnostics. Artifacts are retained for seven days
 Verify all four artifacts' checksums, matching source revisions and passed
 validation records before copying the libraries into `lib/jhv` and regenerating
 licenses. The workflow does not commit or publish a release.
+
+The Java reader checks appear in the workflow's `Validate the Java FITS reader`
+step. To run them locally against a build output directory:
+
+```sh
+python3 extra/test/uri/check_fits_reader.py /path/to/output --platform macos-arm64
+```
 
 Local validation marks dirty source explicitly. Rechecking clears the previous
 artifact first, so a failed retry leaves no stale success package.
@@ -92,3 +99,17 @@ Integer BLANK and BZERO/BSCALE conversion remains the caller's responsibility.
 CFITSIO reconstructs quantized floating-point pixels and substitutes NaN for
 floating nulls. The adapter reports status text without consuming CFITSIO's shared
 error-message stack.
+
+## Application input ownership
+
+`FITSSource` uses released NTF 1.23.1 for headers and CFITSIO for image pixels.
+Header scans are file-backed and leave payloads deferred. The selected HDU,
+dimensions, pixel type, scaling and tile height are captured once. Decodes map
+the input through Java's file API, join all workers, and unmap before returning.
+Workers split at tile boundaries so a tile is not decompressed by multiple bands.
+
+Input files must remain stable during reads. Outer gzip input is inflated once
+into Java's file cache and deleted when the source closes, after active reads
+finish. A long gzip sequence therefore retains its uncompressed files until
+its sources close. Packaged detector masks use Java-owned memory rather than
+filesystem paths. CFITSIO receives no paths or persistent handles.
