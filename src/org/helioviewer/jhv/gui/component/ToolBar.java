@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,6 +29,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.interaction.Interaction;
 import org.helioviewer.jhv.gui.Actions;
@@ -240,6 +242,14 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         addButton(projectionButton);
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
+        JCheckBoxMenuItem showAnnotations = new JCheckBoxMenuItem("Show Annotations", Annotations.isVisible());
+        showAnnotations.addActionListener(e -> {
+            Annotations.setVisible(showAnnotations.isSelected());
+            DisplayController.display();
+        });
+        annotationButton.add(showAnnotations);
+        annotationButton.add(new Actions.ClearAnnotations());
+        annotationButton.addSeparator();
         ButtonGroup annotationGroup = new ButtonGroup();
         for (AnnotationMode mode : AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
@@ -253,8 +263,6 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         annotationButton.addSeparator();
         addAnnotationColorItems(annotationButton);
         annotationButton.add(createAnnotationThicknessPanel());
-        annotationButton.addSeparator();
-        annotationButton.add(new Actions.ClearAnnotations());
         annotationButton.addSeparator();
         annotationButton.add(new Actions.ZoomFOVAnnotation());
         addButton(annotationButton);
