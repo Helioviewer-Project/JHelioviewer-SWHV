@@ -16,25 +16,18 @@ public final class ImageProcessingSettings {
     public record FITSSelection(int hdu, int plane) {}
 
     public enum ClippingMode {
-        Percentile001("Percentile 0.001%", 0.00001),
-        Percentile05("Percentile 0.5%", 0.005),
-        Range("Range", 0);
+        Percentile001(0.00001),
+        Percentile05(0.005),
+        Range(0);
 
-        private final String label;
         private final double percentile;
 
-        ClippingMode(String _label, double _percentile) {
-            label = _label;
+        ClippingMode(double _percentile) {
             percentile = _percentile;
         }
 
         public double percentile() {
             return percentile;
-        }
-
-        @Override
-        public String toString() {
-            return label;
         }
     }
 

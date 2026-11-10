@@ -15,9 +15,11 @@ import java.util.function.DoubleConsumer;
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -147,8 +149,19 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         c.weightx = 0;
         hduLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 6));
         hduLabel.setLabelFor(hduChoice);
+        hduChoice.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focused) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, selected, focused);
+                if (value instanceof FITSSource.Image image) {
+                    String name = image.name();
+                    label.setText(image.hdu() + " · " + (name == null || name.isBlank() ? "Image" : name.trim()));
+                }
+                return label;
+            }
+        });
         hduChoice.setPrototypeDisplayValue(new FITSSource.Image(0, "Image HDU", 1));
-        hduChoice.setToolTipText("Applies to every file in this series");
+        hduChoice.setToolTipText("Image HDU");
         ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(3);
         hduChoice.addActionListener(e -> {
             if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image
@@ -170,7 +183,12 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         c.weightx = 1;
         c.gridwidth = 2;
         for (ImageProcessingSettings.ClippingMode clipping : ImageProcessingSettings.ClippingMode.values()) {
-            JRadioButton radio = new JRadioButton(clipping.toString(), clipping == initialState.clippingMode());
+            String label = switch (clipping) {
+                case Percentile001 -> "Percentile 0.001%";
+                case Percentile05 -> "Percentile 0.5%";
+                case Range -> "Range";
+            };
+            JRadioButton radio = new JRadioButton(label, clipping == initialState.clippingMode());
             clippingButtons.put(clipping, radio);
             boolean rangeMode = clipping == ImageProcessingSettings.ClippingMode.Range;
             if (rangeMode) {
@@ -236,9 +254,9 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
                     hduChoice.addItem(image);
             }
             int planes = 1;
-            if (source != null) {
+            if (selection != null) {
                 for (FITSSource.Image image : images) {
-                    if (image.hdu() == source.selection().hdu()) {
+                    if (image.hdu() == selection.hdu()) {
                         hduChoice.setSelectedItem(image);
                         planes = image.planes();
                         break;
@@ -246,11 +264,15 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
                 }
                 SpinnerNumberModel planeModel = (SpinnerNumberModel) planeChoice.getModel();
                 planeModel.setMaximum(planes);
-                planeModel.setValue(source.selection().plane() + 1);
+                planeModel.setValue(selection.plane() + 1);
             }
             hduLabel.setVisible(images.size() > 1);
             hduChoice.setVisible(images.size() > 1);
-            planeChoice.setToolTipText("Plane " + planeChoice.getValue() + " of " + planes + "; applies to every file in this series");
+            String planeName = source == null ? null : source.planeName();
+            String planeTooltip = "Plane " + planeChoice.getValue() + " of " + planes
+                    + (planeName == null || planeName.isBlank() ? "" : ": " + planeName.trim());
+            planeChoice.setToolTipText(planeTooltip);
+            ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setToolTipText(planeTooltip);
             planeChoice.setVisible(planes > 1);
             hduChoice.setEnabled(!layer.isDownloading());
             planeChoice.setEnabled(!layer.isDownloading());

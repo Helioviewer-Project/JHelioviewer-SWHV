@@ -35,12 +35,7 @@ import nom.tam.util.Cursor;
 // NTF reads headers once; CFITSIO reads pixels from Java-owned input storage.
 public final class FITSSource implements Source {
 
-    public record Image(int hdu, String name, int planes) {
-        @Override
-        public String toString() {
-            return hdu + " · " + name;
-        }
-    }
+    public record Image(int hdu, @Nullable String name, int planes) {}
 
     private final List<Image> images;
     private final ImageProcessingSettings.FITSSelection selection;
@@ -50,6 +45,7 @@ public final class FITSSource implements Source {
     private final int tileRows;
     private final FITSData data;
     private final String xml;
+    private final @Nullable String planeName;
     private final ResolutionSet levels;
     private final @Nullable ClipSet clipSet;
     private boolean closed;
@@ -78,7 +74,7 @@ public final class FITSSource implements Source {
                     if ((axes == 2 || axes == 3) && image.getIntValue("NAXIS1") > 0 && image.getIntValue("NAXIS2") > 0
                             && (axes == 2 || image.getIntValue("NAXIS3") > 0)) {
                         String name = hdus[i].getHeader().getStringValue("EXTNAME");
-                        available.add(new Image(i, name == null ? "Image" : name.trim(), axes == 3 ? image.getIntValue("NAXIS3") : 1));
+                        available.add(new Image(i, name, axes == 3 ? image.getIntValue("NAXIS3") : 1));
                     }
                 }
                 images = List.copyOf(available);
@@ -120,6 +116,7 @@ public final class FITSSource implements Source {
             float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
             ClipSet.Range headerRange = min == Float.MAX_VALUE || max == Float.MAX_VALUE ? null : new ClipSet.Range(min, max);
             data = new FITSData(width, height, hasBlank, blank, bzero, bscale, headerRange);
+            planeName = header.getStringValue("OBSLAYR" + (selection.plane() + 1));
             xml = getHeaderAsXML(header);
             levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, width, height)}, 1);
             clipSet = bitpix == 8 || headerRange != null ? null : data.calculateSampledClipSet(
@@ -138,6 +135,10 @@ public final class FITSSource implements Source {
 
     public List<Image> images() {
         return images;
+    }
+
+    public @Nullable String planeName() {
+        return planeName;
     }
 
     public ImageProcessingSettings.FITSSelection selection() {
