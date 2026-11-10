@@ -1,82 +1,84 @@
-
 # Revision history for JHelioviewer
 
 ## JHelioviewer 5.11.0 (pending)
 
 ### Display and rendering
-- Add glTF/GLB model layers with surfaces, lines, points, textures, transparency, and lighting
-- Improve rendering quality, performance, and memory handling
-- Use consistent percentile clipping across FITS sequences to reduce brightness flicker, and remove ZScale
-- Fix MGN numerical artifacts and refresh queued and difference images when changing filters
-- Show planets and stars (Gaia DR3, Hipparcos for the brightest) at their apparent positions in the Location viewpoint, with names on hover
+- Add annotation color and line-thickness controls, and draw the active annotation thicker instead of red (fixes #156)
+- Improve thick-line joins, rectangle corners, annotation loops, and field-of-view outlines
+- Improve grid stability and longitude labels, and add grid color, opacity, line-width, and label-size controls
+- Make trajectory colors readable against a white background (fixes #260)
+- Add the RHEF radial histogram equalizing filter with an Upsilon midtone control (by @GillySpace27)
+- Add RadialWarp and RectWarp wide-field views with adjustable outer-corona compression while keeping the solar disk linear, replacing Polar and LogPolar (by @GillySpace27)
+- Add image-layer controls for outer-radius masking and sector direction and opening
+- Improve image-canvas positioning and resizing on macOS
+- Add GOES-R SUVI to the Earth-orbit field-of-view catalog
+- Add glTF/GLB 3D model layers with surfaces, lines, points, textures, transparency, and lighting
+- Show planets and stars at their apparent positions in the Location viewpoint, with names on hover, in Orthographic and HPC views
+- Include Gaia DR3 stars and bright stars from Hipparcos, and update STEREO-A trajectory data
+- Improve FITS image positioning and coordinate interpretation with WCSLIB, including angular units, rotated or skewed images, and CAR/CEA surface maps
+- Fix surface-map sampling in HPC and warp views, image rotation, and alignment of reduced-resolution JPEG 2000 images
+- Fix annotation visibility in projected views and restore zoom limits when zooming multiview panels separately
+- Fix numerical artifacts in the MGN filter and refresh images when changing filters, including difference images
+
+### Image loading and data
+- Add a New PUNCH Layer source for FITS images from the PUNCH archive (by @GillySpace27)
+- Allow selecting an image extension (HDU) and a cube plane in FITS layer options
+- Read FITS images with CFITSIO, replacing the custom compressed-image reader
+- Move FITS clipping and scaling controls into each image layer's options
+- Use a shared percentile clipping range across FITS sequences to reduce brightness flicker, and remove ZScale clipping
+- Use OpenJPEG as the default JPEG 2000 decoder, with Kakadu available as an alternative
+- Improve JPIP movie loading, reconnection, cancellation, and disk-cache restoration, and reduce image-cache memory use
+- Use the same proxy settings for HTTP and JPIP connections
+- Add Proba-3 datasets to image-server browsing
+- Preserve image-layer settings and the movie interval while replacement data loads
+- Improve Callisto image loading, refresh, and saved-state restoration
 
 ### Interaction and UI
-- Improve mouse interaction and allow holding X, Y, or Z to override the default rotation axis (normally Y) in Rotate Axis mode
-- Allow multiple dataset selections in the New Image Layer and New Timeline Layer dialogs
-- Add general and timeline interaction guides to the Help menu
-- Move FITS clipping and scaling controls into image-layer options, with SAMP settings supplied through layer `imageParams` instead of the global FITS command
-
-### Timeline and events
-- Allow additional HAPI servers to be configured by user in `sources.json`, alongside image API servers
-- Allow HAPI timelines to be loaded at full time resolution and significantly improve timeline loading and drawing performance
-- Improve SWEK event loading, filtering, display, and related-event handling, with more reliable updates
-
-### Technical
-- Document the heliocentric 3D data interface and add a COCONUT conversion example
-- Read JPEG 2000 files and JPIP streams with the esajpip client library, with faster JPIP movie downloads and lower cache memory use
-- Accelerate Rice-compressed 16-bit FITS decoding
-- Expand rendering, WCS, JPIP retrieval and cache restoration, and Callisto decoding regression coverage
-- Update bundled libraries
-- Various bug fixes, cleanups, and internal refactoring
-
-## JHelioviewer 5.10.0 (pending)
-
-### Display and rendering
-- Add annotation color and line-thickness controls, and draw the active annotation thicker instead of forcing it to red (fixes #156)
-- Improve thick-line joins, rectangle corners, annotation loops, and FOV outline rendering
-- Improve flat-grid stability and grid label formatting
-- Adjust trajectory colors for white canvas (fixes #260)
-- Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch` (by @GillySpace27)
-- Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control (by @GillySpace27)
-- Add `RadialWarp` (circular) and `RectWarp` (angle versus solar distance)
-  wide-field views with λ-controlled outer-corona compression while keeping
-  the solar disk linear (λ = 1 linear, 0 logarithmic, −1 strongest), replacing
-  the redundant Polar and LogPolar projections (by @GillySpace27)
-- Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
-- Add image-layer controls for outer-radius masking and for sector direction and opening
-- Improve FITS WCS interpretation of angular units, including surface maps,
-  and full `PCi_j` and `CDi_j` linear transformations
-- Improve image canvas positioning and resizing on macOS
-
-### Timeline, events, and UI
-- Add a stacked timeline mode with independent vertical scales, scrolling when
-  the plots no longer fit vertically, and a control to maximize and restore the
-  timeline panel
-- Expand HAPI timelines with datasets from multiple catalogs, predefined plots
-  from HAPI metadata, and catalog/group browsing in the New Timeline Layer dialog
-- Support HAPI-defined bar plots, value-level colors, warning thresholds, and
-  switching between multicolor and single-color rendering
-- Add frame-count sampling and use the selected sampling setting when adding,
-  replacing, and synchronizing image layers
-- Add a Movie menu command and `Cmd-R` shortcut to start or stop recording
-- Add controls to collapse the sidebar and hide the status bar, the toolbar, or the toolbar text
+- Add frame-count sampling alongside time-step sampling when adding, replacing, and synchronizing image layers
+- Add controls to collapse the sidebar and hide the status bar, toolbar, or toolbar text
 - Show the original image URI in the Image Information dialog
-- Improve HEK event handling by mapping Flare Trigger events to Flare events
-  (fixes #105) and fixing CACTus event loading (fixes #190)
-- Improve SWEK supplier filtering and configuration, loading, paging, storage,
-  cancellation, indexing, and highlight dispatch
-- Disable COMESEP event source
-- Improve layer-table update/repaint behavior when layer names or metadata change
+- Show dataset time coverage in the New Image Layer dialog and distinguish short EUI exposures in layer names
+- Improve layer-list updates when names or metadata change, and keep moved layers selected after reordering
+- Improve download progress reporting and show Carrington rotation ranges in calendar tooltips
+- Reorganize the sidebar and keep playback and navigation controls visible while scrolling through layer options
+- Allow multiple dataset selections in the New Image Layer and New Timeline Layer dialogs
+- Keep image request settings consistent when selecting datasets, replacing layers, and changing the movie interval
+- Add a Show Annotations menu item to hide drawings without deleting them
+- Change the background-color menu item to alternate between Use White Background and Use Black Background
+- Allow holding X, Y, or Z to choose the rotation axis in Rotate Axis mode
+- Keep mouse gestures tied to their starting view and finish them when the application loses focus
+- Add general and timeline interaction guides to the Help menu
+- Fix canvas positioning after display-scale changes on Windows and improve recovery after a graphics-context loss
 
-### Performance and data
-- Offload and cache viewpoint orbit-trail preparation, and offload PFSS
-  coordinate preparation, from the rendering thread
-- Reduce allocations in status panels, grid labels, FITS scaling, time maps, and interpolation paths
-- Update bundled libraries, FFmpeg (9.0.1), SPICE kernels, and supporting build tools
+### Timelines and events
+- Add stacked timelines with independent vertical scales, scrolling, and a maximize/restore control
+- Browse HAPI datasets from multiple catalogs and groups, and load predefined plots supplied by the server
+- Support HAPI bar plots, value-level colors, warning thresholds, and a choice of multicolor or single-color rendering
+- Improve timeline panning, zooming, and plotting of irregular data and gaps
+- Improve HEK event handling for Flare Trigger events (fixes #105) and CACTus events (fixes #190)
+- Disable the COMESEP event source
+- Allow HAPI timelines to load at full time resolution, and preserve that choice in saved states and exports
+- Allow additional HAPI servers to be configured in `sources.json`
+- Improve timeline loading and drawing, including clearer lines on high-resolution displays and more legible overview dates
+- Improve SWEK event loading, supplier filtering, cancellation, highlighting, related-event details, and updates after changing filters
+- Preserve events with missing optional information and gaps between related observations
+- Fix event-icon positioning across projections and clean up event controls when disabling the plugin
 
-### Technical
-- Reorganize core packages and simplify application, GUI, event, image, movie, thread, and metadata internals
-- Clean up viewpoint position loading, map-scale ownership, FOV shape emission, and SWEK APIs
+### Playback, export, and integration
+- Add a Movie menu command and Cmd-R shortcut to start or stop recording
+- Fix timeline export when the timeline panel is maximized
+- Keep playback and loop recording within the selected time range, including solar-time playback
+- Improve saved-state loading, including refresh-enabled states and restored plugin layers
+- Fix recording-speed rounding and improve reporting of frame-capture and video-encoding failures
+- Improve H.265 export quality and support for video sizes, and correct video color-transfer metadata
+- Supply FITS settings through per-layer SAMP `imageParams` instead of the global FITS command
+- Document the heliocentric 3D data interface and add a COCONUT conversion example
+
+### Performance and maintenance
+- Prepare spacecraft orbit trails and PFSS field lines in the background to reduce interruptions while viewing
+- Reduce memory use and unnecessary redraws during image playback and timeline interaction
+- Update bundled libraries, FFmpeg, native FITS and WCS libraries, SPICE kernels, and supporting build tools
+- Expand regression coverage for image loading, rendering, coordinates, timelines, events, playback, and recording
 - Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 5.5.0 (2026-06-01)
