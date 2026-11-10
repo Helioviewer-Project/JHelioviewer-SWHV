@@ -61,7 +61,7 @@ public final class AppInit {
     }
 
     private static void loadLibs(String resourceDir) throws Exception {
-        String bridge = switch (System.getProperty("jhv.j2k.decoder", "kdu")) {
+        String bridge = switch (System.getProperty("jhv.j2k.decoder", "openjpeg")) {
             case "kdu" -> "jhvj2k_kdu";
             case "openjpeg" -> "jhvj2k_opj";
             default -> throw new IllegalArgumentException("jhv.j2k.decoder must be kdu or openjpeg");
