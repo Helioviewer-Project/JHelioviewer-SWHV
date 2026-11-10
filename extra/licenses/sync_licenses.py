@@ -66,6 +66,7 @@ ADDITIONAL_NOTICES = {
 # Native notices follow the actual binaries, including those inside JARs.
 # Keys omit the platform's "lib" prefix and shared-library extension.
 NATIVE_NOTICES = {
+    "jhvfits": ("CFITSIO.txt",),
     "jhvwcs": ("WCSLIB.txt",),
     "jhvj2k": ("esajpip.txt",),
     "jhvj2k_kdu": ("esajpip.txt",),

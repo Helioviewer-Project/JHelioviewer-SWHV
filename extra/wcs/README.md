@@ -11,19 +11,46 @@ vendored by Astropy at the revision recorded in `wcslib.json`, excluding generat
 `wcsconfig.h`. The archive retains WCSLIB's GPL and LGPL license texts.
 The manifest records its SHA-256. The adapter is separate from the JPEG 2000 bridge.
 
-Build with Python 3 and Zig 0.17.0:
+Build with Python 3, CMake and the platform compiler, as for FITS and JPIP:
 
 ```sh
-python3 extra/wcs/build.py /path/to/build-output
+python3 extra/wcs/build.py macos-arm64 --output /path/to/build-output
 ```
 
-This builds macOS arm64/x64, Linux x64 and Windows x64. Add
-`--platform macos-arm64` to build one target. `--install` atomically installs the
-libraries into the corresponding `lib/jhv/` resource directories. Build records
-and checksums are saved in the output directory. Debug information is stripped;
-the four adapter entry points remain exported. Both macOS builds target macOS 13.0
-and use the installed Apple SDK. No Python scientific packages, CFITSIO or Fortran
-runtime are required to build or run the native library.
+Choose `macos-arm64`, `macos-x64`, `linux-x64` or `windows-x64`. Builds use CMake
+Release with Apple Clang on macOS, GCC on Linux and MinGW-w64 on Windows
+(`MINGW_ROOT`, default `C:\mingw64`). The platform baselines match JPIP and FITS:
+macOS 13.0, Linux glibc 2.17 and Windows PE subsystem 5.2. Linux release builds
+require the same pinned manylinux2014 environment used by JPIP.
+
+`native/wcs/CMakeLists.txt` owns the source list, generated configuration, compiler
+flags and linking. The Python driver verifies and unpacks the pinned archive,
+invokes CMake and checks the binary's architecture, baseline and dependencies.
+The vendored Astropy source subset contains no upstream build system.
+
+`--install` atomically installs the result into its `lib/jhv/` resource directory.
+Build records contain the commands, source pins, compiler versions and checksums.
+The four adapter entrypoints remain exported. GNU runtimes are linked statically.
+No Python scientific packages, CFITSIO or Fortran runtime are required to build
+or run the native library.
+
+
+The same [native-library workflow](../../.github/workflows/build-native-libraries.yml)
+builds FITS and WCS on the four platform runners:
+
+```sh
+gh workflow run build-native-libraries.yml -f library=wcs -f target=all -f jhv_commit=FULL_COMMIT_SHA
+```
+
+After building, `check_build.py` verifies the candidate hash and source pins,
+compiles fresh classes for the existing `WcsLibraryTest`, and runs its independent
+geometry, inverse-domain, parameter and concurrent-ownership checks. Only the
+candidate WCS library is staged for loading. Python 3.13 and JDK 25 are the test
+runtimes; the FITS application integration is not required.
+
+Successful jobs upload `jhv-wcs-TARGET` artifacts with the library, notices, build
+and validation records, logs and checksums. CI requires a clean checkout matching
+the requested source SHA. Validate all four platforms before ingesting binaries.
 
 The C11 build enables WCSLIB's thread-local diagnostics and atomic error handling.
 The adapter retains only the primary two-axis affine celestial WCS, supports
