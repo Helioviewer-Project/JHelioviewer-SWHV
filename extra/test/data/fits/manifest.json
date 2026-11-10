@@ -1,0 +1,132 @@
+{
+  "astropy": "8.0.0",
+  "images": [
+    {
+      "file": "rice-row.fits",
+      "hdu": 2,
+      "bitpix": 16,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "fa13c85fece3bf77441db19829aefdc16e2f53912ae80c89dc60d53e17b040af"
+    },
+    {
+      "file": "rice-block.fits",
+      "hdu": 2,
+      "bitpix": 16,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "fa13c85fece3bf77441db19829aefdc16e2f53912ae80c89dc60d53e17b040af"
+    },
+    {
+      "file": "rice-whole.fits",
+      "hdu": 2,
+      "bitpix": 16,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "fa13c85fece3bf77441db19829aefdc16e2f53912ae80c89dc60d53e17b040af"
+    },
+    {
+      "file": "integer32.fits",
+      "hdu": 2,
+      "bitpix": 32,
+      "width": 70,
+      "height": 35,
+      "planes": 1,
+      "sha256": "59c9680ee54be0fbc42b59e9e4639ceebf8aec2e9e202d9b3ab7950b27f3427d"
+    },
+    {
+      "file": "integer64.fits",
+      "hdu": 1,
+      "bitpix": 64,
+      "width": 70,
+      "height": 35,
+      "planes": 1,
+      "sha256": "02089e7ba71450f457ecce9d7548482819b70f337eca253146ff203fef611e13"
+    },
+    {
+      "file": "byte.fits",
+      "hdu": 1,
+      "bitpix": 8,
+      "width": 70,
+      "height": 35,
+      "planes": 1,
+      "sha256": "be9b09862060fe8b74a80aed7be19d1bc8e96f084ad430cafc1ef5756282184b"
+    },
+    {
+      "file": "dither2-float.fits",
+      "hdu": 2,
+      "bitpix": -32,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "436ca92000201ced84fb9d0305831e170fb999514e6b1e8f6d09c52f2ef801fb"
+    },
+    {
+      "file": "dither2-double.fits",
+      "hdu": 2,
+      "bitpix": -64,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "4080ea766ec6f87944acb24cd94a65fcc22c02bf6bb7b0050e6c49bdf973a0bb",
+      "astropy_reference": "dither2-double.astropy.raw",
+      "astropy_sha256": "0730fb5f2f98b8ff6e7831026ac1e2fbe15e6226bd6ac4df938510cd7b8b25c6"
+    },
+    {
+      "file": "gzip-float.fits",
+      "hdu": 2,
+      "bitpix": -32,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "58c0bf8ce3162a2ae6a5cffbf1811722249df336d538bc3ea239ff7b246ed904"
+    },
+    {
+      "file": "mixed-float.fits",
+      "hdu": 2,
+      "bitpix": -32,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "779260bca34860479d640595887504b741d83b35e1dd24364a8b14198d44d269"
+    },
+    {
+      "file": "mixed-double.fits",
+      "hdu": 2,
+      "bitpix": -64,
+      "width": 70,
+      "height": 35,
+      "planes": 3,
+      "sha256": "35910d85d6b9044c3f1ef8bd2a9825abfab066ee42487723a0e9a62251d5d1a9",
+      "astropy_reference": "mixed-double.astropy.raw",
+      "astropy_sha256": "c2a39a76548a594b15bdaa1ad36f426730f1af5b4b748ac060afd1b64f66537c"
+    },
+    {
+      "file": "hcompress.fits",
+      "hdu": 2,
+      "bitpix": 16,
+      "width": 70,
+      "height": 35,
+      "planes": 1,
+      "sha256": "2d31a24f0be18d8790ec4a7bd195c3306d39e7b6795aaa4cf9d341e475bee6b0"
+    },
+    {
+      "file": "plio.fits",
+      "hdu": 2,
+      "bitpix": 32,
+      "width": 70,
+      "height": 35,
+      "planes": 1,
+      "sha256": "d81647b197983010250314498ffadddad2c9a51ea63ed676e621d455a14eba89"
+    }
+  ],
+  "cfitsio": {
+    "version": "4.7.0",
+    "revision": "d6d27653740864a0483e74cff23c53e34e1dceee",
+    "arithmetic": "-ffp-contract=off",
+    "api": "fits_open_diskfile / fits_read_pix, no JHV adapter"
+  }
+}

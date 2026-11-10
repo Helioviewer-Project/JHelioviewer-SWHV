@@ -1,0 +1,14 @@
+{
+  "cfitsio": {
+    "version": "4.7.0",
+    "revision": "d6d27653740864a0483e74cff23c53e34e1dceee",
+    "url": "https://github.com/HEASARC/cfitsio/releases/tag/cfitsio-4.7.0",
+    "archive_sha256": "d5a26723563536cfaff152d091e44f49c0458cbf14e2ecffc37010a8864abb2a"
+  },
+  "zlib": {
+    "version": "1.3.1",
+    "revision": "51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+    "url": "https://github.com/madler/zlib/releases/tag/v1.3.1",
+    "archive_sha256": "a95d3cbeb68b7e75ab0a2eb2ca4169b5675fbd1f76f39ea0ec2c5834a429adcb"
+  }
+}

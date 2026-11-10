@@ -20,3 +20,20 @@ https://github.com/astropy/astropy/tree/fa8bb7a799a601a7e4ae32529c66d82e3d2e6d8f
 The pinned source, including its license texts, is distributed with JHV in
 extra/wcs/wcslib-8.10.tar.xz. The build recipe is extra/wcs/build.py.
 The JHV adapter is in native/wcs/ and is covered by JHV's GPL-3.0 license.
+
+Windows builds also link winpthreads supplied by MinGW-w64.
+
+
+Copyright (c) 2011-2016  mingw-w64 project
+
+   License terms are included in MIT.txt.
+
+*
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the w64 mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+
+Copyright (c) 2011, 2014 mingw-w64 project
+   Copyright (c) 2015 Intel Corporation
+
+   License terms are included in MIT.txt.

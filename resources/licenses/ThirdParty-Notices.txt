@@ -394,6 +394,11 @@ lib/jhv/linux-amd64/libJNISpice.so
 
 Supplemental notices: SPICE.txt.
 
+lib/jhv/linux-amd64/libjhvfits.so
+---------------------------------
+
+Supplemental notices: CFITSIO.txt.
+
 lib/jhv/linux-amd64/libjhvj2k_kdu.so
 ------------------------------------
 
@@ -433,6 +438,11 @@ lib/jhv/macos-amd64/libJNISpice.dylib
 -------------------------------------
 
 Supplemental notices: SPICE.txt.
+
+lib/jhv/macos-amd64/libjhvfits.dylib
+------------------------------------
+
+Supplemental notices: CFITSIO.txt.
 
 lib/jhv/macos-amd64/libjhvj2k_kdu.dylib
 ---------------------------------------
@@ -474,6 +484,11 @@ lib/jhv/macos-arm64/libJNISpice.dylib
 
 Supplemental notices: SPICE.txt.
 
+lib/jhv/macos-arm64/libjhvfits.dylib
+------------------------------------
+
+Supplemental notices: CFITSIO.txt.
+
 lib/jhv/macos-arm64/libjhvj2k_kdu.dylib
 ---------------------------------------
 
@@ -503,6 +518,11 @@ lib/jhv/windows-amd64/ffmpeg
 ----------------------------
 
 Separately maintained notices: FFmpeg-Notices.txt.
+
+lib/jhv/windows-amd64/jhvfits.dll
+---------------------------------
+
+Supplemental notices: CFITSIO.txt.
 
 lib/jhv/windows-amd64/jhvj2k_kdu.dll
 ------------------------------------
