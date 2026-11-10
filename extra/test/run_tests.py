@@ -21,6 +21,7 @@ SCRIPTS = {
     "wcs": TESTS / "wcs/run_jhv_wcs_hpc_validation_suite.py",
 }
 JAVA_TESTS = {
+    "uri": ["source.FITSReaderTest", "layers.FITSSeriesTest"],
     "commands": ["io.samp.CommandStateTest", "layers.ViewpointBehaviorTest", "display.DisplayLayoutTest", "thread.UiTimerTest"],
     "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest"],
     "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],
@@ -75,9 +76,6 @@ def main():
         try:
             if suite in JAVA_TESTS:
                 run_java_suite(suite, args.native_resources, args.render_output)
-            elif suite == "uri":
-                subprocess.run(["bash", str(TESTS / "uri/run-fast-rice-verifier.sh")],
-                               cwd=ROOT, env={**os.environ, "JHV_SKIP_COMPILE": "1"}, check=True)
             elif suite == "maintenance":
                 for directory in (ROOT / "extra/licenses", ROOT / "extra/ffmpeg"):
                     subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(directory), "-v"],

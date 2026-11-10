@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.source;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -13,32 +14,17 @@ import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
 
-import nom.tam.fits.Header;
-
-record FITSData(Header header, Object pixels, int width, int height, boolean hasBlank, long blank,
+record FITSData(int width, int height, boolean hasBlank, long blank,
                 double bzero, double bscale, @Nullable ClipSet.Range headerRange) {
 
     private static final int BAD_PIXEL = Integer.MIN_VALUE;
-    private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
     private static final int SCALE_LOOKUP_SIZE = 1 << 16;
     private static final int RAW_SHORT_LOOKUP_SIZE = 1 << Short.SIZE;
     private static final short HALF_FLOAT_ZERO = Float.floatToFloat16(0f);
     private static final short HALF_FLOAT_ONE = Float.floatToFloat16(1f);
 
-    @Nullable
-    ClipSet calculateClipSet() throws Exception {
-        if (pixels instanceof byte[] || headerRange != null)
-            return null;
-        SampleBuffer sample = sampleImage();
-        if (sample.length() < MIN_SAMPLES)
-            return new ClipSet(null, null);
-        Arrays.sort(sample.values(), 0, sample.length());
-        return new ClipSet(percentileRange(sample, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
-                percentileRange(sample, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
-    }
-
-    ImageBuffer decode(ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
+    ImageBuffer decode(Object pixels, ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
         ClipSet.Range range = headerRange != null ? headerRange : clipRange;
         ImageBuffer.Format format = pixels instanceof byte[] || range == null ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.Gray16F;
         try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, format)) {
@@ -54,81 +40,37 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
                 float max = range.upper();
                 if (min >= max)
                     max = min + 1;
-                convertPixels(outBuffer.shortBuffer(), min, max, state);
+                convertPixels(pixels, outBuffer.shortBuffer(), min, max, state);
             }
             return outBuffer.finish(filter);
         }
     }
 
-    private SampleBuffer sampleImage() throws Exception {
-        int stepW = Math.max(SAMPLE * width / 1024, 1);
-        int stepH = Math.max(SAMPLE * height / 1024, 1);
-        int sampleRows = (height + stepH - 1) / stepH;
-        int sampleCols = (width + stepW - 1) / stepW;
-        float[] samples = new float[sampleRows * sampleCols];
-        int sampleLen = 0;
-        switch (pixels) {
-            case short[] inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        short raw = inData[line + i];
-                        float v = (hasBlank && raw == (short) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case int[] inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        int raw = inData[line + i];
-                        float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case long[] inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        long raw = inData[line + i];
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case float[] inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = floatPixel(inData[line + i], bzero, bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case double[] inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = floatPixel(inData[line + i], bzero, bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
+    ClipSet calculateSampledClipSet(Object samples) {
+        int length = Array.getLength(samples);
+        float[] values = new float[length];
+        int count = 0;
+        for (int i = 0; i < length; i++) {
+            float value = samplePixel(samples, i);
+            if (value != BAD_PIXEL && value != Float.MAX_VALUE)
+                values[count++] = value;
         }
-        return new SampleBuffer(samples, sampleLen);
+        if (count < MIN_SAMPLES)
+            return new ClipSet(null, null);
+        Arrays.sort(values, 0, count);
+        return new ClipSet(percentileRange(values, count, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
+                percentileRange(values, count, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
+    }
+
+    private float samplePixel(Object pixels, int index) {
+        return switch (pixels) {
+            case short[] data -> hasBlank && data[index] == (short) blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
+            case int[] data -> hasBlank && data[index] == (int) blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
+            case long[] data -> hasBlank && data[index] == blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
+            case float[] data -> floatPixel(data[index], bzero, bscale);
+            case double[] data -> floatPixel(data[index], bzero, bscale);
+            default -> throw new IllegalArgumentException("Unknown FITS sample type");
+        };
     }
 
     private short[] rawShortToHalfFloat(float min, double toUnit, NormalizedMapping mapping) {
@@ -143,7 +85,7 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
         return values;
     }
 
-    private void convertPixels(ShortBuffer outData, float min, float max, ImageProcessingSettings.FITSParameters state) throws Exception {
+    private void convertPixels(Object pixels, ShortBuffer outData, float min, float max, ImageProcessingSettings.FITSParameters state) throws Exception {
         float range = max - min;
         double toUnit = 1. / range;
         double toIndex = SCALE_LOOKUP_SIZE / (double) range;
@@ -238,12 +180,9 @@ record FITSData(Header header, Object pixels, int width, int height, boolean has
         }
     }
 
-    private record SampleBuffer(float[] values, int length) {}
-
-    private static ClipSet.Range percentileRange(SampleBuffer sample, double percentile) {
-        int length = sample.length();
-        float lower = sample.values()[Math.clamp((int) (percentile * length), 0, length - 1)];
-        float upper = sample.values()[Math.clamp((int) ((1 - percentile) * length), 0, length - 1)];
+    private static ClipSet.Range percentileRange(float[] values, int length, double percentile) {
+        float lower = values[Math.clamp((int) (percentile * length), 0, length - 1)];
+        float upper = values[Math.clamp((int) ((1 - percentile) * length), 0, length - 1)];
         return new ClipSet.Range(lower, upper);
     }
 

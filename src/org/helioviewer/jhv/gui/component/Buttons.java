@@ -28,11 +28,11 @@ public class Buttons {
     public static final String chevronDown = "<html><font face='Material Design Icons' size=3>" +
             MaterialDesign.CHEVRON_DOWN + "</font>&nbsp;";
 
-    public static final String fitsRight = chevronRight + "FITS Settings";
-    public static final String fitsDown = chevronDown + "FITS Settings";
+    public static final String fitsRight = chevronRight + "FITS&nbsp;Settings";
+    public static final String fitsDown = chevronDown + "FITS&nbsp;Settings";
 
-    public static final String adjustmentsRight = chevronRight + "More Adjustments";
-    public static final String adjustmentsDown = chevronDown + "More Adjustments";
+    public static final String adjustmentsRight = chevronRight + "More&nbsp;Adjustments";
+    public static final String adjustmentsDown = chevronDown + "More&nbsp;Adjustments";
 
     public static final String newLayer = "<html><font face='Material Design Icons' size=4>" +
             MaterialDesign.PLUS_CIRCLE + "</font>&nbsp;<b>New Layer</b>";

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Rectangle;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
@@ -11,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -122,13 +124,44 @@ public final class LayersPanel extends JPanel implements Layers.Listener {
     }
 
     private JScrollPane scrollTab(JComponent content) {
-        JPanel topAligned = new JPanel(new BorderLayout());
-        topAligned.add(content, BorderLayout.NORTH);
+        TabContent topAligned = new TabContent(content);
         JScrollPane scrollPane = new JScrollPane(topAligned, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setFocusable(false);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(getGridRowHeight());
         return scrollPane;
+    }
+
+    private final class TabContent extends JPanel implements Scrollable {
+        TabContent(JComponent content) {
+            super(new BorderLayout());
+            add(content, BorderLayout.NORTH);
+        }
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return getGridRowHeight();
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return Math.max(getGridRowHeight(), visibleRect.height - getGridRowHeight());
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
     }
 
     private void refreshViewpoint() {

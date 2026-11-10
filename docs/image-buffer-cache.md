@@ -79,8 +79,13 @@ worker. Each source produces an `ImageBuffer`:
   unfiltered gray or RGBA image straight into the final native buffer. Gray filtering reads
   that buffer into Java arrays and produces a half-float output; `WriteBuffer.finish(filter)`
   frees the input even when filtering fails. RGBA data bypasses gray filtering.
-- `FITSSource` reads the file again for each decode and writes display pixels through a
-  `WriteBuffer`, with the same filtering and ownership transfer at `finish`.
+- `FITSSource` retains the selected header's read plan. Java maps stable input for each
+  CFITSIO read and releases the mapping after all tile-aligned workers finish. Clipping
+  reads the existing sample grid directly, without allocating the full image. Gzip input
+  is inflated once into the file cache and removed on source close; close waits for an
+  active file read and unmapping. Conversion and filtering use the Java pixel array
+  outside that lock. Display pixels use a `WriteBuffer`, with the same filtering and
+  ownership transfer at `finish`.
 - `RasterSource` uses raster arrays for gray and indexed images. Other images are converted
   to premultiplied RGBA native storage, copied into the final write buffer, and the
   conversion storage is freed in `finally`.

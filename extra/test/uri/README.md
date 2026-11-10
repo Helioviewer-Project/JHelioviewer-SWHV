@@ -1,7 +1,33 @@
-# FITS Load Benchmark
+# FITS reader checks and loading benchmark
 
-Small off-JHV harness for timing the real JHV FITS loading path on a directory of FITS files.
-The runner uses `bin:resources` plus `lib/*.jar` as the classpath, so JHV service-provider files such as the FastRice SPI are active.
+Run the Java reader checks against the bundled native library:
+
+```sh
+python3 extra/test/run_tests.py uri
+```
+
+`FITSReaderTest` checks planes and strided subsets against 13 small reference
+fixtures covering pixel types, compression formats and tile boundaries. It also
+checks deferred NTF headers, mapping cleanup, Unicode and bracketed paths,
+gzip success and failure cleanup, the CCOR2 missing-pixel clipping regression,
+and the packaged detector mask. Source checks cover image-HDU and cube-plane
+selection, selected metadata, default selection, bounds and displayed row order.
+`FITSSeriesTest` loads a two-file cube series through the production layer loader
+and checks selection across files, decoded pixels, ordering and timestamps. It
+also checks settings-driven reloads, unchanged-selection no-ops, failed-selection
+rollback and selection reset when loading a new file.
+
+To check fresh Java classes with only a candidate native library available:
+
+```sh
+python3 extra/test/uri/check_fits_reader.py /path/to/build/output --platform macos-arm64
+```
+
+See the [native FITS guide](../../cfitsio/README.md) for builds and fixture provenance.
+
+## Loading benchmark
+
+The benchmark times the production JHV FITS loading path on explicit input files.
 
 Run from the repository root:
 
@@ -40,7 +66,7 @@ Output is CSV:
 file,bytes,width,height,format,mode,filter,iteration,total_ms,checksum,status
 ```
 
-`--mode Info` opens a `FITSSource`, which reads the header and collects percentile ranges without creating image buffers. `--mode Buffer` prepares the clipping range once before timing. It then decodes through the source, so its timing includes reading pixels, conversion, and filtering. Checksums and the format column apply only to `Buffer` mode.
+`--mode Info` opens a `FITSSource`, which reads the header and collects percentile ranges without creating image buffers. `--mode Buffer` prepares a clipping range before timing. Each timed call constructs another source, including its clipping sample read, and then decodes, converts, and filters. It does not measure playback through a retained source. Checksums and the format column apply only to `Buffer` mode.
 
 For JProfiler startup recording, pass the JVM argument returned by `prepare_profiling`:
 
@@ -54,45 +80,6 @@ JHV_BENCHMARK_JVMARG='-agentpath:/path/to/libjprofilerti.jnilib=record=/path/to/
 ```
 
 The runner filters JProfiler status lines out of the CSV output and prints `JPROFILER_SNAPSHOT=...` on stderr if the agent saves a snapshot file.
-
-## Fast Rice Verifier
-
-Run the FastRice provider against nom-tam's Rice test fixtures and synthetic comparison cases:
-
-```sh
-extra/test/uri/run-fast-rice-verifier.sh ~/git/nom-tam-fits
-```
-
-If no path is given, it defaults to `~/git/nom-tam-fits`.
-
-The verifier checks service-provider selection, the raw Rice fixtures, generated integer and floating-point data,
-all combinations of 1/2/4-byte Rice encoding and byte/short/int output, with heap and direct input/output tested independently.
-Heap short/int outputs are array-backed so the matrix exercises the fast decoder as well as its fallbacks.
-Short and integer decoder boundary cases cover block transitions, every length from 1 to 256, sliced input and output, and consumed buffer positions.
-For each width, 2,000 constructed tiles cover every block code and long unary zero runs with expected pixels calculated independently of both decoders.
-These cases also check output guards and input/output positions.
-It also compares complete compressed FITS files with their uncompressed reference through JHV's FITS loader.
-Individual failures are reported without skipping subsequent cases. Any failure gives a nonzero exit status.
-
-Small quantized cases have fixed expected values and run through both JHV's provider selection and nom-tam's decoder.
-They cover no dithering, both dither modes, nulls and zeros followed by ordinary pixels, and double precision.
-The expectations include the quantization corrections and dither-sequence fixes in the bundled nom-tam version.
-
-FastRice handles short output with `BYTEPIX=2` and integer output with `BYTEPIX=4`.
-Quantized float and double output uses the fast integer decoder followed by nom-tam's reconstruction.
-The integer optimization requires heap input and output. Direct buffers and other encoded widths use upstream decoding.
-Byte output also uses the upstream provider. The width matrix and `m13_rice.fits` check these fallback paths.
-
-To check a candidate nom-tam JAR without replacing the bundled library:
-
-```sh
-JHV_NOM_TAM_JAR=/absolute/path/to/nom-tam-fits-candidate.jar \
-  extra/test/uri/run-fast-rice-verifier.sh ~/git/nom-tam-fits
-```
-
-Both runners support `JHV_NOM_TAM_JAR`. They exclude the bundled nom-tam JAR and compile all current JHV sources
-against the candidate into their temporary build directory. The verifier prints the loaded nom-tam location.
-Without this variable, the runners use the bundled library as before.
 
 ## Timeline load check
 
@@ -112,3 +99,7 @@ python3 extra/test/j2k/run_j2k_tests.py
 a successful FITS load completes true and a finished layer answers at once, a failed first load
 removes the layer and completes false, and removing a layer with a pending wait completes it
 false. It also checks empty and directory inputs and interrupted directory enumeration.
+
+FITS cube selection supports spatial axes independent of the plane axis. Cubes
+with nonzero PC1_3, PC2_3, CD1_3 or CD2_3 are rejected because the 2D WCS
+interpreter cannot represent their plane-dependent geometry.

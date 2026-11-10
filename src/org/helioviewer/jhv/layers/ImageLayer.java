@@ -36,7 +36,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage = new GLSLImage(displaySettings);
     private final FrameDecoder decoder = new FrameDecoder(processingSettings, this);
-    private final ImageLayerLoader loader = new ImageLayerLoader(this::loaded, this::loadFailed);
+    private final ImageLayerLoader loader = new ImageLayerLoader(processingSettings, this::loaded, this::loadFailed);
 
     private Frames frames;
     @Nullable
@@ -179,8 +179,9 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
         request = result.request();
         baseName = result.baseName();
         setFrames(result.frames());
-        displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
-        Layers.imageLayerLoaded(this, firstLoad);
+        if (!result.preserveSettings())
+            displaySettings.setLUT(frames.defaultLUT(), displaySettings.getInvertLUT());
+        Layers.imageLayerLoaded(this, firstLoad, result.preserveSettings());
         settleLoad();
     }
 

@@ -169,10 +169,10 @@ https://github.com/stleary/JSON-java/blob/master/LICENSE
 
 Supplemental notices: JSON.txt.
 
-lib/formats/nom-tam-fits-master-bbebf33.jar
--------------------------------------------
+lib/formats/nom-tam-fits-1.23.1.jar
+-----------------------------------
 
-Source: lib/formats/nom-tam-fits-master-bbebf33.jar!LICENSE.txt
+Source: lib/formats/nom-tam-fits-1.23.1.jar!LICENSE.txt
 
 The Unlicense
 
@@ -201,7 +201,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 
-Declared in lib/formats/nom-tam-fits-master-bbebf33.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
+Declared in lib/formats/nom-tam-fits-1.23.1.jar!META-INF/maven/gov.nasa.gsfc.heasarc/nom-tam-fits/pom.xml:
 Public Domain
 file://${project.basedir}/src/license/publicdomain/license.txt
 

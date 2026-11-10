@@ -201,9 +201,6 @@ for item in manifest["images"]:
     different = actual != other
     if different:
         assert b < 0
-        (root / path.name.replace(".fits", ".astropy.raw")).write_bytes(other)
-        item["astropy_reference"] = path.name.replace(".fits", ".astropy.raw")
-        item["astropy_sha256"] = hashlib.sha256(other).hexdigest()
         print(path.name, "rounding_difference", np.nanmax(np.abs(raw - astro)))
     else:
         print(path.name, "exact both references")

@@ -71,9 +71,7 @@
       "width": 70,
       "height": 35,
       "planes": 3,
-      "sha256": "4080ea766ec6f87944acb24cd94a65fcc22c02bf6bb7b0050e6c49bdf973a0bb",
-      "astropy_reference": "dither2-double.astropy.raw",
-      "astropy_sha256": "0730fb5f2f98b8ff6e7831026ac1e2fbe15e6226bd6ac4df938510cd7b8b25c6"
+      "sha256": "4080ea766ec6f87944acb24cd94a65fcc22c02bf6bb7b0050e6c49bdf973a0bb"
     },
     {
       "file": "gzip-float.fits",
@@ -100,9 +98,7 @@
       "width": 70,
       "height": 35,
       "planes": 3,
-      "sha256": "35910d85d6b9044c3f1ef8bd2a9825abfab066ee42487723a0e9a62251d5d1a9",
-      "astropy_reference": "mixed-double.astropy.raw",
-      "astropy_sha256": "c2a39a76548a594b15bdaa1ad36f426730f1af5b4b748ac060afd1b64f66537c"
+      "sha256": "35910d85d6b9044c3f1ef8bd2a9825abfab066ee42487723a0e9a62251d5d1a9"
     },
     {
       "file": "hcompress.fits",

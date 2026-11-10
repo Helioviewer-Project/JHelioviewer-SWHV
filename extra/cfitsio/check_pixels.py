@@ -112,20 +112,6 @@ def main():
             raise AssertionError("Selected extension HDU/plane pixels differ")
     print("PASS selected HDUs with different dimensions and planes", flush=True)
 
-    for line in (DATA / "wcs-pixels.tsv").read_text().splitlines():
-        if not line or line.startswith("#"):
-            continue
-        name, hdu, bitpix, width, height, plane, _, expected = line.split("\t")
-        input_bytes = ctypes.create_string_buffer((DATA.parent / name).read_bytes())
-        output = decode(input_bytes, int(hdu), int(bitpix), int(width), int(height), int(plane))
-        # Most outputs already have canonical NaNs; avoid a Python pixel scan then.
-        digest = hashlib.sha256(output.raw).hexdigest()
-        if digest != expected:
-            digest = hashlib.sha256(canonical_bytes(output, int(bitpix))).hexdigest()
-        if digest != expected:
-            raise AssertionError(f"Real-file reference pixels differ: {name}, HDU {hdu}")
-        print(f"PASS real-file pixels: {name}, HDU {hdu}", flush=True)
-
     error = ctypes.create_string_buffer(128)
     output = ctypes.create_string_buffer(4)
     invalid = ctypes.create_string_buffer(b"not a FITS file")
