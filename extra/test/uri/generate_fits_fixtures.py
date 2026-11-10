@@ -19,7 +19,7 @@ parser.add_argument(
 args = parser.parse_args()
 out = Path("extra/test/data/fits")
 out.mkdir(exist_ok=True)
-manifest = []
+manifest = {"astropy": astropy.__version__, "images": []}
 
 
 def add(name, data, compression=None, tile=None, **kw):
@@ -48,15 +48,9 @@ def add(name, data, compression=None, tile=None, **kw):
         fits.PrimaryHDU(data, header=h).writeto(path, overwrite=True)
         hdu = 1
     with fits.open(path, do_not_scale_image_data=True) as hdus:
-        ref = hdus[hdu - 1].data.copy()
         hdr = hdus[hdu - 1].header
         bitpix = hdr["BITPIX"]
-        # Canonicalize NaNs for reference comparison across implementations.
-        if ref.dtype.kind == "f":
-            ref[np.isnan(ref)] = np.nan
-        raw = ref.astype(ref.dtype.newbyteorder("<")).tobytes()
-        (out / (name + ".raw")).write_bytes(raw)
-        manifest.append(
+        manifest["images"].append(
             {
                 "file": path.name,
                 "hdu": hdu,
@@ -64,7 +58,6 @@ def add(name, data, compression=None, tile=None, **kw):
                 "width": data.shape[-1],
                 "height": data.shape[-2],
                 "planes": data.shape[0] if data.ndim == 3 else 1,
-                "sha256": hashlib.sha256(raw).hexdigest(),
             }
         )
 
@@ -139,13 +132,7 @@ with fits.open(out / "byte.fits") as hdus:
         name="UNCERTAINTY",
     )
     fits.HDUList([primary, second]).writeto(out / "multi.fits", overwrite=True)
-(out / "manifest.json").write_text(
-    json.dumps({"astropy": astropy.__version__, "images": manifest}, indent=2) + "\n"
-)
-print(len(manifest), "fixtures")
-
-root = Path("extra/test/data/fits")
-manifest = json.loads((root / "manifest.json").read_text())
+print(len(manifest["images"]), "fixtures")
 lib = c.CDLL(args.cfitsio_library)
 lib.ffdkopn.argtypes = [c.POINTER(c.c_void_p), c.c_char_p, c.c_int, c.POINTER(c.c_int)]
 lib.ffmahd.argtypes = [c.c_void_p, c.c_int, c.POINTER(c.c_int), c.POINTER(c.c_int)]
@@ -162,7 +149,7 @@ lib.ffgpxv.argtypes = [
 ]
 lib.ffclos.argtypes = [c.c_void_p, c.POINTER(c.c_int)]
 for item in manifest["images"]:
-    path = root / item["file"]
+    path = out / item["file"]
     f = c.c_void_p()
     s = c.c_int()
     kind = c.c_int()
@@ -191,7 +178,7 @@ for item in manifest["images"]:
     if b < 0:
         raw[np.isnan(raw)] = np.nan
     actual = raw.astype(raw.dtype.newbyteorder("<")).tobytes()
-    (root / path.name.replace(".fits", ".raw")).write_bytes(actual)
+    (out / path.name.replace(".fits", ".raw")).write_bytes(actual)
     item["sha256"] = hashlib.sha256(actual).hexdigest()
     with fits.open(path, do_not_scale_image_data=True) as hdus:
         astro = hdus[item["hdu"] - 1].data.copy().reshape(-1)
@@ -210,4 +197,4 @@ manifest["cfitsio"] = {
     "arithmetic": "-ffp-contract=off",
     "api": "fits_open_diskfile / fits_read_pix, no JHV adapter",
 }
-(root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+(out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
