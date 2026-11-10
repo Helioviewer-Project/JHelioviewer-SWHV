@@ -3,7 +3,6 @@ package org.helioviewer.jhv.source;
 import java.io.IOException;
 import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -58,9 +57,9 @@ public final class FITSReaderTest {
                 }
             }
             for (int plane = 0; plane < planes; plane++) {
-                Object pixels = FITSReader.read(path, hdu, bitpix, width, height, plane, tileRows(path, hdu, height), 1, 1);
+                float[] pixels = FITSReader.read(path, hdu, bitpix, width, height, plane, tileRows(path, hdu, height), 1, 1);
                 compare(pixels, expected, plane * width * height, bitpix, width * height);
-                Object sampled = FITSReader.read(path, hdu, bitpix, width, height, plane, 1, 3, 4);
+                float[] sampled = FITSReader.read(path, hdu, bitpix, width, height, plane, 1, 3, 4);
                 for (int y = 0, index = 0; y < height; y += 4)
                     for (int x = 0; x < width; x += 3)
                         compareOne(sampled, index++, expected, plane * width * height + y * width + x, bitpix);
@@ -70,6 +69,7 @@ public final class FITSReaderTest {
             System.out.println("PASS raw/subset planes: " + path.getFileName());
         }
         checkInfinities();
+        checkScaling();
         checkSelection();
         checkCoupledCube();
         FITSSource ccor = new FITSSource(data.getParent().resolve("CCOR2_1A_20260902T211514_V00_NC.fits").toFile());
@@ -160,6 +160,37 @@ public final class FITSReaderTest {
         System.out.println("PASS paths, gzip/error cleanup, CCOR2 clipping, and detector mask");
     }
 
+    private static void checkScaling() throws Exception {
+        Path path = Files.createTempFile("jhv-scaled-pixels-", ".fits");
+        try {
+            try (Fits fits = new Fits()) {
+                BasicHDU<?> image = Fits.makeHDU(new short[][]{{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}});
+                image.getHeader().addValue("BZERO", 10, null);
+                image.getHeader().addValue("BSCALE", -2, null);
+                image.getHeader().addValue("BLANK", 2, null);
+                fits.addHDU(image);
+                fits.write(path.toFile());
+            }
+            float[] pixels = FITSReader.read(path, 1, 16, 4, 4, 0, 4, 1, 1);
+            for (int i = 0; i < pixels.length; i++) {
+                if (i == 2 ? !Float.isNaN(pixels[i]) : pixels[i] != 10 - 2 * i)
+                    throw new AssertionError("CFITSIO scaling or integer BLANK conversion");
+            }
+            FITSData data = new FITSData(4, 4, false, null);
+            ClipSet clips = data.calculateSampledClipSet(pixels);
+            if (!new ClipSet.Range(-20, 10).equals(clips.percentile05()))
+                throw new AssertionError("Clipping must use scaled finite pixels");
+            float[] extremes = {Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY,
+                    -3e9f, (float) Integer.MIN_VALUE, -2e9f, -1e9f, 0, 1, 2, 3, 4, 5, Float.MAX_VALUE};
+            clips = data.calculateSampledClipSet(extremes);
+            if (!new ClipSet.Range(-3e9f, Float.MAX_VALUE).equals(clips.percentile05()))
+                throw new AssertionError("Finite values must not collide with undefined-pixel sentinels");
+        } finally {
+            Files.delete(path);
+        }
+        System.out.println("PASS scaled float pixels, BLANK and finite-only clipping");
+    }
+
     private static void checkInfinities() throws Exception {
         for (boolean wide : new boolean[]{false, true}) {
             Path path = Files.createTempFile("jhv-infinite-pixels-", ".fits");
@@ -173,10 +204,10 @@ public final class FITSReaderTest {
                     fits.addHDU(image);
                     fits.write(path.toFile());
                 }
-                Object actual = FITSReader.read(path, 1, wide ? -64 : -32, 4, 1, 0, 1, 1, 1);
-                if (!Double.isNaN(((Number) Array.get(actual, 0)).doubleValue())
-                        || ((Number) Array.get(actual, 1)).doubleValue() != Double.POSITIVE_INFINITY
-                        || ((Number) Array.get(actual, 2)).doubleValue() != Double.NEGATIVE_INFINITY)
+                float[] actual = FITSReader.read(path, 1, wide ? -64 : -32, 4, 1, 0, 1, 1, 1);
+                if (!Float.isNaN(actual[0])
+                        || actual[1] != Float.POSITIVE_INFINITY
+                        || actual[2] != Float.NEGATIVE_INFINITY)
                     throw new AssertionError("Reader must preserve NaN and both infinity signs");
                 FITSSource source = new FITSSource(path.toFile());
                 try {
@@ -292,23 +323,23 @@ public final class FITSReaderTest {
         }
     }
 
-    private static void compare(Object actual, ByteBuffer expected, int first, int bitpix, int count) {
+    private static void compare(float[] actual, ByteBuffer expected, int first, int bitpix, int count) {
         for (int i = 0; i < count; i++)
             compareOne(actual, i, expected, first + i, bitpix);
     }
 
-    private static void compareOne(Object actual, int index, ByteBuffer expected, int offset, int bitpix) {
-        boolean equal = switch (bitpix) {
-            case 8 -> ((byte[]) actual)[index] == expected.get(offset);
-            case 16 -> ((short[]) actual)[index] == expected.getShort(offset * 2);
-            case 32 -> ((int[]) actual)[index] == expected.getInt(offset * 4);
-            case 64 -> ((long[]) actual)[index] == expected.getLong(offset * 8);
-            case -32 -> Float.floatToIntBits(((float[]) actual)[index]) == Float.floatToIntBits(expected.getFloat(offset * 4));
-            case -64 -> Double.doubleToLongBits(((double[]) actual)[index]) == Double.doubleToLongBits(expected.getDouble(offset * 8));
-            default -> false;
+    private static void compareOne(float[] actual, int index, ByteBuffer expected, int offset, int bitpix) {
+        float value = switch (bitpix) {
+            case 8 -> expected.get(offset) & 0xFF;
+            case 16 -> expected.getShort(offset * 2);
+            case 32 -> expected.getInt(offset * 4);
+            case 64 -> expected.getLong(offset * 8);
+            case -32 -> expected.getFloat(offset * 4);
+            case -64 -> (float) expected.getDouble(offset * 8);
+            default -> throw new AssertionError("Unsupported BITPIX");
         };
-        if (!equal)
-            throw new AssertionError("Pixel " + offset + " differs for BITPIX " + bitpix + (bitpix == -64 ? ": actual=" + ((double[]) actual)[index] + " expected=" + expected.getDouble(offset * 8) : ""));
+        if (Float.floatToIntBits(actual[index]) != Float.floatToIntBits(value))
+            throw new AssertionError("Pixel " + offset + " differs for BITPIX " + bitpix);
     }
 
     private static String digest(byte[] pixels) throws Exception {

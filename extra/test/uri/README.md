@@ -8,10 +8,13 @@ python3 extra/test/run_tests.py uri
 
 `FITSReaderTest` checks planes and strided subsets against 13 small reference
 fixtures covering pixel types, compression formats and tile boundaries. It also
-checks deferred NTF headers, mapping cleanup, Unicode and bracketed paths,
+checks native BZERO/BSCALE and BLANK conversion, finite-only clipping,
+infinity preservation and upper-level display, deferred NTF headers, mapping cleanup, Unicode and bracketed paths,
 gzip success and failure cleanup, the CCOR2 missing-pixel clipping regression,
 and the packaged detector mask. Source checks cover image-HDU and cube-plane
 selection, selected metadata, default selection, bounds and displayed row order.
+Image reads return floats; byte images retain the linear Gray8 display path.
+Packaged masks remain raw bytes.
 `FITSSeriesTest` loads a two-file cube series through the production layer loader
 and checks selection across files, decoded pixels, ordering and timestamps. It
 also checks direct selection reloads, busy/unchanged-selection no-ops, retention

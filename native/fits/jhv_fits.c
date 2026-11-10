@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
+#include <float.h>
 #include "fitsio2.h"
 
 #ifdef _WIN32
@@ -11,8 +13,8 @@
 #define JHV_EXPORT __attribute__((visibility("default")))
 #endif
 
-_Static_assert(sizeof(int) == 4 && sizeof(short) == 2 && sizeof(LONGLONG) == 8,
-               "FITS pixel types must match the Java layouts");
+_Static_assert(sizeof(float) == 4 && sizeof(double) == 8,
+               "FITS floating-point types must match the Java layouts");
 
 JHV_EXPORT int jhv_fits_init(void) {
     if (!fits_is_reentrant() || fits_init_cfitsio())
@@ -22,23 +24,14 @@ JHV_EXPORT int jhv_fits_init(void) {
 }
 
 /* Caller owns input and output until return. No native handle escapes this call. */
-JHV_EXPORT int jhv_fits_read(const void *input, int64_t input_length,
+static int read_pixels(const void *input, int64_t input_length,
         int32_t hdu, int32_t bitpix, int32_t width, int32_t height, int32_t plane,
         int32_t firstrow, int32_t rows, int32_t stepx, int32_t stepy,
-        void *output, int64_t capacity, char *error) {
+        void *output, int64_t capacity, char *error, int datatype) {
     fitsfile *file = NULL;
     int status = 0, type = 0, axes = 0, actual = 0, anynull = 0;
     long dimensions[3] = {0, 0, 0};
-    int size, datatype;
-    switch (bitpix) {
-        case 8: size = 1; datatype = TBYTE; break;
-        case 16: size = 2; datatype = TSHORT; break;
-        case 32: size = 4; datatype = TINT; break;
-        case 64: size = 8; datatype = TLONGLONG; break;
-        case -32: size = 4; datatype = TFLOAT; break;
-        case -64: size = 8; datatype = TDOUBLE; break;
-        default: snprintf(error, 128, "Unsupported BITPIX"); return -1;
-    }
+    int size = datatype == TBYTE ? 1 : sizeof(float);
     if (!input || input_length <= 0 || !output || hdu < 1 || width <= 0 || height <= 0 ||
             plane < 0 || firstrow < 0 || rows <= 0 || firstrow > height - rows ||
             stepx <= 0 || stepy <= 0 || capacity < 0) {
@@ -62,11 +55,10 @@ JHV_EXPORT int jhv_fits_read(const void *input, int64_t input_length,
             dimensions[1] != height || actual != bitpix ||
             (axes == 2 && plane != 0) || (axes == 3 && plane >= dimensions[2])))
         status = BAD_DIMEN;
-    /* Java retains the existing BLANK and BZERO/BSCALE conversion policy. */
-    if (!status) fits_set_bscale(file, 1.0, 0.0, &status);
+    // Byte images retain their existing raw display values, as do detector masks.
+    if (!status && bitpix == 8) fits_set_bscale(file, 1.0, 0.0, &status);
     float fnan = NAN;
-    double dnan = NAN;
-    void *nulval = NULL;
+    void *nulval = datatype == TFLOAT && bitpix > 8 ? &fnan : NULL;
     if (!status && bitpix < 0 && fits_is_compressed_image(file, &status)) {
         int column, scale_status = 0, zero_status = 0, quantize_status = 0;
         char quantize[FLEN_VALUE];
@@ -76,22 +68,51 @@ JHV_EXPORT int jhv_fits_read(const void *input, int64_t input_length,
         // Quantized pixels need null substitution; IEEE pixels must retain infinities.
         if ((scale_status == 0 || zero_status == 0) &&
                 (quantize_status != 0 || strcmp(quantize, "NONE") != 0))
-            nulval = bitpix == -32 ? (void *)&fnan : (void *)&dnan;
+            nulval = &fnan;
     }
+    // CFITSIO's double-to-float conversion reports IEEE infinities as overflow.
+    // Read IEEE doubles unchanged, then narrow them without losing their meaning.
+    double *wide = NULL;
+    if (!status && bitpix == -64 && nulval == NULL) {
+        if ((uint64_t)count > SIZE_MAX / sizeof(double) || !(wide = malloc((size_t)count * sizeof(double))))
+            status = MEMORY_ALLOCATION;
+    }
+    void *pixels = wide ? (void *)wide : output;
+    int read_type = wide ? TDOUBLE : datatype;
     long first[3] = {1, (long)firstrow + 1, (long)plane + 1};
     if (!status) {
         if (stepx == 1 && stepy == 1) {
-            fits_read_pix(file, datatype, first, count, nulval, output, &anynull, &status);
+            fits_read_pix(file, read_type, first, count, nulval, pixels, &anynull, &status);
         } else {
             long last[3] = {width, (long)firstrow + rows, (long)plane + 1};
             long inc[3] = {stepx, stepy, 1};
-            fits_read_subset(file, datatype, first, last, inc, nulval, output, &anynull, &status);
+            fits_read_subset(file, read_type, first, last, inc, nulval, pixels, &anynull, &status);
         }
     }
+    if (!status && wide) {
+        for (int64_t i = 0; i < count; i++)
+            ((float *)output)[i] = wide[i] > FLT_MAX ? INFINITY
+                    : wide[i] < -FLT_MAX ? -INFINITY : (float)wide[i];
+    }
+    free(wide);
     int close_status = 0;
     if (file) fits_close_file(file, &close_status);
     if (!status) status = close_status;
     /* The process-wide CFITSIO message stack is deliberately not consumed. */
     if (status) fits_get_errstatus(status, error);
     return status;
+}
+
+JHV_EXPORT int jhv_fits_read_float(const void *input, int64_t input_length,
+        int32_t hdu, int32_t bitpix, int32_t width, int32_t height, int32_t plane,
+        int32_t firstrow, int32_t rows, int32_t stepx, int32_t stepy,
+        void *output, int64_t capacity, char *error) {
+    return read_pixels(input, input_length, hdu, bitpix, width, height, plane,
+            firstrow, rows, stepx, stepy, output, capacity, error, TFLOAT);
+}
+
+JHV_EXPORT int jhv_fits_read_mask(const void *input, int64_t input_length,
+        int32_t width, int32_t height, void *output, int64_t capacity, char *error) {
+    return read_pixels(input, input_length, 1, 8, width, height, 0,
+            0, height, 1, 1, output, capacity, error, TBYTE);
 }

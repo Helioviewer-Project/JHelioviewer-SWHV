@@ -40,7 +40,7 @@ no bundled reader substitutes for it.
 
 The checks compare all planes, subsets and row bands against 13 committed
 CFITSIO/Astropy fixtures. They cover integer types, Rice, gzip, HCOMPRESS, PLIO, quantized float
-and double cubes, zero/null markers, tile edges, concurrent first-use quantized
+and double cubes, BZERO/BSCALE, BLANK, IEEE values, raw masks, tile edges, concurrent first-use quantized
 reads, malformed input, invalid HDUs and insufficient output capacity. Reference
 pixels come from the released CFITSIO C API, independently of this adapter.
 See [fixture provenance](../test/data/fits/README.md). These are native-library
@@ -88,24 +88,31 @@ artifact first, so a failed retry leaves no stale success package.
 Call it before starting reads. It returns zero on success, nonzero on failure.
 There is no adapter-version negotiation.
 
-`jhv_fits_read()` accepts caller-owned input memory and output storage. HDUs are
+`jhv_fits_read_float()` accepts caller-owned input memory and output storage. HDUs are
 one-based; planes and rows are zero-based. It reads the requested plane, row band
 or strided subset. The caller supplies dimensions, BITPIX, output capacity in
 bytes and a 128-byte error buffer. Input must remain stable until the call returns.
 
 Each read opens CFITSIO's read-only memory-file driver and closes its handle before
 returning. No filesystem path or persistent native handle crosses the interface.
-Integer BLANK and BZERO/BSCALE conversion remains the caller's responsibility.
-CFITSIO reconstructs quantized floating-point pixels and substitutes NaN for
-quantized nulls. Non-quantized images preserve IEEE values, including both signs
-of infinity, for Java to interpret. The adapter reports status text without
-consuming CFITSIO's shared error-message stack.
+Image output is always native-endian float32. Byte images retain raw values for
+JHV's existing linear byte display. For other pixel types, CFITSIO applies
+BZERO/BSCALE and converts integer BLANK and quantized nulls to NaN. For IEEE
+floating images, null substitution is disabled so CFITSIO's scaling result,
+including NaN and infinities, reaches Java. IEEE doubles are read
+as doubles before narrowing, because CFITSIO's direct float conversion rejects
+infinities as overflow. Double-to-float overflow becomes signed infinity.
+
+`jhv_fits_read_mask()` reads a two-dimensional primary byte image into raw byte
+storage. It bypasses BZERO/BSCALE and BLANK interpretation for detector masks.
+
+The adapter reports status text without consuming CFITSIO's shared error-message stack.
 
 ## Application input ownership
 
 `FITSSource` uses released NTF 1.23.1 for headers and CFITSIO for image pixels.
 Header scans are file-backed and leave payloads deferred. The selected HDU,
-dimensions, pixel type, scaling and tile height are captured once. Decodes map
+dimensions, pixel type and tile height are captured once. Decodes map
 the input through Java's file API, join all workers, and unmap before returning.
 Workers split at tile boundaries so a tile is not decompressed by multiple bands.
 

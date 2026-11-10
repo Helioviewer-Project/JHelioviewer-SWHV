@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.source;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -14,25 +13,22 @@ import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
 
-record FITSData(int width, int height, boolean hasBlank, long blank,
-                double bzero, double bscale, @Nullable ClipSet.Range headerRange) {
+record FITSData(int width, int height, boolean byteImage, @Nullable ClipSet.Range headerRange) {
 
-    private static final int BAD_PIXEL = Integer.MIN_VALUE;
     private static final int MIN_SAMPLES = 10;
     private static final int SCALE_LOOKUP_SIZE = 1 << 16;
-    private static final int RAW_SHORT_LOOKUP_SIZE = 1 << Short.SIZE;
     private static final short HALF_FLOAT_ZERO = Float.floatToFloat16(0f);
     private static final short HALF_FLOAT_ONE = Float.floatToFloat16(1f);
 
-    ImageBuffer decode(Object pixels, ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
+    ImageBuffer decode(float[] pixels, ImageFilter filter, ImageProcessingSettings.FITSParameters state, @Nullable ClipSet.Range clipRange) throws Exception {
         ClipSet.Range range = headerRange != null ? headerRange : clipRange;
-        ImageBuffer.Format format = pixels instanceof byte[] || range == null ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.Gray16F;
+        ImageBuffer.Format format = byteImage || range == null ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.Gray16F;
         try (ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, format)) {
-            if (pixels instanceof byte[] inData) {
-                ByteBuffer outData = outBuffer.byteBuffer();
-                for (int j = 0; j < height; j++) {
-                    outData.put(width * (height - 1 - j), inData, width * j, width);
-                }
+            if (byteImage) {
+                ByteBuffer output = outBuffer.byteBuffer();
+                for (int y = 0; y < height; y++)
+                    for (int x = 0; x < width; x++)
+                        output.put(width * (height - 1 - y) + x, (byte) pixels[width * y + x]);
             } else if (range == null) {
                 outBuffer.clearPixels();
             } else {
@@ -46,138 +42,34 @@ record FITSData(int width, int height, boolean hasBlank, long blank,
         }
     }
 
-    ClipSet calculateSampledClipSet(Object samples) {
-        int length = Array.getLength(samples);
-        float[] values = new float[length];
+    ClipSet calculateSampledClipSet(float[] samples) {
         int count = 0;
-        for (int i = 0; i < length; i++) {
-            float value = samplePixel(samples, i);
-            if (value != BAD_PIXEL && value != Float.MAX_VALUE)
-                values[count++] = value;
+        for (float value : samples) {
+            if (Float.isFinite(value))
+                samples[count++] = value;
         }
         if (count < MIN_SAMPLES)
             return new ClipSet(null, null);
-        Arrays.sort(values, 0, count);
-        return new ClipSet(percentileRange(values, count, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
-                percentileRange(values, count, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
+        Arrays.sort(samples, 0, count);
+        return new ClipSet(percentileRange(samples, count, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
+                percentileRange(samples, count, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
     }
 
-    private float samplePixel(Object pixels, int index) {
-        return switch (pixels) {
-            case short[] data -> hasBlank && data[index] == (short) blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
-            case int[] data -> hasBlank && data[index] == (int) blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
-            case long[] data -> hasBlank && data[index] == blank ? BAD_PIXEL : (float) (bzero + data[index] * bscale);
-            case float[] data -> floatPixel(data[index], bzero, bscale);
-            case double[] data -> floatPixel(data[index], bzero, bscale);
-            default -> throw new IllegalArgumentException("Unknown FITS sample type");
-        };
-    }
-
-    private short[] rawShortToHalfFloat(float min, double toUnit, NormalizedMapping mapping) {
-        short[] values = new short[RAW_SHORT_LOOKUP_SIZE];
-
-        for (int i = 0; i < values.length; i++) {
-            short raw = (short) i;
-            float v = (hasBlank && raw == (short) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-            // sampling may have missed extremes
-            values[i] = mapNormalizedToHalfFloat((v - min) * toUnit, mapping);
-        }
-        return values;
-    }
-
-    private void convertPixels(Object pixels, ShortBuffer outData, float min, float max, ImageProcessingSettings.FITSParameters state) throws Exception {
+    private void convertPixels(float[] pixels, ShortBuffer outData, float min, float max, ImageProcessingSettings.FITSParameters state) throws Exception {
         float range = max - min;
-        double toUnit = 1. / range;
         double toIndex = SCALE_LOOKUP_SIZE / (double) range;
-        NormalizedMapping mapping = normalizedMapping(state, range);
-
-        final boolean identity = bzero == 0.0 && bscale == 1.0; // hope HotSpot can generate a fast path
-        switch (pixels) {
-            case short[] inData -> {
-                short[] values = rawShortToHalfFloat(min, toUnit, mapping);
-                ParallelRange.run(height, (from, to) -> {
-                    for (int j = from; j < to; j++) {
-                        int inLine = width * j;
-                        int outLine = width * (height - 1 - j);
-
-                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            outData.put(outIdx, values[inData[inLine + i] & 0xFFFF]);
-                        }
-                    }
-                });
+        NormalizedLookup lookup = normalizedLookup(normalizedMapping(state, range));
+        ParallelRange.run(height, (from, to) -> {
+            for (int j = from; j < to; j++) {
+                int inLine = width * j;
+                int outLine = width * (height - 1 - j);
+                for (int i = 0; i < width; i++) {
+                    float value = pixels[inLine + i];
+                    outData.put(outLine + i, Float.isInfinite(value) ? HALF_FLOAT_ONE
+                            : lookup.mapIndex((value - min) * toIndex));
+                }
             }
-            case int[] inData -> {
-                NormalizedLookup lookup = normalizedLookup(mapping);
-                ParallelRange.run(height, (from, to) -> {
-                    for (int j = from; j < to; j++) {
-                        int inLine = width * j;
-                        int outLine = width * (height - 1 - j);
-
-                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            int raw = inData[inLine + i];
-                            float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : identity ? (float) raw : (float) (bzero + raw * bscale);
-                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
-                        }
-                    }
-                });
-            }
-            case long[] inData -> {
-                NormalizedLookup lookup = normalizedLookup(mapping);
-                ParallelRange.run(height, (from, to) -> {
-                    for (int j = from; j < to; j++) {
-                        int inLine = width * j;
-                        int outLine = width * (height - 1 - j);
-
-                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            long raw = inData[inLine + i];
-                            float v = (hasBlank && raw == blank) ? BAD_PIXEL : identity ? (float) raw : (float) (bzero + raw * bscale);
-                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
-                        }
-                    }
-                });
-            }
-            case float[] inData -> {
-                NormalizedLookup lookup = normalizedLookup(mapping);
-                ParallelRange.run(height, (from, to) -> {
-                    for (int j = from; j < to; j++) {
-                        int inLine = width * j;
-                        int outLine = width * (height - 1 - j);
-
-                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            float raw = inData[inLine + i];
-                            float v = Float.isNaN(raw) ? BAD_PIXEL : Float.isInfinite(raw) ? Float.MAX_VALUE : identity ? raw : (float) (bzero + raw * bscale);
-                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
-                        }
-                    }
-                });
-            }
-            case double[] inData -> {
-                NormalizedLookup lookup = normalizedLookup(mapping);
-                ParallelRange.run(height, (from, to) -> {
-                    for (int j = from; j < to; j++) {
-                        int inLine = width * j;
-                        int outLine = width * (height - 1 - j);
-
-                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            double raw = inData[inLine + i];
-                            float v = Double.isNaN(raw) ? BAD_PIXEL : Double.isInfinite(raw) ? Float.MAX_VALUE : identity ? (float) raw : (float) (bzero + raw * bscale);
-                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
-                        }
-                    }
-                });
-            }
-            default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
-        }
-    }
-
-    private static float floatPixel(double v, double bzero, double bscale) {
-        if (Double.isNaN(v)) {
-            return BAD_PIXEL;
-        } else if (Double.isInfinite(v)) {
-            return Float.MAX_VALUE;
-        } else {
-            return (float) (bzero + v * bscale);
-        }
+        });
     }
 
     private static ClipSet.Range percentileRange(float[] values, int length, double percentile) {
@@ -207,7 +99,7 @@ record FITSData(int width, int height, boolean hasBlank, long blank,
 
         for (int i = 0; i < values.length; i++) {
             double x = (i + .5) / SCALE_LOOKUP_SIZE;
-            values[i] = mapNormalizedToHalfFloat(x, mapping);
+            values[i] = Float.floatToFloat16((float) Math.clamp(mapping.map(x), 0, 1));
         }
         return new NormalizedLookup(values);
     }
@@ -229,15 +121,5 @@ record FITSData(int width, int height, boolean hasBlank, long blank,
                 yield x -> scale * Math.log1p(x * alpha);
             }
         };
-    }
-
-    private static short mapNormalizedToHalfFloat(double x, NormalizedMapping mapping) {
-        if (!(x > 0)) {
-            return HALF_FLOAT_ZERO;
-        }
-        if (x >= 1) {
-            return HALF_FLOAT_ONE;
-        }
-        return Float.floatToFloat16((float) Math.clamp(mapping.map(x), 0, 1));
     }
 }

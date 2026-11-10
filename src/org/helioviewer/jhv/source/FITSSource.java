@@ -28,7 +28,6 @@ import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.ImageHDU;
-import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
@@ -106,16 +105,10 @@ public final class FITSSource implements Source {
             if (bitpix != 8 && bitpix != 16 && bitpix != 32 && bitpix != 64 && bitpix != -32 && bitpix != -64)
                 throw new IllegalArgumentException("Unsupported FITS BITPIX: " + bitpix);
             tileRows = Math.clamp(selectedTileRows, 1, height);
-            boolean hasBlank = header.containsKey(Standard.BLANK);
-            long blank = hasBlank ? header.getLongValue(Standard.BLANK) : 0;
-            double bzero = header.getDoubleValue(Standard.BZERO, 0);
-            double bscale = header.getDoubleValue(Standard.BSCALE, 1);
-            if (bitpix != 8 && (!Double.isFinite(bzero) || !Double.isFinite(bscale)))
-                throw new IllegalArgumentException("Invalid FITS BZERO/BSCALE");
             float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
             float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
             ClipSet.Range headerRange = min == Float.MAX_VALUE || max == Float.MAX_VALUE ? null : new ClipSet.Range(min, max);
-            data = new FITSData(width, height, hasBlank, blank, bzero, bscale, headerRange);
+            data = new FITSData(width, height, bitpix == 8, headerRange);
             planeName = header.getStringValue("OBSLAYR" + (selection.plane() + 1));
             xml = getHeaderAsXML(header);
             levels = new ResolutionSet(new ImageGrid[]{new ImageGrid(0, width, height)}, 1);
@@ -195,7 +188,7 @@ public final class FITSSource implements Source {
     @Override
     public ImageBuffer decode(int frame, int level, ImageFilter filter,
                               @Nullable ImageProcessingSettings.FITSParameters fits, @Nullable ClipSet.Range clip) throws Exception {
-        Object pixels;
+        float[] pixels;
         synchronized (this) {
             if (closed)
                 throw new IllegalStateException("FITS source is closed");
@@ -218,7 +211,7 @@ public final class FITSSource implements Source {
         }
     }
 
-    private Object readPixels(int stepX, int stepY) throws Exception {
+    private float[] readPixels(int stepX, int stepY) throws Exception {
         return FITSReader.read(path, selection.hdu() + 1, bitpix, data.width(), data.height(), selection.plane(), tileRows, stepX, stepY);
     }
 

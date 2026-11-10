@@ -23,6 +23,7 @@ import org.lwjgl.system.LibraryResource;
 public final class FITSReader {
 
     private static final MethodHandle read;
+    private static final MethodHandle readMask;
 
     static {
         if (Platform.getResourceDir() == null)
@@ -38,14 +39,18 @@ public final class FITSReader {
         } catch (Throwable e) {
             throw new ExceptionInInitializerError(e);
         }
-        read = Linker.nativeLinker().downcallHandle(library.find("jhv_fits_read").orElseThrow(),
+        read = Linker.nativeLinker().downcallHandle(library.find("jhv_fits_read_float").orElseThrow(),
                 FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
+        readMask = Linker.nativeLinker().downcallHandle(library.find("jhv_fits_read_mask").orElseThrow(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                        ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
     }
 
-    static Object read(Path path, int hdu, int bitpix, int width, int height, int plane,
+    static float[] read(Path path, int hdu, int bitpix, int width, int height, int plane,
                        int tileRows, int stepX, int stepY) throws IOException, InterruptedException {
         if (Thread.currentThread().isInterrupted())
             throw new InterruptedException();
@@ -53,8 +58,7 @@ public final class FITSReader {
             // Inputs remain stable during reads. Arena closure unmaps before the channel closes.
             MemorySegment input = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size(), arena);
             int count = Math.multiplyExact((width - 1) / stepX + 1, (height - 1) / stepY + 1);
-            int pixelBytes = Math.abs(bitpix) / 8;
-            MemorySegment output = arena.allocate(Math.multiplyExact((long) count, pixelBytes), 8);
+            MemorySegment output = arena.allocate(Math.multiplyExact((long) count, Float.BYTES), Float.BYTES);
             if (stepX != 1 || stepY != 1) {
                 invoke(input, hdu, bitpix, width, height, plane, 0, height, stepX, stepY, output);
             } else {
@@ -65,8 +69,8 @@ public final class FITSReader {
                 ParallelRange.run(tiles, (from, to) -> {
                     int first = from * tileRows;
                     int last = (int) Math.min((long) to * tileRows, height);
-                    long offset = (long) first * width * pixelBytes;
-                    long bytes = (long) (last - first) * width * pixelBytes;
+                    long offset = (long) first * width * Float.BYTES;
+                    long bytes = (long) (last - first) * width * Float.BYTES;
                     // Join every worker before releasing the shared arena, including on failure.
                     try {
                         invoke(input, hdu, bitpix, width, height, plane, first, last - first, 1, 1,
@@ -84,7 +88,7 @@ public final class FITSReader {
             }
             if (Thread.currentThread().isInterrupted())
                 throw new InterruptedException();
-            return array(output, bitpix);
+            return output.toArray(ValueLayout.JAVA_FLOAT);
         }
     }
 
@@ -93,8 +97,16 @@ public final class FITSReader {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment input = arena.allocateFrom(ValueLayout.JAVA_BYTE, bytes);
             MemorySegment output = arena.allocate(Math.multiplyExact(width, height));
-            invoke(input, 1, 8, width, height, 0, 0, height, 1, 1, output);
+            MemorySegment error = arena.allocate(128);
+            int status = (int) readMask.invokeExact(input, input.byteSize(), width, height,
+                    output, output.byteSize(), error);
+            if (status != 0)
+                throw new IllegalArgumentException("CFITSIO " + status + ": " + error.getString(0));
             return output.toArray(ValueLayout.JAVA_BYTE);
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -111,18 +123,6 @@ public final class FITSReader {
         } catch (Throwable e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private static Object array(MemorySegment pixels, int bitpix) {
-        return switch (bitpix) {
-            case 8 -> pixels.toArray(ValueLayout.JAVA_BYTE);
-            case 16 -> pixels.toArray(ValueLayout.JAVA_SHORT);
-            case 32 -> pixels.toArray(ValueLayout.JAVA_INT);
-            case 64 -> pixels.toArray(ValueLayout.JAVA_LONG);
-            case -32 -> pixels.toArray(ValueLayout.JAVA_FLOAT);
-            case -64 -> pixels.toArray(ValueLayout.JAVA_DOUBLE);
-            default -> throw new IllegalArgumentException("Unsupported FITS BITPIX: " + bitpix);
-        };
     }
 
     private FITSReader() {}
