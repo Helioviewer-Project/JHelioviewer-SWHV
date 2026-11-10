@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -68,9 +67,10 @@ public final class MenuBar extends JMenuBar {
 
         viewMenu.add(new Actions.SeparateMultiviewZoom());
 
-        JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
-        white.addItemListener(e -> {
-            Display.whiteBackground = white.getState();
+        JMenuItem white = new JMenuItem(Display.whiteBackground ? "Use Black Background" : "Use White Background");
+        white.addActionListener(e -> {
+            Display.whiteBackground = !Display.whiteBackground;
+            white.setText(Display.whiteBackground ? "Use Black Background" : "Use White Background");
             DisplayController.display();
         });
         viewMenu.add(white);
