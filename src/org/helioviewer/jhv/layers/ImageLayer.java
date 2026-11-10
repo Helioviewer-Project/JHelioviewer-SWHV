@@ -36,7 +36,7 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
     private final ImageProcessingSettings processingSettings = new ImageProcessingSettings(this::refreshImage);
     private final GLSLImage glImage = new GLSLImage(displaySettings);
     private final FrameDecoder decoder = new FrameDecoder(processingSettings, this);
-    private final ImageLayerLoader loader = new ImageLayerLoader(processingSettings, this::loaded, this::loadFailed);
+    private final ImageLayerLoader loader = new ImageLayerLoader(this::loaded, this::loadFailed);
 
     private Frames frames;
     @Nullable
@@ -139,6 +139,13 @@ public class ImageLayer extends AbstractLayer implements FrameDecoder.Target, Fr
 
         loader.load(uris);
         Layers.fireLayerUpdated(this); // give feedback asap
+    }
+
+    public void selectFITS(ImageProcessingSettings.FITSSelection selection) {
+        if (removed)
+            return;
+        loader.select(selection);
+        Layers.fireLayerUpdated(this);
     }
 
     private void loadFailed() {

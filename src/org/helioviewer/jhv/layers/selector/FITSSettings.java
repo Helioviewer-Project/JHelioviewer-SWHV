@@ -12,6 +12,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.DoubleConsumer;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -28,7 +29,6 @@ import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.layers.Frames;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.source.FITSSource;
 
 @SuppressWarnings("serial")
@@ -37,6 +37,7 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
     private final ImageLayer layer;
     private final ImageProcessingSettings state;
     private boolean syncing;
+    private @Nullable ImageProcessingSettings.FITSSelection selection;
     private final JLabel hduLabel = new JLabel("HDU", JLabel.RIGHT);
     private final JComboBox<FITSSource.Image> hduChoice = new JComboBox<>();
     private final JSpinner planeChoice = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
@@ -152,15 +153,13 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
         ((JSpinner.DefaultEditor) planeChoice.getEditor()).getTextField().setColumns(3);
         hduChoice.addActionListener(e -> {
             if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image
-                    && state.fitsSelection() != null && image.hdu() != state.fitsSelection().hdu()) {
-                state.setFITSSelection(new ImageProcessingSettings.FITSSelection(image.hdu(), 0));
-                Layers.fireLayerUpdated(layer);
+                    && selection != null && image.hdu() != selection.hdu()) {
+                layer.selectFITS(new ImageProcessingSettings.FITSSelection(image.hdu(), 0));
             }
         });
         planeChoice.addChangeListener(e -> {
             if (!syncing && hduChoice.getSelectedItem() instanceof FITSSource.Image image) {
-                state.setFITSSelection(new ImageProcessingSettings.FITSSelection(image.hdu(), ((Number) planeChoice.getValue()).intValue() - 1));
-                Layers.fireLayerUpdated(layer);
+                layer.selectFITS(new ImageProcessingSettings.FITSSelection(image.hdu(), ((Number) planeChoice.getValue()).intValue() - 1));
             }
         });
         JLabel clippingLabel = new JLabel("Clipping", JLabel.RIGHT);
@@ -229,6 +228,7 @@ public final class FITSSettings extends JPanel implements ImageProcessingSetting
                     break;
                 }
             }
+            selection = source == null ? null : source.selection();
             List<FITSSource.Image> available = source == null ? List.of() : source.images();
             if (!images.equals(available)) {
                 images = available;
