@@ -25,8 +25,8 @@ class CommonMetaData implements MetaData {
     protected float innerRadius = 0;
     protected float outerRadius = Float.POSITIVE_INFINITY;
 
-    protected float sector0 = 0;
-    protected float sector1 = 0;
+    protected float sectorMaskCenter;
+    protected float sectorMaskHalfWidth;
 
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = Float.POSITIVE_INFINITY;
@@ -88,13 +88,13 @@ class CommonMetaData implements MetaData {
     }
 
     @Override
-    public float getSector0() {
-        return sector0;
+    public float getSectorMaskCenter() {
+        return sectorMaskCenter;
     }
 
     @Override
-    public float getSector1() {
-        return sector1;
+    public float getSectorMaskHalfWidth() {
+        return sectorMaskHalfWidth;
     }
 
     @Override

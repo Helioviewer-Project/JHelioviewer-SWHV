@@ -531,7 +531,7 @@ public final class SidebarTest {
                         controlNamed(editor, "Sharpen"), controlNamed(editor, "Levels"),
                         controlNamed(editor, "Color"), controlNamed(editor, "Channels"), controlNamed(editor, "Filter"));
                 List<Component> advanced = List.of(controlNamed(editor, "Slit"), controlNamed(editor, "Mask"),
-                        controlNamed(editor, "Sector"), controlNamed(editor, "Opening"), controlNamed(editor, "δCROTA"),
+                        controlNamed(editor, "PA"), controlNamed(editor, "Width"), controlNamed(editor, "δCROTA"),
                         controlNamed(editor, "δCRVAL1"), controlNamed(editor, "δCRVAL2"));
                 for (int width : new int[]{350, 500}) {
                     editor.setSize(width, editor.getPreferredSize().height);

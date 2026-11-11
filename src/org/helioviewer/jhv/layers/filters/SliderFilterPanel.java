@@ -49,16 +49,16 @@ public final class SliderFilterPanel {
         return create("Sharpen ", -1, 1, settings.getSharpen(), 100, SliderFilterPanel::formatPercent, settings::setSharpen);
     }
 
-    public static FilterDetails sector(ImageLayer layer) {
+    public static FilterDetails sectorPositionAngle(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        return create("Sector", -180, 180, settings.getSectorCenter(), 1, SliderFilterPanel::formatWholeDegree,
+        return create("PA", 0, 360, settings.getSectorPositionAngle(), 1, SliderFilterPanel::formatWholeDegree,
                 value -> settings.setSector(value, settings.getSectorWidth()));
     }
 
     public static FilterDetails sectorWidth(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        return create("Opening", 0, 360, settings.getSectorWidth(), 1, SliderFilterPanel::formatWholeDegree,
-                value -> settings.setSector(settings.getSectorCenter(), value));
+        return create("Width", 0, 360, settings.getSectorWidth(), 1, SliderFilterPanel::formatWholeDegree,
+                value -> settings.setSector(settings.getSectorPositionAngle(), value));
     }
 
     private static String formatWholeDegree(double value) {

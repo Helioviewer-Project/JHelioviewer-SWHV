@@ -22,9 +22,9 @@ public interface MetaData {
 
     float getResponseFactor();
 
-    float getSector0();
+    float getSectorMaskCenter();
 
-    float getSector1();
+    float getSectorMaskHalfWidth();
 
     float getInnerRadius();
 

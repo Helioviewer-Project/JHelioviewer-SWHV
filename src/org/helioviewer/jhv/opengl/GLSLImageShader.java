@@ -164,7 +164,7 @@ public final class GLSLImageShader extends GLSLScreenShader {
                             float shWidth, float shHeight, float shWeight, int isDiff,
                             float bOffset, float bScale,
                             float upsilonLow, float upsilonHigh,
-                            float userSectorCenter, float userSectorHalfWidth, float metadataSectorCenter, float metadataSectorHalfWidth,
+                            float userSectorMaskCenter, float userSectorMaskHalfWidth, float metadataSectorMaskCenter, float metadataSectorMaskHalfWidth,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float innerRadius, float outerRadius,
                             float slitLeft, float slitRight,
@@ -173,7 +173,7 @@ public final class GLSLImageShader extends GLSLScreenShader {
         values.put(color);
         values.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
         values.put(bOffset).put(bScale).put(upsilonLow).put(upsilonHigh);
-        values.put(userSectorCenter).put(userSectorHalfWidth).put(metadataSectorCenter).put(metadataSectorHalfWidth);
+        values.put(userSectorMaskCenter).put(userSectorMaskHalfWidth).put(metadataSectorMaskCenter).put(metadataSectorMaskHalfWidth);
         values.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
         values.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
         values.put(enhanced).put(0).put(0).put(0);

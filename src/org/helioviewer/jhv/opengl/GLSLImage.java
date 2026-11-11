@@ -45,15 +45,6 @@ public class GLSLImage {
     private final float[] color = new float[4];
 
     public void applyFilters(ImageBuffer imageBuffer, MetaData metaData, boolean rhefActive) {
-        float userSectorCenter = 0;
-        float userSectorHalfWidth = 0;
-        if (settings.getSectorWidth() != 0) {
-            userSectorCenter = (float) Math.toRadians(settings.getSectorCenter());
-            userSectorHalfWidth = (float) Math.toRadians(settings.getSectorWidth() / 2);
-        }
-        double metadataHalfWidth = metadataSectorHalfWidth(metaData);
-        float metadataSectorCenter = (float) metadataSectorCenter(metaData, metadataHalfWidth);
-
         color[0] = (float) (settings.getOpacity() * settings.getRedScale()); // premultiplied alpha
         color[1] = (float) (settings.getOpacity() * settings.getGreenScale());
         color[2] = (float) (settings.getOpacity() * settings.getBlueScale());
@@ -67,7 +58,7 @@ public class GLSLImage {
                 // apply as a black/white-point control on the equalized output.
                 (float) settings.getBrightOffset(), (float) (settings.getBrightScale() * (rhefActive ? 1 : metaData.getResponseFactor())),
                 (float) (rhefActive ? settings.getUpsilonLow() : 1), (float) (rhefActive ? settings.getUpsilonHigh() : 1),
-                userSectorCenter, userSectorHalfWidth, metadataSectorCenter, (float) metadataHalfWidth,
+                settings.getSectorMaskCenter(), settings.getSectorMaskHalfWidth(), metaData.getSectorMaskCenter(), metaData.getSectorMaskHalfWidth(),
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 Math.max(metaData.getInnerRadius(), (float) settings.getInnerMask()),
                 Math.min(Display.getShowCorona() ? metaData.getOuterRadius() : 1, (float) settings.getOuterMask()),
@@ -135,18 +126,4 @@ public class GLSLImage {
         maskTex.upload(detectorMask.getImageBuffer());
         uploadedMask = detectorMask;
     }
-
-    private static double metadataSectorCenter(MetaData metaData, double halfWidth) {
-        if (halfWidth == 0)
-            return 0;
-        double center = metaData.getSector1() + halfWidth;
-        return (center + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
-    }
-
-    private static double metadataSectorHalfWidth(MetaData metaData) {
-        float start = metaData.getSector0();
-        float end = metaData.getSector1();
-        return start == end ? 0 : Math.PI + (start - end) / 2;
-    }
-
 }

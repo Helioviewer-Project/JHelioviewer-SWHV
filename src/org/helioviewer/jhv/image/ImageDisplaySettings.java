@@ -30,8 +30,10 @@ public final class ImageDisplaySettings {
     private double outerMask = Double.POSITIVE_INFINITY;
     private double slitLeft;
     private double slitRight = 1;
-    private double sectorCenter;
-    private double sectorWidth;
+    private double sectorPositionAngle;
+    private double sectorWidth = 360;
+    private float sectorMaskCenter = (float) (-Math.PI / 2);
+    private float sectorMaskHalfWidth;
     private double brightOffset;
     private double brightScale = 1;
     private double opacity = 1;
@@ -72,9 +74,16 @@ public final class ImageDisplaySettings {
         slitRight = Math.clamp(right, slitLeft, 1);
     }
 
-    public void setSector(double center, double width) {
-        sectorCenter = Math.clamp(center, -180, 180);
+    // CME convention: position angle from solar north counterclockwise, full angular width
+    public void setSector(double positionAngle, double width) {
+        sectorPositionAngle = Math.clamp(positionAngle, 0, 360);
         sectorWidth = Math.clamp(width, 0, 360);
+        // The shader masks the opposite sector, with angles measured from +X.
+        double maskAngle = sectorPositionAngle - 90;
+        if (maskAngle > 180)
+            maskAngle -= 360;
+        sectorMaskCenter = (float) Math.toRadians(maskAngle);
+        sectorMaskHalfWidth = (float) Math.toRadians((360 - sectorWidth) / 2);
     }
 
     public void setBrightness(double offset, double scale) {
@@ -110,12 +119,20 @@ public final class ImageDisplaySettings {
         return slitRight;
     }
 
-    public double getSectorCenter() {
-        return sectorCenter;
+    public double getSectorPositionAngle() {
+        return sectorPositionAngle;
     }
 
     public double getSectorWidth() {
         return sectorWidth;
+    }
+
+    public float getSectorMaskCenter() {
+        return sectorMaskCenter;
+    }
+
+    public float getSectorMaskHalfWidth() {
+        return sectorMaskHalfWidth;
     }
 
     public double getBrightOffset() {
@@ -227,7 +244,7 @@ public final class ImageDisplaySettings {
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
-        setSector(jo.optDouble("sectorCenter", 0), jo.optDouble("sectorWidth", 0));
+        setSector(jo.optDouble("sectorPositionAngle", 0), jo.optDouble("sectorWidth", 360));
         setMask(jo.optDouble("innerMask", innerMask), jo.optDouble("outerMask", Double.POSITIVE_INFINITY));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         setEnhanced(jo.optDouble("enhanced", enhanced));
@@ -252,7 +269,7 @@ public final class ImageDisplaySettings {
         jo.put("blend", blend);
         jo.put("slitLeft", slitLeft);
         jo.put("slitRight", slitRight);
-        jo.put("sectorCenter", sectorCenter);
+        jo.put("sectorPositionAngle", sectorPositionAngle);
         jo.put("sectorWidth", sectorWidth);
         jo.put("innerMask", innerMask);
         jo.put("outerMask", Double.isFinite(outerMask) ? outerMask : JSONObject.NULL);

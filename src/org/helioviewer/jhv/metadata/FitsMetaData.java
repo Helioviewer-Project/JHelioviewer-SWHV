@@ -53,10 +53,14 @@ public final class FitsMetaData extends CommonMetaData {
     }
 
     private void retrieveSector(MetaDataContainer m) {
-        double s0 = m.getDouble("HV_SECT0").map(Math::toRadians).orElse(0.);
-        double s1 = m.getDouble("HV_SECT1").map(Math::toRadians).orElse(0.);
-        sector0 = (float) s0;
-        sector1 = (float) s1;
+        float start = (float) Math.toRadians(m.getDouble("HV_SECT0").orElse(0.));
+        float end = (float) Math.toRadians(m.getDouble("HV_SECT1").orElse(0.));
+        if (start == end)
+            return;
+        double halfWidth = Math.PI + (start - end) / 2;
+        double center = end + halfWidth;
+        sectorMaskCenter = (float) ((center + 3 * Math.PI) % (2 * Math.PI) - Math.PI);
+        sectorMaskHalfWidth = (float) halfWidth;
     }
 
     private void retrieveResponse() {

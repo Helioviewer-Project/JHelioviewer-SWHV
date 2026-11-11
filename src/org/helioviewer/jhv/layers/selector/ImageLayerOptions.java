@@ -79,7 +79,7 @@ final class ImageLayerOptions extends JPanel {
         adjustmentConstraints.gridy++;
         addFilterRow(adjustmentsPanel, adjustmentConstraints, RangeSliderFilterPanel.mask(layer));
         adjustmentConstraints.gridy++;
-        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.sector(layer));
+        addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.sectorPositionAngle(layer));
         adjustmentConstraints.gridy++;
         addFilterRow(adjustmentsPanel, adjustmentConstraints, SliderFilterPanel.sectorWidth(layer));
         adjustmentConstraints.gridy++;

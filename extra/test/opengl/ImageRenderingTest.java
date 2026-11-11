@@ -171,6 +171,7 @@ public final class ImageRenderingTest {
             }
             sampling(texture, difference, lut, mask, viewpoint);
             fitsReference(texture, difference, lut, mask, viewpoint);
+            sectorSelection();
             layerPose(viewpoint.time);
             layerScales(renderer, viewpoint.time);
             layerFit(renderer, viewpoint.time);
@@ -182,6 +183,61 @@ public final class ImageRenderingTest {
             renderer.destroy();
         }
         System.out.println("ImageRenderingTest passed");
+    }
+
+    private static void sectorSelection() throws Exception {
+        FitsMetaData metadata = poseMetadata("TAN", 215, 0, 0, "2026-01-15T12:00:00");
+        short[] samples = new short[256 * 128];
+        Arrays.fill(samples, Float.floatToFloat16(.5f));
+        DecodedImage decoded = new DecodedImage(ImageBuffer.fromShorts(256, 128, samples, ImageFilter.NONE), metadata.getGeometry());
+        ImageDisplaySettings settings = new ImageDisplaySettings();
+        if (settings.getSectorWidth() != 360)
+            throw new AssertionError("A new layer must show the full 360-degree image");
+        settings.fromJson(new JSONObject());
+        if (settings.getSectorWidth() != 360)
+            throw new AssertionError("An absent width must select the full 360-degree image");
+        settings.fromJson(new JSONObject().put("sectorPositionAngle", 315).put("sectorWidth", 300));
+        if (settings.getSectorPositionAngle() != 315 || settings.toJson().getDouble("sectorPositionAngle") != 315)
+            throw new AssertionError("Sector position angle must use the same name in settings and saved state");
+        GLSLImage image = new GLSLImage(settings);
+        GLRenderer.reshape(65, 65);
+        Viewport viewport = Display.getViewport(0);
+        Position observer = centered(215);
+        MapView view = MapView.create(Display.getCamera(), observer, MapMode.HPC, GridType.Viewpoint,
+                new MapScale[]{MapScale.hpc(.2, .2)});
+        Transform.ortho2D(1, 1, 0, 0);
+        GL.glViewport(0, 0, 65, 65);
+        GLSLScreenShader.setView(view, viewport);
+        try {
+            image.init();
+            image.streamImages(decoded.imageBuffer(), null);
+            ByteBuffer pixels = BufferUtils.newByteBuffer(65 * 65 * 4);
+            int[][] directions = {{32, 52}, {18, 46}, {12, 32}, {18, 18}, {32, 12}, {46, 18}, {52, 32}, {46, 46}};
+            for (int pa : new int[]{0, 90, 180, 270, 315, 360}) {
+                for (int width : new int[]{0, 60, 300, 360}) {
+                    settings.setSector(pa, width);
+                    GL.glClearColor(0, 0, 0, 1);
+                    GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+                    image.applyFilters(decoded.imageBuffer(), metadata, false);
+                    GLSLImageShader.render(MapMode.HPC, Quat.ZERO, observer, decoded.geometry(), observer,
+                            decoded.geometry(), observer, Mat2.IDENTITY, 0, 0, false);
+                    GL.glReadPixels(0, 0, 65, 65, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+                    for (int direction = 0; direction < directions.length; direction++) {
+                        int[] point = directions[direction];
+                        boolean visible = (pixels.get(4 * (point[1] * 65 + point[0])) & 255) > 20;
+                        int separation = Math.abs(direction * 45 - pa % 360);
+                        separation = Math.min(separation, 360 - separation);
+                        boolean expected = width > 0 && separation <= width / 2;
+                        if (visible != expected)
+                            throw new AssertionError("PA " + pa + " width " + width + " direction " + direction * 45 + " visibility " + visible);
+                    }
+                }
+            }
+        } finally {
+            image.dispose();
+            decoded.release();
+        }
+        System.out.println("PASS: actual image settings retain the selected wedge; 360 degrees keeps every direction and zero keeps none");
     }
 
     private static void layerPose(JHVTime time) throws Exception {
@@ -433,14 +489,14 @@ public final class ImageRenderingTest {
                                         MapView view = GLRenderer.getMapView();
                                         String context = projection + " coverage=" + coverage + " enabled=" + enabled + " reset=" + reset;
                                         double expectedHeight = height == 0 ? 2 * distance * Math.tan(Math.toRadians(.5)) : height;
-                                        scaleNear(vp.zoom, reset ? .7 : 1, context + " viewport zoom");
+                                        scaleNear(vp.zoom, 1, context + " viewport zoom");
                                         scaleNear(view.cameraWidth(vp) / vp.zoom, expectedHeight, context + " camera height");
                                         scaleNear(view.cameraTranslationX(), reset ? 0 : .15, context + " translation X");
                                         scaleNear(view.cameraTranslationY(), reset ? 0 : -.1, context + " translation Y");
                                         scaleNear(view.dragRotation().y, reset ? 0 : Math.sin(.3), context + " drag rotation");
                                         if (coverage == 1 && enabled == 1) {
                                             // Read actual fitted pixels inside/outside the unit sphere.
-                                            double width = 2 * (reset ? .7 : 1), tx = reset ? 0 : .15, ty = reset ? 0 : -.1;
+                                            double width = 2, tx = reset ? 0 : .15, ty = reset ? 0 : -.1;
                                             for (Vec2 probe : new Vec2[]{new Vec2(0, .5), new Vec2(1.05, 0)}) {
                                                 int x = (int) Math.round(vp.width / 2. + (probe.x + tx) * vp.height / width - .5);
                                                 int y = (int) Math.round(vp.height / 2. + (probe.y + ty) * vp.height / width - .5);

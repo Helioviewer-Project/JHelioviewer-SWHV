@@ -36,6 +36,13 @@ public final class WcsInterpreterTest {
                 !input.getRequiredString("CTYPE2").equals("SOLAR-Y"))
             throw new AssertionError("Legacy LASCO fixture lost its original axis labels");
         FitsMetaData metadata = new FitsMetaData(input, fixture.toUri());
+        for (double[] sector : new double[][]{{0, 0, 0, 0}, {30, 330, 0, 30}, {30, 150, -90, 120}}) {
+            String sectorXml = xml.replace("</meta>", "<HV_SECT0>" + sector[0] + "</HV_SECT0><HV_SECT1>"
+                    + sector[1] + "</HV_SECT1></meta>");
+            FitsMetaData masked = new FitsMetaData(new XMLMetaDataContainer(sectorXml), fixture.toUri());
+            near(masked.getSectorMaskCenter(), Math.toRadians(sector[2]), 1e-6, "metadata sector center");
+            near(masked.getSectorMaskHalfWidth(), Math.toRadians(sector[3]), 1e-6, "metadata sector half-width");
+        }
         ImageGeometry geometry = metadata.getGeometry();
         WcsSolution wcs = geometry.wcs;
         if (wcs.projection != WcsSolution.Projection.TAN)
