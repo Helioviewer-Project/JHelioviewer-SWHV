@@ -2,10 +2,10 @@ package org.helioviewer.jhv.source;
 
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.image.ClipSet;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
@@ -50,7 +50,6 @@ record FITSData(int width, int height, boolean byteImage, @Nullable ClipSet.Rang
         }
         if (count < MIN_SAMPLES)
             return new ClipSet(null, null);
-        Arrays.sort(samples, 0, count);
         return new ClipSet(percentileRange(samples, count, ImageProcessingSettings.ClippingMode.Percentile001.percentile()),
                 percentileRange(samples, count, ImageProcessingSettings.ClippingMode.Percentile05.percentile()));
     }
@@ -73,8 +72,8 @@ record FITSData(int width, int height, boolean byteImage, @Nullable ClipSet.Rang
     }
 
     private static ClipSet.Range percentileRange(float[] values, int length, double percentile) {
-        float lower = values[Math.clamp((int) (percentile * length), 0, length - 1)];
-        float upper = values[Math.clamp((int) ((1 - percentile) * length), 0, length - 1)];
+        float lower = ArrayUtils.selectKth(values, 0, length - 1, Math.clamp((int) (percentile * length), 0, length - 1));
+        float upper = ArrayUtils.selectKth(values, 0, length - 1, Math.clamp((int) ((1 - percentile) * length), 0, length - 1));
         return new ClipSet.Range(lower, upper);
     }
 

@@ -183,8 +183,10 @@ For `jhv.load.image`, clients may also send:
   serialized image-layer `imageParams`; these options are applied before the
   indicated data is loaded
 
-FITS clipping and scaling use the same `imageParams` object:
+FITS selection, clipping, and scaling use the same `imageParams` object:
 
+- `fitsHDU`: one-based image HDU number; `0` selects the default image HDU
+- `fitsPlane`: zero-based plane index within that HDU
 - `clippingMode`: `Percentile001`, `Percentile05`, or `Range`
 - `clippingMin`, `clippingMax`: manual bounds, clamped to `-1e20` through `1e20`
 - `scalingMode`: `Gamma`, `Beta`, or `Alpha`

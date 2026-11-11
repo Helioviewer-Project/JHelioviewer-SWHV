@@ -86,6 +86,8 @@ worker. Each source produces an `ImageBuffer`:
   active file read and unmapping. Conversion and filtering use the Java pixel array
   outside that lock. Display pixels use a `WriteBuffer`, with the same filtering and
   ownership transfer at `finish`.
+- Changing a layer's FITS selection replaces its timeline, including metadata,
+  geometry, clipping and cache owner.
 - `RasterSource` uses raster arrays for gray and indexed images. Other images are converted
   to premultiplied RGBA native storage, copied into the final write buffer, and the
   conversion storage is freed in `finally`.
