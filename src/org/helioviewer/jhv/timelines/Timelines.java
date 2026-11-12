@@ -20,6 +20,7 @@ public final class Timelines {
     }
 
     private static final TimeListener.Change timeListener = DrawController::timeChanged;
+    private static final TimeListener.Range rangeListener = DrawController::movieRangeChanged;
     private static final ArrayList<Listener> listeners = new ArrayList<>();
     @Nullable
     private static BandReaderHapi.CatalogData catalog;
@@ -28,10 +29,12 @@ public final class Timelines {
         if (TimelineLayers.get().stream().noneMatch(layer -> layer instanceof RadioData))
             TimelineLayers.add(new RadioData(null));
         Player.addTimeListener(timeListener);
+        Player.addTimeRangeListener(rangeListener);
         requestCatalog();
     }
 
     public static void uninstall() {
+        Player.removeTimeRangeListener(rangeListener);
         Player.removeTimeListener(timeListener);
     }
 

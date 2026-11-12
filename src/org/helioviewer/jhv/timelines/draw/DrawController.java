@@ -38,6 +38,7 @@ public final class DrawController {
     private static long currentTime;
 
     private static boolean locked;
+    private static boolean followMovie;
     @Nullable
     private static String status;
     private static final UiTimer layersUpdater = new UiTimer(1000 / 2, DrawController::syncLockedLayers);
@@ -93,6 +94,16 @@ public final class DrawController {
             selectedAxis.set(start, end);
             timeRangeChanged();
         }
+    }
+
+    // The movie interval zoom: the selected interval follows the movie range, except while locked, when it leads.
+    public static void setFollowMovie(boolean follow) {
+        followMovie = follow;
+    }
+
+    public static void movieRangeChanged(long start, long end) {
+        if (followMovie && !locked)
+            setSelectedInterval(start, end);
     }
 
     public static void moveX(double pixelDistance) {

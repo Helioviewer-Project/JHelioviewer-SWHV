@@ -51,6 +51,7 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
         zoomCombo = new JComboBox<>(items);
         zoomCombo.addActionListener(e -> {
             ZoomItem item = (ZoomItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
+            DrawController.setFollowMovie(item.zoom == ZOOM.Movie);
             zoomTo(item.zoom, item.number);
         });
 

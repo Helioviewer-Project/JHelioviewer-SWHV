@@ -92,6 +92,7 @@ public final class TimelineDataTest {
         checkLayerCreation();
         checkSavedState();
         checkExportImport();
+        checkMovieFollow();
         checkHapiTimes();
         checkHapiRequests();
         checkChartPainting();
@@ -684,6 +685,30 @@ public final class TimelineDataTest {
                 throw new AssertionError(e);
             } finally {
                 band.remove();
+                DrawController.setSelectedInterval(previousStart, previousEnd);
+            }
+        });
+    }
+
+    private static void checkMovieFollow() throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            long previousStart = DrawController.selectedAxis.start();
+            long previousEnd = DrawController.selectedAxis.end();
+            try {
+                DrawController.setSelectedInterval(START, START + 60_000);
+                DrawController.movieRangeChanged(START + 600_000, START + 1_200_000);
+                check(DrawController.selectedAxis.start() == START && DrawController.selectedAxis.end() == START + 60_000,
+                        "A movie range change moves the timeline without Movie interval");
+                DrawController.setFollowMovie(true);
+                DrawController.movieRangeChanged(START + 600_000, START + 1_200_000);
+                check(DrawController.selectedAxis.start() == START + 600_000 && DrawController.selectedAxis.end() == START + 1_200_000,
+                        "Movie interval does not follow a movie range change");
+                DrawController.setFollowMovie(false);
+                DrawController.movieRangeChanged(START, START + 1_800_000);
+                check(DrawController.selectedAxis.start() == START + 600_000 && DrawController.selectedAxis.end() == START + 1_200_000,
+                        "The timeline keeps following after leaving Movie interval");
+            } finally {
+                DrawController.setFollowMovie(false);
                 DrawController.setSelectedInterval(previousStart, previousEnd);
             }
         });
