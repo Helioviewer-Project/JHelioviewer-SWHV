@@ -78,14 +78,12 @@ static jhv_wcs *prepare(jhv_wcs *handle, jhv_wcs_info *info, size_t info_size,
     info->version = 1;
     info->projection = projection;
     memcpy(info->reference_pixel, w->crpix, sizeof(info->reference_pixel));
-    double pixels[6] = {w->crpix[0], w->crpix[1], w->crpix[0]+1, w->crpix[1], w->crpix[0], w->crpix[1]+1};
-    double plane[6];
-    status = linp2x(&w->lin, 3, 2, pixels, plane);
-    if (status) return failure(handle, "Invalid WCS affine transform", error, capacity);
-    info->pixel_to_plane[0] = (plane[2]-plane[0])*radians;
-    info->pixel_to_plane[1] = (plane[4]-plane[0])*radians;
-    info->pixel_to_plane[2] = (plane[3]-plane[1])*radians;
-    info->pixel_to_plane[3] = (plane[5]-plane[1])*radians;
+    for (int row = 0; row < 2; row++) {
+        for (int col = 0; col < 2; col++) {
+            double coefficient = w->cdelt[row] * w->pc[2*row+col];
+            info->pixel_to_plane[2*row+col] = (coefficient == 0 ? 0 : coefficient) * radians;
+        }
+    }
     info->reference[0] = w->crval[0]*radians;
     info->reference[1] = w->crval[1]*radians;
 

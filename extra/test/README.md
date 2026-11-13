@@ -152,8 +152,9 @@ Regressions cover surface-map texture lookup with rotated display-frame masks, a
 on both sides of 90°,
 including infinite/finite outer radii, sector direction, square cut-off, enhancement disabled
 at and beyond the Sun-plane horizon, and difference mode.
-`WcsLibraryTest` checks native geometry, domains, parameters and ownership. `WcsInterpreterTest`
-checks the [captured instrument fixtures](data/wcs-instruments/README.md), metadata conventions and parsed sector masks.
+`WcsLibraryTest` checks native geometry, affine scales at fractional and large reference pixels, domains,
+parameters and ownership. `WcsInterpreterTest` checks the
+[captured instrument fixtures](data/wcs-instruments/README.md), metadata conventions and parsed sector masks.
 
 Full-fragment checks cover native frames, surface geometry, depth and Orthographic TAN Orthographic
 sampling. Coordinate diagnostics reuse the production geometry helpers. The differential-rotation check validates rates against the published magnetic model at 0°, 30°, 60° and 90° latitude. Local cases also check finite-distance source horizons, differential rotation across the limb,

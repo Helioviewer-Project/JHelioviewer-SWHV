@@ -200,6 +200,28 @@ public final class WcsLibraryTest {
         near(wcs.pixelToPlane.m11, -.275 * scale, "native FITS signed scale unchanged");
     }
 
+    private static void affineReferencePixels() throws Exception {
+        double scale = Math.PI / 180;
+        for (WcsSolution.Projection projection : WcsSolution.Projection.values()) {
+            for (double reference : new double[]{2.25, Math.scalb(1., 52) - .5, Math.scalb(1., 53)}) {
+                Header input = header(projection, 0, 0);
+                input.addValue("CRPIX1", reference, null);
+                input.addValue("CRPIX2", -reference, null);
+                input.addValue("CDELT1", .125, null);
+                input.addValue("CDELT2", -.25, null);
+                input.addValue("PC1_1", .8, null);
+                input.addValue("PC1_2", -.3, null);
+                input.addValue("PC2_1", .4, null);
+                input.addValue("PC2_2", 1.1, null);
+                WcsSolution wcs = new WcsSolution(input, 1);
+                near(wcs.pixelToPlane.m00, .1 * scale, projection + " X scale at CRPIX " + reference);
+                near(wcs.pixelToPlane.m01, -.0375 * scale, projection + " XY shear at CRPIX " + reference);
+                near(wcs.pixelToPlane.m10, -.1 * scale, projection + " YX shear at CRPIX " + reference);
+                near(wcs.pixelToPlane.m11, -.275 * scale, projection + " Y scale at CRPIX " + reference);
+            }
+        }
+    }
+
     private static void rejected(Header header) {
         try {
             new WcsSolution(header, 1);
@@ -267,6 +289,7 @@ public final class WcsLibraryTest {
         domains();
         coefficients();
         fitsGeometry();
+        affineReferencePixels();
         adjustments();
         concurrency();
         System.out.println("PASS: independent WCS geometry, inverse domains, parameter rejection, adjusted pole defaults and shared native ownership");
