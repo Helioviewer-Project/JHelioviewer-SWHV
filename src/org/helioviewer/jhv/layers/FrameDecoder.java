@@ -10,10 +10,12 @@ import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.ImageProcessingSettings;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.source.ResolutionSet;
 import org.helioviewer.jhv.source.Source;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.wcs.ImageGeometry;
+import org.helioviewer.jhv.wcs.ImageGrid;
 
 // Decodes a layer's current frame on a worker and delivers it on the EDT. EDT only.
 final class FrameDecoder {
@@ -145,7 +147,9 @@ final class FrameDecoder {
 
     // Runs on the decode worker; the decoder owns solar geometry and image filtering.
     private static DecodedImage decodeImage(Source source, Frames.Frame frame, Key key) throws Exception {
-        ImageGeometry geometry = frame.geometry().forGrid(source.levels(frame.index()).getLevel(key.level));
+        ResolutionSet levels = source.levels(frame.index());
+        ImageGrid full = levels.getLevel(0);
+        ImageGeometry geometry = frame.metaData().getGeometry().withSize(full.width(), full.height()).forGrid(levels.getLevel(key.level));
         ImageFilter filter = ImageFilter.of(key.filter, geometry);
         return new DecodedImage(source.decode(frame.index(), key.level, filter, key.fits, key.clip), geometry);
     }

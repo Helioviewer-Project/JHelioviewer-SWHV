@@ -135,8 +135,8 @@ level 0.
 
 ## Composition, decoding and caching
 
-`Frames.Frame.geometry()` reconciles the metadata size with the source's actual full-resolution size.
-When they differ, `withSize` keeps the matrix and reference pixel and changes the extent. `FrameDecoder`
+`FrameDecoder` reconciles the metadata size with the source's actual full-resolution size.
+When they differ, `withSize` keeps the matrix and reference pixel and changes the extent. The decoder
 picks the level from the display size and decodes the finest complete level at that level or coarser.
 
 On a cache miss `FrameDecoder.decodeImage` composes the frame geometry with the chosen grid through

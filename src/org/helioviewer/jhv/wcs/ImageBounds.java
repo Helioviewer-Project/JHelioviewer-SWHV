@@ -14,7 +14,6 @@ public final class ImageBounds {
         if (geometry.wcs.projection.isSurfaceMap())
             return distance / Math.sqrt((distance - 1) * (distance + 1));
 
-        Region region = geometry.bounds;
         double radius = 0;
         for (Vec2 helioprojective : boundary(geometry)) {
             Vec2 hpcPlane = ObserverGeometry.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
@@ -24,16 +23,9 @@ public final class ImageBounds {
         if (radius > 0)
             return radius;
 
-        // Sun offset from the reference pixel in the rectangle's frame: image axes, Y up.
-        double sunX = (geometry.sunPixel.x - geometry.referencePixel.x) * geometry.pixelSizeX;
-        double sunY = (geometry.referencePixel.y - geometry.sunPixel.y) * geometry.pixelSizeY;
-        double x0 = region.llx - sunX;
-        double x1 = region.urx - sunX;
-        double y0 = region.lly - sunY;
-        double y1 = region.ury - sunY;
-        return Math.max(
-                Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
-                Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
+        double dx = Math.max(Math.abs(geometry.sunPixel.x), Math.abs(geometry.grid.width() - geometry.sunPixel.x)) * geometry.pixelSizeX;
+        double dy = Math.max(Math.abs(geometry.sunPixel.y), Math.abs(geometry.grid.height() - geometry.sunPixel.y)) * geometry.pixelSizeY;
+        return Math.hypot(dx, dy);
     }
 
     public static Region hpc(ImageGeometry geometry, double distance) {

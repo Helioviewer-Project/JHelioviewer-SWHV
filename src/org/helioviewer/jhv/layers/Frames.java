@@ -21,22 +21,11 @@ import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
-import org.helioviewer.jhv.wcs.ImageGeometry;
-import org.helioviewer.jhv.wcs.ImageGrid;
 
 // The timeline of an image layer: frames sorted by time, each from a source or empty. EDT only.
 public final class Frames extends TimeMap<Frames.Frame> implements Source.Listener {
 
-    public record Frame(JHVTime time, MetaData metaData, String xml, @Nullable Source source, int index) {
-        // The frame's footprint is independent of the selected decode level.
-        ImageGeometry geometry() {
-            ImageGeometry declared = metaData.getGeometry();
-            if (source == null)
-                return declared;
-            ImageGrid full = source.levels(index).getLevel(0);
-            return declared.withSize(full.width(), full.height());
-        }
-    }
+    public record Frame(JHVTime time, MetaData metaData, String xml, @Nullable Source source, int index) {}
 
     public interface Listener {
         // On the EDT, after the source reported its frame ready.
