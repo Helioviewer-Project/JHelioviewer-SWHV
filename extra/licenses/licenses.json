@@ -468,7 +468,7 @@
     },
     {
       "path": "lib/jhv/linux-amd64/libjhvwcs.so",
-      "sha256": "ed7c4e9f77f3d1e3500f6aebcaf02f97028b2bde734b02d11a0f2adde3d12dc9",
+      "sha256": "86902c236c1835ddb7183b59d9ad84eb9acea267fbacfe92b8d13b6ee304655c",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -586,7 +586,7 @@
     },
     {
       "path": "lib/jhv/macos-amd64/libjhvwcs.dylib",
-      "sha256": "0d54ed536a731d1eb1b9edddcadc455ec42b9f67f39ee547260279a2a5446ee3",
+      "sha256": "6a50a2a4f37f56c12ece1fdb93f97d33ffb6f5844b139db3c48a748420a57d2c",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -704,7 +704,7 @@
     },
     {
       "path": "lib/jhv/macos-arm64/libjhvwcs.dylib",
-      "sha256": "d26969cedd74143c354dd6a5c8976f34e8f283412e89767e38683a9bdfcb6c71",
+      "sha256": "f42781ed387a4af4820cef9ba9be89880b08a06461e49bb723d8d1f0605c5275",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
@@ -796,7 +796,7 @@
     },
     {
       "path": "lib/jhv/windows-amd64/jhvwcs.dll",
-      "sha256": "dd4ccc989a96c57fe2d135d02df51d471af819a1f78e75f5216c75774c265867",
+      "sha256": "d3bdb12f829973c465ab5aa973786bd277aa075d1cefd5ceec5c200152a1d981",
       "embedded_notices": [],
       "declarations": [],
       "supplemental_notices": [
