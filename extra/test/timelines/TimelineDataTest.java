@@ -82,6 +82,7 @@ public final class TimelineDataTest {
         UIGlobals.TL_LABEL_TEXT_COLOR = Color.WHITE;
         UIGlobals.TL_TICK_LINE_COLOR = Color.DARK_GRAY;
         Directories.createCacheDirs();
+        check(DrawController.isFollowMovie(), "Timelines do not start with Movie interval");
         checkEmpty();
         checkOrderingAndGaps();
         checkUnsortedAndEqualTimestamps();
@@ -703,12 +704,19 @@ public final class TimelineDataTest {
                 DrawController.movieRangeChanged(START + 600_000, START + 1_200_000);
                 check(DrawController.selectedAxis.start() == START + 600_000 && DrawController.selectedAxis.end() == START + 1_200_000,
                         "Movie interval does not follow a movie range change");
-                DrawController.setFollowMovie(false);
-                DrawController.movieRangeChanged(START, START + 1_800_000);
+                DrawController.movieRangeChanged(START + 900_000, START + 900_000);
                 check(DrawController.selectedAxis.start() == START + 600_000 && DrawController.selectedAxis.end() == START + 1_200_000,
-                        "The timeline keeps following after leaving Movie interval");
+                        "A single-image movie moves the timeline");
+                DrawController.moveSelectedInterval(60_000);
+                DrawController.movieRangeChanged(START, START + 1_800_000);
+                check(!DrawController.isFollowMovie() && DrawController.selectedAxis.start() == START + 660_000,
+                        "Moving the timeline by hand does not end Movie interval");
+                DrawController.setFollowMovie(true);
+                DrawController.setSelectedInterval(START, START + 60_000); // as a loaded state does
+                DrawController.movieRangeChanged(START + 600_000, START + 1_200_000);
+                check(!DrawController.isFollowMovie() && DrawController.selectedAxis.start() == START && DrawController.selectedAxis.end() == START + 60_000,
+                        "An explicit interval gives way to the movie range");
             } finally {
-                DrawController.setFollowMovie(false);
                 DrawController.setSelectedInterval(previousStart, previousEnd);
             }
         });

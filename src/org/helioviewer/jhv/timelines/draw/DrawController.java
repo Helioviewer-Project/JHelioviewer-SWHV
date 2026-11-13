@@ -25,7 +25,7 @@ public final class DrawController {
 
         default void layoutChanged() {}
 
-        // Lock, stacking or status text changed.
+        // Lock, stacking, Movie interval or status text changed.
         default void optionsChanged() {}
     }
 
@@ -38,7 +38,7 @@ public final class DrawController {
     private static long currentTime;
 
     private static boolean locked;
-    private static boolean followMovie;
+    private static boolean followMovie = true; // Movie interval is the startup zoom
     @Nullable
     private static String status;
     private static final UiTimer layersUpdater = new UiTimer(1000 / 2, DrawController::syncLockedLayers);
@@ -56,7 +56,7 @@ public final class DrawController {
 
     static {
         long t = System.currentTimeMillis();
-        setSelectedInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
+        setInterval(t - 2 * TimeUtils.DAY_IN_MILLIS, t);
     }
 
     public static void saveState(JSONObject jo) {
@@ -89,27 +89,49 @@ public final class DrawController {
         listeners.remove(listener);
     }
 
+    // An explicit interval ends the Movie interval zoom.
     public static void setSelectedInterval(long start, long end) {
+        setFollowMovie(false);
+        setInterval(start, end);
+    }
+
+    private static void setInterval(long start, long end) {
         if (start != selectedAxis.start() || end != selectedAxis.end()) {
             selectedAxis.set(start, end);
             timeRangeChanged();
         }
     }
 
-    // The movie interval zoom: the selected interval follows the movie range, except while locked, when it leads.
+    // The Movie interval zoom: the selected interval follows the movie range, except while locked, when it leads.
     public static void setFollowMovie(boolean follow) {
-        followMovie = follow;
+        if (follow)
+            showMovie(Player.getStartTime(), Player.getEndTime());
+        if (followMovie != follow) {
+            followMovie = follow;
+            listeners.forEach(Listener::optionsChanged);
+        }
+    }
+
+    public static boolean isFollowMovie() {
+        return followMovie;
     }
 
     public static void movieRangeChanged(long start, long end) {
         if (followMovie && !locked)
-            setSelectedInterval(start, end);
+            showMovie(start, end);
+    }
+
+    // TimeAxis would replace a shorter span, as of a single image, with the last minute before now.
+    private static void showMovie(long start, long end) {
+        if (end - start >= TimeUtils.MINUTE_IN_MILLIS)
+            setInterval(start, end);
     }
 
     public static void moveX(double pixelDistance) {
         if (pixelDistance == 0)
             return;
 
+        setFollowMovie(false);
         selectedAxis.move(geometry.graphWidth(), pixelDistance);
         timeRangeChanged();
     }
@@ -118,6 +140,7 @@ public final class DrawController {
         if (distance == 0)
             return;
 
+        setFollowMovie(false);
         selectedAxis.move(distance);
         timeRangeChanged();
     }
@@ -126,6 +149,7 @@ public final class DrawController {
         if (factor == 0)
             return;
 
+        setFollowMovie(false);
         Rectangle graphArea = geometry.area();
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         timeRangeChanged();

@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.FormPanel;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -49,10 +48,11 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
                 new ZoomItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox<>(items);
+        zoomCombo.setSelectedItem(new ZoomItem(ZOOM.Movie, 0)); // as DrawController starts
         zoomCombo.addActionListener(e -> {
             ZoomItem item = (ZoomItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
-            DrawController.setFollowMovie(item.zoom == ZOOM.Movie);
             zoomTo(item.zoom, item.number);
+            DrawController.setFollowMovie(item.zoom == ZOOM.Movie);
         });
 
         lockButton = new JideToggleButton(Buttons.unlock);
@@ -95,6 +95,9 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
         stackedButton.setSelected(stacked);
         stackedButton.setText((stacked ? Buttons.stacked : Buttons.overlaid) + "Stack");
         statusLabel.setText(DrawController.getStatus());
+        ZoomItem item = (ZoomItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
+        if (item.zoom == ZOOM.Movie && !DrawController.isFollowMovie()) // ended by an explicit interval
+            zoomCombo.setSelectedIndex(0);
     }
 
     private record ZoomItem(ZOOM zoom, long number) {
@@ -119,14 +122,13 @@ final class DrawControllerOptions extends JPanel implements DrawController.Liste
         long end = DrawController.selectedAxis.end();
 
         switch (zoom) {
-            case CUSTOM -> {}
+            case CUSTOM, Movie -> {}
             case All -> DrawController.setSelectedInterval(availableInterval.start(), availableInterval.end());
             case Year -> setZoom(end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
             case Month -> setZoom(end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));
             case Day -> setZoom(end, TimeUtils.DAY_IN_MILLIS * value);
             case Hour -> setZoom(end, 60 * 60 * 1000L * value);
             case Carrington -> setZoom(end, (long) (Carrington.CR_SYNODIC_MEAN * TimeUtils.DAY_IN_MILLIS * value));
-            case Movie -> DrawController.setSelectedInterval(Player.getStartTime(), Player.getEndTime());
         }
     }
 
