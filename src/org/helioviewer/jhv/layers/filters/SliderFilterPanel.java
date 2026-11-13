@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.component.PositionAngleKnob;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.image.ImageDisplaySettings;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -49,16 +50,23 @@ public final class SliderFilterPanel {
         return create("Sharpen ", -1, 1, settings.getSharpen(), 100, SliderFilterPanel::formatPercent, settings::setSharpen);
     }
 
-    public static FilterDetails sectorPositionAngle(ImageLayer layer) {
+    // The knob takes the title's place.
+    public static FilterDetails sector(ImageLayer layer) {
         ImageDisplaySettings settings = layer.getDisplaySettings();
-        return create("PA", 0, 360, settings.getSectorPositionAngle(), 1, SliderFilterPanel::formatWholeDegree,
-                value -> settings.setSector(value, settings.getSectorWidth()));
-    }
-
-    public static FilterDetails sectorWidth(ImageLayer layer) {
-        ImageDisplaySettings settings = layer.getDisplaySettings();
-        return create("Width", 0, 360, settings.getSectorWidth(), 1, SliderFilterPanel::formatWholeDegree,
-                value -> settings.setSector(settings.getSectorPositionAngle(), value));
+        PositionAngleKnob knob = new PositionAngleKnob(settings.getSectorPositionAngle(), value -> {
+            settings.setSector(value, settings.getSectorWidth());
+            DisplayController.display();
+        });
+        JHVSlider slider = new JHVSlider(0, 360, settings.getSectorWidth(), 1);
+        slider.setToolTipText("Width");
+        JLabel label = new SliderValueLabel(formatWholeDegree(slider.getDoubleValue()), slider, SliderFilterPanel::formatWholeDegree);
+        slider.addChangeListener(e -> {
+            double value = slider.getDoubleValue();
+            settings.setSector(settings.getSectorPositionAngle(), value);
+            label.setText(formatWholeDegree(value));
+            DisplayController.display();
+        });
+        return new FilterRow(knob, slider, label);
     }
 
     private static String formatWholeDegree(double value) {
