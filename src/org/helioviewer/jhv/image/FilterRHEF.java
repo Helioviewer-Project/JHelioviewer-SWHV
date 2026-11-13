@@ -24,13 +24,9 @@ class FilterRHEF implements ImageFilter.Algorithm {
         if (width < 1 || height < 1)
             return data;
 
-        // Without valid pixel sizes, assume the Sun at the image center with pixel units.
-        boolean valid = geometry.pixelSizeX > 0 && geometry.pixelSizeY > 0;
-        double pixX = valid ? geometry.pixelSizeX : 1;
-        double pixY = valid ? geometry.pixelSizeY : 1;
-        double sunX = valid ? geometry.sunPixel.x : .5 * width;
-        double sunY = valid ? geometry.sunPixel.y : .5 * height;
-        double llx = -sunX * pixX, lly = -sunY * pixY;
+        double pixX = geometry.pixelSizeX;
+        double pixY = geometry.pixelSizeY;
+        double llx = -geometry.sunPixel.x * pixX, lly = -geometry.sunPixel.y * pixY;
         double invBinWidth = 1 / Math.min(pixX, pixY); // ~1-pixel-wide annuli
 
         double dxMax = Math.max(Math.abs(llx), Math.abs(llx + width * pixX));
