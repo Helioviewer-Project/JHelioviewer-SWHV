@@ -29,7 +29,7 @@ vec2 getNormalizedMapPos(void) {
 float unwarpRadius(float normalizedRadius) {
     float outerRadius = screen.mapBounds.w;
     float limbPosition = 1. / outerRadius;
-    if (outerRadius <= 1. || normalizedRadius <= limbPosition)
+    if (normalizedRadius <= limbPosition)
         return normalizedRadius / limbPosition;
 
     float u = (normalizedRadius - limbPosition) / (1. - limbPosition);

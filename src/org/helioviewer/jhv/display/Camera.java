@@ -25,10 +25,6 @@ public final class Camera {
     Camera() {}
 
     void updateViewpoint(Position viewpoint) {
-        updateWidth(viewpoint);
-    }
-
-    private void updateWidth(Position viewpoint) {
         cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
     }
 
@@ -69,7 +65,7 @@ public final class Camera {
 
     void setFOV(double _fov, Position viewpoint) {
         fov = Math.clamp(_fov, MIN_FOV, MAX_FOV);
-        updateWidth(viewpoint);
+        updateViewpoint(viewpoint);
     }
 
     double baseCameraWidth() {

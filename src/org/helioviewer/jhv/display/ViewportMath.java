@@ -110,8 +110,8 @@ public final class ViewportMath {
     }
 
     @Nullable
-    static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
-        Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
+    static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY) {
+        Quat frameRotation = camera.getDragRotation();
         double upX = computeUpX(vp, width, camera.getTranslationX(), screenX);
         double upY = computeUpY(vp, width, camera.getTranslationY(), screenY);
         Vec3 hitPoint = intersectPlane(upX, upY, frameRotation.rotateVector(Vec3.ZAxis));
