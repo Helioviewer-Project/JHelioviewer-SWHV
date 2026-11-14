@@ -237,7 +237,7 @@ def generated_matrix_cases(
             },
         ),
         (
-            "lasco_transform_suppression",
+            "lasco_native_rotation",
             {
                 "TELESCOP": "SOHO",
                 "INSTRUME": "LASCO",
@@ -260,7 +260,6 @@ def generated_matrix_cases(
 
     generated: list[tuple[Path, int | None]] = []
     astropy_cases: set[Path] = set()
-    lasco_case = output_dir / "lasco_transform_suppression.fits"
     reset_keys = (
         "CROTA", "CROTA1", "CROTA2",
         "PC1_1", "PC1_2", "PC2_1", "PC2_2",
@@ -285,7 +284,7 @@ def generated_matrix_cases(
 
         file_path = write_generated_case(validator, output_dir, name, header)
         generated.append((file_path, 0))
-        if file_path != lasco_case and name != "missing_observer_cunit":
+        if name != "missing_observer_cunit":
             astropy_cases.add(file_path)
 
     surface_cases = (
@@ -404,7 +403,7 @@ def generated_matrix_cases(
         generated.append((file_path, 0))
         astropy_cases.add(file_path)
 
-    return generated, astropy_cases, lasco_case
+    return generated, astropy_cases
 
 
 def compare_scalars(name: str, java_value: float, py_value: float, abs_tol: float, rel_tol: float) -> str | None:
@@ -435,7 +434,7 @@ def main() -> int:
     with TemporaryDirectory() as temp_dir:
         java_out = Path(temp_dir)
         compile_java_helper(java_out)
-        generated_cases, astropy_cases, lasco_case = generated_matrix_cases(validator, java_out)
+        generated_cases, astropy_cases = generated_matrix_cases(validator, java_out)
         cases = suite_cases() + generated_cases
 
         for file_path, hdu in cases:
@@ -518,11 +517,6 @@ def main() -> int:
             if (py_meta.projection not in validator.PV2_PROJECTIONS
                     and any(float(value) != 0.0 for value in java_meta["pv2"])):
                 case_errors.append(f"irrelevant PV parameters were retained: {java_meta['pv2']!r}")
-
-            if file_path == lasco_case and java_meta["image_to_plane"] != [1.0, 0.0, 0.0, 1.0]:
-                case_errors.append(
-                    f"LASCO image transform was not suppressed: {java_meta['image_to_plane']!r}"
-                )
 
             render_rect = validator.wcsRect(py_meta)
             for index, (java_value, py_value) in enumerate(zip(java_meta["render_rect"], render_rect, strict=True)):

@@ -12,7 +12,7 @@ final class WcsInterpreter {
     private static final Pattern WCS_KEY = Pattern.compile(
             "LONPOLE|LATPOLE|(?:CRPIX|CRVAL|CDELT|CROTA)[12]|(?:PC|CD)[12]_[12]|PV[12]_\\d+");
 
-    static WcsSolution read(MetaDataContainer metadata, int width, int height, double observerUnitsPerRad) {
+    static Header header(MetaDataContainer metadata, int width, int height) {
         try {
             Header header = new Header();
             // JHV displays a two-dimensional image. SPICE and PUNCH JP2 headers
@@ -67,10 +67,16 @@ final class WcsInterpreter {
                 metadata.getDouble("CROTA").or(() -> metadata.getDouble("CROTA1"))
                         .ifPresent(rotation -> header.addValue("CROTA2", rotation, null));
             }
-            return new WcsSolution(header, surface ? 1 : observerUnitsPerRad);
+            return header;
         } catch (HeaderCardException e) {
             throw new IllegalArgumentException("Invalid WCS metadata", e);
         }
+    }
+
+    static WcsSolution solve(Header header, double observerUnitsPerRad) {
+        String ctype1 = header.getStringValue("CTYPE1");
+        boolean surface = ctype1.endsWith("CAR") || ctype1.endsWith("CEA");
+        return new WcsSolution(header, surface ? 1 : observerUnitsPerRad);
     }
 
     // Historical CEA maps with missing CUNIT2 or "Sine Latitude" store the plane's normalized Y row.

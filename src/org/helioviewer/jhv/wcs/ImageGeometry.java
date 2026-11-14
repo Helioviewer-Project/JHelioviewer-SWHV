@@ -35,10 +35,8 @@ public final class ImageGeometry {
     // Pixel centers: FITS = integers starting at 1, OpenGL = half-integers starting at 0.5.
     // JHV buffers have their origin at the upper-left edge, with Y following buffer rows.
     // Convert FITS centers and upward Y once: x = CRPIX1 - 0.5, y = height - (CRPIX2 - 0.5).
-    public ImageGeometry(int width, int height, WcsSolution _wcs, boolean pixelsAlreadyRotated) {
+    public ImageGeometry(int width, int height, WcsSolution _wcs) {
         Mat2 transform = _wcs.pixelToPlane;
-        if (pixelsAlreadyRotated)
-            transform = new Mat2(Math.hypot(transform.m00, transform.m10), 0, 0, Math.hypot(transform.m01, transform.m11));
         this(width, height, _wcs, new Mat2(transform.m00, -transform.m01, transform.m10, -transform.m11),
                 new Vec2(_wcs.referencePixel.x - .5, height - (_wcs.referencePixel.y - .5)));
     }

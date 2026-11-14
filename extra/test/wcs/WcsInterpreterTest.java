@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
@@ -43,7 +44,14 @@ public final class WcsInterpreterTest {
             near(masked.getSectorMaskCenter(), Math.toRadians(sector[2]), 1e-6, "metadata sector center");
             near(masked.getSectorMaskHalfWidth(), Math.toRadians(sector[3]), 1e-6, "metadata sector half-width");
         }
-        ImageGeometry geometry = metadata.getGeometry();
+        if (metadata.getGeometry().wcs.projection != WcsSolution.Projection.ZPN)
+            throw new AssertionError("Helioviewer LASCO frame after the cutoff was not interpreted as ZPN");
+        // The correction starts exactly at 2011-05-05T00:00Z; earlier frames keep the plain TAN reading.
+        XMLMetaDataContainer atCutoff = new XMLMetaDataContainer(dated(xml, "2011/05/05", "00:00:00.000"));
+        if (new FitsMetaData(atCutoff, fixture.toUri()).getGeometry().wcs.projection != WcsSolution.Projection.ZPN)
+            throw new AssertionError("Helioviewer LASCO frame at the cutoff was not interpreted as ZPN");
+        String plain = dated(xml, "2011/05/04", "23:59:59.999");
+        ImageGeometry geometry = new FitsMetaData(new XMLMetaDataContainer(plain), fixture.toUri()).getGeometry();
         WcsSolution wcs = geometry.wcs;
         if (wcs.projection != WcsSolution.Projection.TAN)
             throw new AssertionError("Legacy solar axes were not interpreted as TAN");
@@ -79,7 +87,7 @@ public final class WcsInterpreterTest {
         // which silently interpreted arbitrary unsupported projections as TAN.
         String unsupported = xml.replace("SOLAR-X", "HPLN-SIN").replace("SOLAR-Y", "HPLT-SIN");
         try {
-            WcsInterpreter.read(new XMLMetaDataContainer(unsupported), 1024, 1024, 215);
+            WcsInterpreter.solve(WcsInterpreter.header(new XMLMetaDataContainer(unsupported), 1024, 1024), 215);
             throw new AssertionError("Unsupported SIN projection was accepted");
         } catch (IllegalArgumentException expected) {
             if (!expected.getMessage().contains("Unsupported WCS projection"))
@@ -88,6 +96,39 @@ public final class WcsInterpreterTest {
         legacyCeaScales();
         instrumentFixtures(fixture.getParent().resolve("wcs-instruments"));
         System.out.println("PASS: original LASCO XML, legacy solar axes, angular scales, derotation and independent TAN geometry");
+        lascoStars(fixture.resolveSibling("lasco_stars.json"));
+    }
+
+    private static String dated(String xml, String date, String time) {
+        return xml.replace("<DATE_OBS>2026/10/14</DATE_OBS>", "<DATE_OBS>" + date + "</DATE_OBS>")
+                .replace("<TIME_OBS>23:54:09.780</TIME_OBS>", "<TIME_OBS>" + time + "</TIME_OBS>");
+    }
+
+    // Helioviewer LASCO C2 and C3 frames, rolled and unrolled, written by generate_lasco_stars.py:
+    // image star centroids against catalog positions seen from SOHO.
+    private static void lascoStars(Path file) throws Exception {
+        JSONArray frames = new JSONArray(Files.readString(file));
+        for (int i = 0; i < frames.length(); i++) {
+            XMLMetaDataContainer input = new XMLMetaDataContainer(frames.getJSONObject(i).getString("header"));
+            ImageGeometry geometry = new FitsMetaData(input, file.toUri()).getGeometry();
+            JSONArray stars = frames.getJSONObject(i).getJSONArray("stars");
+            double[] offsets = new double[stars.length()];
+            for (int j = 0; j < offsets.length; j++) {
+                JSONArray star = stars.getJSONArray(j);
+                Vec2 plane = geometry.toPlane(star.getDouble(0), star.getDouble(1));
+                double[] world = geometry.wcs.planeToWorld(new double[]{plane.x, plane.y});
+                offsets[j] = Math.toDegrees(Math.hypot(world[0] - Math.toRadians(star.getDouble(2) / 3600),
+                        world[1] - Math.toRadians(star.getDouble(3) / 3600))) * 3600 / input.getRequiredDouble("CDELT1");
+            }
+            Arrays.sort(offsets);
+            double median = offsets[offsets.length / 2];
+            double tail = offsets[offsets.length * 9 / 10];
+            String frame = input.getRequiredString("DETECTOR") + " " + input.getRequiredString("DATE_OBS");
+            if (!(median < .6) || !(tail < 1))
+                throw new AssertionError(frame + " star offset median " + median + " px, 90th percentile " + tail + " px");
+            System.out.printf("PASS: LASCO %s, %d stars, star offset median %.2f px, 90th percentile %.2f px%n",
+                    frame, offsets.length, median, tail);
+        }
     }
 
     private static void legacyCeaScales() throws Exception {
@@ -110,8 +151,8 @@ public final class WcsInterpreterTest {
                 {Math.toRadians(-1.6), Math.toRadians(.4), -.003, -.007}
         };
         for (int i = 0; i < cases.length; i++) {
-            WcsSolution wcs = WcsInterpreter.read(new XMLMetaDataContainer(prefix + cases[i] + "</meta></xml>"), 8, 8, 215);
-            ImageGeometry geometry = new ImageGeometry(8, 8, wcs, false);
+            WcsSolution wcs = WcsInterpreter.solve(WcsInterpreter.header(new XMLMetaDataContainer(prefix + cases[i] + "</meta></xml>"), 8, 8), 215);
+            ImageGeometry geometry = new ImageGeometry(8, 8, wcs);
             double[] actual = {geometry.pixelToPlane.m00, geometry.pixelToPlane.m01,
                     geometry.pixelToPlane.m10, geometry.pixelToPlane.m11};
             for (int j = 0; j < actual.length; j++)
@@ -122,8 +163,8 @@ public final class WcsInterpreterTest {
                 "<CUNIT1>degree</CUNIT1>" + sineLatitude +
                 "<CRPIX1>362</CRPIX1><CRPIX2>180.5</CRPIX2><CRVAL1>824220</CRVAL1><CRVAL2>0</CRVAL2>" +
                 "<CDELT1>-0.5</CDELT1><CDELT2>0.005555555555555556</CDELT2></meta></xml>";
-        WcsSolution synopticWcs = WcsInterpreter.read(new XMLMetaDataContainer(synoptic), 720, 360, 215);
-        ImageGeometry synopticGeometry = new ImageGeometry(720, 360, synopticWcs, false);
+        WcsSolution synopticWcs = WcsInterpreter.solve(WcsInterpreter.header(new XMLMetaDataContainer(synoptic), 720, 360), 215);
+        ImageGeometry synopticGeometry = new ImageGeometry(720, 360, synopticWcs);
         for (double row : new double[]{1, 180.5, 360}) {
             Vec2 plane = synopticGeometry.toPlane(361.5, 360 - (row - .5));
             double[] world = synopticWcs.planeToWorld(new double[]{plane.x, plane.y});
@@ -132,7 +173,7 @@ public final class WcsInterpreterTest {
         // PC takes precedence over CD, so it still requires both CDELT values.
         for (String invalid : new String[]{pc + cd, "<CDELT1>-2</CDELT1>"}) {
             try {
-                WcsInterpreter.read(new XMLMetaDataContainer(prefix + invalid + "</meta></xml>"), 8, 8, 215);
+                WcsInterpreter.solve(WcsInterpreter.header(new XMLMetaDataContainer(prefix + invalid + "</meta></xml>"), 8, 8), 215);
                 throw new AssertionError("Missing CEA scales were accepted");
             } catch (IllegalArgumentException expectedFailure) {
                 if (!expectedFailure.getMessage().contains("Image WCS requires"))
@@ -146,7 +187,7 @@ public final class WcsInterpreterTest {
         // This original GONG header records neither CDELT nor CD. Keep the
         // loader's BasicMetaData fallback instead of inventing one arcsec/pixel.
         try {
-            WcsInterpreter.read(new XMLMetaDataContainer(Files.readString(directory.resolve("gong-no-scale.xml"))), 2048, 2048, 215);
+            WcsInterpreter.solve(WcsInterpreter.header(new XMLMetaDataContainer(Files.readString(directory.resolve("gong-no-scale.xml"))), 2048, 2048), 215);
             throw new AssertionError("Missing image scales were accepted");
         } catch (IllegalArgumentException expected) {
             if (!expected.getMessage().contains("Image WCS requires"))
@@ -159,11 +200,11 @@ public final class WcsInterpreterTest {
             XMLMetaDataContainer input = new XMLMetaDataContainer(Files.readString(fixture));
             int width = expected.getJSONArray("size").getInt(0);
             int height = expected.getJSONArray("size").getInt(1);
-            WcsSolution wcs = WcsInterpreter.read(input, width, height, 215);
+            WcsSolution wcs = WcsInterpreter.solve(WcsInterpreter.header(input, width, height), 215);
             if (!wcs.projection.name().equals(expected.getString("projection")))
                 throw new AssertionError("Unexpected projection: " + fixture);
             JSONArray matrix = expected.getJSONArray("matrixRadians");
-            ImageGeometry unrotated = new ImageGeometry(width, height, wcs, false);
+            ImageGeometry unrotated = new ImageGeometry(width, height, wcs);
             double[] actual = {unrotated.pixelToPlane.m00, -unrotated.pixelToPlane.m01,
                     unrotated.pixelToPlane.m10, -unrotated.pixelToPlane.m11};
             for (int j = 0; j < 4; j++)

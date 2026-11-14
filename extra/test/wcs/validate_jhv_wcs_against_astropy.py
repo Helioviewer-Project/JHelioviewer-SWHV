@@ -300,8 +300,6 @@ def build_jhv_meta(header) -> JHVMeta:
     crpix1_gl = float(header.get("CRPIX1", (pixel_width + 1) / 2.0)) - 0.5
     crpix2_gl = float(header.get("CRPIX2", (pixel_height + 1) / 2.0)) - 0.5
 
-    if str(header.get("INSTRUME", "")) == "LASCO":
-        image_to_plane = (1.0, 0.0, 0.0, 1.0)
     plane_to_image = invert_mat2(image_to_plane)
     pv2 = (
         [float(np.float32(header.get(f"PV2_{i}", 0.0))) for i in range(6)]

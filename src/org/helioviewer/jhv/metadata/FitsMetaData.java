@@ -13,10 +13,11 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
 import org.helioviewer.jhv.wcs.WcsSolution;
 
+import nom.tam.fits.Header;
+
 public final class FitsMetaData extends CommonMetaData {
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
-    private static final Set<String> CROTABlockSet = Set.of("LASCO");
 
     private String instrument = "";
     private String detector = "";
@@ -37,7 +38,7 @@ public final class FitsMetaData extends CommonMetaData {
         JHVTime observationTime = retrieveTime(m);
         cacheTimestamp = observationTime.milli;
         viewpoint = retrievePosition(m, observationTime);
-        retrievePixelParameters(m);
+        retrievePixelParameters(m, observationTime);
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
@@ -72,7 +73,7 @@ public final class FitsMetaData extends CommonMetaData {
     // magic
     private void retrieveOcculterLinearCutOff(MetaDataContainer m) {
         if (detector.equals("C2")) {
-            cutOffValue = (float) -geometry.bounds.llx;
+            cutOffValue = (float) (geometry.sunPixel.x * geometry.pixelSizeX);
             double maskRotation = -m.getDouble("CROTA").map(Math::toRadians).orElse(0.); // C2 JP2 already rotated
             cutOffX = (float) (Math.sin(maskRotation) / 0.9625);
             cutOffY = (float) (Math.cos(maskRotation) / 0.9625);
@@ -260,7 +261,7 @@ public final class FitsMetaData extends CommonMetaData {
         return new Position(time, distObs, lon, lat);
     }
 
-    private void retrievePixelParameters(MetaDataContainer m) {
+    private void retrievePixelParameters(MetaDataContainer m, JHVTime observationTime) {
         int pixelW, pixelH;
         if (m.getLong("ZNAXIS").isPresent()) {
             pixelW = (int) m.getRequiredLong("ZNAXIS1");
@@ -271,9 +272,10 @@ public final class FitsMetaData extends CommonMetaData {
         }
 
         double observerUnitsPerRad = Sun.Radius / Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance);
-        WcsSolution wcs = WcsInterpreter.read(m, pixelW, pixelH, observerUnitsPerRad);
-        boolean pixelsAlreadyRotated = CROTABlockSet.contains(instrument);
-        geometry = new ImageGeometry(pixelW, pixelH, wcs, pixelsAlreadyRotated);
+        Header header = WcsInterpreter.header(m, pixelW, pixelH);
+        if (instrument.equals("LASCO") && m.getString("HV_QUICKLOOK").isPresent())
+            LascoWcs.adapt(m, header, detector, observationTime.milli);
+        geometry = new ImageGeometry(pixelW, pixelH, WcsInterpreter.solve(header, observerUnitsPerRad));
     }
 
     private double getSolarRadiusFactor() {

@@ -191,7 +191,7 @@ public final class JHVMetadataDump {
     }
 
     private static String packedImage(Method packer, JSONObject input, WcsSolution wcs) throws Exception {
-        ImageGeometry geometry = new ImageGeometry(input.getInt("width"), input.getInt("height"), wcs, false);
+        ImageGeometry geometry = new ImageGeometry(input.getInt("width"), input.getInt("height"), wcs);
         MapMode mode = switch (input.getString("mode")) {
             case "ortho" -> MapMode.Orthographic;
             case "hpc", "trig" -> MapMode.HPC;
@@ -253,8 +253,8 @@ public final class JHVMetadataDump {
                 for (int j = 0; j < records.length; j++)
                     records[j] = cards.substring(j * 80, (j + 1) * 80);
                 Header header = new Header(records);
-                WcsSolution wcs = WcsInterpreter.read(new FitsMetaDataContainer(header),
-                        input.getInt("width"), input.getInt("height"), input.getDouble("unitsPerRad"));
+                WcsSolution wcs = WcsInterpreter.solve(WcsInterpreter.header(new FitsMetaDataContainer(header),
+                        input.getInt("width"), input.getInt("height")), input.getDouble("unitsPerRad"));
                 output.put(new JSONObject()
                         .put("imageRecord", packedImage(packer, input, wcs))
                         .put("pv2", new JSONArray(wcs.pv2)));

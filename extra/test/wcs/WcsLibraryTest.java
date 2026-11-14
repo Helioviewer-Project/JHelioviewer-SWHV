@@ -99,7 +99,7 @@ public final class WcsLibraryTest {
             near(points[2], 0, "negative longitude copy");
             if (!Double.isNaN(points[4]) || !Double.isNaN(points[5]))
                 throw new AssertionError("Invalid cylinder latitude accepted");
-            ImageGeometry geometry = new ImageGeometry(8, 6, wcs, false);
+            ImageGeometry geometry = new ImageGeometry(8, 6, wcs);
             for (double distance : new double[]{1.01, 2, 10, 215}) {
                 // Independent tangent point and its intersection with the Sun-center plane.
                 double z = 1 / distance, x = Math.sqrt(1 - z * z);
@@ -177,24 +177,19 @@ public final class WcsLibraryTest {
         input.addValue("PC2_2", 1.1, null);
         WcsSolution wcs = new WcsSolution(input, 7);
         double scale = 7 * Math.PI / 180;
-        for (boolean pixelsAlreadyRotated : new boolean[]{false, true}) {
-            ImageGeometry geometry = new ImageGeometry(9, 7, wcs, pixelsAlreadyRotated);
-            near(geometry.referencePixel.x, 1.75, "buffer reference X");
-            near(geometry.referencePixel.y, 2.75, "buffer reference Y");
-            // The declared FITS point (5.25,2.75) is three columns and two rows
-            // below CRPIX. Solve its plane position directly from CDELT * PC.
-            double x = pixelsAlreadyRotated ? 3 * Math.hypot(.1, -.1) : .375;
-            double y = pixelsAlreadyRotated ? -2 * Math.hypot(-.0375, -.275) : .25;
-            Vec2 plane = geometry.toPlane(4.75, 4.75);
-            near(plane.x, x * scale, "FITS-to-buffer plane X, rotated " + pixelsAlreadyRotated);
-            near(plane.y, y * scale, "FITS-to-buffer plane Y, rotated " + pixelsAlreadyRotated);
-            Vec2 pixel = geometry.toPixel(x * scale, y * scale);
-            near(pixel.x, 4.75, "buffer inverse X");
-            near(pixel.y, 4.75, "buffer inverse Y");
-            near(geometry.withSize(11, 8).referencePixel.y, 2.75, "source-size reconciliation preserves buffer reference");
-        }
-        // The buffer conversion, including the already-rotated policy, cannot
-        // alter the native solution's original FITS matrix and reference pixel.
+        ImageGeometry geometry = new ImageGeometry(9, 7, wcs);
+        near(geometry.referencePixel.x, 1.75, "buffer reference X");
+        near(geometry.referencePixel.y, 2.75, "buffer reference Y");
+        // The declared FITS point (5.25,2.75) is three columns and two rows
+        // below CRPIX. Solve its plane position directly from CDELT * PC.
+        Vec2 plane = geometry.toPlane(4.75, 4.75);
+        near(plane.x, .375 * scale, "FITS-to-buffer plane X");
+        near(plane.y, .25 * scale, "FITS-to-buffer plane Y");
+        Vec2 pixel = geometry.toPixel(.375 * scale, .25 * scale);
+        near(pixel.x, 4.75, "buffer inverse X");
+        near(pixel.y, 4.75, "buffer inverse Y");
+        near(geometry.withSize(11, 8).referencePixel.y, 2.75, "source-size reconciliation preserves buffer reference");
+        // The buffer conversion cannot alter the native solution's original FITS matrix and reference pixel.
         near(wcs.referencePixel.y, 4.75, "native FITS reference unchanged");
         near(wcs.pixelToPlane.m01, -.0375 * scale, "native FITS shear unchanged");
         near(wcs.pixelToPlane.m11, -.275 * scale, "native FITS signed scale unchanged");
@@ -234,7 +229,7 @@ public final class WcsLibraryTest {
 
     private static void adjustments() throws Exception {
         WcsSolution original = new WcsSolution(header(WcsSolution.Projection.CAR, 35, 20), 1);
-        ImageGeometry geometry = new ImageGeometry(8, 6, original, false);
+        ImageGeometry geometry = new ImageGeometry(8, 6, original);
         WcsSolution adjusted = geometry.adjustedWcs(0, -40 * 3600);
         if (geometry.adjustedWcs(0, 0) != original || geometry.adjustedWcs(0, -40 * 3600) != adjusted
                 || geometry.forGrid(new ImageGrid(1, 4, 3)).adjustedWcs(0, -40 * 3600) != adjusted)
@@ -281,7 +276,7 @@ public final class WcsLibraryTest {
         for (WcsSolution.Projection projection : WcsSolution.Projection.values()) {
             Position expected = projection.isSurfaceMap() ? display : source;
             WcsSolution wcs = new WcsSolution(projection, new float[]{0, 1, 0, 0, 0, 0}, 215);
-            ImageGeometry geometry = new ImageGeometry(1, 1, wcs, false);
+            ImageGeometry geometry = new ImageGeometry(1, 1, wcs);
             if (geometry.tracingViewpoint(display, source) != expected)
                 throw new AssertionError("Wrong tracing viewpoint for " + projection);
         }
