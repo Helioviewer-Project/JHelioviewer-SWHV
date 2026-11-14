@@ -7,6 +7,7 @@ import org.helioviewer.jhv.math.Region;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 // The LMSAL cut-out request for the enabled AIA layers, the active layer's region and the player's span.
 public final class SDOCutout {
@@ -27,7 +28,7 @@ public final class SDOCutout {
         }
         ImageData id = activeLayer.getImageData();
         if (id != null) {
-            Region region = Region.scale(id.image().geometry().original.bounds, 1 / id.image().geometry().wcs.unitsPerArcsec());
+            Region region = Region.scale(ImageBounds.hpc(id.image().geometry().original, id.metaData().getViewpoint().distance), 3600);
             str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
             str.append(String.format("&yCen=%.1f", region.lly + region.height / 2.));
             str.append(String.format("&width=%.1f", region.width));

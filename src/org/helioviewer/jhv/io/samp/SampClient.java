@@ -22,6 +22,7 @@ import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
@@ -141,7 +142,7 @@ public final class SampClient extends HubConnector {
         msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
-        Region region = Region.scale(id.image().geometry().original.bounds, 1 / id.image().geometry().wcs.unitsPerArcsec());
+        Region region = Region.scale(ImageBounds.hpc(id.image().geometry().original, id.metaData().getViewpoint().distance), 3600);
         msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
         msg.addParam("cutout.y0", SampUtils.encodeFloat(region.lly + region.height / 2.));
         msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
