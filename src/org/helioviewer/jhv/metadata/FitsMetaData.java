@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
@@ -11,13 +12,13 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.ImageGeometry;
-import org.helioviewer.jhv.wcs.WcsSolution;
 
 import nom.tam.fits.Header;
 
 public final class FitsMetaData extends CommonMetaData {
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
+    private static final Pattern TRAILING_ZEROS = Pattern.compile("\\.0*$");
 
     private String instrument = "";
     private String detector = "";
@@ -38,12 +39,12 @@ public final class FitsMetaData extends CommonMetaData {
         JHVTime observationTime = retrieveTime(m);
         cacheTimestamp = observationTime.milli;
         viewpoint = retrievePosition(m, observationTime);
-        retrievePixelParameters(m, observationTime);
+        retrieveGeometry(m, observationTime);
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
         retrieveSector(m);
-        retrieveResponse();
+        retrieveResponse(observationTime);
 
         if (instrument.equals("Euhforia"))
             calculateDepth = true;
@@ -54,8 +55,8 @@ public final class FitsMetaData extends CommonMetaData {
     }
 
     private void retrieveSector(MetaDataContainer m) {
-        float start = (float) Math.toRadians(m.getDouble("HV_SECT0").orElse(0.));
-        float end = (float) Math.toRadians(m.getDouble("HV_SECT1").orElse(0.));
+        double start = Math.toRadians(m.getDouble("HV_SECT0").orElse(0.));
+        double end = Math.toRadians(m.getDouble("HV_SECT1").orElse(0.));
         if (start == end)
             return;
         double halfWidth = Math.PI + (start - end) / 2;
@@ -64,9 +65,9 @@ public final class FitsMetaData extends CommonMetaData {
         sectorMaskHalfWidth = (float) halfWidth;
     }
 
-    private void retrieveResponse() {
+    private void retrieveResponse(JHVTime observationTime) {
         if (DisplaySettings.getNormalizeAIA() && instrument.equals("AIA")) {
-            responseFactor = (float) AIAResponse.get(viewpoint.time.milli, measurement);
+            responseFactor = (float) AIAResponse.get(observationTime.milli, measurement);
         }
     }
 
@@ -142,12 +143,7 @@ public final class FitsMetaData extends CommonMetaData {
         detector = m.getString("DETECTOR").orElse("");
         measurement = m.getString("WAVELNTH").orElse("");
 
-        if (measurement.endsWith("."))
-            measurement = measurement.substring(0, measurement.length() - 1);
-        else if (measurement.endsWith(".0"))
-            measurement = measurement.substring(0, measurement.length() - 2);
-        else if (measurement.endsWith(".00"))
-            measurement = measurement.substring(0, measurement.length() - 3);
+        measurement = TRAILING_ZEROS.matcher(measurement).replaceFirst("");
 
         if (instrument.contains("VSM")) {
             displayName = "NSO-SOLIS " + measurement;
@@ -261,7 +257,7 @@ public final class FitsMetaData extends CommonMetaData {
         return new Position(time, distObs, lon, lat);
     }
 
-    private void retrievePixelParameters(MetaDataContainer m, JHVTime observationTime) {
+    private void retrieveGeometry(MetaDataContainer m, JHVTime observationTime) {
         int pixelW, pixelH;
         if (m.getLong("ZNAXIS").isPresent()) {
             pixelW = (int) m.getRequiredLong("ZNAXIS1");
@@ -288,7 +284,7 @@ public final class FitsMetaData extends CommonMetaData {
         int wv;
         try {
             wv = Integer.parseInt(measurement);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return 1;
         }
 
