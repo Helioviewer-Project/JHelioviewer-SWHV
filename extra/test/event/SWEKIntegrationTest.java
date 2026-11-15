@@ -148,8 +148,7 @@ public final class SWEKIntegrationTest {
                     verify(event, record.getJSONObject("expected"), false, (int) removed);
                     verify(details, record.getJSONObject("expected"), true, 0);
                     check(event.getAllEventParameters().length == event.getVisibleEventParameters().length, "normal metadata contains only visible fields");
-                    if (supplier.isCactus()) {
-                        check(event.getPositionInformation().getEarth() != null, "CACTus rendering and picking need the Earth position");
+                    if (supplier.isArc()) {
                         double speed = record.getJSONObject("event").getDouble("cme_radiallinvel");
                         check(event.getCMEParameters().speedKmPerSecond() == speed, "CACTus speed reaches the renderer");
                         org.helioviewer.jhv.plugins.swek.SWEKLayerTest.checkPropagation(event);
@@ -193,9 +192,6 @@ public final class SWEKIntegrationTest {
         check(position.getBoundBox().length == boundary.length(), "boundary vertex count");
         for (int i = 0; i < boundary.length(); i++)
             check(Math.abs(position.getBoundBox()[i] - boundary.getDouble(i)) < 1e-6, "boundary matches baseline");
-        check((position.getEarth() == null) == expected.isNull("earth"), "observer presence");
-        if (position.getEarth() != null)
-            check(Math.abs(position.getEarth().lon - expected.getDouble("earth")) < 1e-9, "observer matches baseline");
     }
 
     private static void checkCatalogDefinitions() {
@@ -203,19 +199,19 @@ public final class SWEKIntegrationTest {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of("region", SWEK.NumericType.INTEGER));
         SWEK.Source targetSource = new SWEK.Source("target", List.of(), null, Map.of("target_region", SWEK.NumericType.INTEGER, "measurement", SWEK.NumericType.DECIMAL));
         SWEKSupplier supplier = new SWEKSupplier(activeRegion, "test", "test", source, "test", List.of(
-                new SWEK.Parameter("Region", "Region", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)));
-        SWEKSupplier target = new SWEKSupplier(flare, "target", "target", targetSource, "target", List.of());
+                new SWEK.Parameter("Region", "Region", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)), false);
+        SWEKSupplier target = new SWEKSupplier(flare, "target", "target", targetSource, "target", List.of(), false);
         definitions.clear();
         definitions.add(supplier);
         definitions.add(target);
         catalog = new SWEKCatalog(0, definitions, List.of());
         check(catalog.getSupplier("test") == supplier, "catalog lookup uses the explicit supplier ID");
-        SWEKSupplier sibling = new SWEKSupplier(activeRegion, "sibling", "sibling", source, "sibling", List.of());
+        SWEKSupplier sibling = new SWEKSupplier(activeRegion, "sibling", "sibling", source, "sibling", List.of(), false);
         SWEKCatalog ordered = new SWEKCatalog(0, List.of(supplier, target, sibling), List.of());
         check(ordered.getGroups().equals(List.of(activeRegion, flare)), "groups retain first-seen order with interleaved suppliers");
         check(ordered.getSuppliers(activeRegion).equals(List.of(supplier, sibling)), "suppliers retain definition order within each group");
         try {
-            new SWEKCatalog(0, List.of(supplier, target, new SWEKSupplier(flare, "Different supplier", "Different display", targetSource, "test", List.of())), List.of());
+            new SWEKCatalog(0, List.of(supplier, target, new SWEKSupplier(flare, "Different supplier", "Different display", targetSource, "test", List.of(), false)), List.of());
             throw new AssertionError("duplicate supplier ID was accepted");
         } catch (IllegalArgumentException expected) {
         }
@@ -241,7 +237,7 @@ public final class SWEKIntegrationTest {
         }
         definitions.clear();
         definitions.add(new SWEKSupplier(activeRegion, "test", "test", source, "test", List.of(
-                new SWEK.Parameter("unknown", "Unknown", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false))));
+                new SWEK.Parameter("unknown", "Unknown", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)), false));
         expectFailure(List.of(), "Missing");
         definitions.clear();
     }

@@ -106,7 +106,9 @@ public final class SWEKConfig {
                 continue;
 
             List<SWEK.Parameter> parameters = parseSupplierParameters(supplier, defaultParameters);
-            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("id"), parameters);
+            String displayName = supplier.getString("supplier_display_name");
+            boolean arc = "CACTus".equals(displayName) && "HEK".equals(source.name());
+            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, displayName, source, supplier.getString("id"), parameters, arc);
             suppliers.add(supplierObj);
         }
         if (suppliers.size() == supplierCount)

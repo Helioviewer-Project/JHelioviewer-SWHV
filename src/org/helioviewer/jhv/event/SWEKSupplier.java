@@ -12,18 +12,18 @@ public final class SWEKSupplier {
     private final String displayName;
     private final SWEK.Source source;
     private final String id;
-    private final boolean isCactus;
+    private final boolean isArc;
     private final List<SWEK.Parameter> parameterList;
     private final HashMap<String, SWEK.Parameter> parametersByName;
     private final boolean containsParameterFilter;
 
-    public SWEKSupplier(SWEKGroup _group, String _supplierName, String _displayName, SWEK.Source _source, String _id, List<SWEK.Parameter> _parameterList) {
+    public SWEKSupplier(SWEKGroup _group, String _supplierName, String _displayName, SWEK.Source _source, String _id, List<SWEK.Parameter> _parameterList, boolean _isArc) {
         group = _group;
         supplierName = _supplierName;
-        displayName = _displayName.intern();
+        displayName = _displayName;
         source = _source;
         id = _id;
-        isCactus = displayName == "CACTus" && "HEK".equals(source.name());
+        isArc = _isArc;
         parameterList = List.copyOf(_parameterList);
         parametersByName = indexParameters(parameterList, source.generalParameters());
         containsParameterFilter = checkFilters(parameterList);
@@ -81,7 +81,7 @@ public final class SWEKSupplier {
         return id;
     }
 
-    public boolean isCactus() {
-        return isCactus;
+    public boolean isArc() {
+        return isArc;
     }
 }

@@ -29,7 +29,7 @@ public final class EventFilterRequestsTest {
         SWEKGroup group = new SWEKGroup("Filter requests", "");
         SWEK.Parameter parameter = new SWEK.Parameter("value", "Value", new SWEK.ParameterFilter("numeric", 0, 10, 0, 1, ""), true);
         SWEKSupplier supplier = new SWEKSupplier(group, "test", "Test",
-                new SWEK.Source("test", List.of(), new HEKHandler(), Map.of("value", SWEK.NumericType.INTEGER)), "filter-requests", List.of(parameter));
+                new SWEK.Source("test", List.of(), new HEKHandler(), Map.of("value", SWEK.NumericType.INTEGER)), "filter-requests", List.of(parameter), false);
         session = new SWEKSession(new SWEKCatalog(0, List.of(supplier), List.of()));
         database = EventDatabaseTest.database(session);
         long start = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(3), end = start + 1;

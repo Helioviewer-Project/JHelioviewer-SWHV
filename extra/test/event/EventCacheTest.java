@@ -100,7 +100,7 @@ public final class EventCacheTest {
     private static void checkRequestOwnership() throws Exception {
         EventQueue.invokeAndWait(() -> {
             SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
-            SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Requests", ""), "requests", "requests", source, "requests", List.of());
+            SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Requests", ""), "requests", "requests", source, "requests", List.of(), false);
             boolean[] expectedActive = {true};
             int[] notifications = new int[1];
             SWEKSession.Listener listener = new SWEKSession.Listener() {
@@ -133,8 +133,8 @@ public final class EventCacheTest {
 
     private static void checkRebuiltGroupOrder() {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
-        SWEKSupplier retained = new SWEKSupplier(null, "retained", "retained", source, "order-retained", List.of());
-        SWEKSupplier removed = new SWEKSupplier(null, "removed", "removed", source, "order-removed", List.of());
+        SWEKSupplier retained = new SWEKSupplier(null, "retained", "retained", source, "order-retained", List.of(), false);
+        SWEKSupplier removed = new SWEKSupplier(null, "removed", "removed", source, "order-removed", List.of(), false);
         EventCollection groups = new EventCollection();
         for (int id = 1; id <= 7; id++)
             groups.addEvent(new SolarEvent(id == 7 ? removed : retained, id, 100, 200));
@@ -153,8 +153,8 @@ public final class EventCacheTest {
 
     private static void checkVersionsSurviveRegrouping() {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
-        SWEKSupplier firstSupplier = new SWEKSupplier(null, "first", "first", source, "versions-first", List.of());
-        SWEKSupplier secondSupplier = new SWEKSupplier(null, "second", "second", source, "versions-second", List.of());
+        SWEKSupplier firstSupplier = new SWEKSupplier(null, "first", "first", source, "versions-first", List.of(), false);
+        SWEKSupplier secondSupplier = new SWEKSupplier(null, "second", "second", source, "versions-second", List.of(), false);
         SolarEvent left = new SolarEvent(firstSupplier, 1, 100, 200), bridge = new SolarEvent(secondSupplier, 2, 300, 400);
         SolarEvent right = new SolarEvent(firstSupplier, 3, 500, 600);
         SolarEvent.Link firstLink = new SolarEvent.Link(1, 2), secondLink = new SolarEvent.Link(2, 3);
@@ -259,7 +259,7 @@ public final class EventCacheTest {
     private static void checkRemovalNotifications() {
         DisplayController.setRenderRequestHandler(_ -> {});
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
-        SWEKSupplier supplier = new SWEKSupplier(null, "notifications", "notifications", source, "notifications", List.of());
+        SWEKSupplier supplier = new SWEKSupplier(null, "notifications", "notifications", source, "notifications", List.of(), false);
         SolarEvent event = new SolarEvent(supplier, 100, 100, 200);
         session.replaceEvents(new EventBatch(1, List.of(event), List.of()));
         RelatedEvents group = session.getRelatedEvents(100);
@@ -294,8 +294,8 @@ public final class EventCacheTest {
 
     private static void checkGroupOwnership() {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
-        SWEKSupplier firstSupplier = new SWEKSupplier(null, "first", "first", source, "first", List.of());
-        SWEKSupplier secondSupplier = new SWEKSupplier(null, "second", "second", source, "second", List.of());
+        SWEKSupplier firstSupplier = new SWEKSupplier(null, "first", "first", source, "first", List.of(), false);
+        SWEKSupplier secondSupplier = new SWEKSupplier(null, "second", "second", source, "second", List.of(), false);
         SolarEvent first = new SolarEvent(firstSupplier, 1, 100, 200);
         SolarEvent bridge = new SolarEvent(secondSupplier, 2, 300, 400);
         SolarEvent third = new SolarEvent(firstSupplier, 3, 500, 600);
@@ -535,7 +535,7 @@ public final class EventCacheTest {
     }
 
     private static SWEKSupplier supplier(SWEKGroup group, String name, SWEKHandler handler) {
-        SWEKSupplier supplier = new SWEKSupplier(group, name, name, new SWEK.Source("test", List.of(), handler, Map.of()), name, List.of());
+        SWEKSupplier supplier = new SWEKSupplier(group, name, name, new SWEK.Source("test", List.of(), handler, Map.of()), name, List.of(), false);
         session.close();
         session = new SWEKSession(new SWEKCatalog(0, List.of(supplier), List.of()));
         database = EventDatabaseTest.database(session);

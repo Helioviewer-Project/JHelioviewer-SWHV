@@ -57,7 +57,7 @@ public final class HEKHandlerTest {
     private static void checkResponses() throws Exception {
         Handler handler = new Handler();
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "NOAA SWPC",
-                new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of());
+                new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of(), false);
         SWEKHandler.RemotePage page = handler.read(fixture, supplier);
         check(page.events().size() == 1, "defensive supplier filtering");
         SWEKHandler.RemoteEvent remote = page.events().getFirst();
@@ -84,7 +84,7 @@ public final class HEKHandlerTest {
                 .put("result", new JSONArray().put(blankId)), supplier), IOException.class, "blank ID");
 
         SWEKSupplier spocaSupplier = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA",
-                supplier.source(), "test_spoca", List.of());
+                supplier.source(), "test_spoca", List.of(), false);
         SWEKHandler.RemotePage spocaPage = handler.read(fixture, spocaSupplier);
         check(spocaPage.events().size() == 1 && !spocaPage.associations().isEmpty(), "live association to unloaded neighbor retained");
     }
@@ -105,7 +105,7 @@ public final class HEKHandlerTest {
     private static void checkQueries() throws Exception {
         Handler handler = new Handler();
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "NOAA SWPC",
-                new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of());
+                new SWEK.Source("HEK", List.of(), handler, Map.of()), "test_swpc", List.of(), false);
         long start = TimeUtils.parse("2024-05-10T00:00:00");
         long end = TimeUtils.parse("2024-05-10T02:00:00");
         Map<String, String> query = new HashMap<>();
@@ -118,7 +118,7 @@ public final class HEKHandlerTest {
         check(query.get("page").equals("1"), "one-based first page");
         check(handler.createURI(supplier, start, end, 1).getQuery().endsWith("page=2"), "second page");
         SWEKSupplier cactus = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus (Computer Aided CME Tracking)", "CACTus",
-                supplier.source(), "test_cactus", List.of());
+                supplier.source(), "test_cactus", List.of(), true);
         check(!handler.createURI(cactus, start, end, 0).getQuery().contains("param"), "CACTus name is not sent through HEK's supplier predicate");
 
     }
@@ -130,10 +130,10 @@ public final class HEKHandlerTest {
                 "jhv_goesflux", SWEK.NumericType.DECIMAL, "cme_radiallinvel", SWEK.NumericType.DECIMAL, "ar_noaanum", SWEK.NumericType.INTEGER));
         SWEKGroup flare = new SWEKGroup("Flare", ""), activeRegion = new SWEKGroup("Active Region", "");
         SWEKSupplier swpc = new SWEKSupplier(flare, "SWPC", "SWPC", source, "test_swpc", List.of(
-                new SWEK.Parameter("JHV_GOESFlux", "Flux", new SWEK.ParameterFilter("", 0, 1, 0, 1, ""), false)));
+                new SWEK.Parameter("JHV_GOESFlux", "Flux", new SWEK.ParameterFilter("", 0, 1, 0, 1, ""), false)), false);
         SWEKSupplier cactus = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus (Computer Aided CME Tracking)", "CACTus", source, "test_cactus", List.of(
-                new SWEK.Parameter("CME_RadialLinVel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, ""), false)));
-        SWEKSupplier spoca = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA", source, "test_spoca", List.of());
+                new SWEK.Parameter("CME_RadialLinVel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, ""), false)), true);
+        SWEKSupplier spoca = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA", source, "test_spoca", List.of(), false);
         catalog = new SWEKCatalog(0, List.of(swpc, cactus, spoca), List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
 
         Map<String, Number> values = read(swpc, new JSONObject().put("fl_goescls", "M1.0").put("ar_noaanum", 13664).put("cme_radiallinvel", 679));
@@ -164,7 +164,7 @@ public final class HEKHandlerTest {
     }
 
     private static final Handler handler = new Handler();
-    private static final SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "SWPC", new SWEK.Source("HEK", List.of(), handler, Map.of()), "test", List.of());
+    private static final SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), "SWPC", "SWPC", new SWEK.Source("HEK", List.of(), handler, Map.of()), "test", List.of(), false);
     private static final String BOX = "POLYGON((0 0,1 0,1 1,0 0))";
 
     private static SolarEvent parse(JSONObject json) {
@@ -214,7 +214,7 @@ public final class HEKHandlerTest {
             SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus", "CACTus", source, "cactus", List.of(
                     new SWEK.Parameter("cme_radiallinvel", "Speed", null, visible),
                     new SWEK.Parameter("event_coord1", "Angle", null, visible),
-                    new SWEK.Parameter("cme_angularwidth", "Width", null, visible)));
+                    new SWEK.Parameter("cme_angularwidth", "Width", null, visible)), true);
             for (boolean full : List.of(false, true)) {
                 for (Object value : List.of(JSONObject.NULL, "", "bad", 679, 679.9, " 679.9 ", "1e3", "NaN", "Infinity", -12.5)) {
                     JSONObject json = new JSONObject().put("cme_radiallinvel", value).put("event_coord1", value).put("cme_angularwidth", value);
@@ -227,7 +227,10 @@ public final class HEKHandlerTest {
                     check(parameters.angularWidthDegree(), previousValue(details, "cme_angularwidth", 0));
                 }
                 SolarEvent missing = handler.parseEventJSON(new JSONObject(), supplier, 1, 0, 1, full);
-                if (!missing.getCMEParameters().equals(SolarEvent.CMEParameters.DEFAULT)) throw new AssertionError("missing values preserve defaults");
+                SolarEvent.CMEParameters defaults = missing.getCMEParameters();
+                SolarEvent.CMEParameters base = SolarEvent.CMEParameters.DEFAULT;
+                if (defaults.earthView() == null || !defaults.equals(new SolarEvent.CMEParameters(base.speedKmPerSecond(), base.principalAngleDegree(), base.angularWidthDegree(), defaults.earthView())))
+                    throw new AssertionError("missing values preserve defaults with the Earth view");
             }
         }
     }

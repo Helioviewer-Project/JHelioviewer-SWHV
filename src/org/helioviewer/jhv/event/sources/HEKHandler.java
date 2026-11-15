@@ -12,11 +12,14 @@ import java.util.Set;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.GOESLevel;
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONArray;
@@ -156,16 +159,18 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     public SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        return new SolarEvent(supplier, id, start, end, HEKGeometry.position(json, start, supplier.isCactus()),
-                readCMEParameters(json, supplier), HEKParser.parseResult(json, supplier, full));
+        Position earth = Sun.getEarth(new JHVTime(start));
+        return new SolarEvent(supplier, id, start, end, HEKGeometry.position(json, earth),
+                readCMEParameters(json, supplier, earth), HEKParser.parseResult(json, supplier, full));
     }
 
-    private static SolarEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier) {
+    private static SolarEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier, Position earth) {
         SolarEvent.CMEParameters defaults = SolarEvent.CMEParameters.DEFAULT;
-        if (!supplier.isCactus())
+        if (!supplier.isArc())
             return defaults;
         return new SolarEvent.CMEParameters(readDouble(json, "cme_radiallinvel", defaults.speedKmPerSecond()),
-                readDouble(json, "event_coord1", defaults.principalAngleDegree()), readDouble(json, "cme_angularwidth", defaults.angularWidthDegree()));
+                readDouble(json, "event_coord1", defaults.principalAngleDegree()), readDouble(json, "cme_angularwidth", defaults.angularWidthDegree()),
+                earth.toQuat());
     }
 
     private static double readDouble(JSONObject result, String parameter, double fallback) {

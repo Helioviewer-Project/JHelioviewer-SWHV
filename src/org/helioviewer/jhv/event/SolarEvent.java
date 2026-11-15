@@ -1,9 +1,12 @@
 package org.helioviewer.jhv.event;
 
+import org.helioviewer.jhv.math.Quat;
+
 public class SolarEvent {
 
-    public record CMEParameters(double speedKmPerSecond, double principalAngleDegree, double angularWidthDegree) {
-        public static final CMEParameters DEFAULT = new CMEParameters(500, 0, 0);
+    // Arc angles are in the Earth view at the event start
+    public record CMEParameters(double speedKmPerSecond, double principalAngleDegree, double angularWidthDegree, Quat earthView) {
+        public static final CMEParameters DEFAULT = new CMEParameters(500, 0, 0, null);
     }
 
     public record Link(int firstId, int secondId) {}
@@ -50,8 +53,9 @@ public class SolarEvent {
         return cmeParameters;
     }
 
-    public boolean isCactus() {
-        return supplier.isCactus();
+    // Arcs need a direction in the Earth view
+    public boolean isArc() {
+        return cmeParameters.earthView() != null;
     }
 
     public int getUniqueID() {

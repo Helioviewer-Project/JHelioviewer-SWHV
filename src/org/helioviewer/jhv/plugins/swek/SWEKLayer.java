@@ -152,7 +152,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 2);
 
-        Quat q = evt.getPositionInformation().getEarth().toQuat();
+        Quat q = evt.getCMEParameters().earthView();
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
@@ -237,7 +237,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     }
 
     private static boolean hasIcon(MapView mv, SolarEvent evt) {
-        if (evt.isCactus()) {
+        if (evt.isArc()) {
             if (mv.isLatitudinal())
                 return false;
             if (mv.isOrthographic() || mv.isRectWarp())
@@ -358,7 +358,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         for (ActiveEvent active : evs) {
             RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
-            if (evt.isCactus()) {
+            if (evt.isArc()) {
                 drawCactusArc(relatedEvents, evt, currentTime);
             } else {
                 drawPolygon(mv, vp, relatedEvents, evt);
@@ -386,7 +386,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         for (ActiveEvent active : evs) {
             RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
-            if (evt.isCactus() && mv.isRectWarp()) {
+            if (evt.isArc() && mv.isRectWarp()) {
                 drawCactusArcScale(vp, relatedEvents, evt, currentTime, scale);
             } else {
                 drawPolygon(mv, vp, relatedEvents, evt);
@@ -515,20 +515,18 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         for (ActiveEvent active : activeEvents) {
             SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
-            if (pi == null)
-                continue;
-
             Vec3 hitpoint, pt;
-            if (evt.isCactus()) {
+            if (evt.isArc()) {
                 double principalAngle = Math.toRadians(evt.getCMEParameters().principalAngleDegree());
                 double distSun = SWEKData.cactusDistance(evt, currentTime);
-                Quat q = pi.getEarth().toQuat();
+                Quat q = evt.getCMEParameters().earthView();
                 pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
                 hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
-            } else {
+            } else if (pi != null) {
                 hitpoint = sphereHitpoint;
                 pt = pi.centralPoint();
-            }
+            } else
+                continue;
 
             if (pt != null && hitpoint != null) {
                 double deltaX = Math.abs(hitpoint.x - pt.x);
@@ -547,18 +545,13 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         for (ActiveEvent active : activeEvents) {
             SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
-            if (pi == null)
-                continue;
-
             Vec2 tf = null;
-            if (mv.isRectWarp() && evt.isCactus()) {
+            if (mv.isRectWarp() && evt.isArc()) {
                 double principalAngle = evt.getCMEParameters().principalAngleDegree();
                 double distSun = SWEKData.cactusDistance(evt, currentTime);
                 tf = new Vec2((scale.toUnitX(principalAngle) - 0.5) * vp.aspect, scale.toUnitY(distSun) - 0.5);
-            } else {
-                Vec3 pt = pi.centralPoint();
-                if (pt != null)
-                    tf = mv.projectToScreen(vp, pt);
+            } else if (pi != null && pi.centralPoint() != null) {
+                tf = mv.projectToScreen(vp, pi.centralPoint());
             }
 
             if (tf != null) {

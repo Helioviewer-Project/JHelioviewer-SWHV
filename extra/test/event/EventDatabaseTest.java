@@ -141,14 +141,14 @@ public final class EventDatabaseTest {
                         "jhv_goesflux", SWEK.NumericType.DECIMAL, "cme_radiallinvel", SWEK.NumericType.DECIMAL,
                         "test_measurement", SWEK.NumericType.DECIMAL, "test_identifier", SWEK.NumericType.INTEGER)), "test_swpc",
                 List.of(new SWEK.Parameter("jhv_goesflux", "Flux",
-                        new SWEK.ParameterFilter("", 0, 1, 0, 1, ""), false)));
+                        new SWEK.ParameterFilter("", 0, 1, 0, 1, ""), false)), false);
         suppliers.add(supplier);
         SWEKSupplier cactus = new SWEKSupplier(new SWEKGroup("Coronal Mass Ejection", ""), "CACTus", "CACTus", supplier.source(), "test_cactus",
-                List.of(new SWEK.Parameter("cme_radiallinvel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, "km/s"), false)));
+                List.of(new SWEK.Parameter("cme_radiallinvel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, "km/s"), false)), true);
         suppliers.add(cactus);
         SWEKSupplier configured = new SWEKSupplier(supplier.group(), "Configured", "Configured", supplier.source(), "test_configured", List.of(
                 new SWEK.Parameter("Test_Measurement", "Measurement", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false),
-                new SWEK.Parameter("Test_Identifier", "Identifier", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)));
+                new SWEK.Parameter("Test_Identifier", "Identifier", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)), false);
         suppliers.add(configured);
         setRelations(List.of());
         boolean reload = args[0].equals("reload");
@@ -169,7 +169,7 @@ public final class EventDatabaseTest {
         check(database.isStored(recent, recent + 1, supplier), "reuse successful empty response within session");
         // Keep this supplier empty for the second JVM's invalidation regression.
         SWEKSupplier dataSupplier = new SWEKSupplier(supplier.group(), "test", "test", supplier.source(),
-                "test_data", supplier.getParameterList());
+                "test_data", supplier.getParameterList(), false);
         suppliers.add(dataSupplier);
         setRelations(List.of());
         byte[] json = JSONUtils.compressJSON(new JSONObject().put("noposition", true).put("event_title", "test"));
@@ -284,7 +284,7 @@ public final class EventDatabaseTest {
     private static SWEKSupplier supplier(SWEK.Source source, String name) {
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Flare", ""), name, name, source, "test_" + name, List.of(
                 new SWEK.Parameter("speed", "Speed", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false),
-                new SWEK.Parameter("region", "Region", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)));
+                new SWEK.Parameter("region", "Region", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)), false);
         suppliers.add(supplier);
         return supplier;
     }
@@ -357,7 +357,7 @@ public final class EventDatabaseTest {
     }
 
     private static SWEKSupplier supplier(SWEKGroup group, SWEK.Source source, String name) {
-        SWEKSupplier supplier = new SWEKSupplier(group, name, name, source, "test_" + name, List.of());
+        SWEKSupplier supplier = new SWEKSupplier(group, name, name, source, "test_" + name, List.of(), false);
         suppliers.add(supplier);
         return supplier;
     }
@@ -431,7 +431,7 @@ public final class EventDatabaseTest {
         Files.createDirectories(Path.of(Directories.CACHE.getPath()));
         BlockingHandler handler = new BlockingHandler();
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Test", ""), "test", "Test",
-                new SWEK.Source("test", List.of(), handler, Map.of()), "test", List.of());
+                new SWEK.Source("test", List.of(), handler, Map.of()), "test", List.of(), false);
         suppliers.add(supplier);
         setRelations(List.of());
         check(database.storeRemotePage(new SWEKHandler.RemotePage(false,

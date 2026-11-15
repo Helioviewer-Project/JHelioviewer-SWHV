@@ -8,12 +8,10 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
@@ -90,7 +88,7 @@ final class HEKGeometry {
     }
 
     @Nullable
-    static EventGeometry position(JSONObject result, long start, boolean cactus) {
+    static EventGeometry position(JSONObject result, Position earth) {
         List<HgsPoint> hgsBoundedBox = result.isNull("hgs_bbox") ? null : parsePolygon(result.optString("hgs_bbox"));
         List<HgsPoint> hgsBoundCC = result.isNull("hgs_boundcc") ? null : parsePolygon(result.optString("hgs_boundcc"));
         HgsPoint centralPoint = result.isNull("hgs_coord") ? null : parsePoint(result.optString("hgs_coord"));
@@ -105,8 +103,7 @@ final class HEKGeometry {
         if (centralPoint == null && hgsLongitudeDeg != null && hgsLatitudeDeg != null)
             centralPoint = point(hgsLongitudeDeg, hgsLatitudeDeg);
 
-        Position p = Sun.getEarth(new JHVTime(start));
-        double elon = p.lon;
+        double elon = earth.lon;
 
         float[] jhvBoundary = new float[3 * boundary.size()];
         for (int i = 0; i < boundary.size(); i++) {
@@ -117,7 +114,7 @@ final class HEKGeometry {
         }
 
         Vec3 jhvCentralPoint = centralPoint != null ? hgsToJhv(centralPoint, elon) : null;
-        return new EventGeometry(jhvCentralPoint, jhvBoundary, cactus ? p : null);
+        return new EventGeometry(jhvCentralPoint, jhvBoundary);
     }
 
     private static Vec3 hgsToJhv(HgsPoint point, double elon) {

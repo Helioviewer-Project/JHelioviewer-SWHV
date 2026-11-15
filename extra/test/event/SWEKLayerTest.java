@@ -93,7 +93,7 @@ public final class SWEKLayerTest {
 
     private static void run() throws Exception {
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Test", ""), "test", "Test",
-                new SWEK.Source("test", List.of(), null, Map.of()), "test", List.of());
+                new SWEK.Source("test", List.of(), null, Map.of()), "test", List.of(), false);
         Method publish = SWEKSession.class.getDeclaredMethod("replaceEvents", EventBatch.class);
         publish.setAccessible(true);
         SWEKLayer layer = new SWEKLayer(session);
@@ -148,7 +148,7 @@ public final class SWEKLayerTest {
 
     private static void checkLabels() {
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Test", ""), "test", "Test",
-                new SWEK.Source("test", List.of(), null, Map.of()), "test", List.of());
+                new SWEK.Source("test", List.of(), null, Map.of()), "test", List.of(), false);
         EventMetadata.Builder metadata = new EventMetadata.Builder(supplier, true);
         metadata.add("event_title", "Title", "Excluded title", true);
         metadata.add("event_description", "Description", "Excluded description", true);
