@@ -24,7 +24,11 @@ public class ComesepHandler extends SWEKHandler {
     private static final String BASE_URL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+    protected RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+        return parseRemotePage(JSONUtils.get(createURI(supplier, start, end, page)), supplier, indexedParameters);
+    }
+
+    private RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         JSONArray results = eventJSON.getJSONArray("results");
         int len = results.length();
         List<SWEKHandler.RemoteEvent> event2dbList = new ArrayList<>(len);
@@ -61,8 +65,7 @@ public class ComesepHandler extends SWEKHandler {
         return links;
     }
 
-    @Override
-    protected URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
+    private URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
         return new URI(BASE_URL + "model=" + supplier.supplierName() + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
     }
 

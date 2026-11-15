@@ -28,6 +28,10 @@ public class HEKHandler extends SWEKHandler {
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
 
     @Override
+    protected RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+        return parseRemotePage(JSONUtils.get(createURI(supplier, start, end, page)), supplier, indexedParameters);
+    }
+
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         // Missing pagination metadata must not turn a partial response into cached coverage.
         boolean overmax = eventJSON.getBoolean("overmax");
@@ -124,7 +128,6 @@ public class HEKHandler extends SWEKHandler {
         } catch (IllegalArgumentException ignore) {}
     }
 
-    @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
         // HEK's supplier predicate is known to omit CACTus records. Query by event type and filter all suppliers locally.
         // The time bounds select overlapping events, including events that began before the requested start time.

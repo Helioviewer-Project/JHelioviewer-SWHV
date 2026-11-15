@@ -26,7 +26,11 @@ public class FHNWHandler extends SWEKHandler {
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
 
     @Override
-    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+    protected RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+        return parseRemotePage(JSONUtils.get(createURI(supplier, start, end, page)), supplier, indexedParameters);
+    }
+
+    private RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
         JSONArray params = eventJSON.getJSONArray("columns");
         int plen = params.length();
         JSONArray events = eventJSON.getJSONArray("data");
@@ -80,8 +84,7 @@ public class FHNWHandler extends SWEKHandler {
         }
     }
 
-    @Override
-    protected URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
+    private URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
         String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE" +
                 " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";

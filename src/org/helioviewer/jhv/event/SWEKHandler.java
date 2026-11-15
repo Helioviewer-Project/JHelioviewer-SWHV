@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.event;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
-
-import org.helioviewer.jhv.io.JSONUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,14 +16,7 @@ public abstract class SWEKHandler {
 
     public record RemotePage(boolean overmax, List<RemoteEvent> events, List<SolarEvent.LinkRef> associations) {}
 
-    RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
-        JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, page));
-        return parseRemotePage(eventJSON, supplier, indexedParameters);
-    }
-
-    protected abstract RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) throws Exception;
-
-    protected abstract URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception;
+    protected abstract RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception;
 
     public abstract SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException;
 

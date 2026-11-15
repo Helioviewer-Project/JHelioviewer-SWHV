@@ -2,7 +2,6 @@ package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -457,23 +456,13 @@ public final class EventCacheTest {
         PaginatedHandler() throws Exception {}
 
         @Override
-        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) {
+        protected RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) {
             pages.add(page);
             check(page == 0 || page == 1, "only two pages exist");
             if (pages.size() == 2)
                 throw new IllegalStateException("deliberate second page failure");
             RemoteEvent event = new RemoteEvent(json, start, end, start, "page-" + page, Map.of());
             return new RemotePage(page == 0, List.of(event), List.of());
-        }
-
-        @Override
-        protected URI createURI(SWEKSupplier supplier, long start, long end, int page) {
-            throw new AssertionError("controlled pagination does not use the network");
-        }
-
-        @Override
-        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) {
-            throw new AssertionError("controlled pagination supplies pages directly");
         }
 
         @Override
@@ -589,7 +578,7 @@ public final class EventCacheTest {
         }
 
         @Override
-        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
+        protected RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page, Map<String, SWEK.NumericType> indexedParameters) throws Exception {
             int call = calls.incrementAndGet();
             if (call <= blockedCalls) {
                 entered.countDown();
@@ -597,16 +586,6 @@ public final class EventCacheTest {
                 if (call == 1 && failFirst) throw new IllegalStateException("deliberate request failure");
             }
             return new RemotePage(false, List.of(), List.of());
-        }
-
-        @Override
-        protected URI createURI(SWEKSupplier supplier, long start, long end, int page) {
-            throw new AssertionError("controlled fetch does not use a network URI");
-        }
-
-        @Override
-        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier, Map<String, SWEK.NumericType> indexedParameters) {
-            throw new AssertionError("controlled fetch supplies its page directly");
         }
 
         @Override
