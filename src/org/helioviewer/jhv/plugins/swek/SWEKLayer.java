@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKGroup;
@@ -501,7 +502,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
         RelatedEvents found = mv.isOrthographic()
-                ? findOrthographicEvent(active, time, mv.mouseToSurface(vp, x, y), mv.mouseToPlane(vp, x, y))
+                ? findOrthographicEvent(active, time, mv, vp, x, y)
                 : findProjectedEvent(active, time, mv, vp, mv.mouseToScreen(vp, x, y));
 
         hover = found == null ? null : new Hover(found, x, y, time);
@@ -511,23 +512,28 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
     }
 
     @Nullable
-    private static RelatedEvents findOrthographicEvent(List<ActiveEvent> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+    private static RelatedEvents findOrthographicEvent(List<ActiveEvent> activeEvents, long currentTime, MapView mv, Viewport vp, int x, int y) {
+        Vec3 sphereHitpoint = mv.mouseToSurface(vp, x, y);
+        Quat viewRotation = mv.viewRotation();
+        double width = mv.cameraWidth(vp);
+        double upX = ViewportMath.computeUpX(vp, width, mv.cameraTranslationX(), x);
+        double upY = ViewportMath.computeUpY(vp, width, mv.cameraTranslationY(), y);
         for (ActiveEvent active : activeEvents) {
             SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
-            Vec3 hitpoint, pt;
             if (evt.isArc()) {
                 double principalAngle = Math.toRadians(evt.getCMEParameters().principalAngleDegree());
                 double distSun = SWEKData.cactusDistance(evt, currentTime);
                 Quat q = evt.getCMEParameters().earthView();
-                pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
-                hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
-            } else if (pi != null) {
-                hitpoint = sphereHitpoint;
-                pt = pi.centralPoint();
-            } else
+                Vec3 view = viewRotation.rotateVector(q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle)));
+                if (Math.abs(view.x - upX) < 0.08 && Math.abs(view.y - upY) < 0.08)
+                    return active.relatedEvents();
+                continue;
+            }
+            if (pi == null)
                 continue;
 
+            Vec3 hitpoint = sphereHitpoint, pt = pi.centralPoint();
             if (pt != null && hitpoint != null) {
                 double deltaX = Math.abs(hitpoint.x - pt.x);
                 double deltaY = Math.abs(hitpoint.y - pt.y);

@@ -107,10 +107,6 @@ public abstract class MapView {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
 
-    public Vec3 mouseToPlane(Viewport vp, int x, int y) { // only for SWEKLayer
-        return ViewportMath.unprojectToOutputPlane(camera, vp, cameraWidth(vp), x, y);
-    }
-
     public abstract Vec2 projectToScreen(Viewport vp, Vec3 v);
 
     public abstract Vec2 mouseToMap(Viewport vp, int x, int y);
