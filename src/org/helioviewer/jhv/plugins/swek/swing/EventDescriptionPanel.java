@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -17,6 +16,8 @@ import org.helioviewer.jhv.gui.component.FormPanel;
 import org.helioviewer.jhv.gui.dialog.BaseDialog;
 import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 import org.helioviewer.jhv.time.TimeUtils;
+
+import com.formdev.flatlaf.util.UIScale;
 
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel {
@@ -37,7 +38,7 @@ class EventDescriptionPanel extends JPanel {
         summary.add(times, BorderLayout.CENTER);
         summary.add(colorLabel, BorderLayout.PAGE_END);
 
-        add(new JLabel(new ImageIcon(SWEKIconImages.getImage(event.getSupplier().group().getIconKey()))), BorderLayout.LINE_START);
+        add(new JLabel(new SWEKIcon(event.getSupplier().group().getIconKey(), UIScale.scale(SWEKIconImages.DESCRIPTION))), BorderLayout.LINE_START);
         add(summary, BorderLayout.CENTER);
 
         addMouseListener(new MouseAdapter() {

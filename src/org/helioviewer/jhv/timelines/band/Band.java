@@ -227,7 +227,7 @@ public final class Band extends TimelineLayer {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, @Nullable Point mousePosition) {
         draw(g, graphArea, true);
     }
 

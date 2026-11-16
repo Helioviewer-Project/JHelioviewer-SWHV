@@ -13,7 +13,6 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,7 +30,6 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 import org.helioviewer.jhv.plugins.swek.SWEKIconImages;
 
-import com.formdev.flatlaf.util.ScaledImageIcon;
 import com.formdev.flatlaf.util.UIScale;
 import com.jidesoft.swing.JideButton;
 
@@ -132,10 +130,8 @@ final class SWEKTreePane extends JPanel {
 
     private Component createGroupComponent(SWEKGroup group) {
         JLabel label = new JLabel(group.getName());
+        label.setIcon(new SWEKIcon(group.getIconKey(), UIScale.scale(SWEKIconImages.TEXT)));
         int size = label.getPreferredSize().height;
-        int iconSize = UIScale.unscale(size);
-        label.setIcon(new ScaledImageIcon(new ImageIcon(SWEKIconImages.getImage(group.getIconKey())), iconSize, iconSize));
-        size = label.getPreferredSize().height;
 
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.setOpaque(false);

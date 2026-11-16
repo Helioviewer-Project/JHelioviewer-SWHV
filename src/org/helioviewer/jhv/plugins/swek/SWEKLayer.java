@@ -110,14 +110,18 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
         jo.put("icons", icons);
     }
 
-    private void bindTexture(SWEKGroup group) {
-        String key = group.getName();
+    private boolean bindTexture(SWEKGroup group) {
+        String key = group.getIconKey();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            SWEKIconBank.Pixels pixels = SWEKIconBank.getPixels(group.getIconKey());
+            SWEKIconBank.Pixels pixels = SWEKIconImages.full(key);
+            if (pixels == null)
+                return false;
+
             tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
             try {
-                tex.upload2D(GLTexture.Format.RGBA8, pixels.width(), pixels.height(), GL.LINEAR, ByteBuffer.wrap(pixels.rgba()));
+                tex.upload2D(GLTexture.Format.RGBA8, pixels.width(), pixels.height(), GL.LINEAR_MIPMAP_LINEAR, GL.LINEAR,
+                        GL.CLAMP_TO_EDGE, GL.CLAMP_TO_EDGE, ByteBuffer.wrap(pixels.rgba()));
             } catch (RuntimeException | Error e) {
                 tex.delete();
                 throw e;
@@ -125,6 +129,7 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
             iconCacheId.put(key, tex);
         }
         tex.bind();
+        return true;
     }
 
     private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, byte[] color, BufVertex vexBuf) {
@@ -326,8 +331,8 @@ public final class SWEKLayer extends AbstractLayer implements SWEKSession.Listen
             SolarEvent evt = active.event();
             if (!hasIcon(mv, evt))
                 continue;
-            bindTexture(evt.getSupplier().group());
-            glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(relatedEvents.getColor(), ICON_ALPHA), idx, 4);
+            if (bindTexture(evt.getSupplier().group()))
+                glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(relatedEvents.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }

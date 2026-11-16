@@ -16,8 +16,6 @@ public class DrawConstants {
     public static final int INTERVAL_SELECTION_HEIGHT = 20;
     public static final int RANGE_SELECTION_WIDTH = 15;
 
-    public static final int EVENT_OFFSET = 3;
-
     public static final DecimalFormat valueFormatter = MathUtils.numberFormatter("0", 4);
 
 }

@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -18,7 +18,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
-import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
@@ -31,16 +30,38 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         void open(RelatedEvents related, SolarEvent event, Point locationOnScreen);
     }
 
+    // Rows are as tall as a marker icon; the first row leaves room for a highlighted icon
+    private static final int ROW_HEIGHT = SWEKIconImages.MARKER;
+    private static final int TOP = SWEKIconImages.MARKER_HIGHLIGHTED / 2;
+    // Parameter box padding, and its distance from the pointer
+    private static final int PADDING = 3;
+
+    // An event interval: its center and width in pixels, and the center of its row
+    private record Plot(RelatedEvents event, String iconKey, int center, int y, int width) {
+        // A bar is at least as wide as its icon
+        int barWidth(int iconSize) {
+            return Math.max(width, iconSize);
+        }
+
+        // The square of the icon, widened to the bar; for a marker, the bar's row cell
+        boolean contains(@Nullable Point p, int iconSize) {
+            int barWidth = barWidth(iconSize);
+            int left = center - barWidth / 2;
+            return p != null && p.x >= left && p.x < left + barWidth && p.y >= y - iconSize / 2 && p.y < y - iconSize / 2 + iconSize;
+        }
+    }
+
     private final SWEKSession session;
     @Nullable
     private Ui ui;
-    private EventPlotConfiguration eventUnderMouse;
-    private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
-    private List<RelatedEvents> visibleEvents = Collections.emptyList();
+    private List<RelatedEvents> visibleEvents = List.of();
+    private final ArrayList<Plot> plots = new ArrayList<>();
+    @Nullable
+    private Plot plotUnderMouse;
 
     EventTimelineLayer(SWEKSession _session) {
         session = _session;
-        registerAndRefresh();
+        session.addListener(this);
     }
 
     void setUi(@Nullable Ui _ui) {
@@ -61,92 +82,127 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         if (enabled == _enabled) return;
         super.setEnabled(_enabled);
         if (enabled) {
-            registerAndRefresh();
+            session.addListener(this);
+            cacheUpdated();
         } else {
             session.removeListener(this);
         }
     }
 
-    private void registerAndRefresh() {
-        session.addListener(this);
-        cacheUpdated();
-    }
-
     @Override
     public void highlightChanged() {
-        DrawController.highlightChanged();
-    }
-
-    @Override
-    public void cacheUpdated() {
-        if (!enabled) return;
-        fetchData(DrawController.selectedAxis);
         DrawController.drawRequest();
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
-        if (!enabled)
-            return;
+    public void cacheUpdated() {
+        fetchData(DrawController.selectedAxis);
+        DrawController.drawRequest();
+    }
 
-        eventUnderMouse = null;
-        eventPlots.clear();
-        List<RelatedEvents> events = visibleEvents;
-        if (events.isEmpty()) {
-            if (mousePosition != null) {
-                session.highlight(null);
-            }
-            return;
-        }
-
-        ArrayList<Long> endDates = new ArrayList<>();
+    // A null mouse position means the pointer is outside the graph
+    @Override
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, @Nullable Point mousePosition) {
         TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
+        plots.clear();
+        // Each event goes in the first row where it does not overlap the bars already drawn; a bar reaches at most half an icon past its event
+        long[] rowEnds = new long[visibleEvents.size()];
+        int rows = 0;
+        for (RelatedEvents event : visibleEvents) {
+            long left = (long) xMapper.toPixel(event.getStart()) - SWEKIconImages.MARKER / 2;
+            int row = 0;
+            while (row < rows && rowEnds[row] > left)
+                row++;
+            if (row == rows)
+                rows++;
+            rowEnds[row] = (long) xMapper.toPixel(event.getEnd()) + SWEKIconImages.MARKER / 2;
 
-        for (RelatedEvents event : events) {
-            long eventStart = event.getStart();
-            long eventEnd = event.getEnd();
-            int i = 0;
-            while (i < endDates.size() && endDates.get(i) >= eventStart) {
-                i++;
-            }
-            if (i == endDates.size()) {
-                endDates.add(eventEnd);
-            } else {
-                endDates.set(i, eventEnd);
-            }
-            int eventPosition = i;
-
+            int y = graphArea.y + TOP + ROW_HEIGHT * row;
             for (Interval interval : event.getIntervals()) {
                 if (interval.end() < xAxis.start() || interval.start() > xAxis.end())
                     continue;
                 int x0 = xMapper.toPixel(interval.start());
-                int x1 = xMapper.toPixel(interval.end());
+                int width = xMapper.toPixel(interval.end()) - x0;
                 long middle = interval.start() + (interval.end() - interval.start()) / 2;
-                EventPlotConfiguration plot = createEventPlot(graphArea, event, x0, x1, eventPosition, middle);
-                eventPlots.add(plot);
-                drawEvent(graphArea, plot, g, mousePosition);
-                if (plot.contains(mousePosition))
-                    eventUnderMouse = plot;
+                plots.add(new Plot(event, event.getClosestTo(middle).getSupplier().group().getIconKey(), x0 + width / 2, y, width));
             }
         }
 
-        if (mousePosition != null) {
-            if (eventUnderMouse != null) {
-                drawEvent(graphArea, eventUnderMouse, g, mousePosition);
-                session.highlight(eventUnderMouse.event);
-            } else {
-                session.highlight(null);
-            }
+        // The bars move with the axis, so the event beneath a still pointer can change
+        plotUnderMouse = plotAt(mousePosition);
+        if (mousePosition != null)
+            session.highlight(plotUnderMouse == null ? null : plotUnderMouse.event());
+
+        AffineTransform transform = g.getTransform();
+        for (Plot plot : plots) {
+            if (!session.isHighlighted(plot.event()))
+                drawPlot(g, transform, plot, SWEKIconImages.MARKER);
         }
+        for (Plot plot : plots) {
+            if (session.isHighlighted(plot.event()))
+                drawPlot(g, transform, plot, SWEKIconImages.MARKER_HIGHLIGHTED);
+        }
+        if (mousePosition != null && plotUnderMouse != null)
+            drawText(g, transform, graphArea, xMapper, plotUnderMouse, mousePosition.x);
+    }
+
+    // The bar is half as thick as its icon and at least as wide; both are centered on the interval
+    private static void drawPlot(Graphics2D g, AffineTransform transform, Plot plot, int iconSize) {
+        int width = plot.barWidth(iconSize);
+        g.setColor(plot.event().getColor());
+        g.fillRect(plot.center() - width / 2, plot.y() - iconSize / 4, width, iconSize / 2);
+        SWEKIconImages.draw(g, transform, plot.iconKey(), plot.center() - iconSize / 2, plot.y() - iconSize / 2, iconSize);
+    }
+
+    // The parameters of the event beneath the pointer, beside it and inside the graph; a box too large clips at the right and bottom
+    private static void drawText(Graphics2D g, AffineTransform transform, Rectangle graphArea, TimeAxis.Mapper xMapper, Plot plot, int mouseX) {
+        SolarEvent event = plot.event().getClosestTo(xMapper.toValue(mouseX));
+        List<String> lines = SWEKData.visibleParameterLines(event);
+        FontMetrics metrics = g.getFontMetrics();
+        int textWidth = 0;
+        for (String line : lines)
+            textWidth = Math.max(textWidth, metrics.stringWidth(line));
+
+        int iconSize = SWEKIconImages.TEXT;
+        int width = 3 * PADDING + iconSize + textWidth;
+        int height = 2 * PADDING + Math.max(iconSize, lines.size() * metrics.getHeight());
+        int x = mouseX + PADDING;
+        if (x + width > graphArea.x + graphArea.width)
+            x = Math.max(graphArea.x, mouseX - PADDING - width);
+        int y = Math.max(graphArea.y, Math.min(plot.y() - SWEKIconImages.MARKER_HIGHLIGHTED / 2, graphArea.y + graphArea.height - height));
+
+        g.setColor(UIGlobals.TL_TEXT_BACKGROUND_COLOR);
+        g.fillRect(x, y, width, height);
+        SWEKIconImages.draw(g, transform, event.getSupplier().group().getIconKey(), x + PADDING, y + PADDING, iconSize);
+
+        g.setColor(UIGlobals.TL_TEXT_COLOR);
+        int textX = x + 2 * PADDING + iconSize;
+        int baseline = y + PADDING + metrics.getAscent();
+        for (String line : lines) {
+            g.drawString(line, textX, baseline);
+            baseline += metrics.getHeight();
+        }
+    }
+
+    // Topmost first, in reverse drawing order: highlighted plots at their drawn size, then the others
+    @Nullable
+    private Plot plotAt(@Nullable Point p) {
+        for (int i = plots.size() - 1; i >= 0; i--) {
+            Plot plot = plots.get(i);
+            if (session.isHighlighted(plot.event()) && plot.contains(p, SWEKIconImages.MARKER_HIGHLIGHTED))
+                return plot;
+        }
+        for (int i = plots.size() - 1; i >= 0; i--) {
+            Plot plot = plots.get(i);
+            if (plot.contains(p, SWEKIconImages.MARKER))
+                return plot;
+        }
+        return null;
     }
 
     @Override
     public void remove() {
         setEnabled(false);
-        visibleEvents = List.of();
-        eventPlots.clear();
-        eventUnderMouse = null;
-        ui = null;
     }
 
     @Override
@@ -175,93 +231,12 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
         return false;
     }
 
-    private record EventPlotConfiguration(RelatedEvents event, int x, int y, int width, int height, long time) {
-        boolean contains(Point point) {
-            return containsPoint(point, x - 1, y - 1, width + 2, height + 2);
-        }
-    }
-
-    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, RelatedEvents event, int x0, int x1, int yPosition, long time) {
-        int w = Math.max(x1 - x0, 1);
-        if (w < 5) {
-            x0 -= (5 - w) / 2; // center the widened marker on the event
-            w = 5;
-        }
-        int y = graphArea.y + 6 * yPosition + DrawConstants.EVENT_OFFSET;
-        return new EventPlotConfiguration(event, x0, y, w, 3, time);
-    }
-
-    private void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
-        RelatedEvents event = plot.event;
-        int x0 = plot.x;
-        int y = plot.y;
-        int w = plot.width;
-        int h = plot.height;
-        int spacePerLine = h;
-        boolean containsMouse = plot.contains(mousePosition);
-        boolean hl = session.isHighlighted(event) && (mousePosition == null || containsMouse); // null mousePosition from image canvas
-        int sz = Math.min(w, 8);
-        if (hl) {
-            x0 -= 10;
-            y -= 1;
-            w += 20;
-            h += 2;
-            sz = 12;
-            spacePerLine = h;
-        }
-        g.setColor(event.getColor());
-        g.fillRect(x0, y, w, spacePerLine);
-
-        BufferedImage icon = SWEKIconImages.getImage(event.getClosestTo(plot.time).getSupplier().group().getIconKey());
-        g.drawImage(icon, x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getWidth(), icon.getHeight(), null);
-
-        if (hl && mousePosition != null) {
-            drawText(graphArea, g, event, y, mousePosition.x);
-        }
-    }
-
-    private static void drawText(Rectangle graphArea, Graphics2D g, RelatedEvents event, int y, int mouseX) {
-        long ts = DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(mouseX);
-        SolarEvent closestEvent = event.getClosestTo(ts);
-        List<String> txts = SWEKData.visibleParameterLines(closestEvent);
-        int width = 1;
-        for (String text : txts) {
-            width = Math.max(width, g.getFontMetrics().stringWidth(text));
-        }
-        g.setColor(UIGlobals.TL_TEXT_BACKGROUND_COLOR);
-        g.fillRect(mouseX + 5, y, width + 21 + 10, txts.size() * 10 + 11);
-        g.setColor(UIGlobals.TL_TEXT_COLOR);
-
-        y += 5;
-        BufferedImage icon = SWEKIconImages.getImage(closestEvent.getSupplier().group().getIconKey());
-        g.drawImage(icon, mouseX + 8, y - 2, mouseX + 24, y + 14, 0, 0, icon.getWidth(), icon.getHeight(), null);
-
-        for (String txt : txts) {
-            g.drawString(txt, mouseX + 26, y += 10);
-        }
-    }
-
-    private static boolean containsPoint(Point p, int clickx, int clicky, int clickw, int clickh) {
-        return p != null && p.x >= clickx && p.x <= clickx + clickw && p.y >= clicky && p.y <= clicky + clickh;
-    }
-
     @Override
-    public boolean highlightChanged(Point p) {
-        if (!enabled)
-            return false;
-
-        EventPlotConfiguration current = null;
-        for (int i = eventPlots.size() - 1; i >= 0; i--) {
-            EventPlotConfiguration plot = eventPlots.get(i);
-            if (plot.contains(p)) {
-                current = plot;
-                break;
-            }
-        }
-
-        boolean changed = current != eventUnderMouse;
-        eventUnderMouse = current;
-        session.highlight(current == null ? null : current.event);
+    public boolean highlightChanged(@Nullable Point p) {
+        Plot current = plotAt(p);
+        boolean changed = current != plotUnderMouse;
+        plotUnderMouse = current;
+        session.highlight(current == null ? null : current.event());
         // Event details depend on the time beneath the pointer.
         return changed || current != null;
     }
@@ -269,11 +244,11 @@ public final class EventTimelineLayer extends TimelineLayer implements SWEKSessi
     @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
-        if (eventUnderMouse == null || ui == null)
+        if (plotUnderMouse == null || ui == null)
             return null;
 
         Ui target = ui;
-        RelatedEvents event = eventUnderMouse.event;
+        RelatedEvents event = plotUnderMouse.event();
         return (location, timestamp) -> target.open(event, event.getClosestTo(timestamp), location);
     }
 

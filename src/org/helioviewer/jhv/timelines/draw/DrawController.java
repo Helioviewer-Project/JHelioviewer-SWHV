@@ -317,10 +317,6 @@ public final class DrawController {
         Player.setTime(new JHVTime(geometry.xMapper(selectedAxis).toValue(point.x)));
     }
 
-    public static void highlightChanged() {
-        drawRequest();
-    }
-
     public static boolean setYAxisHighlight(@Nullable GraphGeometry.YAxisHit hit) {
         boolean changed = false;
         for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {

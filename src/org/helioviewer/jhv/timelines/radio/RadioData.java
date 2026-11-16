@@ -280,7 +280,7 @@ public final class RadioData extends TimelineLayer {
     }
 
     @Override
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, Point mousePosition) {
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, @Nullable Point mousePosition) {
         if (!enabled)
             return;
 

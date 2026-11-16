@@ -28,6 +28,7 @@ public class SWEKPlugin extends Plugin implements Layers.Listener {
     @Override
     protected void install() {
         session = new SWEKSession(SWEKConfig.load(Map.of("HEK", new HEKHandler())));
+        SWEKIconImages.load(session.catalog().getGroups());
         layer = new SWEKLayer(session);
         layer.setEnabled(true);
         Layers.add(layer);

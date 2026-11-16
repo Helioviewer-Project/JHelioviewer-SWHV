@@ -48,6 +48,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private final TimelineLabelPainter labelPainter = new TimelineLabelPainter();
     private final List<TimelineLayer> layers = TimelineLayers.get();
+    @Nullable
     private Point mousePosition;
 
     private boolean redrawGraphArea;
@@ -148,6 +149,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private void drawChart(Graphics2D g, GraphGeometry geometry, TimeAxis timeAxis) {
         Rectangle graphArea = geometry.area();
+        Point pointer = inGraph(geometry, mousePosition);
         g.setFont(TimelineLabelPainter.font);
         // Radio fills its plot area. Put the grid over it, then paint foreground data.
         for (TimelineLayer layer : layers) {
@@ -155,7 +157,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 Rectangle area = geometry.getLayerArea(layer);
                 if (area != null) {
                     g.setClip(area);
-                    layer.draw(g, area, timeAxis, mousePosition);
+                    layer.draw(g, area, timeAxis, pointer);
                 }
             }
         }
@@ -182,7 +184,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 warningBandDrawn |= band.hasWarningLevels();
                 band.draw(g, area, drawWarnings);
             } else {
-                layer.draw(g, area, timeAxis, mousePosition);
+                layer.draw(g, area, timeAxis, pointer);
             }
         }
     }
@@ -277,6 +279,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             }
         }
         mousePressedPosition = p;
+        mousePosition = p;
+        if (highlightChanged(inGraph(DrawController.getGeometry(), p)))
+            drawRequest();
     }
 
     private void moveChart(Point p) {
@@ -291,22 +296,24 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mousePosition = e.getPoint();
-        boolean eventHighlightChanged = highlightChanged(mousePosition);
-
+        Point p = e.getPoint();
+        mousePosition = p;
         GraphGeometry geometry = DrawController.getGeometry();
-        if (overMovieLine(mousePosition)) {
+        Point pointer = inGraph(geometry, p);
+        boolean eventHighlightChanged = highlightChanged(pointer);
+
+        if (overMovieLine(p)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else if (geometry.area().contains(mousePosition)) {
+        } else if (pointer != null) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
 
         boolean axisHighlightChanged = !geometry.isStacked()
-                && DrawController.setYAxisHighlight(geometry.yAxisHit(mousePosition));
+                && DrawController.setYAxisHighlight(geometry.yAxisHit(p));
         if (axisHighlightChanged || eventHighlightChanged)
             drawRequest();
         else
@@ -333,10 +340,18 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         return null;
     }
 
-    private boolean highlightChanged(Point p) {
+    // Layers see the pointer only inside the graph, where they draw
+    @Nullable
+    private static Point inGraph(GraphGeometry geometry, @Nullable Point p) {
+        return p != null && geometry.area().contains(p) ? p : null;
+    }
+
+    private boolean highlightChanged(@Nullable Point p) {
         boolean changed = false;
-        for (TimelineLayer layer : layers)
-            changed = layer.highlightChanged(p) || changed;
+        for (TimelineLayer layer : layers) {
+            if (layer.isEnabled())
+                changed = layer.highlightChanged(p) || changed;
+        }
         return changed;
     }
 

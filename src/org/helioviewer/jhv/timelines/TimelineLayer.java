@@ -47,7 +47,8 @@ public abstract class TimelineLayer {
 
     public abstract boolean isDeletable();
 
-    public abstract void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    // A null mouse position means the pointer is outside the graph
+    public abstract void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, @Nullable Point mousePosition);
 
     @Nullable
     public YAxis getYAxis() {
@@ -64,7 +65,7 @@ public abstract class TimelineLayer {
 
     public void resetAxis() {}
 
-    public boolean highlightChanged(Point p) {
+    public boolean highlightChanged(@Nullable Point p) {
         return false;
     }
 

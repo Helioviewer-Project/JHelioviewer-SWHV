@@ -137,7 +137,8 @@ public final class SWEKSession implements AutoCloseable {
     private final Set<Listener> listeners = new HashSet<>();
     private EventCollection eventCollection = new EventCollection();
 
-    private RelatedEvents lastHighlighted = null;
+    @Nullable
+    private RelatedEvents lastHighlighted;
 
     public SWEKSession(SWEKCatalog _catalog) {
         catalog = _catalog;
@@ -239,14 +240,10 @@ public final class SWEKSession implements AutoCloseable {
         return event == lastHighlighted;
     }
 
-    public void highlight(RelatedEvents event) {
+    public void highlight(@Nullable RelatedEvents event) {
         if (closed) return;
         if (event == lastHighlighted) return;
         lastHighlighted = event;
-        fireHighlightChanged();
-    }
-
-    private void fireHighlightChanged() {
         listeners.forEach(Listener::highlightChanged);
     }
 

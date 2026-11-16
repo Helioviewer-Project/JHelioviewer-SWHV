@@ -75,7 +75,7 @@ final class EventCollection {
         }
     }
 
-    boolean contains(RelatedEvents relatedEvents) {
+    boolean contains(@Nullable RelatedEvents relatedEvents) {
         return relatedEvents != null && relatedEventsByStart.getOrDefault(relatedEvents.getStart(), List.of()).contains(relatedEvents);
     }
 
