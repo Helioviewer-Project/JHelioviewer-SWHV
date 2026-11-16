@@ -164,7 +164,7 @@ public final class ImageDialog extends BaseDialog implements DataSources.Listene
                 ImageLayer.create().load(settings.request(item.server, item.sourceId));
         } else {
             DataSourcesParser.SourceItem item = items.getFirst();
-            layerToReplace.changeDataset(item.server, item.sourceId);
+            layerToReplace.load(settings.request(item.server, item.sourceId));
             layerToReplace = null;
         }
     }
