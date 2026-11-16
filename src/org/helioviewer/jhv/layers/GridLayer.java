@@ -58,6 +58,7 @@ public final class GridLayer extends AbstractLayer {
     private double latStep = 20;
     private boolean gridNeedsInit = true;
 
+    private boolean showAxis = true;
     private boolean showRadial = false;
 
     private Colors gridColor = Colors.ReducedGreen;
@@ -90,6 +91,7 @@ public final class GridLayer extends AbstractLayer {
     public void serialize(JSONObject jo) {
         jo.put("lonStep", lonStep);
         jo.put("latStep", latStep);
+        jo.put("showAxis", showAxis);
         jo.put("showRadial", showRadial);
         jo.put("type", Display.gridType);
         jo.put("color", gridColor.name());
@@ -104,6 +106,7 @@ public final class GridLayer extends AbstractLayer {
         lonStep = Math.clamp(jo.optDouble("lonStep", lonStep), GRID_STEP_MIN, GRID_STEP_MAX);
         latStep = Math.clamp(jo.optDouble("latStep", latStep), GRID_STEP_MIN, GRID_STEP_MAX);
 
+        showAxis = jo.optBoolean("showAxis", showAxis);
         showRadial = jo.optBoolean("showRadial", showRadial);
         gridColor = Colors.parse(jo.optString("color", gridColor.name()), gridColor);
         gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
@@ -155,7 +158,8 @@ public final class GridLayer extends AbstractLayer {
 
         drawEarthCircles(vp, pixFactor, Sun.getEarth(viewpoint.time));
 
-        axesLine.renderLine(vp, LINEWIDTH_AXES);
+        if (showAxis)
+            axesLine.renderLine(vp, LINEWIDTH_AXES);
 
         if (labelAlpha > 0) {
             Transform.pushView();
@@ -281,6 +285,15 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public String getName() {
         return "Grid";
+    }
+
+    public boolean isShowAxis() {
+        return showAxis;
+    }
+
+    public void setShowAxis(boolean _showAxis) {
+        showAxis = _showAxis;
+        DisplayController.display();
     }
 
     public boolean isShowRadial() {

@@ -35,7 +35,9 @@ final class GridLayerOptions extends FormPanel {
                 new JLabel("Latitude"), createGridResolutionSpinner(layer.getLatStep(), layer::setLatStep));
         JCheckBox radial = new JCheckBox("Radial grid", layer.isShowRadial());
         radial.addActionListener(e -> layer.setShowRadial(radial.isSelected()));
-        addRow("", radial);
+        JCheckBox axis = new JCheckBox("Solar axis", layer.isShowAxis());
+        axis.addActionListener(e -> layer.setShowAxis(axis.isSelected()));
+        addRow("", axis, radial);
         addRow("Color", createColorBox(layer));
         addRow("Line width", createLineWidthSlider(layer));
         addRow("Line opacity", createOpacitySlider(layer.getGridAlpha(), layer::setGridAlpha));
