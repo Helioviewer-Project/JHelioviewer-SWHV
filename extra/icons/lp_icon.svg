@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="g" cx="64" cy="64" r="64" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe000"/><stop offset="0.06" stop-color="#ffc30a"/><stop offset="0.125" stop-color="#ffa51e"/><stop offset="0.19" stop-color="#ff8728"/><stop offset="0.25" stop-color="#ff692d"/><stop offset="0.31" stop-color="#ff4b28"/><stop offset="0.375" stop-color="#fa1a12"/><stop offset="0.44" stop-color="#e10c0c"/><stop offset="0.5" stop-color="#bc0606"/><stop offset="0.56" stop-color="#960202"/><stop offset="0.625" stop-color="#710202"/><stop offset="0.69" stop-color="#4c0000"/><stop offset="0.75" stop-color="#260000"/><stop offset="0.81" stop-color="#050000"/><stop offset="1" stop-color="#000000"/></radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="63" fill="url(#g)"/>
+  <path d="M40 82V79.16H43.68V49.84H40V47H54.79V49.84H51.09V78.79H62.39V73.26H65V82Z M70 82V79.16H73.7V49.84H70V47H86.47Q91.32 47 94.16 49.78Q97 52.56 97 57.22Q97 61.91 94.15 64.71Q91.29 67.51 86.47 67.51H81.17V79.16H85.85V82ZM81.17 64.68H83.35Q85.87 64.68 87.36 62.65Q88.86 60.62 88.86 57.22Q88.86 53.85 87.38 51.84Q85.89 49.84 83.35 49.84H81.17Z" fill="#ffffff"/>
+</svg>

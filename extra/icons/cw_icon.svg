@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="g" cx="64" cy="64" r="64" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe000"/><stop offset="0.06" stop-color="#ffc30a"/><stop offset="0.125" stop-color="#ffa51e"/><stop offset="0.19" stop-color="#ff8728"/><stop offset="0.25" stop-color="#ff692d"/><stop offset="0.31" stop-color="#ff4b28"/><stop offset="0.375" stop-color="#fa1a12"/><stop offset="0.44" stop-color="#e10c0c"/><stop offset="0.5" stop-color="#bc0606"/><stop offset="0.56" stop-color="#960202"/><stop offset="0.625" stop-color="#710202"/><stop offset="0.69" stop-color="#4c0000"/><stop offset="0.75" stop-color="#260000"/><stop offset="0.81" stop-color="#050000"/><stop offset="1" stop-color="#000000"/></radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="63" fill="url(#g)"/>
+  <path d="M61 73.13Q59.73 78.65 56.44 81.32Q53.15 84 47.6 84Q39.45 84 34.72 79.02Q30 74.04 30 65.51Q30 56.96 34.72 51.98Q39.45 47 47.6 47Q50.45 47 53.56 47.76Q56.67 48.53 60.11 50.08V58.85H57.39Q56.55 54.36 54.34 52.12Q52.13 49.89 48.49 49.89Q43.78 49.89 41.51 53.72Q39.23 57.56 39.23 65.51Q39.23 73.47 41.51 77.29Q43.78 81.11 48.51 81.11Q51.74 81.11 53.78 79.13Q55.81 77.14 56.72 73.13Z M97.86 83H92.9L86.41 57.52L79.93 83H74.97L66.78 50.84H64V48H77.6V50.84H74.52L80.01 72.33L86.18 48H91.64L97.94 72.73L103.54 50.84H100.12V48H109V50.84H106.05Z" fill="#ffffff"/>
+</svg>

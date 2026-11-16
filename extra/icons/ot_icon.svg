@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="g" cx="60" cy="64" r="64" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#20e060"/><stop offset="0.35" stop-color="#5be0c7"/><stop offset="0.75" stop-color="#66d2de"/><stop offset="1" stop-color="#90c4ee"/></radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="63" fill="url(#g)"/>
+  <path d="M72.07 82.48H52.32V79.71Q52.32 75.07 54.13 71.48Q55.93 67.89 61.73 62.34L65.23 59.06Q68.35 56.12 69.8 53.52Q71.25 50.91 71.25 48.31Q71.25 44.35 68.63 42.12Q66 39.88 61.3 39.88Q56.86 39.88 51.72 41.78Q46.58 43.67 41 47.41V29.64Q47.62 27.26 53.09 26.13Q58.56 25 63.65 25Q77 25 84 30.63Q91 36.26 91 47.07Q91 52.61 88.87 57Q86.73 61.38 81.59 66.42L78.09 69.64Q74.37 73.15 73.22 75.27Q72.07 77.39 72.07 79.94ZM52.32 90.86H72.07V111H52.32Z" fill="#ffffff"/>
+</svg>
