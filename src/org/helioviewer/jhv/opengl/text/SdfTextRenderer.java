@@ -30,6 +30,7 @@ public final class SdfTextRenderer {
     private static final String ATLAS_IMAGE = "/sdf/atlas-128.png";
     private static final String ATLAS_JSON = "/sdf/atlas-128.json";
     private static final String ATLAS_CHARSET = "/sdf/charset";
+    private static final float ATLAS_PADDING = 12; // -pxpadding in extra/font/generate-atlas.sh
     private static final int FALLBACK_CODE_POINT = '?';
 
     private static final int VERTICES_PER_QUAD = 6;
@@ -78,7 +79,14 @@ public final class SdfTextRenderer {
     }
 
     public float measureWidth(String str) {
+        return measureLine(str).width();
+    }
+
+    public record LineMetrics(float width, float descent) {}
+
+    public LineMetrics measureLine(String str) {
         float width = 0;
+        float bottom = 0;
         Glyph previousGlyph = null;
         int len = str.length();
         for (int offset = 0; offset < len; ) {
@@ -87,10 +95,11 @@ public final class SdfTextRenderer {
             if (previousGlyph != null)
                 width += getKerning(previousGlyph, glyph);
             width += glyph.advance;
+            bottom = Math.min(bottom, glyph.y0);
             previousGlyph = glyph;
             offset += Character.charCount(codePoint);
         }
-        return width;
+        return new LineMetrics(width, Math.max(0, -bottom - ATLAS_PADDING));
     }
 
     public void beginRendering(int width, int height) {

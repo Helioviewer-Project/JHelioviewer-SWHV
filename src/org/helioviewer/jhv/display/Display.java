@@ -32,11 +32,17 @@ public final class Display {
 
     static int glWidth = 1;
     static int glHeight = 1;
+    private static float renderPixelsPerPoint = 1;
     public static final double[] pixelScale = {1, 1};
 
-    public static void setGLSize(int x, int y, int w, int h) {
+    public static float getRenderPixelsPerPoint() {
+        return renderPixelsPerPoint;
+    }
+
+    public static void setGLSize(int x, int y, int w, int h, float pixelsPerPoint) {
         glWidth = w;
         glHeight = h;
+        renderPixelsPerPoint = pixelsPerPoint;
         fullViewport = DisplayLayout.fullViewport(x, y, w, h, glHeight);
     }
 

@@ -18,6 +18,8 @@ public class TimestampLayer extends AbstractLayer {
 
     public static final int MIN_SCALE = 50;
     public static final int MAX_SCALE = 300;
+    private static final float FONT_SIZE = 18;
+    private static final float DESCENT = 0.25f;
 
     private int scale = 100;
     private boolean extra = false;
@@ -64,16 +66,28 @@ public class TimestampLayer extends AbstractLayer {
             }
         }
 
-        int size = (int) (vp.height * (scale * 0.01 * 0.024));
-
         int deltaX = (int) (vp.height * 0.01);
-        int deltaY = top ? (int) (vp.height - Display.pixelScale[1] * deltaX - size) : deltaX; //!
+        int availableWidth = vp.width - 2 * deltaX;
+        int availableHeight = vp.height - 2 * deltaX;
+        if (availableWidth <= 0)
+            return;
+
+        float shadowScale = vp.height / 1024f;
 
         SdfTextRenderer renderer = GLText.renderer();
-        float textScaleFactor = size / renderer.getFontSize();
+        SdfTextRenderer.LineMetrics metrics = renderer.measureLine(text);
+        float fontSize = renderer.getFontSize();
+        float requestedSize = FONT_SIZE * (scale / 100f) * Display.getRenderPixelsPerPoint();
+        float size = Math.min(requestedSize, availableWidth * fontSize / metrics.width());
+        size = Math.min(size, availableHeight / (1 + DESCENT));
+        float textScaleFactor = size / fontSize;
+        float shadowY = GLText.SHADOW_OFFSET_Y * shadowScale;
+        float deltaY = top ? vp.height - deltaX - size
+                : Math.max(deltaX, metrics.descent() * textScaleFactor - shadowY);
         renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.SHADOW_COLOR);
-        renderer.draw(text, deltaX + GLText.SHADOW_OFFSET_X, deltaY + GLText.SHADOW_OFFSET_Y, 0, textScaleFactor);
+        renderer.draw(text, deltaX + GLText.SHADOW_OFFSET_X * shadowScale,
+                deltaY + shadowY, 0, textScaleFactor);
         renderer.setColor(Colors.LightGrayFloat);
         renderer.draw(text, deltaX, deltaY, 0, textScaleFactor);
         renderer.endRendering();

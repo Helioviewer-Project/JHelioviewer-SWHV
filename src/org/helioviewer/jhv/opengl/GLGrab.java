@@ -4,16 +4,28 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.Viewport;
 
 public class GLGrab {
 
     public final int w;
     public final int h;
+    private final float pixelsPerPoint;
     private GLFrameCapture capture;
 
     public GLGrab(int _w, int _h) {
+        this(_w, _h, fixedSizePixelsPerPoint(_w, _h));
+    }
+
+    public GLGrab(int _w, int _h, float _pixelsPerPoint) {
         w = _w;
         h = _h;
+        pixelsPerPoint = _pixelsPerPoint;
+    }
+
+    public static float fixedSizePixelsPerPoint(int width, int height) {
+        // The 1024×1024 preset uses one output pixel per point.
+        return Math.min(width, height) / 1024f;
     }
 
     private void init() {
@@ -31,13 +43,11 @@ public class GLGrab {
         if (capture == null)
             init();
 
-        int _x = Display.fullViewport.x;
-        int _y = Display.fullViewport.yGL;
-        int _w = Display.fullViewport.width;
-        int _h = Display.fullViewport.height;
+        Viewport screen = Display.fullViewport;
+        float screenPixelsPerPoint = Display.getRenderPixelsPerPoint();
 
         try {
-            Display.setGLSize(0, 0, w, h);
+            Display.setGLSize(0, 0, w, h, pixelsPerPoint);
             Display.reshapeAll();
             MapView exportView = GLRenderer.createMapView(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
 
@@ -47,7 +57,7 @@ public class GLGrab {
             capture.readPixels(buffer);
         } finally {
             GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
-            Display.setGLSize(_x, _y, _w, _h);
+            Display.setGLSize(screen.x, screen.yAWT, screen.width, screen.height, screenPixelsPerPoint);
             Display.reshapeAll();
         }
     }

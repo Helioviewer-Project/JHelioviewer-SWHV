@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.image.nio.MappedImageFactory;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
@@ -145,6 +146,7 @@ public final class ExportMovie {
         private final ViewState.RecordingMode mode;
         private final int width;
         private final int height;
+        private final float pixelsPerPoint;
         private final ExportWriter writer;
 
         private @Nullable GLGrab grabber;
@@ -170,6 +172,7 @@ public final class ExportMovie {
             if (mode != ViewState.RecordingMode.SHOT)
                 outputHeight = outputHeight / MACROBLOCK * MACROBLOCK;
             height = outputHeight;
+            pixelsPerPoint = size.internal() ? GLGrab.fixedSizePixelsPerPoint(width, height) : Display.getRenderPixelsPerPoint();
 
             writer = new ExportWriter(mode == ViewState.RecordingMode.SHOT ?
                     ExportFormat.PNG : ExportFormat.fromSettings(), width, height, fps);
@@ -273,7 +276,7 @@ public final class ExportMovie {
                 return;
             if (grabber != null)
                 grabber.dispose();
-            grabber = new GLGrab(width, grabberHeight);
+            grabber = new GLGrab(width, grabberHeight, pixelsPerPoint);
         }
 
         private int timelineHeight(BufferedImage image) {

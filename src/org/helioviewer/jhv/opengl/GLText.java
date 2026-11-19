@@ -29,16 +29,12 @@ public final class GLText {
         }
     }
 
-    private static int logicalToPhysicalSize(int logicalSize) {
-        return (int) (logicalSize * Display.pixelScale[1]);
-    }
-
     public static void drawTextFloat(Viewport vp, List<String> lines, int x, int y) {
         if (lines.isEmpty())
             return;
 
         SdfTextRenderer renderer = renderer();
-        int textSize = logicalToPhysicalSize(FLOAT_TEXT_SIZE);
+        int textSize = (int) (FLOAT_TEXT_SIZE * Display.getRenderPixelsPerPoint());
         float textScaleFactor = textSize / renderer.getFontSize();
         int lineStep = (int) (textSize * FLOAT_TEXT_LINE_HEIGHT);
 

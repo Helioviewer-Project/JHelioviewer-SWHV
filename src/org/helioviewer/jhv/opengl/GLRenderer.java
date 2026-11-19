@@ -94,7 +94,7 @@ public final class GLRenderer {
     }
 
     public static void reshape(int glWidth, int glHeight) {
-        Display.setGLSize(0, 0, glWidth, glHeight);
+        Display.setGLSize(0, 0, glWidth, glHeight, (float) Display.pixelScale[1]);
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null)

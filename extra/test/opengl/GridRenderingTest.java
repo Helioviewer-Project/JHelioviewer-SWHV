@@ -84,9 +84,37 @@ public final class GridRenderingTest {
                     }
                 }
             }
+            checkFixedExports(grid, renderer, viewpoint);
         } finally {
             renderer.destroy();
         }
         System.out.println("GridRenderingTest passed");
+    }
+
+    private static void checkFixedExports(GridLayer grid, AngleRenderer renderer, Position viewpoint) {
+        GLGrab grab = new GLGrab(1024, 1024);
+        ByteBuffer normal = ByteBuffer.allocate(3 * grab.w * grab.h);
+        ByteBuffer retina = ByteBuffer.allocate(normal.capacity());
+        try {
+            for (MapMode mode : MapMode.values()) {
+                Display.mode = mode;
+                Display.pixelScale[0] = Display.pixelScale[1] = 1;
+                GLRenderer.reshape(640, 360);
+                grid.setLabelAlpha(1);
+                renderer.render(viewpoint, false);
+                grab.renderFrame(normal);
+                Display.pixelScale[0] = Display.pixelScale[1] = 2;
+                GLRenderer.reshape(800, 600);
+                grab.renderFrame(retina);
+                if (!normal.equals(retina))
+                    throw new AssertionError("Fixed-size grid text changed with monitor DPI: " + mode);
+                grid.setLabelAlpha(0);
+                grab.renderFrame(retina);
+                if (normal.equals(retina))
+                    throw new AssertionError("Grid export lacked labels: " + mode);
+            }
+        } finally {
+            grab.dispose();
+        }
     }
 }
