@@ -24,9 +24,9 @@ JAVA_TESTS = {
     "uri": ["source.FITSReaderTest", "layers.FITSSeriesTest"],
     "commands": ["io.samp.CommandStateTest", "layers.ViewpointBehaviorTest", "display.DisplayLayoutTest", "thread.UiTimerTest"],
     "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest"],
-    "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.viewpoint.LocationProjectionTest"],
+    "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.viewpoint.LocationProjectionTest", "layers.viewpoint.ViewpointOrbitTrailTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
-    "opengl": ["opengl.EclipseRenderingTest", "opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
+    "opengl": ["opengl.EclipseRenderingTest", "opengl.ViewpointObjectNamesTest", "opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
 }
 
 
@@ -47,10 +47,10 @@ def run_java_suite(suite, native_resources=None, render_output=None):
             home.mkdir()
             print("Running " + name, flush=True)
             output_args = []
-            if render_output and name in ("opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest"):
+            if render_output and name in ("opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GridRenderingTest", "opengl.ImageRenderingTest", "opengl.ViewpointObjectNamesTest"):
                 render_output.mkdir(parents=True, exist_ok=True)
                 filename = name.rsplit(".", 1)[1]
-                output_args = [str(render_output / (filename if filename in ("GridRenderingTest", "ImageRenderingTest") else filename + ".png"))]
+                output_args = [str(render_output / (filename if filename in ("GridRenderingTest", "ImageRenderingTest", "ViewpointObjectNamesTest") else filename + ".png"))]
             subprocess.run([
                 "java", "--enable-native-access=ALL-UNNAMED", "-Djava.awt.headless=" + str(suite != "sidebar").lower(),
                 *(["--add-exports=java.desktop/sun.awt=ALL-UNNAMED", "--add-exports=java.desktop/sun.swing=ALL-UNNAMED"] if suite == "sidebar" else []),

@@ -17,6 +17,12 @@ public class PositionResponse {
         public double x;
         public double y;
         public double z;
+        private int linearSegment = -1;
+
+        // Index of the linear interpolation segment, or -1 for a state response.
+        public int linearSegment() {
+            return linearSegment;
+        }
 
         public double distance() {
             return Math.sqrt(x * x + y * y + z * z);
@@ -126,6 +132,7 @@ public class PositionResponse {
             vel[1] = out.y;
             vel[2] = out.z;
         }
+        out.linearSegment = velocity == null ? i : -1;
         if (velocity == null || i == inext)
             interpolateLinear(position, i, inext, alpha, out);
         else

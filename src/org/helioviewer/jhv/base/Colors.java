@@ -39,6 +39,10 @@ public enum Colors {
         return bytes;
     }
 
+    public byte[] bytes(double alpha) {
+        return alpha == 1 ? bytes : bytes(awtColor, alpha);
+    }
+
     @Override
     public String toString() {
         return displayName;

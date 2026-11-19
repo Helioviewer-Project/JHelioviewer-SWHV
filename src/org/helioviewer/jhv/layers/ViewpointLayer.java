@@ -19,7 +19,8 @@ import org.helioviewer.jhv.input.InputMouseListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
-import org.helioviewer.jhv.layers.viewpoint.ViewpointOrbitWorker;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointObjectNames;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointOrbitGeometry;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -39,21 +40,24 @@ public class ViewpointLayer extends AbstractLayer {
     private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
     private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
+    private static final int SPIRAL_POINTS = 2 * SPIRAL_DIVISIONS + 1;
+    private static final double[][] SPIRAL_ROTATIONS = spiralRotations();
+    private static final byte[] SPIRAL_REFERENCE_COLOR = Colors.ReducedGreen.bytes();
+    private static final byte[] SPIRAL_SECONDARY_COLOR = Colors.ReducedGreen.bytes(0.4);
 
     private final GLSLLine orbits = new GLSLLine(true);
     private final GLSLShape planets = new GLSLShape(true);
-    private final ViewpointOrbitWorker orbitWorker = new ViewpointOrbitWorker(this::orbitsReady);
-    private ViewpointOrbitWorker.Parameters uploadedParameters;
-    private ViewpointOrbitWorker.Prepared readyOrbits;
+    private final ViewpointOrbitGeometry orbitGeometry = new ViewpointOrbitGeometry();
+    private ViewpointOrbitGeometry.Parameters uploadedParameters;
+    private List<ViewpointOrbitGeometry.Marker> uploadedMarkers = List.of();
+    private final ViewpointObjectNames objectNames = new ViewpointObjectNames();
 
     private final GLSLLine spiral = new GLSLLine(true);
-    private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2));
-    private final byte[] spiralColor = Colors.ReducedGreen.bytes();
+    private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (SPIRAL_POINTS + 2));
+    private final double[][] spiralArm = new double[SPIRAL_POINTS][3];
 
     private final double[] lati = new double[3];
-    private final double[] hoverPoint = new double[3];
     private final PositionResponse.Interpolated latiInterpolated = new PositionResponse.Interpolated();
-    private final PositionResponse.Interpolated hoverInterpolated = new PositionResponse.Interpolated();
 
     private final ViewpointLayerOptions options;
     private final HoverListener hoverListener = new HoverListener();
@@ -74,22 +78,9 @@ public class ViewpointLayer extends AbstractLayer {
         options = new ViewpointLayerOptions(jo);
     }
 
-    private double getRelativeLongitude(ViewpointLayerOptionsExpert equatorial, long time, long start, long end) {
-        double relativeLon = 0;
-
-        PositionLoad control = equatorial.getHighlightedLoad();
-        if (control != null && equatorial.isRelative()) {
-            PositionResponse response = control.getResponse();
-            if (response != null) {
-                response.interpolateLatitudinal(time, start, end, lati, latiInterpolated);
-                relativeLon = lati[1];
-            }
-        }
-        return relativeLon;
-    }
-
     @Override
     public void render(MapView mv, Viewport vp) {
+        objectNames.clear();
         if (vp.idx == 0 && options.isLocation())
             options.getSky().compute(mv, vp, enabled);
 
@@ -107,32 +98,40 @@ public class ViewpointLayer extends AbstractLayer {
         long end = Player.getEndTime();
 
         ViewpointLayerOptionsExpert equatorial = options.getEquatorialOptions();
-        PositionLoad control = equatorial.getHighlightedLoad();
+        List<PositionLoad> positionLoads = equatorial.getSelectedLoads();
+        boolean hasOrbits = !positionLoads.isEmpty() && prepareOrbits(positionLoads, time, start, end);
+        boolean relative = equatorial.isRelative();
+        PositionLoad reference = null;
         double relativeLon = 0;
-        int spiralSpeed = 0;
+        int spiralSpeed = equatorial.getSpiralSpeed();
 
-        if (control != null) {
-            PositionResponse response = control.getResponse();
+        if (relative || spiralSpeed > 0) {
+            PositionLoad control = equatorial.getHighlightedLoad();
+            PositionResponse response = control == null ? null : control.getResponse();
             if (response != null) {
                 response.interpolateLatitudinal(time, start, end, lati, latiInterpolated);
-                spiralSpeed = equatorial.getSpiralSpeed(); // only if we have control point
-                relativeLon = equatorial.isRelative() ? lati[1] : 0;
+                relativeLon = relative ? lati[1] : 0;
+                reference = control;
+            } else {
+                spiralSpeed = 0;
             }
         }
 
-        double pointFactor = temperedPointFactor(vp, mv.cameraWidth(vp));
+        double pointFactor = temperedPointFactor(mv, vp);
         Position viewpoint = mv.viewpoint();
+        Quat orbitFrameRotation = relativeLon == 0 ? viewpoint.toQuat() : Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon);
 
         Transform.pushView();
-        Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));
+        Transform.rotateViewInverse(orbitFrameRotation);
 
         if (spiralSpeed > 0)
             renderSpiral(vp, lati, spiralSpeed);
 
-        List<PositionLoad> positionLoads = equatorial.getSelectedLoads();
-        if (!positionLoads.isEmpty()) {
+        if (hasOrbits) {
             GL.glDisable(GL.DEPTH_TEST);
-            renderPlanets(vp, positionLoads, pointFactor, time, start, end);
+            orbits.renderLine(vp, LINEWIDTH_ORBIT);
+            planets.renderPoints(pointFactor);
+            objectNames.prepare(uploadedMarkers, reference, mv, vp, orbitFrameRotation, pointFactor);
             GL.glEnable(GL.DEPTH_TEST);
         }
 
@@ -141,6 +140,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void renderScale(MapView mv, Viewport vp) {
+        objectNames.clear();
         if (!mv.isHpc() || !options.isLocation())
             return;
         options.getSky().compute(mv, vp, enabled);
@@ -153,14 +153,22 @@ public class ViewpointLayer extends AbstractLayer {
     private final List<String> hoverText = new ArrayList<>();
     private int mouseX, mouseY;
 
-    private static double temperedPointFactor(Viewport vp, double width) {
-        double pixelScale = Display.pixelScale[1];
-        return pixelScale * Math.cbrt(ViewportMath.getPixelFactor(vp, width) / pixelScale);
+    private static double temperedPointFactor(MapView mv, Viewport vp) {
+        double markerScale = Math.max(1, vp.height / 1024f);
+        return markerScale * Math.cbrt(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)) / markerScale);
+    }
+
+    @Override
+    public void renderFloat(MapView mv, Viewport vp) {
+        if (enabled && options.isHeliospheric() && mv.isOrthographic())
+            objectNames.render(vp, Display.getRenderPixelsPerPoint());
+        else
+            objectNames.clear();
     }
 
     @Override
     public void renderFullFloat(Viewport vp) {
-        if (!enabled)
+        if (!enabled || !options.isLocation())
             return;
         GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
@@ -173,69 +181,10 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     private void handleMouseMoved(PointerEvent e) {
-        if (options.isLocation()) {
+        if (options.isLocation())
             hoverLocation(e);
-            return;
-        }
-        if (!options.isHeliospheric()) {
+        else
             clearHoverTextIfNeeded();
-            return;
-        }
-
-        ViewpointLayerOptionsExpert equatorial = options.getEquatorialOptions();
-        List<PositionLoad> positionLoads = equatorial.getSelectedLoads();
-        if (positionLoads.isEmpty()) {
-            clearHoverTextIfNeeded();
-            return;
-        }
-
-        MapView mv = GLRenderer.getMapView();
-        long time = Player.getTime().milli, start = Player.getStartTime(), end = Player.getEndTime();
-        double relativeLon = getRelativeLongitude(equatorial, time, start, end);
-
-        mouseX = e.x();
-        mouseY = e.y();
-
-        Viewport vp = Display.getActiveViewport();
-        double width = mv.cameraWidth(vp);
-        double mousePlaneX = ViewportMath.computeUpX(vp, width, mv.cameraTranslationX(), mouseX);
-        double mousePlaneY = ViewportMath.computeUpY(vp, width, mv.cameraTranslationY(), mouseY);
-        Quat dragRotation = mv.dragRotation();
-
-        double halfWidth = width / 2;
-        double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);
-        double cosRelativeLon = Math.cos(-relativeLon);
-        double sinRelativeLon = Math.sin(-relativeLon);
-        double minDist2 = Double.MAX_VALUE;
-
-        String name = null;
-        for (PositionLoad positionLoad : positionLoads) {
-            PositionResponse response = positionLoad.getResponse();
-            if (response == null)
-                continue;
-
-            response.interpolateRectangular(time, start, end, hoverPoint, hoverInterpolated);
-            if (relativeLon != 0) {
-                double x = hoverPoint[0];
-                double y = hoverPoint[1];
-                hoverPoint[0] = x * cosRelativeLon - y * sinRelativeLon;
-                hoverPoint[1] = x * sinRelativeLon + y * cosRelativeLon;
-            }
-            dragRotation.qxv(hoverPoint, hoverPoint);
-
-            double deltaX = hoverPoint[0] - mousePlaneX;
-            double deltaY = hoverPoint[1] - mousePlaneY;
-            double dist2 = deltaX * deltaX + deltaY * deltaY;
-            if (dist2 < minDist2) {
-                minDist2 = dist2;
-                name = positionLoad.target().toString();
-            }
-        }
-        clearHoverTextIfNeeded();
-        if (name != null && minDist2 < hoverThreshold2) {
-            hoverText.add(name);
-            DisplayController.display();
-        }
     }
 
     private void hoverLocation(PointerEvent e) {
@@ -268,7 +217,7 @@ public class ViewpointLayer extends AbstractLayer {
             options.applyCurrentViewpoint(mode);
         } else {
             hoverText.clear();
-            clearOrbitWorker();
+            clearUploadedOrbits();
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
@@ -311,15 +260,17 @@ public class ViewpointLayer extends AbstractLayer {
     public void init() {
         orbits.init();
         planets.init();
+        objectNames.init();
         options.getSky().init();
         spiral.init();
     }
 
     @Override
     public void dispose() {
-        clearOrbitWorker();
+        clearUploadedOrbits();
         orbits.dispose();
         planets.dispose();
+        objectNames.dispose();
         options.getSky().dispose();
         spiral.dispose();
     }
@@ -333,90 +284,90 @@ public class ViewpointLayer extends AbstractLayer {
         return options;
     }
 
-    private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor, long time, long start, long end) {
-        ViewpointOrbitWorker.Parameters parameters = createOrbitParameters(positionLoads, time, start, end);
+    private boolean prepareOrbits(List<PositionLoad> positionLoads, long time, long start, long end) {
+        ViewpointOrbitGeometry.Parameters parameters = createOrbitParameters(positionLoads, time, start, end);
         if (parameters.entries().isEmpty()) {
-            clearOrbitWorker();
-            return;
+            clearUploadedOrbits();
+            return false;
         }
 
-        uploadReadyOrbits(parameters);
-
-        if (!parameters.equals(uploadedParameters))
-            orbitWorker.submit(parameters);
-
-        if (parameters.compatibleWith(uploadedParameters)) {
-            orbits.renderLine(vp, LINEWIDTH_ORBIT);
-            planets.renderPoints(pointFactor);
+        if (!parameters.equals(uploadedParameters)) {
+            ViewpointOrbitGeometry.Prepared geometry = orbitGeometry.build(parameters);
+            orbits.upload(geometry.orbitVertices());
+            planets.upload(geometry.planetVertices());
+            uploadedParameters = parameters;
+            uploadedMarkers = geometry.markers();
         }
+
+        return true;
     }
 
-    private static ViewpointOrbitWorker.Parameters createOrbitParameters(List<PositionLoad> positionLoads, long time, long start, long end) {
-        ArrayList<ViewpointOrbitWorker.Entry> entries = new ArrayList<>(positionLoads.size());
+    private static ViewpointOrbitGeometry.Parameters createOrbitParameters(List<PositionLoad> positionLoads, long time, long start, long end) {
+        ArrayList<ViewpointOrbitGeometry.Entry> entries = new ArrayList<>(positionLoads.size());
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
             if (response != null)
-                entries.add(new ViewpointOrbitWorker.Entry(positionLoad, response, positionLoad.target().getTrajectoryColor(Display.whiteBackground)));
+                entries.add(new ViewpointOrbitGeometry.Entry(positionLoad, response, positionLoad.target().getTrajectoryColor(Display.whiteBackground)));
         }
-        return new ViewpointOrbitWorker.Parameters(entries, time, start, end);
+        return new ViewpointOrbitGeometry.Parameters(entries, time, start, end);
     }
 
-    private void uploadReadyOrbits(ViewpointOrbitWorker.Parameters parameters) {
-        if (readyOrbits == null)
-            return;
-
-        if (parameters.compatibleWith(readyOrbits.parameters())) {
-            orbits.upload(readyOrbits.orbitVertices());
-            planets.upload(readyOrbits.planetVertices());
-            uploadedParameters = readyOrbits.parameters();
-        }
-        readyOrbits = null;
-    }
-
-    private void orbitsReady(ViewpointOrbitWorker.Prepared prepared) {
-        readyOrbits = prepared;
-        DisplayController.display();
-    }
-
-    private void clearOrbitWorker() {
-        readyOrbits = null;
+    private void clearUploadedOrbits() {
         uploadedParameters = null;
-        orbitWorker.cancel();
+        uploadedMarkers = List.of();
+        objectNames.clear();
     }
 
-    private void spiralPutVertex(double rad, double lon, double lat, byte[] color, boolean startLine) {
-        float x = (float) (rad * Math.cos(lat) * Math.cos(lon));
-        float y = (float) (rad * Math.cos(lat) * Math.sin(lon));
-        float z = (float) (rad * Math.sin(lat));
-        if (startLine)
-            spiralBuf.startLine(x, y, z, 1, color);
-        else
-            spiralBuf.putVertex(x, y, z, 1, color);
+    private static double[][] spiralRotations() {
+        double[][] rotations = new double[SPIRAL_ARMS][2];
+        for (int i = 0; i < rotations.length; i++) {
+            double angle = i * (2 * Math.PI / SPIRAL_ARMS);
+            rotations[i][0] = Math.cos(angle);
+            rotations[i][1] = Math.sin(angle);
+        }
+        return rotations;
+    }
+
+    private int sampleSpiralArm(double[] spiralLati, int speed) {
+        double rad0 = spiralLati[0];
+        double lon0 = spiralLati[1];
+        double cosLat = Math.cos(spiralLati[2]);
+        double sinLat = Math.sin(spiralLati[2]);
+        double sr = speed * (Sun.RadiusKMeterInv / Sun.RotationRate);
+
+        int pointCount = 0;
+        // Index zero is the reference point, with radial samples on either side.
+        for (int i = -SPIRAL_DIVISIONS; i <= SPIRAL_DIVISIONS; i++) {
+            double rad = i < 0
+                    ? Sun.Radius + (rad0 - Sun.Radius) * (i + SPIRAL_DIVISIONS) / SPIRAL_DIVISIONS
+                    : rad0 + (SPIRAL_RADIUS - rad0) * i / SPIRAL_DIVISIONS;
+            if (rad > SPIRAL_RADIUS)
+                break;
+            double lon = lon0 - (rad - rad0) / sr;
+            double[] point = spiralArm[pointCount++];
+            point[0] = rad * cosLat * Math.cos(lon);
+            point[1] = rad * cosLat * Math.sin(lon);
+            point[2] = rad * sinLat;
+        }
+        return pointCount;
     }
 
     private void renderSpiral(Viewport vp, double[] spiralLati, int speed) {
-        double rad0 = spiralLati[0];
-        double lon0 = spiralLati[1];
-        double lat0 = spiralLati[2];
-
-        double sr = speed * (Sun.RadiusKMeterInv / Sun.RotationRate);
-        for (int j = 0; j < SPIRAL_ARMS; j++) {
-            double lona = lon0 + j * (2 * Math.PI / SPIRAL_ARMS); // arm longitude
-            // before control point
-            for (int i = 0; i < SPIRAL_DIVISIONS; i++) {
-                double rad = (Sun.Radius + (rad0 - Sun.Radius) * i / (double) SPIRAL_DIVISIONS);
-                if (rad > SPIRAL_RADIUS)
-                    break;
-                double lon = lona - (rad - rad0) / sr;
-                spiralPutVertex(rad, lon, lat0, spiralColor, i == 0);
-            }
-            // after control point
-            for (int i = 0; i <= SPIRAL_DIVISIONS; i++) {
-                double rad = (rad0 + (SPIRAL_RADIUS - rad0) * i / (double) SPIRAL_DIVISIONS);
-                if (rad > SPIRAL_RADIUS)
-                    break;
-                double lon = lona - (rad - rad0) / sr;
-                spiralPutVertex(rad, lon, lat0, spiralColor, false);
+        int pointCount = sampleSpiralArm(spiralLati, speed);
+        for (int arm = 0; arm < SPIRAL_ROTATIONS.length; arm++) {
+            double[] rotation = SPIRAL_ROTATIONS[arm];
+            double cos = rotation[0];
+            double sin = rotation[1];
+            byte[] color = arm == 0 ? SPIRAL_REFERENCE_COLOR : SPIRAL_SECONDARY_COLOR;
+            for (int i = 0; i < pointCount; i++) {
+                double[] point = spiralArm[i];
+                float x = (float) (point[0] * cos - point[1] * sin);
+                float y = (float) (point[0] * sin + point[1] * cos);
+                float z = (float) point[2];
+                if (i == 0)
+                    spiralBuf.startLine(x, y, z, 1, color);
+                else
+                    spiralBuf.putVertex(x, y, z, 1, color);
             }
             spiralBuf.endLine();
         }

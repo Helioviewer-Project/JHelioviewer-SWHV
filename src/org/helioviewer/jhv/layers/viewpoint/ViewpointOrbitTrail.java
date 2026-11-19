@@ -32,9 +32,9 @@ final class ViewpointOrbitTrail {
         }
     }
 
-    private record Point(long time, float x, float y, float z, double dist) {
-        Point(long _time, float[] xyzw, double _dist) {
-            this(_time, xyzw[0], xyzw[1], xyzw[2], _dist);
+    private record Point(long time, float x, float y, float z, double dist, int linearSegment) {
+        Point(long _time, float[] xyzw, double _dist, int _linearSegment) {
+            this(_time, xyzw[0], xyzw[1], xyzw[2], _dist, _linearSegment);
         }
 
         void put(float[] xyzw) {
@@ -63,24 +63,24 @@ final class ViewpointOrbitTrail {
         return response == _response && start == _start && end == _end;
     }
 
-    int vertexCount(long time) {
+    int sampleCount(long time) {
         sampleThrough(time);
-        int count = upperBound(time);
-        return count + 2 + (points.get(count - 1).time == time ? 0 : 1);
+        return upperBound(time);
     }
 
-    void putVertices(BufVertex orbitBuf, float[] currentPoint, byte[] color, long time) {
-        sampleThrough(time);
-        int count = upperBound(time);
+    int vertexCount(int sampleCount, long time) {
+        return sampleCount + 2 + (points.get(sampleCount - 1).time == time ? 0 : 1);
+    }
 
+    void putVertices(BufVertex orbitBuf, float[] currentPoint, byte[] color, int sampleCount, long time) {
         Point first = points.getFirst();
         orbitBuf.startLine(first.x, first.y, first.z, 1, color);
-        for (int i = 1; i < count; i++) {
+        for (int i = 1; i < sampleCount; i++) {
             Point point = points.get(i);
             orbitBuf.putVertex(point.x, point.y, point.z, 1, color);
         }
 
-        Point last = points.get(count - 1);
+        Point last = points.get(sampleCount - 1);
         if (last.time == time) {
             last.put(currentPoint);
         } else {
@@ -123,7 +123,15 @@ final class ViewpointOrbitTrail {
 
     private void addPoint(long t) {
         double dist = response.interpolateRectangular(t, start, end, xyz, interpolated);
-        points.add(new Point(t, xyz, dist));
+        int linearSegment = interpolated.linearSegment();
+        Point point = new Point(t, xyz, dist, linearSegment);
+        int size = points.size();
+        // Keep both ends of each straight run and the vertices on either side of a corner.
+        if (linearSegment >= 0 && size >= 2 && points.get(size - 2).linearSegment == linearSegment
+                && points.getLast().linearSegment == linearSegment)
+            points.set(size - 1, point);
+        else
+            points.add(point);
     }
 
     private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au

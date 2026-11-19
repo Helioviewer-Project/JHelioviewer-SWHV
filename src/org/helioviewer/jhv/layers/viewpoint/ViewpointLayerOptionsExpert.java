@@ -216,12 +216,14 @@ public final class ViewpointLayerOptionsExpert {
 
     public List<PositionLoad> getSelectedLoads() {
         ArrayList<PositionLoad> selectedLoads = new ArrayList<>();
-        for (SpaceObjectElement element : container.getSelectedElements()) {
+        for (SpaceObjectElement element : container.getElements()) {
+            if (!element.isSelected())
+                continue;
+
             PositionLoad load = loads.get(element);
-            if (load != null)
+            if (load != null && !load.hasFailed())
                 selectedLoads.add(load);
         }
-        selectedLoads.removeIf(PositionLoad::hasFailed);
         return selectedLoads;
     }
 

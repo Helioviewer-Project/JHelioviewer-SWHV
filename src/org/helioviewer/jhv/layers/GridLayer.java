@@ -393,7 +393,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private void updateGridColorBytes() {
-        gridColorBytes = gridAlpha == 1 ? gridColor.bytes() : Colors.bytes(gridColor.awtColor(), gridAlpha);
+        gridColorBytes = gridColor.bytes(gridAlpha);
     }
 
     private void updateLabelColors() {
