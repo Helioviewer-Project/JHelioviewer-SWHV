@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import java.util.Locale;
 import java.util.TimeZone;

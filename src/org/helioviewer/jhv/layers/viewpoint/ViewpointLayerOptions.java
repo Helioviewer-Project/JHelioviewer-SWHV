@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
@@ -28,7 +28,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         }
     }
 
-    final ViewpointSky sky;
+    private final ViewpointSky sky;
 
     private final ViewpointLayerOptionsExpert locationOptions;
     private final ViewpointLayerOptionsExpert equatorialOptions;
@@ -61,11 +61,15 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         }
     }
 
-    void serialize(JSONObject jo) {
+    public void serialize(JSONObject jo) {
         jo.put("mode", cameraMode.name());
         jo.put("camera", DisplayController.cameraToJson());
         jo.put("location", locationOptions.toJson());
         jo.put("equatorial", equatorialOptions.toJson());
+    }
+
+    public ViewpointSky getSky() {
+        return sky;
     }
 
     public CameraMode getCameraMode() {
@@ -87,7 +91,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         return equatorialOptions;
     }
 
-    void applyCurrentViewpoint(DisplayController.ViewpointApplyMode mode) {
+    public void applyCurrentViewpoint(DisplayController.ViewpointApplyMode mode) {
         DisplayController.setViewpointUpdate(createViewpointUpdate(), mode);
     }
 
@@ -111,13 +115,13 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         }
     }
 
-    void activate() {
+    public void activate() {
         Player.addTimeRangeListener(this);
         active = true;
         updateSky();
     }
 
-    void deactivate() {
+    public void deactivate() {
         Player.removeTimeRangeListener(this);
         active = false;
         updateSky();
@@ -134,11 +138,11 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         optionStateChanged(cameraMode);
     }
 
-    boolean isLocation() {
+    public boolean isLocation() {
         return cameraMode == CameraMode.Location;
     }
 
-    boolean isHeliospheric() {
+    public boolean isHeliospheric() {
         return cameraMode == CameraMode.Heliosphere;
     }
 

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,6 @@ import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.movie.Player;
@@ -35,7 +34,7 @@ import org.helioviewer.jhv.opengl.Transform;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
-final class ViewpointSky {
+public final class ViewpointSky {
 
     private static final float PLANET_SIZE = 6;
     private static final double STAR_OFFSET = 3e-3; // [rad] apparent minus catalogue star direction: proper motion 1990-2050, aberration at 192 km/s, deflection, parallax
@@ -74,11 +73,11 @@ final class ViewpointSky {
         location = _location;
     }
 
-    void init() {
+    public void init() {
         points.init();
     }
 
-    void dispose() {
+    public void dispose() {
         points.dispose();
     }
 
@@ -143,7 +142,7 @@ final class ViewpointSky {
     }
 
     // Orthographic points are shared; HPC points use each viewport's angular scale.
-    void compute(MapView mv, Viewport vp, boolean enabled) {
+    public void compute(MapView mv, Viewport vp, boolean enabled) {
         // Preserve screen hover positions while rendering captures.
         if (mv == GLRenderer.getMapView() && vp.idx == 0)
             hoverPoints.clear();
@@ -241,7 +240,7 @@ final class ViewpointSky {
         bodies.sort((a, b) -> Double.compare(b.distance(), a.distance()));
     }
 
-    void render(MapView mv) {
+    public void render(MapView mv) {
         Transform.pushView();
         if (mv.isOrthographic())
             Transform.rotateViewInverse(mv.viewRotation()); // points are in screen coordinates
@@ -321,7 +320,7 @@ final class ViewpointSky {
     }
 
     @Nullable
-    String hover(MapView mv, Viewport vp, int mouseX, int mouseY) {
+    public String hover(MapView mv, Viewport vp, int mouseX, int mouseY) {
         if (!(mv.isOrthographic() || mv.isHpc()))
             return null;
         double width = mv.cameraWidth(vp);

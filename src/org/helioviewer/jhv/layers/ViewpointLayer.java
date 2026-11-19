@@ -17,6 +17,9 @@ import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputMouseListener;
 import org.helioviewer.jhv.input.PointerEvent;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointOrbitWorker;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -88,12 +91,12 @@ public class ViewpointLayer extends AbstractLayer {
     @Override
     public void render(MapView mv, Viewport vp) {
         if (vp.idx == 0 && options.isLocation())
-            options.sky.compute(mv, vp, enabled);
+            options.getSky().compute(mv, vp, enabled);
 
         if (!enabled)
             return;
         if (options.isLocation()) {
-            options.sky.render(mv);
+            options.getSky().render(mv);
             return;
         }
         if (!options.isHeliospheric())
@@ -140,9 +143,9 @@ public class ViewpointLayer extends AbstractLayer {
     public void renderScale(MapView mv, Viewport vp) {
         if (!mv.isHpc() || !options.isLocation())
             return;
-        options.sky.compute(mv, vp, enabled);
+        options.getSky().compute(mv, vp, enabled);
         if (enabled)
-            options.sky.render(mv);
+            options.getSky().render(mv);
     }
 
     private static final int MOUSE_OFFSET_X = 25;
@@ -238,7 +241,7 @@ public class ViewpointLayer extends AbstractLayer {
     private void hoverLocation(PointerEvent e) {
         mouseX = e.x();
         mouseY = e.y();
-        String name = enabled ? options.sky.hover(GLRenderer.getMapView(), Display.getActiveViewport(), mouseX, mouseY) : null;
+        String name = enabled ? options.getSky().hover(GLRenderer.getMapView(), Display.getActiveViewport(), mouseX, mouseY) : null;
         clearHoverTextIfNeeded();
         if (name != null) {
             hoverText.add(name);
@@ -308,7 +311,7 @@ public class ViewpointLayer extends AbstractLayer {
     public void init() {
         orbits.init();
         planets.init();
-        options.sky.init();
+        options.getSky().init();
         spiral.init();
     }
 
@@ -317,7 +320,7 @@ public class ViewpointLayer extends AbstractLayer {
         clearOrbitWorker();
         orbits.dispose();
         planets.dispose();
-        options.sky.dispose();
+        options.getSky().dispose();
         spiral.dispose();
     }
 

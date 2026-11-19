@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +11,6 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -211,12 +209,12 @@ public final class ViewpointLayerOptionsExpert {
     }
 
     @Nullable
-    PositionLoad getHighlightedLoad() {
+    public PositionLoad getHighlightedLoad() {
         SpaceObjectElement element = container.getHighlightedElement();
         return element == null ? null : loads.get(element);
     }
 
-    List<PositionLoad> getSelectedLoads() {
+    public List<PositionLoad> getSelectedLoads() {
         ArrayList<PositionLoad> selectedLoads = new ArrayList<>();
         for (SpaceObjectElement element : container.getSelectedElements()) {
             PositionLoad load = loads.get(element);
@@ -247,7 +245,7 @@ public final class ViewpointLayerOptionsExpert {
         DisplayController.display();
     }
 
-    int getSpiralSpeed() {
+    public int getSpiralSpeed() {
         return spiral ? spiralSpeed : 0;
     }
 

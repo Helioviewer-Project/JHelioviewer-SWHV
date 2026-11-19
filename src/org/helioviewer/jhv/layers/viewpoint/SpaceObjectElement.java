@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers.spaceobject;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 

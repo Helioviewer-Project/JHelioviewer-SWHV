@@ -17,8 +17,8 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.dialog.TextDialog;
 import org.helioviewer.jhv.layers.ViewpointLayer;
-import org.helioviewer.jhv.layers.ViewpointLayerOptions;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
+import org.helioviewer.jhv.layers.viewpoint.SpaceObjectElement;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;

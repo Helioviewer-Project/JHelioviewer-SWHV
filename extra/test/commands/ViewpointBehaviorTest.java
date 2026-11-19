@@ -18,6 +18,8 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.UiThread;
 import org.helioviewer.jhv.time.JHVTime;

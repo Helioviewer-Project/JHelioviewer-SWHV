@@ -17,7 +17,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.gui.component.SliderValueLabel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
-import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
 
 @SuppressWarnings("serial")
 final class ViewpointLayerOptionsExpertPanel extends JPanel {

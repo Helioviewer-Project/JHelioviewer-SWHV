@@ -18,9 +18,9 @@ import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.TableValue;
-import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
+import org.helioviewer.jhv.layers.viewpoint.SpaceObjectContainer;
+import org.helioviewer.jhv.layers.viewpoint.SpaceObjectElement;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
 
 @SuppressWarnings("serial")
 final class SpaceObjectContainerPanel extends JScrollPane {

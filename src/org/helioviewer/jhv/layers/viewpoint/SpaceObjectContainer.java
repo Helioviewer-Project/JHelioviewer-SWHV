@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers.spaceobject;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import java.util.ArrayList;
 import java.util.List;

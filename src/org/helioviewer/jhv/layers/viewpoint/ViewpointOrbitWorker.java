@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.viewpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.DirectBufVertex;
 import org.helioviewer.jhv.thread.LatestWorker;
 
-final class ViewpointOrbitWorker {
+public final class ViewpointOrbitWorker {
 
     private static final float SIZE_PLANET = 5;
     private static final DirectBufVertex EMPTY_VERTICES = new DirectBufVertex(new BufVertex(0));
@@ -25,18 +25,18 @@ final class ViewpointOrbitWorker {
 
     private Parameters submittedParameters;
 
-    ViewpointOrbitWorker(@Nonnull Consumer<Prepared> _onReady) {
+    public ViewpointOrbitWorker(@Nonnull Consumer<Prepared> _onReady) {
         onReady = _onReady;
     }
 
-    void submit(Parameters parameters) {
+    public void submit(Parameters parameters) {
         if (parameters.compatibleWith(submittedParameters))
             return;
         submittedParameters = parameters;
         worker.submit(new Builder(parameters, orbitTrails), callback);
     }
 
-    void cancel() {
+    public void cancel() {
         worker.invalidate();
         submittedParameters = null;
     }
@@ -87,15 +87,15 @@ final class ViewpointOrbitWorker {
         }
     }
 
-    record Entry(PositionLoad positionLoad, PositionResponse response, byte[] color) {
+    public record Entry(PositionLoad positionLoad, PositionResponse response, byte[] color) {
     }
 
-    record Parameters(List<Entry> entries, long time, long start, long end) {
-        boolean compatibleWith(Parameters other) {
+    public record Parameters(List<Entry> entries, long time, long start, long end) {
+        public boolean compatibleWith(Parameters other) {
             return other != null && start == other.start && end == other.end && entries.equals(other.entries);
         }
     }
 
-    record Prepared(Parameters parameters, DirectBufVertex orbitVertices, DirectBufVertex planetVertices) {
+    public record Prepared(Parameters parameters, DirectBufVertex orbitVertices, DirectBufVertex planetVertices) {
     }
 }

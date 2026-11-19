@@ -24,7 +24,7 @@ JAVA_TESTS = {
     "uri": ["source.FITSReaderTest", "layers.FITSSeriesTest"],
     "commands": ["io.samp.CommandStateTest", "layers.ViewpointBehaviorTest", "display.DisplayLayoutTest", "thread.UiTimerTest"],
     "sidebar": ["layers.selector.SidebarTest", "io.DataSourcesTest", "opengl.WindowsCanvasTest"],
-    "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.LocationProjectionTest"],
+    "astronomy": ["astronomy.PositionResponseTest", "astronomy.PositionLoadTest", "astronomy.SpiceTest", "astronomy.StarsTest", "layers.viewpoint.LocationProjectionTest"],
     "model": ["io.ModelDataUriTest", "opengl.model.AssimpMetaDataTest", "opengl.model.AssimpModelLoaderTest"],
     "opengl": ["opengl.EclipseRenderingTest", "opengl.ColoredVertexRenderingTest", "opengl.ModelRenderingTest", "opengl.GLGrabRenderingTest", "opengl.GridRenderingTest", "opengl.SdfTextRenderingTest", "opengl.ImageRenderingTest", "opengl.AnnotationRenderingTest", "opengl.ContextRecoveryTest"],
 }
