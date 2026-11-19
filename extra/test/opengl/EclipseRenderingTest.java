@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +20,7 @@ import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.Stars;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
@@ -31,7 +33,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.input.InputController;
-import org.helioviewer.jhv.input.InputMouseListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.AbstractLayer;
@@ -41,6 +42,7 @@ import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.viewpoint.SpaceObjectElement;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointSky;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -88,12 +90,13 @@ public final class EclipseRenderingTest {
                 hpcDisks();
                 hpcMarkersAndHover();
                 capturePreservesHover();
+                hoverFollowsLocationMode();
                 check(!GLException.checkErrors("EclipseRenderingTest"), "Moon rendering GL errors");
             } finally {
                 renderer.destroy();
             }
         }
-        System.out.println("PASS: Orthographic and HPC eclipses, wide-field Moon/Earth limbs, stars and planets, per-viewport projection and hover, ordering, clearing and context recreation");
+        System.out.println("PASS: Orthographic and HPC eclipses, wide-field Moon/Earth limbs, stars and planets, per-viewport projection, Location hover lifecycle and capture, ordering, clearing and context recreation");
     }
 
     private static void cap() throws Exception {
@@ -599,18 +602,17 @@ public final class EclipseRenderingTest {
                 int row = (int) Math.round(scales[vp.idx].toUnitY(5) * vp.height - .5);
                 check((pixels.get(4 * (row * vp.width + col)) & 255) == 255, "HPC star projection in viewport " + vp.idx);
             }
-            InputMouseListener listener = (InputMouseListener) field(ViewpointLayer.class, "hoverListener").get(fixture.layer);
-            InputController.addListener(listener);
+            InputController.addListener(fixture.sky);
             try {
                 for (Viewport vp : viewports) {
                     int x = vp.x + (int) Math.round(scales[vp.idx].toUnitX(10) * vp.width);
                     int y = vp.yAWT + (int) Math.round((1 - scales[vp.idx].toUnitY(5)) * vp.height);
                     InputController.mouseMoved(new PointerEvent(x, y, 0, 0, false, false, false, false, false));
-                    List<String> text = (List<String>) field(ViewpointLayer.class, "hoverText").get(fixture.layer);
+                    List<String> text = (List<String>) field(ViewpointSky.class, "hoverText").get(fixture.sky);
                     check(text.size() == 1 && text.getFirst().startsWith("HIP123,"), "HPC star hover in viewport " + vp.idx);
                 }
             } finally {
-                InputController.removeListener(listener);
+                InputController.removeListener(fixture.sky);
             }
             fixture.apparentPlanets.add(load(MOON, fixture.angularVector(10, 5, 430), TIME));
             for (Viewport vp : viewports) {
@@ -675,12 +677,11 @@ public final class EclipseRenderingTest {
             MapView screen = fixture.hpcView(new MapScale[]{MapScale.hpc(5, 10)}, 1, 0, 0, Quat.ZERO);
             field(GLRenderer.class, "screenView").set(null, screen);
             GLRenderer.renderScene(screen);
-            InputMouseListener listener = (InputMouseListener) field(ViewpointLayer.class, "hoverListener").get(fixture.layer);
-            InputController.addListener(listener);
+            InputController.addListener(fixture.sky);
             try {
                 PointerEvent atMoon = new PointerEvent(112, 144, 0, 0, false, false, false, false, false);
                 InputController.mouseMoved(atMoon);
-                List<String> hover = (List<String>) field(ViewpointLayer.class, "hoverText").get(fixture.layer);
+                List<String> hover = (List<String>) field(ViewpointSky.class, "hoverText").get(fixture.sky);
                 check(hover.equals(List.of("Moon")), "Moon hover missing before capture");
                 GLGrab capture = new GLGrab(1024, 1024);
                 try {
@@ -702,7 +703,7 @@ public final class EclipseRenderingTest {
                 InputController.mouseMoved(atMoon);
                 check(hover.equals(List.of("Moon")), "Capture replaced screen hover coordinates");
             } finally {
-                InputController.removeListener(listener);
+                InputController.removeListener(fixture.sky);
             }
         } finally {
             layers.clear();
@@ -710,6 +711,31 @@ public final class EclipseRenderingTest {
             Display.mode = originalMode;
             GLRenderer.reshape(SIZE, SIZE);
             field(GLRenderer.class, "screenView").set(null, originalView);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void hoverFollowsLocationMode() throws Exception {
+        JSONObject empty = new JSONObject().put("objects", new JSONArray());
+        ViewpointLayer layer = new ViewpointLayer(new JSONObject().put("mode", "Location").put("location", empty).put("equatorial", empty));
+        ViewpointSky sky = layer.getOptions().getSky();
+        Set<?> listeners = (Set<?>) field(InputController.class, "mouseListeners").get(null);
+        List<String> hover = (List<String>) field(ViewpointSky.class, "hoverText").get(sky);
+        UpdateViewpoint originalUpdate = DisplayController.getViewpointUpdate();
+        try {
+            layer.setEnabled(true);
+            check(listeners.contains(sky), "Location did not register sky hover");
+            hover.add("Moon");
+            layer.getOptions().setCameraMode(ViewpointLayerOptions.CameraMode.Heliosphere, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+            check(!listeners.contains(sky) && hover.isEmpty(), "Location hover survived switching to Heliosphere");
+            layer.getOptions().setCameraMode(ViewpointLayerOptions.CameraMode.Location, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+            check(listeners.contains(sky) && hover.isEmpty(), "Location restored stale hover text");
+            hover.add("Moon");
+            layer.setEnabled(false);
+            check(!listeners.contains(sky) && hover.isEmpty(), "Location hover survived disabling the layer");
+        } finally {
+            layer.setEnabled(false);
+            DisplayController.setViewpointUpdate(originalUpdate, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 
@@ -721,7 +747,7 @@ public final class EclipseRenderingTest {
         private final double[][] axes;
         private final double distance;
         private final JHVTime time;
-        private final Object sky;
+        private final ViewpointSky sky;
         private final List<PositionLoad> apparentPlanets;
 
         Fixture(double[] _sun, double[] _moon, String observer) throws Exception {
@@ -738,7 +764,7 @@ public final class EclipseRenderingTest {
             JSONObject empty = new JSONObject().put("objects", new JSONArray()).put("stars", false).put("planets", true);
             layer = new ViewpointLayer(new JSONObject().put("mode", "Location").put("location", empty).put("equatorial", empty));
             options = layer.getOptions().getLocationOptions();
-            sky = field(ViewpointLayerOptions.class, "sky").get(layer.getOptions());
+            sky = layer.getOptions().getSky();
             apparentPlanets = (List<PositionLoad>) field(sky.getClass(), "apparentPlanets").get(sky);
             for (SpaceObjectElement element : options.getContainer().getElements()) {
                 if (element.getTarget() == SpaceObject.get(observer)) {

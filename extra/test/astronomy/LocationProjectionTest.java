@@ -18,7 +18,7 @@ import org.helioviewer.jhv.wcs.ObserverGeometry;
 
 import spice.basic.CSPICE;
 
-// ViewpointSky.projectLocation in J2000 against eqs. (3), (6) of Skokić in the Carrington frame, occultation, solar pole
+// ViewpointSky projection in J2000 against eqs. (3), (6) of Skokić in the Carrington frame, occultation, solar pole
 public class LocationProjectionTest {
 
     private static final double AU = 149_597_870.7;
@@ -50,18 +50,19 @@ public class LocationProjectionTest {
 
     private static void hpcProjection() {
         double[] sun = {0, 0, 1}, north = {0, 1, 0}, west = {1, 0, 0};
+        ViewpointSky.Projection projection = new ViewpointSky.Projection(MapMode.HPC, 215, 215);
         for (double longitude : new double[]{-179, -100, -90, -45, 0, 45, 90, 100, 179}) {
             for (double latitude : new double[]{-80, -10, 0, 10, 80}) {
                 double lon = Math.toRadians(longitude), lat = Math.toRadians(latitude);
                 double[] v = {Math.sin(lon) * Math.cos(lat), Math.sin(lat), Math.cos(lon) * Math.cos(lat)};
-                Vec2 projected = ViewpointSky.projectLocation(v, false, sun, north, west, 215, 215, MapMode.HPC);
+                Vec2 projected = projection.project(v, false, sun, north, west);
                 check(projected != null && Math.abs(projected.x - longitude) < 1e-10 && Math.abs(projected.y - latitude) < 1e-10,
                         "HPC apparent direction " + longitude + "," + latitude);
             }
         }
-        check(ViewpointSky.projectLocation(new double[]{0, 0, 430}, false, sun, north, west, 215, 215, MapMode.HPC) == null,
+        check(projection.project(new double[]{0, 0, 430}, false, sun, north, west) == null,
                 "HPC background planet visible through the Sun");
-        check(ViewpointSky.projectLocation(new double[]{0, 0, 1}, true, sun, north, west, 215, 215, MapMode.HPC) == null,
+        check(projection.project(new double[]{0, 0, 1}, true, sun, north, west) == null,
                 "HPC star visible through the Sun");
     }
 
@@ -92,7 +93,7 @@ public class LocationProjectionTest {
         double sunDistance = Math.sqrt(dot(sun, sun));
         double[] z = sun.clone(), north = new double[3], west = new double[3];
         ViewpointSky.helioprojectiveAxes(z, sunDistance, pole, north, west);
-        return ViewpointSky.projectLocation(v, beyondSun, z, north, west, sunDistance, distance, MapMode.Orthographic);
+        return new ViewpointSky.Projection(MapMode.Orthographic, distance, sunDistance).project(v, beyondSun, z, north, west);
     }
 
     // helioprojective from spherical coordinates, https://celestialscenes.com/alma/convert/coordconvert.pdf eqs. (3), (6)

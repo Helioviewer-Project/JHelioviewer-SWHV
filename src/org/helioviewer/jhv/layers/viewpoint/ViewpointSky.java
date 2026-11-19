@@ -22,6 +22,9 @@ import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.InputMouseListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.movie.Player;
@@ -30,13 +33,15 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLEclipseShader;
 import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.Transform;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
-public final class ViewpointSky {
+public final class ViewpointSky implements InputMouseListener {
 
     private static final float PLANET_SIZE = 6;
+    private static final int HOVER_OFFSET = 25;
     private static final double STAR_OFFSET = 3e-3; // [rad] apparent minus catalogue star direction: proper motion 1990-2050, aberration at 192 km/s, deflection, parallax
     static final double[] SOLAR_POLE = solarPole(Math.toRadians(286.13), Math.toRadians(63.87)); // J2000, BODY10_POLE_RA/DEC in pck00011.tpc
 
@@ -59,6 +64,8 @@ public final class ViewpointSky {
     private int starCount;
     private final List<Body> bodies = new ArrayList<>();
     private final List<HoverPoint> hoverPoints = new ArrayList<>();
+    private final List<String> hoverText = new ArrayList<>(1);
+    private int mouseX, mouseY;
     private final double[] vector = new double[3];
     private final double[] point = new double[3];
     private final double[] sun = new double[3];
@@ -85,6 +92,13 @@ public final class ViewpointSky {
         if (active == _active)
             return;
         active = _active;
+        if (active) {
+            InputController.addListener(this);
+        } else {
+            InputController.removeListener(this);
+            hoverPoints.clear();
+            hoverText.clear();
+        }
         reload();
     }
 
@@ -142,16 +156,14 @@ public final class ViewpointSky {
     }
 
     // Orthographic points are shared; HPC points use each viewport's angular scale.
-    public void compute(MapView mv, Viewport vp, boolean enabled) {
+    public void compute(MapView mv, Viewport vp) {
         // Preserve screen hover positions while rendering captures.
         if (mv == GLRenderer.getMapView() && vp.idx == 0)
             hoverPoints.clear();
         starCount = 0;
         bodies.clear();
-        if (enabled)
-            putSky(mv, vp);
-        points.upload(pointBuffer);
-        pointBuffer.clear();
+        putSky(mv, vp);
+        points.uploadAndClear(pointBuffer);
     }
 
     private void putSky(MapView mv, Viewport vp) {
@@ -167,6 +179,7 @@ public final class ViewpointSky {
         long time = Player.getTime().milli, start = Player.getStartTime(), end = Player.getEndTime();
         double sunDistance = sunResponse.interpolateRectangular(time, start, end, sun, interpolated);
         helioprojectiveAxes(sun, sunDistance, SOLAR_POLE, north, west);
+        Projection projection = new Projection(mv.mode(), viewpoint.distance, sunDistance);
 
         PositionResponse state = observerState == null ? null : observerState.getResponse();
         PositionResponse helioResponse = heliocentric == null ? null : heliocentric.getResponse();
@@ -210,7 +223,7 @@ public final class ViewpointSky {
                     continue;
                 double[] apparent = Stars.apparent(star, years, ssb, helio, helioDistance, velocity);
                 float size = (float) Math.clamp(5 - 0.28 * star.mag(), 2.5, 5.5);
-                putPoint(star, projectLocation(apparent, true, sun, north, west, sunDistance, viewpoint.distance, mv.mode()), mv, vp, size, color);
+                putPoint(star, projection.project(apparent, true, sun, north, west), mv, vp, size, color);
             }
         }
         starCount = pointBuffer.getCount();
@@ -220,19 +233,17 @@ public final class ViewpointSky {
             if (response == null)
                 continue;
             double objectDistance = response.interpolateRectangular(time, start, end, vector, interpolated);
-            Vec2 center = projectLocation(vector, false, sun, north, west, sunDistance, viewpoint.distance, mv.mode());
-            if (center == null && objectDistance >= sunDistance)
+            double z = dot(vector, sun);
+            boolean hidden = projection.isHidden(z, objectDistance, false);
+            if (hidden && objectDistance >= sunDistance)
                 continue;
+            double x = dot(vector, west);
+            double y = dot(vector, north);
+            Vec2 center = hidden ? null : projection.project(x, y, z);
             SpaceObject target = load.target();
             int pointIndex = pointBuffer.getCount();
             putPoint(load, center, mv, vp, PLANET_SIZE, target.getTrajectoryColor(Display.whiteBackground));
             double sinRadius = objectDistance < sunDistance ? target.getRadius() / objectDistance : 0;
-            double x = 0, y = 0, z = 0;
-            for (int i = 0; i < 3; i++) {
-                x += vector[i] * west[i];
-                y += vector[i] * north[i];
-                z += vector[i] * sun[i];
-            }
             Vec3 direction = new Vec3(x / objectDistance, y / objectDistance, z / objectDistance);
             bodies.add(new Body(direction, objectDistance, sinRadius * sinRadius,
                     target.getEclipseColor(Display.whiteBackground), pointIndex, pointBuffer.getCount() - pointIndex));
@@ -303,24 +314,66 @@ public final class ViewpointSky {
         west[2] = sun[0] * north[1] - sun[1] * north[0];
     }
 
-    // Apparent angular position in HPC, or position on the Sun plane in Orthographic mode.
-    @Nullable
-    static Vec2 projectLocation(double[] v, boolean beyondSun, double[] sun, double[] north, double[] west, double sunDistance, double distance, MapMode mode) {
-        double z = v[0] * sun[0] + v[1] * sun[1] + v[2] * sun[2];
-        if (mode == MapMode.Orthographic && z <= 0)
-            return null;
-        double r = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-        if ((beyondSun || r > sunDistance) && z * sunDistance > r * Math.sqrt(sunDistance * sunDistance - Sun.Radius * Sun.Radius)) // cos(sep) > cos(solar angular radius)
-            return null;
-        double x = v[0] * west[0] + v[1] * west[1] + v[2] * west[2];
-        double y = v[0] * north[0] + v[1] * north[1] + v[2] * north[2];
-        if (mode == MapMode.HPC)
-            return new Vec2(Math.toDegrees(Math.atan2(x, z)), Math.toDegrees(Math.atan2(y, Math.hypot(x, z))));
-        return new Vec2(distance * x / z, distance * y / z);
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    record Projection(MapMode mode, double viewpointDistance, double sunDistance, double limbDistance) {
+        Projection(MapMode mode, double viewpointDistance, double sunDistance) {
+            this(mode, viewpointDistance, sunDistance, Math.sqrt(sunDistance * sunDistance - Sun.Radius * Sun.Radius));
+        }
+
+        boolean isHidden(double z, double objectDistance, boolean beyondSun) {
+            if (mode == MapMode.Orthographic && z <= 0)
+                return true;
+            // cos(separation) > cos(solar angular radius)
+            return (beyondSun || objectDistance > sunDistance) && z * sunDistance > objectDistance * limbDistance;
+        }
+
+        @Nullable
+        Vec2 project(double[] v, boolean beyondSun, double[] sun, double[] north, double[] west) {
+            double z = dot(v, sun);
+            if (isHidden(z, Math.sqrt(dot(v, v)), beyondSun))
+                return null;
+            return project(dot(v, west), dot(v, north), z);
+        }
+
+        // Apparent angles in HPC, or a position on the Sun plane in Orthographic mode.
+        Vec2 project(double x, double y, double z) {
+            if (mode == MapMode.HPC)
+                return new Vec2(Math.toDegrees(Math.atan2(x, z)), Math.toDegrees(Math.atan2(y, Math.hypot(x, z))));
+            return new Vec2(viewpointDistance * x / z, viewpointDistance * y / z);
+        }
+    }
+
+    public void renderHover(Viewport vp) {
+        GLText.drawTextFloat(vp, hoverText, mouseX + HOVER_OFFSET, mouseY + HOVER_OFFSET);
+    }
+
+    @Override
+    public void mouseMoved(PointerEvent e) {
+        mouseX = e.x();
+        mouseY = e.y();
+        MapView mv = GLRenderer.getMapView();
+        setHoverText(mv == null ? null : hover(mv, Display.getActiveViewport(), mouseX, mouseY));
+    }
+
+    @Override
+    public void mouseExited(PointerEvent e) {
+        setHoverText(null);
+    }
+
+    private void setHoverText(@Nullable String name) {
+        if (name == null && hoverText.isEmpty())
+            return;
+        hoverText.clear();
+        if (name != null)
+            hoverText.add(name);
+        DisplayController.display();
     }
 
     @Nullable
-    public String hover(MapView mv, Viewport vp, int mouseX, int mouseY) {
+    private String hover(MapView mv, Viewport vp, int mouseX, int mouseY) {
         if (!(mv.isOrthographic() || mv.isHpc()))
             return null;
         double width = mv.cameraWidth(vp);

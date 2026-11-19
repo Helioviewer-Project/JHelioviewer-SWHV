@@ -14,21 +14,17 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
-import org.helioviewer.jhv.input.InputController;
-import org.helioviewer.jhv.input.InputMouseListener;
-import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointObjectNames;
 import org.helioviewer.jhv.layers.viewpoint.ViewpointOrbitGeometry;
+import org.helioviewer.jhv.layers.viewpoint.ViewpointSky;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
-import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.Transform;
 
 import org.json.JSONObject;
@@ -60,19 +56,6 @@ public class ViewpointLayer extends AbstractLayer {
     private final PositionResponse.Interpolated latiInterpolated = new PositionResponse.Interpolated();
 
     private final ViewpointLayerOptions options;
-    private final HoverListener hoverListener = new HoverListener();
-
-    private final class HoverListener implements InputMouseListener {
-        @Override
-        public void mouseMoved(PointerEvent e) {
-            handleMouseMoved(e);
-        }
-
-        @Override
-        public void mouseExited(PointerEvent e) {
-            handleMouseExited();
-        }
-    }
 
     public ViewpointLayer(JSONObject jo) {
         options = new ViewpointLayerOptions(jo);
@@ -81,13 +64,13 @@ public class ViewpointLayer extends AbstractLayer {
     @Override
     public void render(MapView mv, Viewport vp) {
         objectNames.clear();
-        if (vp.idx == 0 && options.isLocation())
-            options.getSky().compute(mv, vp, enabled);
-
         if (!enabled)
             return;
         if (options.isLocation()) {
-            options.getSky().render(mv);
+            ViewpointSky sky = options.getSky();
+            if (vp.idx == 0)
+                sky.compute(mv, vp);
+            sky.render(mv);
             return;
         }
         if (!options.isHeliospheric())
@@ -141,17 +124,12 @@ public class ViewpointLayer extends AbstractLayer {
     @Override
     public void renderScale(MapView mv, Viewport vp) {
         objectNames.clear();
-        if (!mv.isHpc() || !options.isLocation())
+        if (!enabled || !mv.isHpc() || !options.isLocation())
             return;
-        options.getSky().compute(mv, vp, enabled);
-        if (enabled)
-            options.getSky().render(mv);
+        ViewpointSky sky = options.getSky();
+        sky.compute(mv, vp);
+        sky.render(mv);
     }
-
-    private static final int MOUSE_OFFSET_X = 25;
-    private static final int MOUSE_OFFSET_Y = 25;
-    private final List<String> hoverText = new ArrayList<>();
-    private int mouseX, mouseY;
 
     private static double temperedPointFactor(MapView mv, Viewport vp) {
         double markerScale = Math.max(1, vp.height / 1024f);
@@ -168,38 +146,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void renderFullFloat(Viewport vp) {
-        if (!enabled || !options.isLocation())
-            return;
-        GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
-    }
-
-    private void clearHoverTextIfNeeded() {
-        if (!hoverText.isEmpty()) {
-            hoverText.clear();
-            DisplayController.display();
-        }
-    }
-
-    private void handleMouseMoved(PointerEvent e) {
-        if (options.isLocation())
-            hoverLocation(e);
-        else
-            clearHoverTextIfNeeded();
-    }
-
-    private void hoverLocation(PointerEvent e) {
-        mouseX = e.x();
-        mouseY = e.y();
-        String name = enabled ? options.getSky().hover(GLRenderer.getMapView(), Display.getActiveViewport(), mouseX, mouseY) : null;
-        clearHoverTextIfNeeded();
-        if (name != null) {
-            hoverText.add(name);
-            DisplayController.display();
-        }
-    }
-
-    private void handleMouseExited() {
-        clearHoverTextIfNeeded();
+        options.getSky().renderHover(vp);
     }
 
     @Override
@@ -212,13 +159,10 @@ public class ViewpointLayer extends AbstractLayer {
         super.setEnabled(_enabled && options.getCameraMode() != ViewpointLayerOptions.CameraMode.Observer);
 
         if (enabled) {
-            InputController.addListener(hoverListener);
             options.activate();
             options.applyCurrentViewpoint(mode);
         } else {
-            hoverText.clear();
             clearUploadedOrbits();
-            InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
                 DisplayController.setViewpointUpdate(UpdateViewpoint.observer, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
